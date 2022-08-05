@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Relecloud.Mocks.TicketManagementService": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 5861"
+    }
+  }
+}

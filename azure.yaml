@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://azuresdkreleasepreview.blob.core.windows.net/azd/schema/azure.yaml.json
+
+name: rc-reference
+services:
+  web:
+    project: src/Relecloud.Web
+    language: csharp
+    host: appservice
+  api:
+    project: src/Relecloud.Web.Api
+    language: csharp
+    host: appservice

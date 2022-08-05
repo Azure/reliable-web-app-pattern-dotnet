@@ -1,0 +1,184 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Azure Functions OpenAPI Extension",
+    "version": "1.0.0"
+  },
+  "host": "relecloudconcerts-ticketmanagement-app.azurewebsites.net",
+  "basePath": "/api",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/CountAvailableTicketsFunction": {
+      "get": {
+        "tags": [
+          "TicketManagementServices"
+        ],
+        "operationId": "CountAvailableTickets",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "concertId",
+            "description": "A uniqueIdentifierForAConcert",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The status of the operation",
+            "schema": {
+              "$ref": "#/definitions/countAvailableTicketsResult"
+            }
+          }
+        },
+        "security": [
+          {
+            "function_key": [ ]
+          }
+        ]
+      }
+    },
+    "/HaveTicketsBeenSoldFunction": {
+      "get": {
+        "tags": [
+          "TicketManagementServices"
+        ],
+        "operationId": "HaveTicketsBeenSold",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "concertId",
+            "description": "A uniqueIdentifierForAConcert",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The status of the operation",
+            "schema": {
+              "$ref": "#/definitions/haveTicketsBeenSoldResult"
+            }
+          }
+        },
+        "security": [
+          {
+            "function_key": [ ]
+          }
+        ]
+      }
+    },
+    "/ReserveTicketsFunction": {
+      "get": {
+        "tags": [
+          "TicketManagementServices"
+        ],
+        "operationId": "ReserveTickets",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "concertId",
+            "description": "A uniqueIdentifier for a Concert",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "description": "A uniqueIdentifier for a User",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "ticketCount",
+            "description": "Number of tickets to reserve",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The status of the operation",
+            "schema": {
+              "$ref": "#/definitions/reserveTicketsResult"
+            }
+          }
+        },
+        "security": [
+          {
+            "function_key": [ ]
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "countAvailableTicketsResult": {
+      "type": "object",
+      "properties": {
+        "countOfAvailableTickets": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "haveTicketsBeenSoldResult": {
+      "type": "object",
+      "properties": {
+        "haveTicketsBeenSold": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "reserveTicketsResult": {
+      "type": "object",
+      "properties": {
+        "ticketNumbers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "format": "int32",
+          "default": 0,
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "type": "integer"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "function_key": {
+      "type": "apiKey",
+      "name": "code",
+      "in": "query"
+    }
+  }
+}

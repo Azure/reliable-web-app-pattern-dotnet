@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Relecloud</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="//ajax.aspnetcdn.com/ajax/jquery.ui/1.12.1/themes/redmond/jquery-ui.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Relecloud.Web.styles.css" asp-append-version="true" />
+
+    <!-- Bootstrap Font Icon CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Relecloud</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Concert" asp-action="Index">Upcoming</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">Cart</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Ticket" asp-action="Index">Tickets</a>
+                        </li>
+                        <li class="nav-item">
+                            <form class="navbar-form navbar-left" asp-controller="Concert" asp-action="Search" method="get">
+                                <div class="d-inline-block align-middle">
+                                    <input type="text" id="query" name="query" class="form-control" placeholder="Search concerts">
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="bi bi-search" aria-hidden="true"></i></button>
+                            </form>
+                        </li>
+                    </ul>
+                    
+                    <ul class="navbar-nav navbar-right">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li><a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="EditProfile">Hello @User.Identity.Name!</a></li>
+                            <li><a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">Sign out</a></li>
+                        }
+                        else
+                        {
+                            <li><a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignIn">Sign in</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; @DateTime.Now.Year Microsoft
+            &middot;
+            This site is used only for demonstration purposes, no rights may be derived from it
+            &middot;
+            <a href="https://privacy.microsoft.com/en-us/privacystatement">Privacy &amp; Cookies</a>
+            &middot;
+            <a href="http://go.microsoft.com/fwlink/?LinkID=206977">Terms of Use</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
