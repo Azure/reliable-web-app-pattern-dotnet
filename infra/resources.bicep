@@ -5,6 +5,7 @@ param resourceToken string
 param tags object
 
 
+// temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
 resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'app_config_svc_purge'
   location: location
@@ -501,6 +502,7 @@ resource privateDnsZoneName_privateDnsZoneName_link 'Microsoft.Network/privateDn
     }
   }
 }
+
 resource pvtendpointdnsgroupname 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
   name: '${privateEndpoint.name}/mydnsgroupname'
   properties: {
