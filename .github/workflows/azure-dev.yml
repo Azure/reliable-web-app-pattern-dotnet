@@ -2,8 +2,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
-      - 'kschlobohm/**'
+      - 'dev/**'
   pull_request:
     branches:
       - main
