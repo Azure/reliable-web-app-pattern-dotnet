@@ -4,7 +4,9 @@ param principalId string = ''
 param resourceToken string
 param tags object
 
+var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(environmentName),'prod')
 
+// temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
 resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'app_config_svc_purge'
   location: location
@@ -46,9 +48,8 @@ resource appConfigRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-0
   }
 }
 
-
 resource kv 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
-  name: '${resourceToken}-kv' // keyvault name cannot start with a number
+  name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
   location: location
   properties: {
     sku: {
@@ -299,12 +300,14 @@ resource appConfigSvc 'Microsoft.AppConfiguration/configurationStores@2022-05-01
   ]
 }
 
+var appServicePlanSku = (isProd) ?  'P1v2' : 'B1'
+
 resource webAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${resourceToken}-web-plan'
   location: location
   tags: tags
   sku: {
-    name: 'B1'
+    name: appServicePlanSku
   }
 }
 
@@ -313,7 +316,124 @@ resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   location: location
   tags: tags
   sku: {
-    name: 'B1'
+    name: appServicePlanSku
+  }
+}
+
+resource webAppScaleRule 'Microsoft.Insights/autoscalesettings@2021-05-01-preview' = if (isProd) {
+  name: '${resourceToken}-web-plan-autoscale'
+  location: location
+  properties: {
+    targetResourceUri: webAppServicePlan.id
+    enabled: true
+    profiles: [
+      {
+        name: 'Auto created scale condition'
+        capacity: {
+          maximum: '10'
+          default: '1'
+          minimum: '1'
+        }
+        rules: [
+          {
+            metricTrigger: {
+              metricResourceUri: webAppServicePlan.id
+              metricName: 'CpuPercentage'
+              timeGrain: 'PT5M'
+              statistic: 'Average'
+              timeWindow: 'PT10M'
+              timeAggregation: 'Average'
+              operator: 'GreaterThan'
+              threshold: scaleOutThreshold
+            }
+            scaleAction: {
+              direction: 'Increase'
+              type: 'ChangeCount'
+              value: string(1)
+              cooldown: 'PT10M'
+            }
+          }
+          {
+            metricTrigger: {
+              metricResourceUri: webAppServicePlan.id
+              metricName: 'CpuPercentage'
+              timeGrain: 'PT5M'
+              statistic: 'Average'
+              timeWindow: 'PT10M'
+              timeAggregation: 'Average'
+              operator: 'LessThan'
+              threshold: scaleInThreshold
+            }
+            scaleAction: {
+              direction: 'Decrease'
+              type: 'ChangeCount'
+              value: string(1)
+              cooldown: 'PT10M'
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+
+var scaleOutThreshold = 85
+var scaleInThreshold = 60
+
+resource apiAppScaleRule 'Microsoft.Insights/autoscalesettings@2014-04-01' = {
+  name: '${resourceToken}-api-plan-autoscale'
+  location: location
+  properties: {
+    targetResourceUri: apiAppServicePlan.id
+    enabled: true
+    profiles: [
+      {
+        name: 'Auto created scale condition'
+        capacity: {
+          minimum: string(1)
+          maximum: string(10)
+          default: string(1)
+        }
+        rules: [
+          {
+            metricTrigger: {
+              metricResourceUri: apiAppServicePlan.id
+              metricName: 'CpuPercentage'
+              timeGrain: 'PT5M'
+              statistic: 'Average'
+              timeWindow: 'PT10M'
+              timeAggregation: 'Average'
+              operator: 'GreaterThan'
+              threshold: scaleOutThreshold
+            }
+            scaleAction: {
+              direction: 'Increase'
+              type: 'ChangeCount'
+              value: string(1)
+              cooldown: 'PT10M'
+            }
+          }
+          {
+            metricTrigger: {
+              metricResourceUri: apiAppServicePlan.id
+              metricName: 'CpuPercentage'
+              timeGrain: 'PT5M'
+              statistic: 'Average'
+              timeWindow: 'PT10M'
+              timeAggregation: 'Average'
+              operator: 'LessThan'
+              threshold: scaleInThreshold
+            }
+            scaleAction: {
+              direction: 'Decrease'
+              type: 'ChangeCount'
+              value: string(1)
+              cooldown: 'PT10M'
+            }
+          }
+        ]
+      }
+    ]
   }
 }
 
@@ -368,15 +488,19 @@ resource apiApplicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
+var redisCacheSkuName = isProd ? 'Standard' : 'Basic'
+var redisCacheFamilyName = isProd ? 'C' : 'C'
+var redisCacheCapacity = isProd ? 0 : 0
+
 resource redisCache 'Microsoft.Cache/Redis@2019-07-01' = {
   name: '${resourceToken}-rediscache'
   location: location
   tags: tags
   properties: {
     sku: {
-      name: 'Basic'
-      family: 'C'
-      capacity: 0
+      name: redisCacheSkuName
+      family: redisCacheFamilyName
+      capacity: redisCacheCapacity
     }
   }
 }
@@ -396,21 +520,34 @@ resource sqlServer 'Microsoft.Sql/servers@2021-11-01-preview' = {
   }
 }
 
+
 var sqlCatalogName = '${resourceToken}-sql-database'
+var skuTierName = isProd ? 'Premium' : 'Standard'
+var dtuCapacity = isProd ? 125 : 10
+var requestedBackupStorageRedundancy = isProd ? 'Geo' : 'Local'
+var readScale = isProd ? 'Enabled' : 'Disabled'
+
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
   name: '${sqlServer.name}/${sqlCatalogName}'
   location: location
   sku: {
-    name: 'Standard'
-    tier: 'Standard'
+    name: skuTierName
+    tier: skuTierName
+    capacity: dtuCapacity
+  }
+  properties: {
+    requestedBackupStorageRedundancy: requestedBackupStorageRedundancy
+    readScale: readScale
   }
 }
+
+var storageSku = isProd ? 'Standard_ZRS' : 'Standard_LRS'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
   name: '${resourceToken}storage' //storage account name cannot contain '-'
   location: location
   sku: {
-    name: 'Standard_LRS'
+    name: storageSku
   }
   kind: 'StorageV2'
 
@@ -501,6 +638,7 @@ resource privateDnsZoneName_privateDnsZoneName_link 'Microsoft.Network/privateDn
     }
   }
 }
+
 resource pvtendpointdnsgroupname 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
   name: '${privateEndpoint.name}/mydnsgroupname'
   properties: {
