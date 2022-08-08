@@ -22,10 +22,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo "Inputs"
-echo "----------------------------------------------"
-echo "resourceToken=$resourceToken"
-echo ""
+echo -e "Inputs\n"
+echo -e "----------------------------------------------\n"
+echo -e "resourceToken=$resourceToken\n"
+echo -e "\n"
 
 deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?starts_with(name, '$resourceToken')].name" -o tsv)
 
