@@ -4,10 +4,6 @@ param principalId string = ''
 param resourceToken string
 param tags object
 
-// used to force deployment scripts to re-run
-// https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deployment-script-bicep#run-script-more-than-once
-param uniqueGuidValue string = newGuid()
-
 var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(environmentName),'prod')
 
 // Managed Identity
