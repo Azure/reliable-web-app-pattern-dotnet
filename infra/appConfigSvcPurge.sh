@@ -34,7 +34,6 @@ deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?configurationStor
 if [[ ${#deletedAppConfigSvcName} -gt 0 ]]; then
   az appconfig purge --name $deletedAppConfigSvcName --yes
   echo "Purged $deletedAppConfigSvcName"  
-  sleep 3 # give Azure some time to propagate this event
 else
    echo "Nothing to purge"
 fi
