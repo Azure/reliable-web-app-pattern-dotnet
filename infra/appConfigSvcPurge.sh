@@ -6,8 +6,8 @@ POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --resource-group|-g)
-      resourceGroup="$2"
+    --appcfgname)
+      appcfgname="$2"
       shift # past argument
       shift # past value
       ;;
@@ -24,10 +24,10 @@ done
 
 echo -e "Inputs\n"
 echo -e "----------------------------------------------\n"
-echo -e "resourceGroup=$resourceGroup\n"
+echo -e "appcfgname=$appcfgname\n"
 echo -e "\n"
 
-deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?configurationStoreId.contains(@,'$resourceGroup')].name" -o tsv)
+deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?name=='$appcfgname'].name" -o tsv)
 
 if [[ ${#deletedAppConfigSvcName} -gt 0 ]]; then
   az appconfig purge --name $deletedAppConfigSvcName --yes
@@ -36,6 +36,3 @@ if [[ ${#deletedAppConfigSvcName} -gt 0 ]]; then
 else
   echo "Nothing to purge"
 fi
-
-echo "Purged $appcfgname"  
-sleep 3 # give Azure some time to propagate this event

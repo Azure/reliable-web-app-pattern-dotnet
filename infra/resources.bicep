@@ -10,24 +10,56 @@ param uniqueGuidValue string = newGuid()
 
 var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(environmentName),'prod')
 
+// Managed Identity
+@description('A user-assigned managed identity that is used by the App Service app to communicate with a storage account.')
+resource operationalMI 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+  name: 'ops-${resourceToken}-identity'
+  location: location
+  tags: tags
+}
+
+@description('Built in \'Contributor\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+var contributorRole = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+
+@description('Grant the \'Contributor\' role to the user-assigned managed identity, at the scope of the resource group.')
+resource operationalRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(contributorRole, operationalMI.id, resourceToken)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
+    principalId: managedIdentity.properties.principalId
+    description: 'Grant the "Contributor" role to the user-assigned managed identity so it can perform deploymentScripts.'
+  }
+}
+
 // temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
 var appConfigName='${resourceToken}-appconfig'
-// resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-//   name: 'app_config_svc_purge'
-//   location: location
-//   kind:'AzureCLI'
-//   properties: {
-//     azCliVersion: '2.37.0'
-//     retentionInterval: 'P1D'
-//     forceUpdateTag: uniqueGuidValue //forces this script to run everytime
-//     scriptContent: loadTextContent('appConfigSvcPurge.sh')
-//     arguments:'--appcfgname \'${appConfigName}\''
-//   }
-// }
+resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'app_config_svc_purge'
+  location: location
+  kind:'AzureCLI'
+  identity:{
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${operationalMI.id}': {} 
+    }
+  }
+  properties: {
+    azCliVersion: '2.37.0'
+    retentionInterval: 'P1D'
+    forceUpdateTag: uniqueGuidValue //forces this script to run everytime
+    scriptContent: loadTextContent('appConfigSvcPurge.sh')
+    arguments:'--appcfgname \'${appConfigName}\''
+  }
+  dependsOn:[
+    operationalRoleAssignment
+  ]
+}
 
 
 // Managed Identity
-@description('A user-assigned managed identity that is used by the App Service app to communicate with a storage account.')
+@description('A user-assigned managed identity that is used by the App Service app.')
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
   name: 'web-${resourceToken}-identity'
   location: location
@@ -47,7 +79,7 @@ resource appConfigRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-0
     principalType: 'ServicePrincipal'
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
     principalId: managedIdentity.properties.principalId
-    description: 'Grant the "Data Reader" role to the user-assigned managed identity so it can access the storage account.'
+    description: 'Grant the "Data Reader" role to the user-assigned managed identity so it can access the azure app configuration service.'
   }
 }
 

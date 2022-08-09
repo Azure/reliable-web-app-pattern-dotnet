@@ -17,47 +17,26 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
-      - name: Purge App Config Svc
-        run: |
-          resourceGroup='${{ secrets.AZURE_ENV_NAME }}'
-          echo "Inputs"
-          echo "----------------------------------------------"
-          echo "resourceGroup=$resourceGroup"
-          echo ""
+      - name: Azure Dev Provision
+        run: azd provision --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-          deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?configurationStoreId.contains(@,'$resourceGroup-rg')].name" -o tsv)
+      - name: Azure Dev Deploy
+        run: azd deploy --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-          if [[ ${#deletedAppConfigSvcName} -gt 0 ]]; then
-            az appconfig purge --name $deletedAppConfigSvcName --yes
-            echo "Purged $deletedAppConfigSvcName"  
-            sleep 3 # give Azure some time to propagate this event
-          else
-            echo "Nothing to purge"
-          fi
+      - name: Quality Assurance
+        run: echo 'TODO - perform test automation here'
 
-          sleep 3 # give Azure some time to propagate this event
-
-      # - name: Azure Dev Provision
-      #   run: azd provision --no-prompt
-      #   env:
-      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      # - name: Azure Dev Deploy
-      #   run: azd deploy --no-prompt
-      #   env:
-      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      # - name: Quality Assurance
-      #   run: echo 'TODO - perform test automation here'
-
-      # - name: Azure Dev Down
-      #   run: azd down --force --purge --no-prompt
-      #   env:
-      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Azure Dev Down
+        run: azd down --force --purge --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
