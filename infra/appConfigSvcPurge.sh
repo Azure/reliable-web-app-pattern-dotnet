@@ -22,10 +22,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo -e "Inputs\n"
-echo -e "----------------------------------------------\n"
-echo -e "appcfgname=$appcfgname\n"
-echo -e "\n"
+echo "Inputs"
+echo "----------------------------------------------"
+echo "appcfgname=$appcfgname"
+echo "----------------------------------------------"
 
 deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?name=='$appcfgname'].name" -o tsv)
 
