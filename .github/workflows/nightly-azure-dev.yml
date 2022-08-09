@@ -17,26 +17,33 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Azure Dev Provision
-        run: azd provision --no-prompt
+      - name: Purge App Cfg Svc
+        run: az appconfig purge --name azj5cfvdzwfr2-appconfig
         env:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Azure Dev Deploy
-        run: azd deploy --no-prompt
-        env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # - name: Azure Dev Provision
+      #   run: azd provision --no-prompt
+      #   env:
+      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Quality Assurance
-        run: echo 'TODO - perform test automation here'
+      # - name: Azure Dev Deploy
+      #   run: azd deploy --no-prompt
+      #   env:
+      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Azure Dev Down
-        run: azd down --force --purge --no-prompt
-        env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # - name: Quality Assurance
+      #   run: echo 'TODO - perform test automation here'
+
+      # - name: Azure Dev Down
+      #   run: azd down --force --purge --no-prompt
+      #   env:
+      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
