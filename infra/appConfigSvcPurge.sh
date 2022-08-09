@@ -27,6 +27,6 @@ echo -e "----------------------------------------------\n"
 echo -e "appcfgname=$appcfgname\n"
 echo -e "\n"
 
-az appconfig purge --name appcfgname --yes 2> /dev/null
+az appconfig purge --name $appcfgname --yes 2> /dev/null
 echo "Purged $appcfgname"  
 sleep 3 # give Azure some time to propagate this event
