@@ -17,6 +17,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
       - name: Azure Dev Provision
         run: |
           # find all deleted app configurations related to the resource group for this workflow
@@ -25,26 +26,26 @@ jobs:
           # allow this event to propagate
           sleep 3
 
-      # - name: Azure Dev Provision
-      #   run: azd provision --no-prompt
-      #   env:
-      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Azure Dev Provision
+        run: azd provision --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # - name: Azure Dev Deploy
-      #   run: azd deploy --no-prompt
-      #   env:
-      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Azure Dev Deploy
+        run: azd deploy --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # - name: Quality Assurance
-      #   run: echo 'TODO - perform test automation here'
+      - name: Quality Assurance
+        run: echo 'TODO - perform test automation here'
 
-      # - name: Azure Dev Down
-      #   run: azd down --force --purge --no-prompt
-      #   env:
-      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Azure Dev Down
+        run: azd down --force --purge --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
