@@ -17,12 +17,6 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
-      - name: Purge App Configuration Service
-        run: |
-          chmod +x ./infra/appConfigSvcPurge.sh
-          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}nightly-rg
-
       - name: Azure Dev Provision
         run: azd provision --no-prompt
         env:
