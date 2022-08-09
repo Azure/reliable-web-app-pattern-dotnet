@@ -12,18 +12,18 @@ var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(env
 
 // temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
 var appConfigName='${resourceToken}-appconfig'
-resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: 'app_config_svc_purge'
-  location: location
-  kind:'AzureCLI'
-  properties: {
-    azCliVersion: '2.37.0'
-    retentionInterval: 'P1D'
-    forceUpdateTag: uniqueGuidValue //forces this script to run everytime
-    scriptContent: loadTextContent('appConfigSvcPurge.sh')
-    arguments:'--appcfgname \'${appConfigName}\''
-  }
-}
+// resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+//   name: 'app_config_svc_purge'
+//   location: location
+//   kind:'AzureCLI'
+//   properties: {
+//     azCliVersion: '2.37.0'
+//     retentionInterval: 'P1D'
+//     forceUpdateTag: uniqueGuidValue //forces this script to run everytime
+//     scriptContent: loadTextContent('appConfigSvcPurge.sh')
+//     arguments:'--appcfgname \'${appConfigName}\''
+//   }
+// }
 
 
 // Managed Identity
@@ -298,9 +298,9 @@ resource appConfigSvc 'Microsoft.AppConfiguration/configurationStores@2022-05-01
   sku: {
     name: 'Standard'
   }
-  dependsOn:[
-    app_config_svc_purge
-  ]
+  // dependsOn:[
+  //   app_config_svc_purge
+  // ]
 }
 
 var appServicePlanSku = (isProd) ?  'P1v2' : 'B1'
