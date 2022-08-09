@@ -17,8 +17,9 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
       - name: Purge App Cfg Svc
-        run: az appconfig purge --name azj5cfvdzwfr2-appconfig --yes
+        run: az appconfig purge --name azj5cfvdzwfr2-appconfig --yes 2> /dev/null
         env:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
