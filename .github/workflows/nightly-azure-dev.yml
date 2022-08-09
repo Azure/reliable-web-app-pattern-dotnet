@@ -17,12 +17,6 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
-      - name: Purge App Configuration Service
-        run: |
-          chmod +x ./infra/appConfigSvcPurge.sh
-          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}nightly-rg
-
       - name: Azure Dev Provision
         run: azd provision --no-prompt
         env:
@@ -46,3 +40,11 @@ jobs:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
+      # Resource names are reserved for a period of time after deletion
+      # https://docs.microsoft.com/en-us/azure/azure-app-configuration/faq#why-can-t-i-create-an-app-configuration-store-with-the-same-name-as-one-that-i-just-deleted
+      - name: Purge App Configuration Service
+        run: |
+          chmod +x ./infra/appConfigSvcPurge.sh
+          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}nightly-rg
