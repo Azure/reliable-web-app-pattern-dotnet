@@ -4,6 +4,10 @@ param principalId string = ''
 param resourceToken string
 param tags object
 
+// used to force deployment scripts to re-run
+// https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deployment-script-bicep#run-script-more-than-once
+param uniqueGuidValue string = newGuid()
+
 var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(environmentName),'prod')
 
 // temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
@@ -14,6 +18,7 @@ resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01'
   properties: {
     azCliVersion: '2.37.0'
     retentionInterval: 'P1D'
+    forceUpdateTag: uniqueGuidValue //forces this script to run everytime
     scriptContent: loadTextContent('appConfigSvcPurge.sh')
     arguments:'--resourceToken \'${resourceToken}\''
   }
