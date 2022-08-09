@@ -23,26 +23,26 @@ jobs:
           chmod +x ./infra/appConfigSvcPurge.sh
           ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}nightly-rg
 
-      # - name: Azure Dev Provision
-      #   run: azd provision --no-prompt
-      #   env:
-      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Azure Dev Provision
+        run: azd provision --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # - name: Azure Dev Deploy
-      #   run: azd deploy --no-prompt
-      #   env:
-      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Azure Dev Deploy
+        run: azd deploy --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # - name: Quality Assurance
-      #   run: echo 'TODO - perform test automation here'
+      - name: Quality Assurance
+        run: echo 'TODO - perform test automation here'
 
-      # - name: Azure Dev Down
-      #   run: azd down --force --purge --no-prompt
-      #   env:
-      #     AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
-      #     AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Azure Dev Down
+        run: azd down --force --purge --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
