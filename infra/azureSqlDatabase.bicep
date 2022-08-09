@@ -13,6 +13,9 @@ param sqlAdministratorLogin string
 @secure()
 param sqlAdministratorPassword string
 
+@description('Ensures that the idempotent scripts are executed each time the deployment is executed')
+param uniqueScriptId string = newGuid()
+
 resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
   name: '${resourceToken}-sql-server'
   location: location
@@ -94,13 +97,48 @@ resource createSqlUserScript 'Microsoft.Resources/deploymentScripts@2020-10-01' 
         value: 'IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N\'${managedIdentity.name}\'); CREATE USER [${managedIdentity.name}] FROM EXTERNAL PROVIDER; ALTER ROLE db_owner ADD MEMBER [${managedIdentity.name}];'
       }
     ]
+    forceUpdateTag: uniqueScriptId
     azPowerShellVersion: '7.4'
     retentionInterval: 'P1D'
     cleanupPreference: 'OnSuccess'
     scriptContent:'Install-Module -Name SqlServer -Force; Import-Module -Name SqlServer; Invoke-Sqlcmd -ServerInstance $ENV:SERVER_NAME -database $ENV:DATABASE_NAME -username $ENV:USER_NAME -password "$ENV:PASSWORD" -query $ENV:QUERY'
   }
+  dependsOn:[
+    sqlDatabase
+  ]
 }
 
+resource setManagedIdentityOnlyAdmin 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'setManagedIdentityOnlyAdmin'
+  location: location
+  kind: 'AzurePowerShell'
+  properties: {
+    forceUpdateTag: uniqueScriptId
+    azPowerShellVersion: '7.4'
+    retentionInterval: 'P1D'
+    cleanupPreference: 'OnSuccess'
+    scriptContent:'Write-Host "Hello world"'
+  }
+  dependsOn:[
+    createSqlUserScript
+  ]
+}
+
+resource blockPublicAccess 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (isProd) {
+  name: 'blockPublicAccess'
+  location: location
+  kind: 'AzureCLI'
+  properties: {
+    forceUpdateTag: uniqueScriptId
+    azCliVersion: '2.37.0'
+    retentionInterval: 'P1D'
+    cleanupPreference: 'OnSuccess'
+    scriptContent:'Write-Host "Hello world"'
+  }
+  dependsOn:[
+    setManagedIdentityOnlyAdmin
+  ]
+}
 
 output sqlServerFqdn string = sqlServer.properties.fullyQualifiedDomainName
 output sqlCatalogName string = sqlCatalogName
