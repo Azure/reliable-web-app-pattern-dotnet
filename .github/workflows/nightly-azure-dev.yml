@@ -22,7 +22,7 @@ jobs:
         run: |
           # find all deleted app configurations related to the resource group for this workflow
           appcfgname=$(az appconfig list-deleted --query "[?configurationStoreId.contains(@,'${{ secrets.AZURE_ENV_NAME }}nightly-rg')].name" -o tsv)
-          az appconfig purge --name $appcfgname --yes 2> /dev/null
+          az appconfig purge --name $appcfgname --yes &> /dev/null
           # allow this event to propagate
           sleep 3
 
