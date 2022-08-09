@@ -18,7 +18,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Purge App Cfg Svc
-        run: az appconfig purge --name azj5cfvdzwfr2-appconfig
+        run: az appconfig purge --name azj5cfvdzwfr2-appconfig --yes
         env:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
