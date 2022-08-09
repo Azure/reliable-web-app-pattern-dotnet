@@ -4,7 +4,27 @@ param principalId string = ''
 param resourceToken string
 param tags object
 
+// used to force deployment scripts to re-run
+// https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deployment-script-bicep#run-script-more-than-once
+param uniqueGuidValue string = newGuid()
+
 var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(environmentName),'prod')
+
+// temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
+var appConfigName='${resourceToken}-appconfig'
+resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'app_config_svc_purge'
+  location: location
+  kind:'AzureCLI'
+  properties: {
+    azCliVersion: '2.37.0'
+    retentionInterval: 'P1D'
+    forceUpdateTag: uniqueGuidValue //forces this script to run everytime
+    scriptContent: loadTextContent('appConfigSvcPurge.sh')
+    arguments:'--appcfgname \'${appConfigName}\''
+  }
+}
+
 
 // Managed Identity
 @description('A user-assigned managed identity that is used by the App Service app to communicate with a storage account.')
@@ -273,11 +293,14 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
 }
 
 resource appConfigSvc 'Microsoft.AppConfiguration/configurationStores@2022-05-01' = {
-  name: '${resourceToken}-appconfig'
+  name: appConfigName
   location: location
   sku: {
     name: 'Standard'
   }
+  dependsOn:[
+    app_config_svc_purge
+  ]
 }
 
 var appServicePlanSku = (isProd) ?  'P1v2' : 'B1'
