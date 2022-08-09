@@ -30,8 +30,8 @@ echo "----------------------------------------------"
 # deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?name=='$appcfgname'].name" -o tsv)
 
 # if [[ ${#deletedAppConfigSvcName} -gt 0 ]]; then
-  az appconfig purge --name $deletedAppConfigSvcName --yes
-  echo "Purged $deletedAppConfigSvcName"  
+  az appconfig purge --name $appcfgname --yes
+  echo "Purged $appcfgname"  
   sleep 3 # give Azure some time to propagate this event
 # else
 #   echo "Nothing to purge"
