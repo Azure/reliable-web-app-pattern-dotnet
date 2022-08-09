@@ -20,11 +20,8 @@ jobs:
       # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
       - name: Purge App Configuration Service
         run: |
-          # find all deleted app configurations related to the resource group for this workflow
-          appcfgname=$(az appconfig list-deleted --query "[?configurationStoreId.contains(@,'${{ secrets.AZURE_ENV_NAME }}nightly-rg')].name" -o tsv)
-          az appconfig purge --name $appcfgname --yes &> /dev/null
-          # allow this event to propagate
-          sleep 3
+          chmod +x ./infra/appConfigSvcPurge.sh
+          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}nightly-rg
 
       # - name: Azure Dev Provision
       #   run: azd provision --no-prompt
