@@ -19,7 +19,23 @@ jobs:
 
       # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
       - name: Purge App Config Svc
-        run: ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}nightly
+        run: |
+          echo -e "Inputs\n"
+          echo -e "----------------------------------------------\n"
+          echo -e "resourceGroup=$resourceGroup\n"
+          echo -e "\n"
+
+          deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?configurationStoreId.contains(@,'${{ secrets.AZURE_ENV_NAME }}nightly-rg')].name" -o tsv)
+
+          if [[ ${#deletedAppConfigSvcName} -gt 0 ]]; then
+            az appconfig purge --name $deletedAppConfigSvcName --yes
+            echo "Purged $deletedAppConfigSvcName"  
+            sleep 3 # give Azure some time to propagate this event
+          else
+            echo "Nothing to purge"
+          fi
+
+          sleep 3 # give Azure some time to propagate this event
 
       # - name: Azure Dev Provision
       #   run: azd provision --no-prompt
