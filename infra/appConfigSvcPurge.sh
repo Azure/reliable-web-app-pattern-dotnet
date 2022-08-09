@@ -27,6 +27,8 @@ echo -e "----------------------------------------------\n"
 echo -e "appcfgname=$appcfgname\n"
 echo -e "\n"
 
-az appconfig purge --name $appcfgname --yes 2> /dev/null
+#az appconfig purge --name $appcfgname --yes 2> /dev/null
+az resource delete -g relecloudresourcesnightly-rg -n azj5cfvdzwfr2-appconfig --resource-type "Microsoft.AppConfiguration/configurationStores" --verbose
+
 echo "Purged $appcfgname"  
 sleep 3 # give Azure some time to propagate this event
