@@ -11,6 +11,7 @@ param uniqueGuidValue string = newGuid()
 var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(environmentName),'prod')
 
 // temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
+var appConfigName='${resourceToken}-appconfig'
 resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'app_config_svc_purge'
   location: location
@@ -20,7 +21,7 @@ resource app_config_svc_purge 'Microsoft.Resources/deploymentScripts@2020-10-01'
     retentionInterval: 'P1D'
     forceUpdateTag: uniqueGuidValue //forces this script to run everytime
     scriptContent: loadTextContent('appConfigSvcPurge.sh')
-    arguments:'--resourceToken \'${resourceToken}\''
+    arguments:'--appcfgname \'${appConfigName}\''
   }
 }
 
@@ -31,9 +32,6 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-
   name: 'web-${resourceToken}-identity'
   location: location
   tags: tags
-  dependsOn:[
-    app_config_svc_purge
-  ]
 }
 
 @description('Built in \'Data Reader\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
@@ -295,7 +293,7 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
 }
 
 resource appConfigSvc 'Microsoft.AppConfiguration/configurationStores@2022-05-01' = {
-  name: '${resourceToken}-appconfig'
+  name: appConfigName
   location: location
   sku: {
     name: 'Standard'
