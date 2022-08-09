@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# This script is a workaround to a known issue
+# This script is a temporary workaround to a known issue
+# Executed from Github workflow it will handle purging soft-deleted Azure App Configuration Service instances
+# https://github.com/Azure/azure-dev/issues/248
 
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --resourceToken)
-      resourceToken="$2"
+    --resource-group|-g)
+      resourceGroupName="$2"
       shift # past argument
       shift # past value
       ;;
@@ -22,17 +24,16 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo -e "Inputs\n"
-echo -e "----------------------------------------------\n"
-echo -e "resourceToken=$resourceToken\n"
-echo -e "\n"
+echo "Inputs"
+echo "----------------------------------------------"
+echo "resourceGroupName=$resourceGroupName"
+echo "----------------------------------------------"
 
-deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?starts_with(name, '$resourceToken')].name" -o tsv)
+deletedAppConfigSvcName=$(az appconfig list-deleted --query "[?configurationStoreId.contains(@,'$resourceGroupName')].name" -o tsv)
 
 if [[ ${#deletedAppConfigSvcName} -gt 0 ]]; then
   az appconfig purge --name $deletedAppConfigSvcName --yes
   echo "Purged $deletedAppConfigSvcName"  
-  sleep 3 # give Azure some time to propagate this event
 else
-  echo "Nothing to purge"
+   echo "Nothing to purge"
 fi
