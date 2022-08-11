@@ -2,7 +2,7 @@
 {
     public class RelecloudApiOptions
     {
-        public string BaseUri { get; set; }
-        public string AttendeeScope { get; set; }
+        public string? BaseUri { get; set; }
+        public string? AttendeeScope { get; set; }
     }
 }
