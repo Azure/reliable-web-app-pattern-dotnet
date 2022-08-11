@@ -59,6 +59,12 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
 
             foreach(var ticketNumber in unusedTicketNumberss)
             {
+                if (ticketNumber.Ticket is null)
+                {
+                    // can happen if the navigational property is not set
+                    throw new NullReferenceException($"The ticket number {ticketNumber.Id} was not related to an existing ticket");
+                }
+
                 await this.eventSenderService.SendEventAsync(new Event
                 {
                     EntityId = ticketNumber.Ticket.Id.ToString(),

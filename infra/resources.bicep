@@ -77,7 +77,7 @@ resource sqlConnStrAppConfigSetting 'Microsoft.AppConfiguration/configurationSto
   parent: appConfigSvc
   name: 'App:SqlDatabase:ConnectionString'
   properties: {
-    value: 'Server=tcp:${sqlServer.properties.fullyQualifiedDomainName},1433;Initial Catalog=${sqlCatalogName};Authentication=Active Directory Default'
+    value: 'Server=tcp:${sqlSetup.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlSetup.outputs.sqlCatalogName};Authentication=Active Directory Default'
   }
 }
 
@@ -485,42 +485,71 @@ resource redisCache 'Microsoft.Cache/Redis@2019-07-01' = {
     }
   }
 }
-
-resource sqlServer 'Microsoft.Sql/servers@2021-11-01-preview' = {
-  name: '${resourceToken}-sql-server'
+resource adminVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
+  name: 'admin-${resourceToken}-kv' // keyvault name cannot start with a number
   location: location
   properties: {
-    administrators: {
-      azureADOnlyAuthentication: true
-      login: managedIdentity.name
-      principalType: 'User'
-      sid: managedIdentity.properties.principalId
-      tenantId: managedIdentity.properties.tenantId
+    sku: {
+      family: 'A'
+      name: 'standard'
     }
-    publicNetworkAccess: 'Disabled'
+    tenantId: subscription().tenantId
+    enabledForTemplateDeployment: true
+    accessPolicies: [
+      {
+        objectId: principalId
+        tenantId: subscription().tenantId
+        permissions: {
+          secrets: [
+            'all'
+          ]
+        }
+      }
+    ]
   }
 }
 
-
-var sqlCatalogName = '${resourceToken}-sql-database'
-var skuTierName = isProd ? 'Premium' : 'Standard'
-var dtuCapacity = isProd ? 125 : 10
-var requestedBackupStorageRedundancy = isProd ? 'Geo' : 'Local'
-var readScale = isProd ? 'Enabled' : 'Disabled'
-
-resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
-  name: '${sqlServer.name}/${sqlCatalogName}'
-  location: location
-  sku: {
-    name: skuTierName
-    tier: skuTierName
-    capacity: dtuCapacity
-  }
+resource kvSqlAdministratorPassword 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: adminVault
+  name: 'sqlAdministratorPassword'
   properties: {
-    requestedBackupStorageRedundancy: requestedBackupStorageRedundancy
-    readScale: readScale
+    // uniqueString produces a 13 character result
+    // concatenation of 2 unique strings produces a 26 character password unique to your subscription per environment
+    value: '${uniqueString(subscription().id, resourceToken)}${toUpper(uniqueString(managedIdentity.properties.principalId, resourceToken))}'
   }
 }
+
+var sqlAdministratorLogin = 'sqladmin${resourceToken}'
+resource kvSqlAdministratorLogin 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: adminVault
+  name: 'sqlAdministratorLogin'
+  properties: {
+    value: sqlAdministratorLogin
+  }
+}
+
+module sqlSetup 'azureSqlDatabase.bicep' = {
+  name: 'sqlSetup'
+  scope: resourceGroup()
+  params: {
+    location: location
+    resourceToken: resourceToken
+    isProd: isProd
+    managedIdentity: {
+      name: managedIdentity.name
+      properties: {
+        tenantId: managedIdentity.properties.tenantId
+        clientId: managedIdentity.properties.clientId
+        principalId: managedIdentity.properties.principalId
+      }
+    }
+    tags: tags
+    sqlAdministratorLogin: sqlAdministratorLogin
+    sqlAdministratorPassword: adminVault.getSecret(kvSqlAdministratorPassword.name)
+  }
+}
+
+
 
 var storageSku = isProd ? 'Standard_ZRS' : 'Standard_LRS'
 
@@ -587,9 +616,9 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
     }
     privateLinkServiceConnections: [
       {
-        name: '${sqlServer.name}/${sqlDatabase.name}'
+        name: '${sqlSetup.outputs.sqlServerName}/${sqlSetup.outputs.sqlDatabaseName}'
         properties: {
-          privateLinkServiceId: sqlServer.id
+          privateLinkServiceId: sqlSetup.outputs.sqlServerId
           groupIds: [
             'sqlServer'
           ]
@@ -598,7 +627,6 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
     ]
   }
 }
-
 
 resource privateDnsZoneName_resource 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: 'windows.net'

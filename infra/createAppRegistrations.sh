@@ -4,10 +4,22 @@ POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --resourceGroupName|-g)
+    --resource-group|-g)
       resourceGroupName="$2"
       shift # past argument
       shift # past value
+      ;;
+    --help*)
+      echo ""
+      echo "<This command should only be run after using the azd command to deploy resources to Azure>"
+      echo ""
+      echo "Command"
+      echo "    createAppRegistrations.sh : Will create two app registrations for the scalable-web-app-pattern-dotnet and register settings with App Configuration Svc and Key Vault."
+      echo ""
+      echo "Arguments"
+      echo "    --resource-group -g : Name of resource group containing the environment that was creaed by the azd command."
+      echo ""
+      exit 1
       ;;
     -*|--*)
       echo "Unknown option $1"
