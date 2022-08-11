@@ -19,7 +19,7 @@ namespace Relecloud.Web.Services.AzureSearchService
 
         #region Search
 
-        public async Task<SearchResponse<ConcertSearchResult>> SearchAsync(SearchRequest request)
+        public Task<SearchResponse<ConcertSearchResult>> SearchAsync(SearchRequest request)
         {
             var concertResults = this.database.Concerts
                 .Select(c => new ConcertSearchResult{
@@ -35,7 +35,7 @@ namespace Relecloud.Web.Services.AzureSearchService
             var searchResponse = new SearchResponse<ConcertSearchResult>(request, concertResults, new List<SearchFacet>());
             searchResponse.TotalCount = concertResults.Count;
 
-            return searchResponse;
+            return Task.FromResult(searchResponse);
         }
 
         #endregion
