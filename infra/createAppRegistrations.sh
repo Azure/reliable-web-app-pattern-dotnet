@@ -44,7 +44,7 @@ echo "resourceGroupName='$resourceGroupName'"
 echo ""
 
 # assumes there is only one vault deployed to this resource group
-keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[].name" -o tsv)
+keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name" -o tsv)
 
 appConfigSvcName=$(az appconfig list -g "$resourceGroupName" --query "[].name" -o tsv)
 
