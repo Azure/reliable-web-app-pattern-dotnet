@@ -1,13 +1,13 @@
 ﻿using Relecloud.Web.Api.Services.TicketManagementService;
 using Relecloud.Web.Models.ConcertContext;
 
-namespace Relecloud.Web.Api.Services.DummyServices
+namespace Relecloud.Web.Api.Services.MockServices
 {
-    public class DummyTicketServiceFactory : ITicketServiceFactory
+    public class MockTicketServiceFactory : ITicketServiceFactory
     {
         private readonly ITicketManagementService ticketManagementService;
 
-        public DummyTicketServiceFactory(ITicketManagementService ticketManagementService)
+        public MockTicketServiceFactory(ITicketManagementService ticketManagementService)
         {
             this.ticketManagementService = ticketManagementService;
         }

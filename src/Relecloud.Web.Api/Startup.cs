@@ -7,7 +7,7 @@ using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
 using Relecloud.Web.Api.Infrastructure;
 using Relecloud.Web.Api.Services;
-using Relecloud.Web.Api.Services.DummyServices;
+using Relecloud.Web.Api.Services.MockServices;
 using Relecloud.Web.Api.Services.PaymentGatewayService;
 using Relecloud.Web.Api.Services.SqlDatabaseConcertRepository;
 using Relecloud.Web.Api.Services.StorageAccountEventSenderService;
@@ -85,8 +85,8 @@ namespace Relecloud.Web.Api
 
             if (options is null || string.IsNullOrEmpty(options.BaseUri) || string.IsNullOrEmpty(options.ApiKey))
             {
-                services.AddScoped<ITicketManagementService, DummyTicketManagementService>();
-                services.AddScoped<ITicketServiceFactory, DummyTicketServiceFactory>();
+                services.AddScoped<ITicketManagementService, MockTicketManagementService>();
+                services.AddScoped<ITicketServiceFactory, MockTicketServiceFactory>();
             }
             else
             {
@@ -109,7 +109,7 @@ namespace Relecloud.Web.Api
             if (string.IsNullOrWhiteSpace(azureSearchServiceName) && string.IsNullOrWhiteSpace(sqlDatabaseConnectionString))
             {
                 // Add a dummy concert search service in case the Azure Search service isn't provisioned and configured yet.
-                services.AddScoped<IConcertSearchService, DummyConcertSearchService>();
+                services.AddScoped<IConcertSearchService, MockConcertSearchService>();
             }
             else if (string.IsNullOrWhiteSpace(azureSearchServiceName))
             {
@@ -129,7 +129,7 @@ namespace Relecloud.Web.Api
             if (string.IsNullOrWhiteSpace(storageAccountConnectionString) || string.IsNullOrWhiteSpace(storageAccountEventQueueName))
             {
                 // Add a dummy event sender service in case the Azure Storage account isn't provisioned and configured yet.
-                services.AddScoped<IAzureEventSenderService, DummyEventSenderService>();
+                services.AddScoped<IAzureEventSenderService, MockEventSenderService>();
             }
             else
             {
@@ -146,7 +146,7 @@ namespace Relecloud.Web.Api
 
             if (string.IsNullOrWhiteSpace(sqlDatabaseConnectionString))
             {
-                services.AddScoped<IConcertRepository, DummyConcertRepository>();
+                services.AddScoped<IConcertRepository, MockConcertRepository>();
             }
             else
             {
@@ -189,7 +189,7 @@ namespace Relecloud.Web.Api
 
             if (options is null || string.IsNullOrWhiteSpace(options.BaseUri)|| string.IsNullOrWhiteSpace(options.ApiKey))
             {
-                services.AddScoped<IPaymentGatewayService, DummyPaymentGatewayService>();
+                services.AddScoped<IPaymentGatewayService, MockPaymentGatewayService>();
             }
             else
             {
