@@ -41,7 +41,7 @@ namespace Relecloud.Web.Api
             services.AddApplicationInsightsTelemetry(Configuration["App:Api:ApplicationInsights:ConnectionString"]);
 
             AddAzureSearchService(services);
-            AddConcerContextServices(services);
+            AddConcertContextServices(services);
             AddDistributedSession(services);
             AddPaymentGatewayService(services);
             AddEventSenderService(services);
@@ -138,7 +138,7 @@ namespace Relecloud.Web.Api
             }
         }
 
-        private void AddConcerContextServices(IServiceCollection services)
+        private void AddConcertContextServices(IServiceCollection services)
         {
             services.AddSingleton<ITicketNumberGenerator, TicketNumberGenerator>();
 
