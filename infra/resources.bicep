@@ -516,6 +516,9 @@ module sqlSetup 'azureSqlDatabase.bicep' = {
     sqlAdministratorPassword: adminVault.getSecret(kvSqlAdministratorPassword.name)
     tags: tags
   }
+  dependsOn: [
+    vnet
+  ]
 }
 
 module redisSetup 'azureRedisCache.bicep' = {
@@ -527,6 +530,9 @@ module redisSetup 'azureRedisCache.bicep' = {
     resourceToken: resourceToken
     tags: tags
   }
+  dependsOn: [
+    vnet
+  ]
 }
 
 module storageSetup 'azureStorageSetup.bicep' = {
@@ -538,6 +544,9 @@ module storageSetup 'azureStorageSetup.bicep' = {
     resourceToken: resourceToken
     tags: tags
   }
+  dependsOn: [
+    vnet
+  ]
 }
 
 var subnet1Name = 'mySubnet'
