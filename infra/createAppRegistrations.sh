@@ -288,7 +288,7 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
     echo "Set appconfig value for: 'Api:AzureAd:ClientId'"
 
     # save 'Api:AzureAd:TenantId' to App Config Svc
-    az appconfig kv set --name $appConfigSvcName --key 'Api:AzureAd:TenantId' --value $apiWebAppClientId --yes --only-show-errors > /dev/null
+    az appconfig kv set --name $appConfigSvcName --key 'Api:AzureAd:TenantId' --value $tenantId --yes --only-show-errors > /dev/null
     echo "Set appconfig value for: 'Api:AzureAd:TenantId'"
 
 else
