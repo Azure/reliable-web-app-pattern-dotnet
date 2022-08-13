@@ -138,6 +138,8 @@ resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/k
   }
 }
 
+var aspNetCoreEnvironment = isProd ? 'Production' : 'Development'
+
 resource web 'Microsoft.Web/sites@2021-03-01' = {
   name: 'web-${resourceToken}-web-app'
   location: location
@@ -163,7 +165,7 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
   resource appSettings 'config' = {
     name: 'appsettings'
     properties: {
-      ASPNETCORE_ENVIRONMENT: 'Development'
+      ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
@@ -222,10 +224,7 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
   resource appSettings 'config' = {
     name: 'appsettings'
     properties: {
-      WEBSITE_VNET_ROUTE_ALL: '1' 
-      // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-      WEBSITE_DNS_SERVER: '168.63.129.16' 
-      ASPNETCORE_ENVIRONMENT: 'Development'
+      ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
       APPLICATIONINSIGHTS_CONNECTION_STRING: apiApplicationInsights.properties.ConnectionString
       'App:AppConfig:Uri': appConfigSvc.properties.endpoint
@@ -550,7 +549,9 @@ module storageSetup 'azureStorageSetup.bicep' = {
 }
 
 var subnet1Name = 'mySubnet'
-var subnetAppServiceName = 'subnetAppService'
+var subnetApiAppService = 'subnetApiAppService'
+var subnetWebAppService = 'subnetWebAppService'
+
 resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
   name: 'myVirtualNetwork'
   location: location
@@ -570,9 +571,23 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
         }
       }
       {
-        name: subnetAppServiceName
+        name: subnetWebAppService
         properties: {
           addressPrefix: '10.0.1.0/24'
+          delegations: [
+            {
+              name: 'delegation'
+              properties: {
+                serviceName: 'Microsoft.Web/serverfarms'
+              }
+            }
+          ]
+        }
+      }
+      {
+        name: subnetApiAppService
+        properties: {
+          addressPrefix: '10.0.2.0/24'
           delegations: [
             {
               name: 'delegation'
@@ -645,11 +660,20 @@ resource pvtendpointdnsgroupname 'Microsoft.Network/privateEndpoints/privateDnsZ
   }
 }
 
-resource websitename_virtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
+resource apiVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
   parent: api
   name: 'virtualNetwork'
   properties: {
-    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetAppServiceName)
+    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetWebAppService)
+    swiftSupported: true
+  }
+}
+
+resource webVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
+  parent: web
+  name: 'virtualNetwork'
+  properties: {
+    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetApiAppService)
     swiftSupported: true
   }
 }
