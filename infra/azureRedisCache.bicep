@@ -30,6 +30,7 @@ resource existingKv 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
 
 resource kvSecretRedis 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   name: 'App--RedisCache--ConnectionString'
+  tags: tags
   parent: existingKv
   properties: {
     value: '${redisCache.name}.redis.cache.windows.net:6380,password=${redisCache.listKeys().primaryKey},ssl=True,abortConnect=False'
