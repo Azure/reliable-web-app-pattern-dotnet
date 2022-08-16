@@ -167,9 +167,12 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
     properties: {
       ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
-      SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
       'App:AppConfig:Uri': appConfigSvc.properties.endpoint
+      SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
+      // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
+      WEBSITE_DNS_SERVER: '168.63.129.16' 
+      WEBSITE_VNET_ROUTE_ALL: '1'
     }
   }
 
@@ -228,6 +231,10 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
       APPLICATIONINSIGHTS_CONNECTION_STRING: apiApplicationInsights.properties.ConnectionString
       'App:AppConfig:Uri': appConfigSvc.properties.endpoint
+      SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
+      // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
+      WEBSITE_DNS_SERVER: '168.63.129.16' 
+      WEBSITE_VNET_ROUTE_ALL: '1'
     }
   }
 
@@ -520,6 +527,7 @@ module sqlSetup 'azureSqlDatabase.bicep' = {
   ]
 }
 
+var privateEndpointNameForRedis = 'privateEndpointForRedis'
 module redisSetup 'azureRedisCache.bicep' = {
   name: 'redisSetup'
   scope: resourceGroup()
@@ -528,10 +536,10 @@ module redisSetup 'azureRedisCache.bicep' = {
     location: location
     resourceToken: resourceToken
     tags: tags
+    privateEndpointNameForRedis: privateEndpointNameForRedis
+    privateEndpointVnetName: vnet.name
+    privateEndpointSubnetName: privateEndpointSubnetName
   }
-  dependsOn: [
-    vnet
-  ]
 }
 
 module storageSetup 'azureStorageSetup.bicep' = {
@@ -548,12 +556,12 @@ module storageSetup 'azureStorageSetup.bicep' = {
   ]
 }
 
-var subnet1Name = 'mySubnet'
+var privateEndpointSubnetName = 'subnetPrivateEndpoints'
 var subnetApiAppService = 'subnetApiAppService'
 var subnetWebAppService = 'subnetWebAppService'
 
 resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
-  name: 'myVirtualNetwork'
+  name: 'rc-${resourceToken}-vnet'
   location: location
   tags: tags
   properties: {
@@ -564,7 +572,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
     }
     subnets: [
       {
-        name: subnet1Name
+        name: privateEndpointSubnetName
         properties: {
           addressPrefix: '10.0.0.0/24'
           privateEndpointNetworkPolicies: 'Disabled'
@@ -603,12 +611,12 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
 }
 
 resource privateEndpointForSql 'Microsoft.Network/privateEndpoints@2020-07-01' = {
-  name: 'mySqlPrivateEndpoint'
+  name: 'privateEndpointForSql'
   location: location
   tags: tags
   properties: {
     subnet: {
-      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnet1Name)
+      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, privateEndpointSubnetName)
     }
     privateLinkServiceConnections: [
       {
@@ -624,8 +632,8 @@ resource privateEndpointForSql 'Microsoft.Network/privateEndpoints@2020-07-01' =
   }
 }
 
-resource privateDnsZoneName_resource 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'windows.net'
+resource privateDnsZoneNameForSql 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'privatelink${environment().suffixes.sqlServerHostname}'
   location: 'global'
   tags: tags
   dependsOn: [
@@ -633,9 +641,9 @@ resource privateDnsZoneName_resource 'Microsoft.Network/privateDnsZones@2020-06-
   ]
 }
 
-resource privateDnsZoneName_privateDnsZoneName_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: privateDnsZoneName_resource
-  name: '${privateDnsZoneName_resource.name}-link'
+resource privateDnsZoneNameForSql_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDnsZoneNameForSql
+  name: '${privateDnsZoneNameForSql.name}-link'
   location: 'global'
   tags: tags
   properties: {
@@ -646,14 +654,28 @@ resource privateDnsZoneName_privateDnsZoneName_link 'Microsoft.Network/privateDn
   }
 }
 
-resource pvtendpointdnsgroupname 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
+resource SqlPvtEndpointDnsGroupName 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
   name: '${privateEndpointForSql.name}/mydnsgroupname'
   properties: {
     privateDnsZoneConfigs: [
       {
         name: 'config1'
         properties: {
-          privateDnsZoneId: privateDnsZoneName_resource.id
+          privateDnsZoneId: privateDnsZoneNameForSql.id
+        }
+      }
+    ]
+  }
+}
+
+resource redisPvtEndpointDnsGroupName 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
+  name: '${privateEndpointNameForRedis}/mydnsgroupname'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'config1'
+        properties: {
+          privateDnsZoneId: redisSetup.outputs.privateDnsZoneId
         }
       }
     ]
@@ -664,7 +686,7 @@ resource apiVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
   parent: api
   name: 'virtualNetwork'
   properties: {
-    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetWebAppService)
+    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetApiAppService)
     swiftSupported: true
   }
 }
@@ -673,7 +695,7 @@ resource webVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
   parent: web
   name: 'virtualNetwork'
   properties: {
-    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetApiAppService)
+    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetWebAppService)
     swiftSupported: true
   }
 }

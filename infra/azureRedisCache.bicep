@@ -2,6 +2,9 @@ param location string
 param resourceToken string
 param tags object
 param isProd bool
+param privateEndpointNameForRedis string
+param privateEndpointVnetName string
+param privateEndpointSubnetName string
 
 var redisCacheSkuName = isProd ? 'Standard' : 'Basic'
 var redisCacheFamilyName = isProd ? 'C' : 'C'
@@ -33,18 +36,17 @@ resource kvSecretRedis 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = 
   }
 }
 
-// TODO - should be a param
-var vnetname = 'myVirtualNetwork'
-// TODO - should be a param
-var subnet1Name = 'mySubnet'
+resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' existing = {
+  name: privateEndpointVnetName
+}
 
 resource privateEndpointForRedis 'Microsoft.Network/privateEndpoints@2020-07-01' = {
-  name: 'myRedisPrivateEndpoint'
+  name: privateEndpointNameForRedis
   location: location
   tags: tags
   properties: {
     subnet: {
-      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetname, subnet1Name)
+      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, privateEndpointSubnetName)
     }
     privateLinkServiceConnections: [
       {
@@ -58,24 +60,33 @@ resource privateEndpointForRedis 'Microsoft.Network/privateEndpoints@2020-07-01'
       }
     ]
   }
+  dependsOn: [
+    vnet
+  ]
 }
 
-resource privateDnsZoneName_resource 'Microsoft.Network/privateDnsZones@2020-06-01' existing = {
-  name: 'windows.net'
+resource privateDnsZoneNameForRedis 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'privatelink.redis.cache.windows.net'
+  location: 'global'
+  tags: tags
+  dependsOn: [
+    vnet
+  ]
 }
 
-resource pvtendpointdnsgroupname 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
-  name: '${privateEndpointForRedis.name}/mydnsgroupname'
+resource privateDnsZoneNameForRedis_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDnsZoneNameForRedis
+  name: '${privateDnsZoneNameForRedis.name}-link'
+  location: 'global'
+  tags: tags
   properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: 'config1'
-        properties: {
-          privateDnsZoneId: privateDnsZoneName_resource.id
-        }
-      }
-    ]
+    registrationEnabled: false
+    virtualNetwork: {
+      id: vnet.id
+    }
   }
 }
 
+
 output keyVaultRedisConnStrName string = kvSecretRedis.name
+output privateDnsZoneId string = privateDnsZoneNameForRedis.id
