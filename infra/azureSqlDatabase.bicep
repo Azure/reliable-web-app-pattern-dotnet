@@ -72,6 +72,7 @@ resource allowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@2021-11-01
 resource createSqlUserScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'createSqlUserScript'
   location: location
+  tags: tags
   kind: 'AzurePowerShell'
   properties: {
     forceUpdateTag: uniqueScriptId

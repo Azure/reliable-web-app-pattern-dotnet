@@ -34,6 +34,7 @@ resource appConfigRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-0
 resource kv 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
   location: location
+  tags: tags
   properties: {
     sku: {
       family: 'A'
@@ -112,6 +113,7 @@ var frontEndClientSecretName='AzureAd--ClientSecret'
 resource check_if_client_secret_exists 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'check_if_client_secret_exists'
   location: location
+  tags: tags
   kind:'AzureCLI'
   identity:{
     type: 'UserAssigned'
@@ -295,6 +297,7 @@ resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
 resource webAppScaleRule 'Microsoft.Insights/autoscalesettings@2021-05-01-preview' = if (isProd) {
   name: '${resourceToken}-web-plan-autoscale'
   location: location
+  tags: tags
   properties: {
     targetResourceUri: webAppServicePlan.id
     enabled: true
@@ -355,6 +358,7 @@ var scaleInThreshold = 60
 resource apiAppScaleRule 'Microsoft.Insights/autoscalesettings@2014-04-01' = {
   name: '${resourceToken}-api-plan-autoscale'
   location: location
+  tags: tags
   properties: {
     targetResourceUri: apiAppServicePlan.id
     enabled: true
@@ -463,6 +467,7 @@ resource apiApplicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 resource adminVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'admin-${resourceToken}-kv' // keyvault name cannot start with a number
   location: location
+  tags: tags
   properties: {
     sku: {
       family: 'A'
