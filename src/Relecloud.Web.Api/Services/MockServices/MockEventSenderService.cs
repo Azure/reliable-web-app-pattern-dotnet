@@ -1,8 +1,8 @@
 ﻿using Relecloud.Web.Models.Events;
 
-namespace Relecloud.Web.Api.Services.DummyServices
+namespace Relecloud.Web.Api.Services.MockServices
 {
-    public class DummyEventSenderService : IAzureEventSenderService
+    public class MockEventSenderService : IAzureEventSenderService
     {
         public void Initialize()
         {

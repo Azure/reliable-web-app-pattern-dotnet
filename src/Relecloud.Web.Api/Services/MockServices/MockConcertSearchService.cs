@@ -1,9 +1,9 @@
 ﻿using Relecloud.Web.Models.Search;
 using Relecloud.Web.Models.Services;
 
-namespace Relecloud.Web.Api.Services.DummyServices
+namespace Relecloud.Web.Api.Services.MockServices
 {
-    public class DummyConcertSearchService : IConcertSearchService
+    public class MockConcertSearchService : IConcertSearchService
     {
         public Task<SearchResponse<ConcertSearchResult>> SearchAsync(SearchRequest request)
         {

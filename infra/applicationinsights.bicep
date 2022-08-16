@@ -4,7 +4,7 @@ param tags object
 param workspaceId string
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: '${resourceToken}-appi'
+  name: 'web-${resourceToken}-appi'
   location: location
   kind: 'web'
   tags: tags

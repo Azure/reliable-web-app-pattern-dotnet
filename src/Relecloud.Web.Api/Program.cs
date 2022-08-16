@@ -1,5 +1,6 @@
 using Azure.Identity;
 using Relecloud.Web.Api;
+using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,11 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 builder.Configuration.AddUserSecrets<Program>(optional: true);
 
 builder.Logging.AddConsole();
+
+if (builder.Environment.IsDevelopment())
+{
+    IdentityModelEventSource.ShowPII = true;
+}
 
 // Apps migrating to 6.0 don't need to use the new minimal hosting model
 // https://docs.microsoft.com/en-us/aspnet/core/migration/50-to-60?view=aspnetcore-6.0&tabs=visual-studio#apps-migrating-to-60-dont-need-to-use-the-new-minimal-hosting-model

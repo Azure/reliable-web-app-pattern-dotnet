@@ -2,9 +2,9 @@
 using Relecloud.Web.Models.ConcertContext;
 using Relecloud.Web.Models.TicketManagement;
 
-namespace Relecloud.Web.Api.Services.DummyServices
+namespace Relecloud.Web.Api.Services.MockServices
 {
-    public class DummyTicketManagementService : ITicketManagementService
+    public class MockTicketManagementService : ITicketManagementService
     {
         public TicketManagementServiceProviders GetServiceType()
         {

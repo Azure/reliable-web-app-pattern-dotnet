@@ -1,9 +1,9 @@
 ﻿using Relecloud.Web.Api.Services.PaymentGatewayService;
 using Relecloud.Web.Models.Services;
 
-namespace Relecloud.Web.Api.Services.DummyServices
+namespace Relecloud.Web.Api.Services.MockServices
 {
-    public class DummyPaymentGatewayService : IPaymentGatewayService
+    public class MockPaymentGatewayService : IPaymentGatewayService
     {
         public Task<CapturePaymentResult> CapturePaymentAsync(CapturePaymentRequest request)
         {

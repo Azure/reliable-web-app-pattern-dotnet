@@ -86,19 +86,12 @@ resource redisConnAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores
   name: 'App:RedisCache:ConnectionString'
   properties: {
     value: string({
-      uri: '${kv.properties.vaultUri}secrets/${kvSecretRedis.name}'
+      uri: '${kv.properties.vaultUri}secrets/${redisSetup.outputs.keyVaultRedisConnStrName}'
     })
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
 }
 
-resource kvSecretRedis 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  parent: kv
-  name: 'App--RedisCache--ConnectionString'
-  properties: {
-    value: '${redisCache.name}.redis.cache.windows.net:6380,password=${redisCache.listKeys().primaryKey},ssl=True,abortConnect=False'
-  }
-}
 
 resource frontEndClientSecretAppCfg 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
   parent: appConfigSvc
@@ -139,19 +132,13 @@ resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/k
   name: 'App:StorageAccount:QueueConnectionString'
   properties: {
     value: string({
-      uri: '${kv.properties.vaultUri}secrets/${kvSecretStorageAcct.name}'
+      uri: '${kv.properties.vaultUri}secrets/${storageSetup.outputs.keyVaultStorageConnStrName}'
     })
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
 }
 
-resource kvSecretStorageAcct 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  parent: kv
-  name: 'App--StorageAccount--QueueConnectionString'
-  properties: {
-    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0]};EndpointSuffix=core.windows.net'
-  }
-}
+var aspNetCoreEnvironment = isProd ? 'Production' : 'Development'
 
 resource web 'Microsoft.Web/sites@2021-03-01' = {
   name: 'web-${resourceToken}-web-app'
@@ -178,11 +165,14 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
   resource appSettings 'config' = {
     name: 'appsettings'
     properties: {
-      ASPNETCORE_ENVIRONMENT: 'Development'
+      ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
-      SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
       'App:AppConfig:Uri': appConfigSvc.properties.endpoint
+      SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
+      // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
+      WEBSITE_DNS_SERVER: '168.63.129.16' 
+      WEBSITE_VNET_ROUTE_ALL: '1'
     }
   }
 
@@ -237,13 +227,14 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
   resource appSettings 'config' = {
     name: 'appsettings'
     properties: {
-      WEBSITE_VNET_ROUTE_ALL: '1' 
-      // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-      WEBSITE_DNS_SERVER: '168.63.129.16' 
-      ASPNETCORE_ENVIRONMENT: 'Development'
+      ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
       APPLICATIONINSIGHTS_CONNECTION_STRING: apiApplicationInsights.properties.ConnectionString
       'App:AppConfig:Uri': appConfigSvc.properties.endpoint
+      SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
+      // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
+      WEBSITE_DNS_SERVER: '168.63.129.16' 
+      WEBSITE_VNET_ROUTE_ALL: '1'
     }
   }
 
@@ -469,22 +460,6 @@ resource apiApplicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-var redisCacheSkuName = isProd ? 'Standard' : 'Basic'
-var redisCacheFamilyName = isProd ? 'C' : 'C'
-var redisCacheCapacity = isProd ? 0 : 0
-
-resource redisCache 'Microsoft.Cache/Redis@2019-07-01' = {
-  name: '${resourceToken}-rediscache'
-  location: location
-  tags: tags
-  properties: {
-    sku: {
-      name: redisCacheSkuName
-      family: redisCacheFamilyName
-      capacity: redisCacheCapacity
-    }
-  }
-}
 resource adminVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'admin-${resourceToken}-kv' // keyvault name cannot start with a number
   location: location
@@ -532,49 +507,63 @@ module sqlSetup 'azureSqlDatabase.bicep' = {
   name: 'sqlSetup'
   scope: resourceGroup()
   params: {
-    location: location
-    resourceToken: resourceToken
     isProd: isProd
+    location: location
     managedIdentity: {
       name: managedIdentity.name
       properties: {
-        tenantId: managedIdentity.properties.tenantId
         clientId: managedIdentity.properties.clientId
         principalId: managedIdentity.properties.principalId
+        tenantId: managedIdentity.properties.tenantId
       }
     }
-    tags: tags
+    resourceToken: resourceToken
     sqlAdministratorLogin: sqlAdministratorLogin
     sqlAdministratorPassword: adminVault.getSecret(kvSqlAdministratorPassword.name)
+    tags: tags
+  }
+  dependsOn: [
+    vnet
+  ]
+}
+
+var privateEndpointNameForRedis = 'privateEndpointForRedis'
+module redisSetup 'azureRedisCache.bicep' = {
+  name: 'redisSetup'
+  scope: resourceGroup()
+  params: {
+    isProd: isProd
+    location: location
+    resourceToken: resourceToken
+    tags: tags
+    privateEndpointNameForRedis: privateEndpointNameForRedis
+    privateEndpointVnetName: vnet.name
+    privateEndpointSubnetName: privateEndpointSubnetName
   }
 }
 
-
-
-var storageSku = isProd ? 'Standard_ZRS' : 'Standard_LRS'
-
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
-  name: '${resourceToken}storage' //storage account name cannot contain '-'
-  location: location
-  sku: {
-    name: storageSku
+module storageSetup 'azureStorageSetup.bicep' = {
+  name: 'storageSetup'
+  scope: resourceGroup()
+  params: {
+    isProd: isProd
+    location: location
+    resourceToken: resourceToken
+    tags: tags
   }
-  kind: 'StorageV2'
-
-  resource queueService 'queueServices@2021-09-01' = {
-    name: 'default'
-
-    resource queue 'queues@2021-09-01' = {
-      name: 'relecloudconcertevents'
-    }
-  }
+  dependsOn: [
+    vnet
+  ]
 }
 
-var subnet1Name = 'mySubnet'
-var subnetAppServiceName = 'subnetAppService'
+var privateEndpointSubnetName = 'subnetPrivateEndpoints'
+var subnetApiAppService = 'subnetApiAppService'
+var subnetWebAppService = 'subnetWebAppService'
+
 resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
-  name: 'myVirtualNetwork'
+  name: 'rc-${resourceToken}-vnet'
   location: location
+  tags: tags
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -583,16 +572,30 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
     }
     subnets: [
       {
-        name: subnet1Name
+        name: privateEndpointSubnetName
         properties: {
           addressPrefix: '10.0.0.0/24'
           privateEndpointNetworkPolicies: 'Disabled'
         }
       }
       {
-        name: subnetAppServiceName
+        name: subnetWebAppService
         properties: {
           addressPrefix: '10.0.1.0/24'
+          delegations: [
+            {
+              name: 'delegation'
+              properties: {
+                serviceName: 'Microsoft.Web/serverfarms'
+              }
+            }
+          ]
+        }
+      }
+      {
+        name: subnetApiAppService
+        properties: {
+          addressPrefix: '10.0.2.0/24'
           delegations: [
             {
               name: 'delegation'
@@ -607,12 +610,13 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
   }
 }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
-  name: 'myPrivateEndpoint'
+resource privateEndpointForSql 'Microsoft.Network/privateEndpoints@2020-07-01' = {
+  name: 'privateEndpointForSql'
   location: location
+  tags: tags
   properties: {
     subnet: {
-      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnet1Name)
+      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, privateEndpointSubnetName)
     }
     privateLinkServiceConnections: [
       {
@@ -628,18 +632,20 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
   }
 }
 
-resource privateDnsZoneName_resource 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'windows.net'
+resource privateDnsZoneNameForSql 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'privatelink${environment().suffixes.sqlServerHostname}'
   location: 'global'
+  tags: tags
   dependsOn: [
     vnet
   ]
 }
 
-resource privateDnsZoneName_privateDnsZoneName_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: privateDnsZoneName_resource
-  name: '${privateDnsZoneName_resource.name}-link'
+resource privateDnsZoneNameForSql_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDnsZoneNameForSql
+  name: '${privateDnsZoneNameForSql.name}-link'
   location: 'global'
+  tags: tags
   properties: {
     registrationEnabled: false
     virtualNetwork: {
@@ -648,25 +654,48 @@ resource privateDnsZoneName_privateDnsZoneName_link 'Microsoft.Network/privateDn
   }
 }
 
-resource pvtendpointdnsgroupname 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
-  name: '${privateEndpoint.name}/mydnsgroupname'
+resource SqlPvtEndpointDnsGroupName 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
+  name: '${privateEndpointForSql.name}/mydnsgroupname'
   properties: {
     privateDnsZoneConfigs: [
       {
         name: 'config1'
         properties: {
-          privateDnsZoneId: privateDnsZoneName_resource.id
+          privateDnsZoneId: privateDnsZoneNameForSql.id
         }
       }
     ]
   }
 }
 
-resource websitename_virtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
+resource redisPvtEndpointDnsGroupName 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
+  name: '${privateEndpointNameForRedis}/mydnsgroupname'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'config1'
+        properties: {
+          privateDnsZoneId: redisSetup.outputs.privateDnsZoneId
+        }
+      }
+    ]
+  }
+}
+
+resource apiVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
   parent: api
   name: 'virtualNetwork'
   properties: {
-    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetAppServiceName)
+    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetApiAppService)
+    swiftSupported: true
+  }
+}
+
+resource webVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
+  parent: web
+  name: 'virtualNetwork'
+  properties: {
+    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetWebAppService)
     swiftSupported: true
   }
 }

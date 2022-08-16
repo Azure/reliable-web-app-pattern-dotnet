@@ -44,7 +44,7 @@ echo "resourceGroupName='$resourceGroupName'"
 echo ""
 
 # assumes there is only one vault deployed to this resource group
-keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[].name" -o tsv)
+keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name" -o tsv)
 
 appConfigSvcName=$(az appconfig list -g "$resourceGroupName" --query "[].name" -o tsv)
 
@@ -288,7 +288,7 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
     echo "Set appconfig value for: 'Api:AzureAd:ClientId'"
 
     # save 'Api:AzureAd:TenantId' to App Config Svc
-    az appconfig kv set --name $appConfigSvcName --key 'Api:AzureAd:TenantId' --value $apiWebAppClientId --yes --only-show-errors > /dev/null
+    az appconfig kv set --name $appConfigSvcName --key 'Api:AzureAd:TenantId' --value $tenantId --yes --only-show-errors > /dev/null
     echo "Set appconfig value for: 'Api:AzureAd:TenantId'"
 
 else
