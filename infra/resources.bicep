@@ -175,6 +175,13 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
       // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
       WEBSITE_DNS_SERVER: '168.63.129.16' 
       WEBSITE_VNET_ROUTE_ALL: '1'
+      // App Insights settings
+      // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
+      APPINSIGHTS_INSTRUMENTATIONKEY: apiApplicationInsights.properties.InstrumentationKey
+      ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
+      XDT_MicrosoftApplicationInsights_Mode: 'recommended'
+      InstrumentationEngine_EXTENSION_VERSION: '~1'
+      XDT_MicrosoftApplicationInsights_BaseExtensions: '~1'
     }
   }
 
@@ -237,6 +244,13 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
       // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
       WEBSITE_DNS_SERVER: '168.63.129.16' 
       WEBSITE_VNET_ROUTE_ALL: '1'
+      // App Insights settings
+      // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
+      APPINSIGHTS_INSTRUMENTATIONKEY: apiApplicationInsights.properties.InstrumentationKey
+      ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
+      XDT_MicrosoftApplicationInsights_Mode: 'recommended'
+      InstrumentationEngine_EXTENSION_VERSION: '~1'
+      XDT_MicrosoftApplicationInsights_BaseExtensions: '~1'
     }
   }
 
