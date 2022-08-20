@@ -561,7 +561,7 @@ module redisSetup 'azureRedisCache.bicep' = {
   }
 }
 
-module storageSetup 'azureStorageSetup.bicep' = {
+module storageSetup 'azureStorage.bicep' = {
   name: 'storageSetup'
   scope: resourceGroup()
   params: {
