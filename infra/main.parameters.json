@@ -10,6 +10,12 @@
     },
     "principalId": {
       "value": "${AZURE_PRINCIPAL_ID}"
+    },
+    "secondaryAzureLocation": {
+      "value": "${SECONDARY_AZURE_LOCATION}"
+    },
+    "isProd": {
+      "value": "${IS_PROD}"
     }
   }
 }

@@ -6,32 +6,32 @@ targetScope = 'subscription'
 param name string
 
 @minLength(1)
-@description('Primary location for all resources')
+@description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
 
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
 
-var primaryResourceToken = toLower(uniqueString(subscription().id, name, location))
+@description('Will select production ready SKUs when `true`')
+param isProd string = 'false'
+
+@description('Should specify an Azure region, if not set to none, to trigger multiregional deployment. The second region should be different than the `location` . e.g. `westus3`')
+param secondaryAzureLocation string
+
+var isProdBool = isProd == 'true' ? true : false
 
 var tags = {
   'azd-env-name': name
 }
 
-var proposedResourceGroupName = '${name}-rg'
+var isMultiLocationDeployment = secondaryAzureLocation == '' ? false : true
 
-// assumes that this will be a multisite deployment when the environment name starts with an azure region
-var secondaryLocation = substring(proposedResourceGroupName, 0, indexOf(proposedResourceGroupName,'-'))
+//var primaryResourceGroupName = isMultiLocationDeployment ? 'primary-${name}-rg' : '${name}-rg'
+var primaryResourceGroupName = '${name}-rg'
+var secondaryResourceGroupName = 'secondary-${name}-rg'
 
-// TODO - secondary azure region should be a parameter
-var azureRegions = ['eastus','eastus2','westus3','southcentralus']
-
-var isMultiSiteDeployment = contains(azureRegions, secondaryLocation)
-var secondaryResourceToken = toLower(uniqueString(subscription().id, name, '2', secondaryLocation))
-
-var resourceGroupNameWithoutRegion = isMultiSiteDeployment ? substring(proposedResourceGroupName, length(secondaryLocation)+1) : 'none'
-var primaryResourceGroupName = isMultiSiteDeployment ? 'primary-${resourceGroupNameWithoutRegion}' : proposedResourceGroupName
-var secondaryResourceGroupName = 'secondary-${resourceGroupNameWithoutRegion}'
+var primaryResourceToken = toLower(uniqueString(subscription().id, primaryResourceGroupName, location))
+var secondaryResourceToken = toLower(uniqueString(subscription().id, secondaryResourceGroupName, '2', secondaryAzureLocation))
 
 resource primaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: primaryResourceGroupName
@@ -39,9 +39,9 @@ resource primaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
   tags: tags
 }
 
-resource secondaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = if (isMultiSiteDeployment) {
+resource secondaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = if (isMultiLocationDeployment) {
   name: secondaryResourceGroupName
-  location: location
+  location: secondaryAzureLocation
   tags: tags
 }
 
@@ -49,19 +49,22 @@ module primaryResources './resources.bicep' = {
   name: 'primary-${primaryResourceToken}'
   scope: primaryResourceGroup
   params: {
+    isProd: isProdBool
     location: location
     environmentName: name
     principalId: principalId
-    resourceToken: secondaryResourceToken
+    resourceToken: primaryResourceToken
     tags: tags
   }
 }
 
-module secondaryResources './resources.bicep' = if (isMultiSiteDeployment) {
+module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
   name: 'secondary-${primaryResourceToken}'
-  scope: isMultiSiteDeployment ? primaryResourceGroup : secondaryResourceGroup
+  // scope: isMultiLocationDeployment ? secondaryResourceGroup : primaryResourceGroup
+  scope: secondaryResourceGroup
   params: {
-    location: secondaryLocation
+    isProd: isProdBool
+    location: secondaryAzureLocation
     environmentName: name
     principalId: principalId
     resourceToken: secondaryResourceToken
@@ -69,17 +72,20 @@ module secondaryResources './resources.bicep' = if (isMultiSiteDeployment) {
   }
 }
 
-module azureFrontDoor './azureFrontDoor.bicep' = if (isMultiSiteDeployment) {
+module azureFrontDoor './azureFrontDoor.bicep' = if (isMultiLocationDeployment) {
   name: 'frontDoor-${primaryResourceToken}'
   scope: primaryResourceGroup
   params: {
     resourceToken: primaryResourceToken
     tags: tags
     primaryBackendAddress: primaryResources.outputs.WEB_URI
-    secondaryBackendAddress: isMultiSiteDeployment ? secondaryResources.outputs.WEB_URI : 'none'
+    secondaryBackendAddress: isMultiLocationDeployment ? secondaryResources.outputs.WEB_URI : 'none'
   }
 }
 
-output IS_MULTI_SITE bool = isMultiSiteDeployment
-output WEB_BASE_URL string = isMultiSiteDeployment ? azureFrontDoor.outputs.WEB_URI : 'none'
+output WEB_URI string = isMultiLocationDeployment ? azureFrontDoor.outputs.WEB_URI : primaryResources.outputs.WEB_URI
 output AZURE_LOCATION string = location
+
+output DEBUG_IS_MULTI_LOCATION_DEPLOYMENT bool = isMultiLocationDeployment
+output DEBUG_SECONDARY_AZURE_LOCATION string = secondaryAzureLocation
+output DEBUG_IS_PROD bool = isProdBool

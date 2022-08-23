@@ -1,10 +1,11 @@
+param isProd bool
+
 param location string
+
 param environmentName string
 param principalId string = ''
 param resourceToken string
 param tags object
-
-var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(environmentName),'prod')
 
 // Managed Identity
 @description('A user-assigned managed identity that is used by the App Service app.')
