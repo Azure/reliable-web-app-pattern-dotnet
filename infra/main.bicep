@@ -31,7 +31,7 @@ var primaryResourceGroupName = '${name}-rg'
 var secondaryResourceGroupName = 'secondary-${name}-rg'
 
 var primaryResourceToken = toLower(uniqueString(subscription().id, primaryResourceGroupName, location))
-var secondaryResourceToken = toLower(uniqueString(subscription().id, secondaryResourceGroupName, '2', secondaryAzureLocation))
+var secondaryResourceToken = toLower(uniqueString(subscription().id, secondaryResourceGroupName, secondaryAzureLocation))
 
 resource primaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: primaryResourceGroupName

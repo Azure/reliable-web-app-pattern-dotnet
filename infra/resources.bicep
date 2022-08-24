@@ -720,5 +720,5 @@ resource webVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
   }
 }
 
-output WEB_URI string = 'https://${web.properties.defaultHostName}'
-output API_URI string = 'https://${api.properties.defaultHostName}'
+output WEB_URI string = web.properties.defaultHostName
+output API_URI string = api.properties.defaultHostName
