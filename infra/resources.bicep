@@ -177,7 +177,7 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
       WEBSITE_VNET_ROUTE_ALL: '1'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
-      APPINSIGHTS_INSTRUMENTATIONKEY: apiApplicationInsights.properties.InstrumentationKey
+      APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
       ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
       XDT_MicrosoftApplicationInsights_Mode: 'recommended'
       InstrumentationEngine_EXTENSION_VERSION: '~1'
@@ -297,6 +297,9 @@ resource webAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   sku: {
     name: appServicePlanSku
   }
+  properties:{
+    
+  }
 }
 
 resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
@@ -305,6 +308,9 @@ resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   tags: tags
   sku: {
     name: appServicePlanSku
+  }
+  properties:{
+
   }
 }
 
