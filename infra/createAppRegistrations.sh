@@ -295,9 +295,5 @@ else
     echo "API app registration objectId=$apiObjectId already exists. Delete the '$apiWebAppName' app registration to recreate or reset the settings."
 fi
 
-echo ""
-echo "Your azure scalable web app is now ready to deploy. Run 'azd deploy --no-prompt' to continue..."
-echo ""
-
 # all done
 exit 0
