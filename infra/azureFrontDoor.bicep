@@ -61,6 +61,7 @@ resource frontDoorPrimaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@202
     weight: 1000
   }
 }
+
 resource frontDoorSecondaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
   name: '${frontDoorOriginName}2'
   parent: frontDoorOriginGroup
@@ -69,7 +70,7 @@ resource frontDoorSecondaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2
     httpPort: 80
     httpsPort: 443
     originHostHeader: secondaryBackendAddress
-    priority: 1
+    priority: 2
     weight: 1000
   }
 }
@@ -96,6 +97,52 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' 
     forwardingProtocol: 'HttpsOnly'
     linkToDefaultDomain: 'Enabled'
     httpsRedirect: 'Enabled'
+  }
+}
+
+resource frontdoorwebapplicationfirewallpolicies_wafpolicy_name_resource 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@2020-11-01' = {
+  name: 'wafpolicy${resourceToken}'
+  location: 'Global'
+  sku: {
+    name: 'Standard_AzureFrontDoor'
+  }
+  properties: {
+    policySettings: {
+      enabledState: 'Enabled'
+      mode: 'Prevention'
+      requestBodyCheck: 'Enabled'
+    }
+    customRules: {
+      rules: []
+    }
+    managedRules: {
+      managedRuleSets: []
+    }
+  }
+}
+
+resource profiles_manualryckozesqpn24_name_manualwafpolicy_cfc67469 'Microsoft.Cdn/profiles/securitypolicies@2021-06-01' = {
+  parent: frontDoorProfile
+  name: 'wafpolicy-${resourceToken}'
+  properties: {
+    parameters: {
+      wafPolicy: {
+        id: frontdoorwebapplicationfirewallpolicies_wafpolicy_name_resource.id
+      }
+      associations: [
+        {
+          domains: [
+            {
+              id: frontDoorEndpoint.id
+            }
+          ]
+          patternsToMatch: [
+            '/*'
+          ]
+        }
+      ]
+      type: 'WebApplicationFirewall'
+    }
   }
 }
 
