@@ -43,7 +43,7 @@ resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' =
     healthProbeSettings: {
       probePath: '/'
       probeRequestType: 'HEAD'
-      probeProtocol: 'Http'
+      probeProtocol: 'Https'
       probeIntervalInSeconds: 100
     }
   }
