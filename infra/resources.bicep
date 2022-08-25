@@ -1,10 +1,11 @@
+param isProd bool
+
 param location string
+
 param environmentName string
 param principalId string = ''
 param resourceToken string
 param tags object
-
-var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(environmentName),'prod')
 
 // Managed Identity
 @description('A user-assigned managed identity that is used by the App Service app.')
@@ -567,7 +568,7 @@ module redisSetup 'azureRedisCache.bicep' = {
   }
 }
 
-module storageSetup 'azureStorageSetup.bicep' = {
+module storageSetup 'azureStorage.bicep' = {
   name: 'storageSetup'
   scope: resourceGroup()
   params: {
@@ -725,5 +726,5 @@ resource webVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
   }
 }
 
-output WEB_URI string = 'https://${web.properties.defaultHostName}'
-output API_URI string = 'https://${api.properties.defaultHostName}'
+output WEB_URI string = web.properties.defaultHostName
+output API_URI string = api.properties.defaultHostName
