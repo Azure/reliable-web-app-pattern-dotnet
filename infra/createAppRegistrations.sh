@@ -9,6 +9,11 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       shift # past value
       ;;
+    --secondary-resource-group|-sg)
+      secondaryResourceGroupName="$2"
+      shift # past argument
+      shift # past value
+      ;;
     --help*)
       echo ""
       echo "<This command should only be run after using the azd command to deploy resources to Azure>"
@@ -37,13 +42,14 @@ if [[ ${#resourceGroupName} -eq 0 ]]; then
   exit 6
 fi
 
+canSetSecondAzureLocation=1
 
 echo "Inputs"
 echo "----------------------------------------------"
 echo "resourceGroupName='$resourceGroupName'"
 echo ""
 
-# assumes there is only one vault deployed to this resource group
+# assumes there is only one vault deployed to this resource group that will match this filter
 keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name" -o tsv)
 
 appConfigSvcName=$(az appconfig list -g "$resourceGroupName" --query "[].name" -o tsv)
@@ -52,7 +58,7 @@ appServiceRootUri='azurewebsites.net' # hard coded because app svc does not retu
 frontEndWebAppName=$(az resource list -g "$resourceGroupName" --query "[?tags.\"azd-service-name\"=='web'].name" -o tsv)
 frontEndWebAppUri="https://$frontEndWebAppName.$appServiceRootUri"
 
-# assumes resourceToken is located in app service front end web app name
+# assumes resourceToken is located in app service frontend web app name
 # assumes the uniquestring function from the bicep template always returns a string of length 13
 resourceToken=${frontEndWebAppName:4:13}
 
@@ -149,8 +155,9 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
     az appconfig kv set --name $appConfigSvcName --key 'AzureAd:ClientId' --value $frontEndWebAppClientId --yes --only-show-errors > /dev/null
     echo "Set appconfig value for: 'AzureAd:ClientId'"
 else
-    echo "front end app registration objectId=$frontEndWebObjectId already exists. Delete the '$frontEndWebAppName' app registration to recreate or reset the settings."
+    echo "frontend app registration objectId=$frontEndWebObjectId already exists. Delete the '$frontEndWebAppName' app registration to recreate or reset the settings."
     frontEndWebAppClientId=$(az ad app show --id $frontEndWebObjectId --query "id" -o tsv)
+    canSetSecondAzureLocation=2
 fi
 
 echo ""
@@ -292,7 +299,59 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
     echo "Set appconfig value for: 'Api:AzureAd:TenantId'"
 
 else
-    echo "API app registration objectId=$apiObjectId already exists. Delete the '$apiWebAppName' app registration to recreate or reset the settings."
+  echo "API app registration objectId=$apiObjectId already exists. Delete the '$apiWebAppName' app registration to recreate or reset the settings."
+  canSetSecondAzureLocation=3
+fi
+
+############## Copy the App Configuration and Key Vault settings to second azure location ##############
+
+if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]]; then
+  
+  # assumes there is only one vault deployed to this resource group that will match this filter
+  secondaryKeyVaultName=$(az keyvault list -g "$secondaryResourceGroupName" --query "[?name.starts_with(@,'rc-')].name" -o tsv)
+
+  secondaryAppConfigSvcName=$(az appconfig list -g "$secondaryResourceGroupName" --query "[].name" -o tsv)
+
+  echo ""
+  echo "Derived inputs for second azure location"
+  echo "----------------------------------------------"
+  echo "secondaryKeyVaultName=$secondaryKeyVaultName"
+  echo "secondaryAppConfigSvcName=$secondaryAppConfigSvcName"
+
+  echo ""
+  echo "Now configuring secondary key vault"
+
+  # save 'AzureAd:ClientSecret' to Key Vault
+  az keyvault secret set --name 'AzureAd--ClientSecret' --vault-name $secondaryKeyVaultName --value $frontEndWebAppClientSecret --only-show-errors > /dev/null
+  echo "... Set keyvault value for: 'AzureAd--ClientSecret'"
+
+  echo ""
+  echo "Now configuring secondary app config svc"
+  # save 'AzureAd:TenantId' to App Config Svc
+  az appconfig kv set --name $secondaryAppConfigSvcName --key 'AzureAd:TenantId' --value $tenantId --yes --only-show-errors > /dev/null
+  echo "... Set appconfig value for: 'AzureAd:TenantId'"
+
+  #save 'AzureAd:ClientId' to App Config Svc
+  az appconfig kv set --name $secondaryAppConfigSvcName --key 'AzureAd:ClientId' --value $frontEndWebAppClientId --yes --only-show-errors > /dev/null
+  echo "... Set appconfig value for: 'AzureAd:ClientId'"
+  
+  # save 'App:RelecloudApi:AttendeeScope' scope for role to App Config Svc
+  az appconfig kv set --name $secondaryAppConfigSvcName --key 'App:RelecloudApi:AttendeeScope' --value "api://$apiWebAppClientId/$scopeName" --yes --only-show-errors > /dev/null
+  echo "... Set appconfig value for: 'App:RelecloudApi:AttendeeScope'"
+
+  # save 'Api:AzureAd:ClientId' to App Config Svc
+  az appconfig kv set --name $secondaryAppConfigSvcName --key 'Api:AzureAd:ClientId' --value $apiWebAppClientId --yes --only-show-errors > /dev/null
+  echo "... Set appconfig value for: 'Api:AzureAd:ClientId'"
+    
+  # save 'Api:AzureAd:TenantId' to App Config Svc
+  az appconfig kv set --name $secondaryAppConfigSvcName --key 'Api:AzureAd:TenantId' --value $tenantId --yes --only-show-errors > /dev/null
+  echo "... Set appconfig value for: 'Api:AzureAd:TenantId'"
+elif [[ $canSetSecondAzureLocation -eq 2 ]]; then
+  echo ""
+  echo "skipped setup for secondary azure location because frontend app registration objectId=$frontEndWebObjectId already exists."
+elif [[ $canSetSecondAzureLocation -eq 3 ]]; then
+  echo ""
+  echo "skipped setup for secondary location because API app registration objectId=$apiObjectId already exists."
 fi
 
 # all done
