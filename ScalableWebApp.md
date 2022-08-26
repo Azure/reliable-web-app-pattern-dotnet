@@ -42,6 +42,8 @@ upon which they will achieve their longer-term objectives in later
 phases.The following solution diagram shows the reference architecture
 that we'll discuss for the rest of the guide.
 
+![Scalable web app architecture diagram](./assets/Guide/ScalableWebAppArchitectureDiagram.png)
+
 ## Well Architected Scalable Web Application Pillars
 
 The five pillars of the Azure Well-Architected Framework provide guiding
@@ -75,7 +77,7 @@ Availability is whether your users can access your workload when they
 need to. These patterns are used by the Relecloud sample to improve
 reliability.
 
-* [Service to Service Communication and Retry](https://docs.microsoft.com/azure/architecture/patterns/retry)
+### Service to Service Communication and Retry
 
 Given the distributed nature of cloud applications, they must be
 designed to operate under the assumption of unreliable communications.
@@ -85,26 +87,52 @@ Faults include the momentary loss of network connectivity to components
 and services, the temporary unavailability of a service, or timeouts
 that occur when a service is busy.
 
-The Relecloud web app does this with the [retry
-pattern](https://docs.microsoft.com/azure/architecture/patterns/retry)
+The Relecloud web app does this with the [Retry Pattern](https://docs.microsoft.com/azure/architecture/patterns/retry)
 because these faults are typically self-correcting and if a service call
 is retried after a short delay, then it is likely to succeed. Adding the
-retry pattern helped us build a web app that insulates the user
+Retry Pattern helped us build a web app that insulates the user
 experience from these transient errors.
 
-To implement the Retry pattern in ASP.NET Core we use the
+To implement the Retry Pattern in ASP.NET Core we use the
 [Polly](https://github.com/App-vNext/Polly) library. This enables us to
 use fluent APIs that describe the behavior we want in one central
 location of our app. In the following screenshot we can see that the
 retry pattern is setup for all service calls made to the concert search
 service.
 
-> **Update Code Block**
->
-> image2.png text goes here
+```cs
+private void AddConcertSearchService(IServiceCollection services)
+{
+    var baseUri = Configuration["App:RelecloudApi:BaseUri"];
+    if (string.IsNullOrWhiteSpace(baseUri))
+    {
+        services.AddScoped<IConcertSearchService, DummyConcertSearchService>();
+    }
+    else
+    {
+        services.AddHttpClient<IConcertSearchService, RelecloudApiConcertSearchService>(httpClient =>
+        {
+            httpClient.BaseAddress = new Uri(baseUri);
+            httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+            httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "Relecloud.Web");
+        })
+        .AddPolicyHandler(GetRetryPolicy())
+        .AddPolicyHandler(GetCircuitBreakerPolicy());
+    }
+}
 
-<sup>Sample code demonstrates how to use **Polly**to retry api calls to the
-Concert Search Service</sup>
+private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(500), retryCount: 3);
+    return HttpPolicyExtensions
+      .HandleTransientHttpError()
+      .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+      .WaitAndRetryAsync(delay);
+}
+```
+
+<sup>Sample code demonstrates how to use **Polly** to retry api calls to the
+Concert Search Service. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L85)</sup>
 
 In this sample we see that the dependency injection for the
 `IConcertSearchService` object is configured so that whenever a class,
@@ -122,15 +150,15 @@ using this built-in method is that the retry pattern is not exactly but
 includes some randomness to help smooth out bursts of traffic that could
 be sent to the API if an error happens.
 
-- [Circuit Breaker](https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker)
+### Circuit Breaker
 
-In the previous section we showed how the Retry pattern can help users
+In the previous section we showed how the Retry Pattern can help users
 bypass errors in our web app by retrying operations that are likely to
 succeed. But, what-if a real error happens? In that scenario we don't
 want our users to keep waiting because when they retry an operation it
 is not likely to succeed. This is why the Relecloud web app pairs the
-Retry pattern with the Circuit Breaker pattern. The purpose of the
-Circuit breaker is to help our customers understand the difference
+Retry Pattern with the [Circuit Breaker pattern](https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker).
+The purpose of the Circuit breaker is to help our customers understand the difference
 between a transient error and one that will impact their experience. If
 the database is unavailable, perhaps because a configuration is not set
 correctly, then we don't want every user to wait up to 3 seconds for
@@ -142,12 +170,17 @@ behavior is named ` GetCircuitBreakerPolicy()`. This behavior is also
 provided by the Polly library and the behavior we want is described with
 the same fluent method extensions.
 
-> **Update Code Block**
->
-> image3.png text goes here
+```cs
+private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
+}
+```
 
 <sup>Sample code shows how to use Polly to add Circuit Breaker behavior to
-web API calls</sup>
+web API calls. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L115)</sup>
 
 In this sample we can see that if the front-end web app observes more
 than 5 errors it will stop the retry behavior we previously described
@@ -165,7 +198,7 @@ your security architecture assures confidentiality, integrity, and
 availability. These patterns are used by the Relecloud sample to improve
 security.
 
-- Use identity-based authentication [Authentication with Azure AD](https://docs.microsoft.com/azure/architecture/framework/security/design-identity-authentication#use-identity-based-authentication)
+### Use identity-based authentication
 
 To achieve their goal of improving security the Relecloud team developed
 the web app to connect to Key Vault and App Configuration with the
@@ -180,16 +213,16 @@ permission to both Key Vault and App Configuration so that they can run
 the app locally. We recommend using Security Groups to make this
 administration easier to manage.
 
-- Endpoint security [Best practices for endpoint security](https://docs.microsoft.com/azure/architecture/framework/security/design-network-endpoints)
-- Add:  "Break Glass" Pattern
-- Add: Public connections refused
+### Endpoint security
+TODO -  elaborate based on best practices [Best practices for endpoint security](https://docs.microsoft.com/azure/architecture/framework/security/design-network-endpoints)
 
-### TODO: Inner loop dev
+TODO -  describe that public connections refused
 
-### TODO:Context and implementation
+### Inner loop dev
 
+TODO - describe connection to Azure resources and provide guidance on the creation of non-prod environments to support individual dev streams
 
-### Cost Optimization
+## Cost Optimization
 
 Cost optimization principles balance business goals with budget
 justification to create a cost-effective workload while avoiding
@@ -198,21 +231,20 @@ to reduce unnecessary expenses and improve operational efficiencies.
 These patterns are used by the Relecloud sample to improve cost
 optimization.
 
-- [Cache-Aside pattern - Azure Architecture Center](https://docs.microsoft.com/azure/architecture/patterns/cache-aside)
+### Cache-Aside Pattern
 
-Cache aside pattern is for DATA CACHING, e.g. tickets. Redis, in this
-solution, is also used for caching the msal access token.
-
-1. Move the cache aside pattern to scale(performance
-    efficiency)/operational excellence.
-
-    a.  Talk about cache aside cost in terms of avoiding selecting a
-        larger sku. Scale vertically easier. Easier to manage and
-        configure caches vs. read replicas or other databases.
-
-2. Talk about reusing the same redis cache for cost optimization even
-    though it's caching different things. (Pattern: Reuse common
-    infrastructure?)
+> [Cache-Aside Pattern](https://docs.microsoft.com/azure/architecture/patterns/cache-aside) is for DATA CACHING, e.g. tickets. Redis, in this
+> solution, is also used for caching the msal access token.
+> 
+> 1. TODO - Move the cache aside pattern to scale(performance efficiency)/operational excellence.
+> 
+>     a.  Talk about cache aside cost in terms of avoiding selecting a
+>         larger sku. Scale vertically easier. Easier to manage and
+>         configure caches vs. read replicas or other databases.
+> 
+> 2. TODO - Talk about reusing the same redis cache for cost optimization even
+>     though it's caching different things. (Pattern: Reuse common
+>     infrastructure?)
 
 The Relecloud web app uses Azure SQL to store information about
 Concerts, Users, and Tickets. Relational databases are great for storing
@@ -234,12 +266,25 @@ The caching process begins when the web app starts as we connect to the
 cache and register it with the ASP.NET Core dependency injection
 container. You can see this in Startup.cs
 
-> **Update Code Block**
->
-> image4.png text goes here
+```cs
+private void AddAzureCacheForRedis(IServiceCollection services)
+{
+    if (!string.IsNullOrWhiteSpace(Configuration["App:RedisCache:ConnectionString"]))
+    {
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = Configuration["App:RedisCache:ConnectionString"];
+        });
+    }
+    else
+    {
+        services.AddDistributedMemoryCache();
+    }
+}
+```
 
 <sup>Sample code demonstrates how the web app connects to Azure Cache for
-Redis</sup>
+Redis. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L50)</sup>
 
 Once the app is started, the cache is empty until the first request is
 made to the page that displays the upcoming concerts. When this page is
@@ -247,11 +292,34 @@ loaded ASP.NET Core will use the SqlDatabaseConcertRepository to
 retrieve data from Azure SQL so it can be shown on the page. Let's
 examine the method GetUpcomingConcertsAsync from this repository.
 
-> **Update Code Block**
->
-> image5.png text goes here
-
-<sup>Sample code demonstrates how to use Redis with Azure SQL</sup>
+```cs
+public async Task<ICollection<Concert>> GetUpcomingConcertsAsync(int count)
+{
+    IList<Concert>? concerts;
+    var concertsJson = await this.cache.GetStringAsync(CacheKeys.UpcomingConcerts);
+    if (concertsJson != null)
+    {
+        // We have cached data, deserialize the JSON data.
+        concerts = JsonSerializer.Deserialize<IList<Concert>>(concertsJson);
+    }
+    else
+    {
+        // There's nothing in the cache, retrieve data from the repository and cache it for one hour.
+        concerts = await this.database.Concerts.AsNoTracking()
+            .Where(c => c.StartTime > DateTimeOffset.UtcNow && c.IsVisible)
+            .OrderBy(c => c.StartTime)
+            .Take(count)
+            .ToListAsync();
+        concertsJson = JsonSerializer.Serialize(concerts);
+        var cacheOptions = new DistributedCacheEntryOptions {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+        };
+        await this.cache.SetStringAsync(CacheKeys.UpcomingConcerts, concertsJson, cacheOptions);
+    }
+    return concerts ?? new List<Concert>();
+}
+```
+<sup>Sample code demonstrates how to use Redis with Azure SQL. [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L67)</sup>
 
 The main purpose of this method is to access the database and retrieve
 the 10 latest Concerts. We filter by time, sort, and return data to the
@@ -265,19 +333,25 @@ we don't have to ask again. In this example the information will only be
 cached for 1-hour. We do this to keep the information in cache relevant
 but the right duration for the cache will vary for every scenario.
 
-- In this sample the Concerts are not editable. Remember that when you
-    use a cache you will want to invalidate it whenever the data is
-    modified. You can achieve this with an event driven system or by
-    ensuring that the cached data is only accessed directly from the
-    repository class that is responsible for the create and edit events.
-    When using the Repository Pattern you can manage stale data by
-    clearing the cache key as shown in the CreateConcertAsync method.
-
-> **Update Code Block**
->
-> image6.png text goes here
->
-<sup>Sample code demonstrates how to invalidate cache when using Repository Pattern</sup>
+> In this sample the Concerts are not editable. Remember that when you
+> use a cache you will want to invalidate it whenever the data is
+> modified. You can achieve this with an event driven system or by
+> ensuring that the cached data is only accessed directly from the
+> repository class that is responsible for the create and edit events.
+> When using the Repository Pattern you can manage stale data by
+> clearing the cache key as shown in the CreateConcertAsync method.
+> 
+> ```cs
+> public async Task<CreateResult> CreateConcertAsync(Concert newConcert)
+> {
+>     database.Add(newConcert);
+>     await this.database.SaveChangesAsync();
+>     this.cache.Remove(CacheKeys.UpcomingConcerts);
+>     return CreateResult.SuccessResult(newConcert.Id);
+> }
+> ```
+> <sup>Sample code demonstrates how to invalidate cache when using Repository Pattern.
+> [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L28)</sup>
 
 ## Operational Excellence
 
@@ -288,35 +362,38 @@ Fast and routine deployment processes won\'t slow down the release of
 new features or bug fixes. These patterns are used by the Relecloud
 sample to improve operational excellence.
 
-Repeatable Infrastructure ([Repeatable Infrastructure - Microsoft Azure
-Well-Architected Framework \| Microsoft
-Docs](https://docs.microsoft.com/azure/architecture/framework/devops/automation-infrastructure))
+### "Break Glass" Pattern
+TODO - elaborate on value achieved by having an admin account that can assist with critical issues but remains unknown, and inaccessible, until required.
 
-\[TODO -- add context and implementation\]
+### Repeatable Infrastructure
 
-Monitoring ([Monitoring workloads - Microsoft Azure Well-Architected
-Framework \| Microsoft
-Docs](https://docs.microsoft.com/azure/architecture/framework/devops/monitor-pipeline))
+TODO - elaborate value achieved based on best practices from [Repeatable Infrastructure - Microsoft Azure Well-Architected Framework \| Microsoft Docs](https://docs.microsoft.com/azure/architecture/framework/devops/automation-infrastructure)
+
+### Monitoring
 
 To see how our application is behaving we're integrating with
 Application Insights. The setup for monitoring request throughput,
 average request duration, errors, and monitoring dependencies is
 accomplished by adding a NuGet package reference to
-'Microsoft.ApplicationInsights.AspNetCore' and registering it with the
+*Microsoft.ApplicationInsights.AspNetCore* and registering it with the
 ASP.NET Core Dependency Injection container.
 
-> **Update Code Block**
->
-> image7.png text goes here
+```cs
+public void ConfigureServices(IServiceCollection services)
+{
+   ...
+   services.AddApplicationInsightsTelemetry(Configuration["App:Api:ApplicationInsights:ConnectionString"]);
+   ...
+}
+```
 
-<sup>Abbreviated sample code shows how to connect to Application Insights</sup>
+<sup>Abbreviated sample code shows how to setup Application Insights.
+[Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L38)</sup>
 
 Adding this setting enables us to see the following types of dashboards
 in the Azure Portal.
 
-> **Update Azure Portal Image**
->
-> image8.png goes here
+![image of Azure Monitor's Live Metrics feature](./assets/Guide/AzureMonitorLiveMetrics.png)
 
 <sup>Screenshot of Azure Portal shows real time metrics for requests being
 made to the web app</sup>
@@ -324,24 +401,16 @@ made to the web app</sup>
 Adding Application Insights also helps us address other requirements for
 Relecloud:
 
-- Must be able to set alerts if no orders have been placed in the past
-    few hours
-
-- Must be able to see if more (or fewer) tickets are added to cart for
-    A/B testing
-
-- Must be able to measure response times to ensure a positive user
-    experience
-
+- Must be able to set alerts if no orders have been placed in the past few hours
+- Must be able to see if more (or fewer) tickets are added to cart for A/B testing
+- Must be able to measure response times to ensure a positive user experience
 - Must be able to see and diagnose application errors
 
 Relecloud uses the baseline metrics and three business metrics that are
 recorded in Application Insights as Events. The 3 custom events are:
 
 - Add to Cart
-
 - Remove from Cart
-
 - Checkout Cart
 
 To track these Events we use the TelemetryClient object provided through
@@ -351,32 +420,31 @@ additional details about the event, the concertId and the number of
 tickets, that we can use for more complex reporting and monitoring needs
 in Azure.
 
-> **Update Code Block**
->
-> image9.png text goes here
+```cs
+this.telemetryClient.TrackEvent("AddToCart", new Dictionary<string, string> {
+    { "ConcertId", concertId.ToString() },
+    { "Count", count.ToString() }
+});
+```
 
 <sup>Sample code show how to track a business event with additional data for
-reporting</sup>
+reporting [Link to CartController.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Controllers/CartController.cs#L81)</sup>
 
 These custom events can be found in the Azure Portal on the Events tab
 for the Application Insights resource.
 
-> **Update Code Block**
->
-> code goes here
+![image of Azure Monitor's Custom Events graphing](./assets/Guide/AzureMonitorCustomEvents.png)
 
-*Screenshot of Azure Portal shows*
+<sup>Screenshot of Azure Portal shows custom events</sup>
 
 Using the Azure Log Analytics Workspace you can create custom queries so
 that you can make dashboards and charts that reflect how your business
 monitors the application.
 
-> **Update Code Block**
->
-> code goes here
+![image of a custom query run in Log Analytics](./assets/Guide/AzureMonitorLogAnalyticsQueries.png)
 
-*Screenshot of Azure Portal shows that details for AddToCart event
-includes ConcertId and ticket Count*
+<sup>Screenshot of Azure Portal shows that details for AddToCart event
+includes ConcertId and ticket Count</sup>
 
 ## Performance Efficiency
 
@@ -386,9 +454,7 @@ anticipate increases in cloud environments to meet business
 requirements. These patterns are used by the Relecloud sample to improve
 performance efficiency.
 
-Queue-Based Load Leveling ([Queue-Based Load Leveling pattern - Azure
-Architecture Center \| Microsoft
-Docs](https://docs.microsoft.com/azure/architecture/patterns/queue-based-load-leveling))
+### Queue-Based Load Leveling
 
 A key measure of success for the Relecloud web app is its ability to
 help customers buy tickets. As more tickets are purchased, the web app
@@ -404,19 +470,12 @@ achieve its goal of selling tickets.
 The Relecloud web app offloads the rendering of tickets to achieve the
 following business goals:
 
-1. The web app should only scale when doing so will help sell more
-    tickets
+1. The web app should only scale when doing so will help sell more tickets
+2. The team would like to update Ticket rendering without impacting the web app
+3. The team would like to ensure that every purchased ticket is saved eventually
+4. The number of tickets purchased should not impact web app response time
 
-2. The team would like to update Ticket rendering without impacting the
-    web app
-
-3. The team would like to ensure that every purchased ticket is saved
-    eventually
-
-4. The number of tickets purchased should not impact web app response
-    time
-
-Event Flow
+**Event Flow**
 
 Separating the generation of tickets to a background process requires
 some setup and orchestration. The following diagram shows each of the
@@ -434,13 +493,11 @@ steps involved with generating a ticket.
 
 6. The customer visits the Tickets page to see their ticket
 
-> **Update Code Block**
->
-> code goes here
+![workflow of ticket generation](./assets/Guide/AsyncRequestReplyPattern.png)
 
-*Reference diagram shows how the user's request becomes a Ticket Image*
+<sup>Reference diagram shows how the user's request becomes a Ticket Image</sup>
 
-### Writing to Azure Queue Storage
+**Writing to Azure Queue Storage**
 
 The process for generating a ticket starts with the
 StorageAccountEventSenderService that we registered with ASP.NET Core's
@@ -449,30 +506,61 @@ dependency injection to send events to the queue.
 We use Managed Identity to securely connect with the
 `DefaultAzureCredential` as shown here:
 
-> **Update Code Block**
->
-> code goes here
+```cs
+public StorageAccountEventSenderService(string serviceUri, string queueName)
+{
+    var queueUri = new Uri(serviceUri+queueName);
+    this.queue = new QueueClient(queueUri, new DefaultAzureCredential(), new QueueClientOptions
+    {
+        MessageEncoding = QueueMessageEncoding.Base64
+    });
+}
+```
 
-*Sample code demonstrates how to connect to the Azure Storage Queue*
+<sup>Sample code demonstrates how to connect to the Azure Storage Queue.
+[Link to StorageAccountEventSenderService.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/StorageAccountEventSenderService/StorageAccountEventSenderService.cs#L13)</sup>
+
 
 And we use the QueueClient object to send the event.
 
-> **Update Code Block**
->
-> code goes here
-*Sample code demonstrates how to send event to the Azure Storage Queue*
+```cs
+public async Task SendEventAsync(Event eventData)
+{
+    var options = new JsonSerializerOptions
+    {
+        WriteIndented = true,
+        Converters =
+        {
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+        }
+    };
+    var body = JsonSerializer.Serialize(eventData, options);
+    await this.queue.SendMessageAsync(body);
+}
+```
+<sup>Sample code demonstrates how to send event to the Azure Storage Queue.
+[Link to StorageAccountEventSenderService.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/StorageAccountEventSenderService/StorageAccountEventSenderService.cs#L28)</sup>
 
-### Reading from Azure Queue Storage
+**Reading from Azure Queue Storage**
 
 In this section the event that was sent from the web app is now being
 received by a different app. We use an Azure Function project and an
 Azure Function input binding to retrieve data from the queue.
 
-> **Update Code Block**
->
-> code goes here
+ ```cs
+ [FunctionName("EventProcessor")]
+ public async Task Run(
+     [QueueTrigger("relecloudconcertevents", Connection = "App:StorageAccount:ConnectionString")]
+     Event eventInfo,
+     ILogger log)
+ {
+   ...
+ }
+```
 
-*Sample code from EventProcessorFunction.cs in Azure Functions project*
+<sup>Sample code from EventProcessorFunction.cs in Azure Functions project.
+[Link to EventProcessorFunction.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.FunctionApp/EventProcessor/EventProcessorFunction.cs#L35)
+</sup>
 
 In this scenario the function uses the Azure Storage Account's
 connection string to connect. For most operations we recommend Managed
@@ -481,22 +569,36 @@ Connection String option provides different options in this scenario
 that we'll discuss when talking about the Shared Access Signature in the
 next section.
 
-### Writing to Azure Blob Storage
+**Writing to Azure Blob Storage**
 
 Within the Function app we save the generated image as a blob to Azure
 storage.
 
-> **Update Code Block**
->
-> code goes here
+```cs
+var storageAccountConnStr = this.configuration["App:StorageAccount:ConnectionString"];
+var blobServiceClient = new BlobServiceClient(storageAccountConnStr);
+
+//  Gets a reference to the container.
+var blobContainerClient = blobServiceClient.GetBlobContainerClient(StorageContainerName);
+
+//  Gets a reference to the blob in the container
+var blobClient = blobContainerClient.GetBlobClient(BlobNameFormatString.Replace($"{{{nameof(Event.EntityId)}}}", ticketId.ToString()));
+var blobInfo = await blobClient.UploadAsync(ticketImageBlob, overwrite: true);
+
+log.LogInformation("Successfully wrote blob to storage.");
+```
+
+<sup>Sample code from EventProcessorFunction.cs in Azure Functions project.
+[Link to EventProcessorFunction.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.FunctionApp/EventProcessor/EventProcessorFunction.cs#L151)
+</sup>
 
 In this section we see the 2^nd^ way that Shared Access Signatures
 changed our code. First, we used the Connection String to connect to
 Azure Storage, and now we're using the BlobServiceClient instead of the
 Azure Function output binding.
 
-The purpose of the Shared Access Signature (often called SAS) is to
-secure each of the tickets that we've rendered but also make those
+The purpose of the [Shared Access Signature](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview)
+(often called SAS) is to secure each of the tickets that we've rendered but also make those
 images directly available to users that have purchased tickets. A Shared
 Access Signature is a component that can be added to the URL for each
 blob to grant access to the private resource. And you can only generate
@@ -510,19 +612,31 @@ maximum duration for a Shared Access Signature from a user token is only
 Here's how we use C# to automate the generation of Shared Access
 Signatures.
 
-> **Update Code Block**
->
-> code goes here
+```cs
+//  Defines the resource being accessed and for how long the access is allowed.
+var blobSasBuilder = new BlobSasBuilder
+{
+    StartsOn = DateTime.UtcNow.AddMinutes(-5),
+    ExpiresOn = DateTime.UtcNow.Add(TimeSpan.FromDays(30)),
+};
+
+//  Defines the type of permission.
+blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+//  Builds the Sas URI.
+var queryUri = blobClient.GenerateSasUri(blobSasBuilder);
+```
+
+<sup>Sample code from EventProcessorFunction.cs in Azure Functions project.
+[Link to EventProcessorFunction.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.FunctionApp/EventProcessor/EventProcessorFunction.cs#L166)
+</sup>
 
 After generating the Shared Access Signature, the code will update the
 database so the tickets can be displayed in the web app's Tickets page.
 
-> **Update Code Block**
->
-> code goes here
+![screenshot of tickets page in Relecloud web app](./assets/Guide/WebAppTicketsPage.png)
 
-*Screenshot of Relecloud web app shows a sample ticket that was rendered
-by Azure Functions*
+<sup>Screenshot of Relecloud web app shows a sample ticket that was rendered by Azure Functions</sup>
 
 # Deploying the solution
 
@@ -543,25 +657,23 @@ There are 4 phases to deploying this solution
 ## 1. Pre-requisites
 
 This guide assumes you have access to a bash terminal. Windows users can
-access a Linux shell with WSL.
+access a Linux shell with WSL ([Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/about)).
 
 Install the Azure CLI. Run the following command to verify that you have
 a minimum version of 2.38.0.
 
-> **Update Code Block**
->
-> code goes here
+```bash
+az version
+```
 
 You will need an Azure subscription with permission to create resources
 in a resource group to deploy this solution. You will also need to
 install the Azure Dev CLI to deploy the code and services.
 
 Run the following command to verify that the Azure Dev CLI is installed
-> **Update Code Block**
->
-> code goes here
-
-Run the following command to verify that the Azure CLI is installed
+```bash
+azd version
+```
 
 ## 3. Deploy the code
 
@@ -570,38 +682,34 @@ sample we included a Github workflow that will deploy the code. To
 invoke the same behavior from your dev box we only need to run two
 commands with Azure Dev CLI.
 
-Provision the infrastructure
+**Provision the infrastructure**
 
 You will be asked to create the environment, select an Azure region, and
 to select the Azure subscription you would like to use.
 
-> **Update Code Block**
->
-> code goes here
+```bash
+azd provision -e relecloudresourcesdev
+```
 
-Create the App Registrations
+**Create the App Registrations**
 
 Run the following command to create two app registrations and setup the
 App Configuration Service and Key Vault values that are needed to run
 the web app.
 
-> **Update Code Block**
->
-> code goes here
+```bash 
+./infra/createAppRegistrations.sh -g relecloudresourcesdev-rg
+```
 
-Deploy the code
+**Deploy the code**
 
-When finished the console will display the URI for the web app.
+```bash
+ azd deploy --no-prompt
+```
 
-> **Update Code Block**
->
-> code goes here
+When finished the console will display the URI for the web app. You can use this URI to view the deployed solution in a browser.
 
-You can use this URI to view the deployed solution in a browser.
-
-> **Update Code Block**
->
-> code goes here
+![screenshot of Relecloud app home page](./assets/Guide/WebAppHomePage.png)
 
 # Choosing the right services
 
@@ -616,84 +724,64 @@ We have chosen a set of services based on the following criteria:
 
 - Our target SLA is 99.9%
 
-- We expect an average daily user load will be around 1000 users
+- We expect an average daily user load will be around 1,000 users
 
-[Summary of services used]{.underline}
+**Summary of services used**
 
-- [App Services - Web
-    Apps](https://www.microsoft.com/azure/app-service/app-service-web-overview) hosts
+- [App Services - Web Apps](https://www.microsoft.com/azure/app-service/app-service-web-overview) hosts
     web applications allowing autoscaling and high availability without
     having to manage infrastructure. This is where the Relecloud
     Concerts web app will be deployed.
 
-- [Azure Active Directory -
-    B2C](https://www.microsoft.com/azure/active-directory-b2c/active-directory-b2c-overview) is
-    an identity management service that enables customization and
-    control over how customers sign up, sign in, and manage their
-    profiles in an application.
+- [Azure Active Directory]().
 
-- [Azure SQL
-    Database](https://docs.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql) is
+- [Azure SQL Database](https://docs.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql) is
     a general-purpose relational database managed service in Microsoft
     Azure that supports structures such as relational data, JSON,
     spatial, and XML.
 
-- [Application
-    Insights](https://docs.microsoft.com/azure/azure-monitor/app/app-insights-overview)
+- [Application Insights](https://docs.microsoft.com/azure/azure-monitor/app/app-insights-overview)
     is a feature of Azure Monitor that provides extensible application
     performance management (APM) and monitoring for live web apps,
 
-- [Azure Cache for
-    Redis](https://docs.microsoft.com/azure/azure-cache-for-redis/cache-overview)
+- [Azure Cache for Redis](https://docs.microsoft.com/azure/azure-cache-for-redis/cache-overview)
     provides an in-memory data store based on the Redis software.
 
-- [Azure Application
-    Gateway](https://docs.microsoft.com/azure/application-gateway/overview)
+- [Azure Application Gateway](https://docs.microsoft.com/azure/application-gateway/overview)
     is a web traffic load balancer that enables you to manage traffic to
     your web applications.
 
-- [Azure Web Application
-    Firewall](https://docs.microsoft.com/azure/web-application-firewall/overview)
+- [Azure Web Application Firewall](https://docs.microsoft.com/azure/web-application-firewall/overview)
     provides centralized protection of your web applications from common
     exploits and vulnerabilities.
 
-- [Azure Key
-    Vault](https://docs.microsoft.com/azure/key-vault/general/overview)
+- [Azure Key Vault](https://docs.microsoft.com/azure/key-vault/general/overview)
     provides centralized storage of application secrets to control their
     distribution
 
-- [Azure App
-    Configuration](https://docs.microsoft.com/azure/azure-app-configuration/overview)
+- [Azure App Configuration](https://docs.microsoft.com/azure/azure-app-configuration/overview)
     is a service to centrally manage application settings and feature
     flags
 
-- [Azure
-    Functions](https://docs.microsoft.com/azure/azure-functions/functions-overview)
+- [Azure Functions](https://docs.microsoft.com/azure/azure-functions/functions-overview)
     is a serverless solution that runs on demand. It provides triggers
     and bindings that enable devs to quickly build code to process
     events.
 
-- [Azure
-    Storage](https://docs.microsoft.com/azure/storage/common/storage-introduction)
+- [Azure Storage](https://docs.microsoft.com/azure/storage/common/storage-introduction)
     provides storage for files and queue storage for message driven
     communication.
 
-- [Azure Private
-    DNS](https://docs.microsoft.com/azure/dns/private-dns-overview)
+- [Azure Private DNS](https://docs.microsoft.com/azure/dns/private-dns-overview)
     provides a reliable and secure DNS service for your virtual network.
     Azure Private DNS manages and resolves domain names in the virtual
     network without the need to configure a custom DNS solution.
 
-- [Azure Private
-    Link](https://docs.microsoft.com/azure/private-link/private-link-overview)
+- [Azure Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview)
     enables you to access Azure PaaS Services over a Private Endpoint in
     your virtual network. A Private Endpoint is a network interface that
     uses a private IP address from your virtual network. This connects
     you privately and securely to a service such as Azure SQL Database.
-
-- Polly
-
-- Entity Framework
 
 ### App Service
 
@@ -716,32 +804,27 @@ Web Apps meets the following requirements for hosting our app:
 App Service meets our requirements. We are free to choose whether we
 want to host our app using App Service running Windows or Linux.
 
-###
+<br />
 
-### Azure Active Directory -- B2C
+### Azure Active Directory
 
 Azure Active Directory (AAD) was chosen as our identity platform for
 this app. We need to be able to both authenticate a user's identity and
 authorize them based on roles that our app understands. We have the
-following requirements that were satisfied by choosing Azure AD B2C:
+following requirements that were satisfied by choosing Azure AD:
 
-- we want to authenticate and authorize users, but we want users to
-    provide their own identity
+- we want to authenticate and authorize users
+
+- we want to leverage the power of a well-known solution that has
+    proven it can scale to support larger scenarios for millions of users
+
+- we do not allow users to choose their identity, or create their own accounts
 
 - we do not want to be responsible for managing forgotten passwords
     and password resets for our users
 
-- we want to meet users where they are, and integrate with popular
-    social login providers
-
 - we want our identity solution to be conform to OpenID Connect and
     OAuth 2.0
-
-- we need to be able to store custom extended profile details within
-    our identity solution
-
-- we want the option to brand the login page according to our business
-    branding guidelines
 
 Identity is a broad topic, and getting it right is important. If you
 think Azure AD B2C might be a good fit for your app, review your
@@ -749,7 +832,7 @@ requirements and compare them against the [technical and feature
 overview](https://docs.microsoft.com/azure/active-directory-b2c/technical-overview)
 of Azure AD B2C.
 
-###
+<br />
 
 ### SQL Database
 
@@ -779,6 +862,10 @@ running in Azure, then [select the best Azure SQL
 deployment](https://cloudblogs.microsoft.com/sqlserver/2020/03/17/tips-to-select-the-best-azure-sql-deployment-option/)
 option for your app.
 
+<br />
+
+### Azure Storage
+
 Many solutions hosted on Azure make at least some use of Azure Storage.
 Our app processes ticket purchases by processing purchase messages off a
 queue, then generating a printable ticket to a concert. We chose to use
@@ -800,16 +887,14 @@ We have the following requirements for our queue:
 - we want to authenticate to our queue using Managed Identity
 
 These requirements lead us to use Azure Storage Queues for our queuing
-needs. If you have a queue scenario in your app, [[review the messaging
-options
-available]{.underline}](https://docs.microsoft.com/azure/service-bus-messaging/service-bus-azure-and-service-bus-queues-compared-contrasted)
+needs. If you have a queue scenario in your app,
+[review the messaging options available](https://docs.microsoft.com/azure/service-bus-messaging/service-bus-azure-and-service-bus-queues-compared-contrasted)
 in both Storage Queues and Azure Service Bus and determine which is the
 best fit for your app.
 
 We have the following requirements for storing images of tickets:
 
-- endpoints for accessing storage should not be exposed to the public
-    Internet
+- endpoints for accessing storage should not be exposed to the public internet
 
 - we want to manage our encryption keys using our own certificates
 
@@ -825,10 +910,12 @@ zones in the primary region. Each availability zone is in a separate
 physical location with independent power, cooling, and networking.
 
 We can use Key Vault to manage our certificate used to encrypt our
-storage account, and [[private
-endpoints]{.underline}](https://docs.microsoft.com/azure/private-link/private-endpoint-overview)
-to allow clients to securely access data over a [[Private
-Link]{.underline}](https://docs.microsoft.com/azure/private-link/private-link-overview).
+storage account, and 
+[private endpoints](https://docs.microsoft.com/azure/private-link/private-endpoint-overview)
+to allow clients to securely access data over a
+[Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview).
+
+<br />
 
 ### Azure Functions
 
@@ -853,6 +940,8 @@ We chose Azure Functions to host our ticket generation logic. Because we
 have a no cold start requirement, we will choose the Premium SKU for
 Functions.
 
+<br />
+
 ### Azure Cache for Redis
 
 Our app is expected to attract more than a million daily users. We
@@ -868,7 +957,9 @@ want to implement a cache that provides us with:
 
 - a unified cache location for all instances of our web app to use
 
-Application Insights / Azure Monitor
+<br />
+
+### Application Insights / Azure Monitor
 
 Application Insights is a feature of Azure monitor that provides
 extensible application performance management (APM) and monitoring for
@@ -882,33 +973,26 @@ web apps. We chose to incorporate Application Insights because it:
 
 - allows us to easily send custom events we want to track in our app
 
->  
-
 Azure Monitor is a comprehensive suite of monitoring tools. Data
 captured by Application Insights is surfaced through a variety of
 mechanisms. Review the following concepts to quickly come up to speed on
 its capabilities:
 
-- [[Smart detection in application
-    insights]{.underline}](https://docs.microsoft.com/azure/azure-monitor/app/proactive-diagnostics)
+- [Smart detection in application insights](https://docs.microsoft.com/azure/azure-monitor/app/proactive-diagnostics)
 
-- [[Application Map: Triaging Distributed
-    Applications]{.underline}](https://docs.microsoft.com/azure/azure-monitor/app/app-map?tabs=net)
+- [Application Map: Triaging Distributed Applications](https://docs.microsoft.com/azure/azure-monitor/app/app-map?tabs=net)
 
-- [[Profile live App Service apps with Application
-    Insights]{.underline}](https://docs.microsoft.com/azure/azure-monitor/app/profiler)
+- [Profile live App Service apps with Application Insights](https://docs.microsoft.com/azure/azure-monitor/app/profiler)
 
-- [[Usage analysis with Application
-    Insights]{.underline}](https://docs.microsoft.com/azure/azure-monitor/app/usage-overview)
+- [Usage analysis with Application Insights](https://docs.microsoft.com/azure/azure-monitor/app/usage-overview)
 
-- [[Getting started with Azure Metrics
-    Explorer]{.underline}](https://docs.microsoft.com/azure/azure-monitor/essentials/metrics-getting-started)
+- [Getting started with Azure Metrics Explorer](https://docs.microsoft.com/azure/azure-monitor/essentials/metrics-getting-started)
 
-- [[Application Insights Overview
-    dashboard]{.underline}](https://docs.microsoft.com/azure/azure-monitor/app/overview-dashboard)
+- [Application Insights Overview dashboard](https://docs.microsoft.com/azure/azure-monitor/app/overview-dashboard)
 
-- [[Log queries in Azure
-    Monitor]{.underline}](https://docs.microsoft.com/azure/azure-monitor/logs/log-query-overview)
+- [Log queries in Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/logs/log-query-overview)
+
+<br />
 
 ### App Configuration
 
@@ -929,22 +1013,19 @@ configuration data. Our configuration requirements are:
     repository**, and that data to be updated in our central
     configuration store as part of our pipeline
 
-- we want to use [[Managed
-    Identity]{.underline}](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview)
+- we want to use [[Managed Identity]{.underline}](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview)
     to simplify and secure our connection to our configuration store
 
->  
-
-[[App
-Configuration]{.underline}](https://docs.microsoft.com/azure/azure-app-configuration/overview)
+[App Configuration](https://docs.microsoft.com/azure/azure-app-configuration/overview)
 meets these needs and is easy to incorporate in your existing app using
 the
-[[ConfigurationBuilder]{.underline}](https://docs.microsoft.com/azure/azure-app-configuration/quickstart-dotnet-core-app)
-object. Review App Configuration capabilities and [[best
-practices]{.underline}](https://docs.microsoft.com/azure/azure-app-configuration/howto-best-practices#app-configuration-bootstrap)
+[ConfigurationBuilder](https://docs.microsoft.com/azure/azure-app-configuration/quickstart-dotnet-core-app)
+object. Review App Configuration capabilities and [best practices](https://docs.microsoft.com/azure/azure-app-configuration/howto-best-practices#app-configuration-bootstrap)
 to decide if this service is a fit for your app.
 
-Key Vault
+<br />
+
+### Key Vault
 
 Our solution requires use of X.509 certificates, connection strings and
 API keys for integration with 3^rd^ party services. We favor the use of
@@ -952,40 +1033,39 @@ Managed Identity for intra-Azure service communication but there are
 still secrets that must be managed. We chose to use Key Vault for the
 following capabilities:
 
-- Data is encrypted at rest
+- data is encrypted at rest
 
-- Data is encrypted in transit
+- data is encrypted in transit
 
-- Authentication to our secret store should support Managed Identity
+- authentication to our secret store should support Managed Identity
 
-- Our secret store must support logging to allow us to audit access
+- our secret store must support logging to allow us to audit access
 
-- Our secret store needs to be able to alert us when changes are made
+- our secret store needs to be able to alert us when changes are made
     to stored secrets
 
-- We should be able to import of PFX and PEM formatted certificates
+- we should be able to import of PFX and PEM formatted certificates
 
->  
 
 Key Vault meets this need, and like App Configuration is easy to
 incorporate in .NET apps using the
-[[ConfigurationBuilder]{.underline}](https://docs.microsoft.com/dotnet/api/overview/azure/extensions.aspnetcore.configuration.secrets-readme)
+[ConfigurationBuilder](https://docs.microsoft.com/dotnet/api/overview/azure/extensions.aspnetcore.configuration.secrets-readme)
 object.
+
+<br />
 
 # Simulating the patterns
 
 Here are some things you can try to see these patterns in action while
 running this solution in Azure.
 
-Queue-based load leveling
+### Queue-based load leveling
 
 This pattern offloads the ticket rendering process from our web app to
 the Azure function. We can easily see this in action by navigating
 through the checkout process.
 
-> **Update Code Block**
->
-> code goes here
+![image of shopping cart page with 1 item in cart](./assets/Guide/Simulating_CheckoutPage.png)
 
 Try buying a ticket, then do it again and try buying 20 tickets. The
 value of this pattern is that our web app will remain performant and
@@ -995,15 +1075,17 @@ always accept more customer orders.
 Here's how that looks from Application Insights where the response times
 are similar for both checkout processes.
 
-> **Update Code Block**
->
-> code goes here
+> Note that App Insights graphs can take a couple of minutes to aggregate the
+> latest information. To see your events and data as they happen use the
+> [Live Metric stream](https://docs.microsoft.com/en-us/azure/azure-monitor/app/live-stream)
+
+![image of common requests displayed in app insights](./assets/Guide/Simulating_AppInsightsTopRequests.png)
 
 In the screenshot above we can see the checkout flow for the first
 request with 1 ticket as 588ms and the checkout for the second request
 with 20 tickets was 162ms.
 
-Retry and Circuit Breakers
+### Retry and Circuit Breakers
 
 These patterns improve the reliability of the solution by attempting to
 resolve transient errors that can surface when making an API call. To
@@ -1016,9 +1098,7 @@ First, open the Azure App Configuration blade in the Azure Portal.
 Scroll down through the tabs and find the "Configuration Explorer" so
 you can see the settings that the web app uses.
 
-> **Update Code Block**
->
-> code goes here
+![image of Configuration Explorer in the App Configuration Service blade on the Azure Portal](./assets/Guide/Simulating_AppConfigSvcConfigurationExplorer.png)
 
 Based on the bicep templates provided this setting
 `App:RelecloudApi:BaseUri` is automatically set to the correct URL so
@@ -1028,44 +1108,33 @@ this configuration with ".com" and observe the behavior. Click save and
 use the Azure Portal to restart the front-end App Service so that this
 value is reloaded.
 
-> **Update Code Block**
->
-> code goes here
-
-> **Update Code Block**
->
-> code goes here
+![image of App Service restart confirmation dialog](./assets/Guide/Simulating_AppServiceRestart.png)
 
 After the web app is restarted we can click on the "Upcoming" menu link
 and see that all of the concert data has disappeared. Even though our
 data is cached in Redis we can see that the web front-end needs access
 to the web api app to receive that data.
 
+![image of App Service restart confirmation dialog](./assets/Guide/Simulating_UpcomingConcertsPage.png)
+
 And in App Insights we can see that this is not an error the web app
 could recover from so the Circuit Breaker pattern allowed the user to
 see a "fail fast" experience because the circuit was open.
 
-> **Update Code Block**
->
-> code goes here
+![image of request error in Application Insights shows that the circuit is now open](./assets/Guide/Simulating_AppInsightsTransationDetails.png)
 
 Let's re-open the Azure App Configuration Explorer and fix that setting
 before moving to the next step. Edit the `App:RelecloudApi:BaseUri`
 and replace the ".com" part of the Uri with ".net" as it was originally
 configured.
 
-> **Update Code Block**
->
-> code goes here
+![image of Configuration Explorer in the App Configuration Service blade on the Azure Portal](./assets/Guide/Simulating_AppConfigSvcConfigurationExplorer.png)
 
-And, we must also restart the web app again for this new setting to take
-effect.
+And, we must also restart the web app again for this new setting to take effect.
 
-> **Update Code Block**
->
-> code goes here
+![image of App Service restart confirmation dialog](./assets/Guide/Simulating_AppServiceRestart.png)
 
-Cache Aside Pattern
+### Cache Aside Pattern
 
 The cache aside pattern enables us to offload read queries to SQL server
 and it also provides a layer of redundancy that can keep parts of our
@@ -1078,36 +1147,29 @@ of times. The first time the page is loaded the web api app will send a
 request to SQL server but the following requests will go to Azure Cache
 for Redis.
 
-> **Update Code Block**
->
-> code goes here
+![image of App Insights shows connection to SQL server to retrieve data](./assets/Guide/Simulating_AppInsightsRequestWithSqlServer.png)
 
 In this screenshot above we see a connection was made to SQL server and
 that this request took 742ms.
 
-> **Update Code Block**
->
-> code goes here
+![image of App Insights shows request returns data without SQL](./assets/Guide/Simulating_AppInsightsRequestWithoutSql.png)
 
 In the next request we see that the API call was only 55ms because it
 didn't have to connect to SQL Server and instead used the data from
 Azure Cache for Redis.
 
-> **Update Code Block**
->
-> code goes here
+![image of Azure Cache for Redis Console lists all keys](./assets/Guide/Simulating_RedisConsoleListKeys.png)
 
 Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
-> **Update Code Block**
->
-> code goes here
+![image of Azure Cache for Redis Console shows data for upcoming concerts](./assets/Guide/Simulating_RedisConsoleShowUpcomingConcerts.png)
+
 
 # Resulting service level and cost
 
 The deployment of this solution achieves an SLO of about 99.6% and will
 have a minimum estimated cost of \$929.97 when deployed to the East US
-region.SLO
+region.
 
 This solution uses multiple Azure Services with varying SLAs to achieve
 a composite availability SLO of 99.61%. To begin, we define that the
@@ -1117,15 +1179,14 @@ SLA for the underlying components.
 
 | Azure Service | SLA |
 | --- | --- |
-| [Azure | 99.99% |
-| [Azure SQL](https://azure.microsoft.com/support/legal/sla/azure-sql-database/v1_8/) |  99.99% |
-| [Azure Active Directory](https://azure.microsoft.com/support/legal/sla/active-directory/v1_1/) |
-| [Azure App Service](https://azure.microsoft.com/support/legal/sla/app-service/) | 99.9% |
-| [Azure App Configuration](<https://azure.microsoft.com/support/legal/sla/app-configuration/v1_0/>) |
-| [Key Vault](https://azure.microsoft.com/support/legal/sla/key-vault/v1_0/) | 99.99% |
-| [Azure Storage Accounts](https://azure.microsoft.com/support/legal/sla/storage/v1_5/) |  99.9% |
+| [Azure Active Directory](https://azure.microsoft.com/support/legal/sla/active-directory/v1_1/) | 99.99% |
+| [Azure App Configuration](<https://azure.microsoft.com/support/legal/sla/app-configuration/v1_0/>) | 99.9% |
+| [Azure App Service](https://azure.microsoft.com/support/legal/sla/app-service/) | 99.95% |
 | [Azure Cache for Redis](https://azure.microsoft.com/support/legal/sla/cache/) |99.9% |
+| [Azure Key Vault](https://azure.microsoft.com/support/legal/sla/key-vault/v1_0/) | 99.99% |
 | [Azure Private Link](https://azure.microsoft.com/support/legal/sla/private-link/v1_0/) | 99.99%|
+| [Azure Storage Accounts](https://azure.microsoft.com/support/legal/sla/storage/v1_5/) |  99.9% |
+| [Azure SQL Database](https://azure.microsoft.com/support/legal/sla/azure-sql-database/v1_8/) |  99.99% |
 
 All of these components must be functioning to meet the business
 objective of selling tickets. When combined as a solution we multiple
@@ -1180,11 +1241,35 @@ appropriate for Dev/Test workloads and costs an estimated minimum of $278 for ea
 
 # Getting starting with your modernization journey
 
-> TODO -- link to other starting guidance references with quick value
-blurbs i.e., CAF, .net migration assistant, sql migration assistant, app
-service dev landing zone. Need to include a few key decisions here,
-including whether to migrate from .NET Framework to .NET Core in the
-first phase.
+In this guide we provided the content to build a web app based on other resources such as the Azure Architecture Center. In this section we'll highlight those source materials that you can use to learn more about Azure and modernization.
+
+## Additional sources for Azure Best Practices
+
+Use the following resources to learn more about Microsoft's best practices and recommendations for building solutions on Azure.
+
+For further guidance on how to build Azure solutions that align with Microsoft's best practices and recommendations 
+* [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/overview) - Helps an organization prepare and execute their strategy to build solutions on Azure
+* [Azure Architecture Center fundementals](https://docs.microsoft.com/en-us/azure/architecture/guide/) - Provides a library of content that presents a structured approach for designing aplications on Azure that are scalable, secure, resilient, and highly available.
+* [Well Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/) - Describes the best practices and design principles that should be applied when designing Azure solutions that align with Microsoft's recommended best practices
+* [Azure Architectures](https://docs.microsoft.com/en-us/azure/architecture/browse/) - Provides architecture diagrams and technology descriptions for reference architectures, real world examples of cloud architectures, and solution ideas for common workloads on Azure.
+
+## Additional sources for Azure Migration
+
+The following tools and resources can help you with migrating on-prem resources to Azure.
+
+* [Azure Migrate](https://docs.microsoft.com/en-us/azure/migrate/migrate-services-overview) - Azure Migrate provides a simplified migration, modernization, and optimziation service for Azure that handles assessment, migration of web apps, SQL server, and Virtual Machnines.
+* [Azure Database Migration Guides](https://docs.microsoft.com/en-us/data-migration/) - Provides resources for different database types, and different tools designed for your migration scenario
+
+## Additional sources for upgrading .NET Framework apps
+
+This solution includes a dotnet web app capable of running on Linux that was deployed to an App Service running Windows.
+The Azure App Service windows platform enables customers to move .NET Framework web apps to Azure without upgrading to newer framework versions.
+For cutomers wanting Linux App Service plans, or new features and performance improvements added to the latest versions of dotnet, we recommend the following resources.
+
+* [Overview of porting from .NET Framework to .NET](https://docs.microsoft.com/en-us/dotnet/core/porting/) - Is a starting point for finding additional guidance based on your specific type of .NET app.
+* [Overview of the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview) - Is a console tool that can help automate many of the tasks associated with upgrading .NET framework projects
+* [Migrating from ASP.NET to ASP.NET Core in Visual Studio](https://devblogs.microsoft.com/dotnet/introducing-project-migrations-visual-studio-extension/) - The ASP.NET Core team is developing a Visual Studio extension that can assist with incremental migrations of web apps.
+
 
 ## References
 
