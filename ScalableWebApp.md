@@ -216,9 +216,29 @@ the app locally. We recommend using Security Groups to make this
 administration easier to manage.
 
 ### Endpoint security
-TODO -  elaborate based on best practices [Best practices for endpoint security](https://docs.microsoft.com/azure/architecture/framework/security/design-network-endpoints)
 
-TODO -  describe that public connections are refused
+The Relecloud team also manages their security risk by applying networking
+constraints on their Azure resources. By default Azure SQL Database, Azure
+Cache for Redis, and Azure App Service are all publicly accessible resources.
+
+The team secures their data, their secrets, and ensures the integrity of the
+system by using Azure Private Endpoints and blocking public network access.
+Azure Private Link is a service that enables Azure resources to connect
+directly to an Azure Virtual Network where they receive a private IP address.
+Since these resources have private IP addresses this enables the team to
+block all public internet connections.
+
+Using this Virtual Network approach also enables to the team to prepare for
+future network scenarios including hybrid networking if the web app ever
+needs to access on-prem resources.
+
+The team also uses Azure Front Door with Web Application Firewall. The Web
+Application Firewall provides an additional layer of security to protect
+the web app from attackers that exploit common security scenarios. 
+
+> Read the [Best practices for endpoint security](https://docs.microsoft.com/azure/architecture/framework/security/design-network-endpoints)
+> if you would like to learn more about how to secure traffic to and from your Azure resources
+
 
 ## Cost Optimization
 
