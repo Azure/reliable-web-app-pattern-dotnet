@@ -412,7 +412,29 @@ other areas such as Azure Subscriptions and
 
 ### Repeatable Infrastructure
 
-TODO - elaborate value achieved based on best practices from [Repeatable Infrastructure - Microsoft Azure Well-Architected Framework \| Microsoft Docs](https://docs.microsoft.com/azure/architecture/framework/devops/automation-infrastructure)
+Relecloud achieves their goal of being able to rapidly innovate on Azure
+by using the Azure Dev CLI to deploy their solution and their code. The 
+Azure Dev CLI uses bicep templates to create Azure resources,
+setup configuration, and deploy the web app from a Github Action.
+
+Automating the deployment helped achieve the following goals
+- The team needs to ensure consistency between environments. This leads
+to more predictable behaviors in production and helps the dev team troubleshoot
+production issues by being able to recreate the environment.
+- The team needs to ensure that when a mistake is fixed that it is deployed
+to every environment. Using a Github action to create a deployment pipeline
+ensures that when a change is deployed to the dev environment that the same
+change will be applied to other environments including production.
+- The team needs to maximize productivity. Automation helps new team
+members quickly setup a new environment and reduces the operational toil
+related to maintaining production.
+
+Saving the infrastructure definitions as code also enables Relecloud to
+audit and review all production changes deployed to Azure because they
+are each part of a specific commit specific release to Azure.
+
+> Read [Repeatable Infrastructure](https://docs.microsoft.com/azure/architecture/framework/devops/automation-infrastructure)
+> to learn more about improving operational efficiency with automation.
 
 ### Monitoring
 
