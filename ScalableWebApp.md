@@ -1044,7 +1044,7 @@ configuration data. Our configuration requirements are:
     repository**, and that data to be updated in our central
     configuration store as part of our pipeline
 
-- we want to use [[Managed Identity]{.underline}](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview)
+- we want to use [Managed Identity](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview)
     to simplify and secure our connection to our configuration store
 
 [App Configuration](https://docs.microsoft.com/azure/azure-app-configuration/overview)
@@ -1271,7 +1271,8 @@ for production workloads and is more than enough capacity to handle the
 needs for both web apps.
 
 For non-production environments this solution chooses pricing tiers
-appropriate for Dev/Test workloads and costs an estimated minimum of $278 for each non-production environment.
+appropriate for Dev/Test workloads and costs an estimated minimum of
+$278 for each non-production environment.
 
 # Getting starting with your modernization journey
 
