@@ -351,8 +351,44 @@ Fast and routine deployment processes won\'t slow down the release of
 new features or bug fixes. These patterns are used by the Relecloud
 sample to improve operational excellence.
 
-### "Break Glass" Pattern
-TODO - elaborate on value achieved by having an admin account that can assist with critical issues but remains unknown, and inaccessible, until required.
+### Emergency Access Accounts
+
+<!-- https://docs.microsoft.com/en-us/azure/active-directory/roles/security-planning#define-at-least-two-emergency-access-accounts -->
+
+During the creation of the Azure SQL Database the bicep templates will
+deploy the server and create a SQL Admin user account. This account
+has administrative permission to maintain the database and also has the
+power to drop tables.
+
+Keeping the SQL Administrator account helped us address the following
+requirements:
+
+- If an admin forgets their password, or goes on vacation, we need
+to be able to access the system
+- If an outage is detected we need to connect with an account that
+is gauranteed to have the permissions we need to do any operations
+necessary to restore system health
+- If someone leaves the team we need to ensure that we can still
+access the database backups no matter who they were created them.
+
+One of the risks with having this break glass account is that it could
+create a security concern. The team addresses these risks in two ways.
+
+1. The account is stored in a separate Azure Key Vault and access is
+not granted to any other resources. Admins are the only users that
+can access the vault during an outage scenario and the credentials are
+not shared with other teams.
+
+2. The production Azure SQL Database is configured to block network
+connections unless they come through the Private Endpoint. And, the
+database is also configured only to allow Azure AD connections. These
+two settings must be modified before the SQL Admin account in Key
+Vault can be used.
+
+<!-- https://docs.microsoft.com/en-us/azure/defender-for-cloud/recommendations-reference#identityandaccess-recommendations -->
+> This practice is not automated but is recommended for
+other areas such as Azure Subscriptions and
+[Azure AD administration](https://docs.microsoft.com/en-us/azure/active-directory/roles/security-planning#define-at-least-two-emergency-access-accounts).
 
 ### Repeatable Infrastructure
 
