@@ -6,36 +6,86 @@ targetScope = 'subscription'
 param name string
 
 @minLength(1)
-@description('Primary location for all resources')
+@description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
 
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
 
-var resourceToken = toLower(uniqueString(subscription().id, name, location))
+@description('Will select production ready SKUs when `true`')
+param isProd string = 'false'
+
+@description('Should specify an Azure region, if not set to none, to trigger multiregional deployment. The second region should be different than the `location` . e.g. `westus3`')
+param secondaryAzureLocation string
+
+var isProdBool = isProd == 'true' ? true : false
 
 var tags = {
   'azd-env-name': name
 }
 
-resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: '${name}-rg'
+var isMultiLocationDeployment = secondaryAzureLocation == '' ? false : true
+
+var primaryResourceGroupName = '${name}-rg'
+var secondaryResourceGroupName = '${name}-secondary-rg'
+
+var primaryResourceToken = toLower(uniqueString(subscription().id, primaryResourceGroupName, location))
+var secondaryResourceToken = toLower(uniqueString(subscription().id, secondaryResourceGroupName, secondaryAzureLocation))
+
+resource primaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: primaryResourceGroupName
   location: location
   tags: tags
 }
 
-module resources './resources.bicep' = {
-  name: 'resources-${resourceToken}'
-  scope: resourceGroup
+// temporary workaround for multiple resource group bug
+// `azd down` expects to be able to delete this resource because it was listed by the azure deployment output even when it is not deployed
+resource secondaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: secondaryResourceGroupName
+  location: isMultiLocationDeployment ? secondaryAzureLocation : location
+  tags: tags
+}
+
+module primaryResources './resources.bicep' = {
+  name: 'primary-${primaryResourceToken}'
+  scope: primaryResourceGroup
   params: {
+    isProd: isProdBool
     location: location
     environmentName: name
     principalId: principalId
-    resourceToken: resourceToken
+    resourceToken: primaryResourceToken
     tags: tags
   }
 }
 
-output CSHARP_APP_WEB_BASE_URL string = resources.outputs.WEB_URI
-output CSHARP_APP_API_BASE_URL string = resources.outputs.API_URI
+module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
+  name: 'secondary-${primaryResourceToken}'
+  scope: secondaryResourceGroup
+  params: {
+    isProd: isProdBool
+    location: secondaryAzureLocation
+    environmentName: name
+    principalId: principalId
+    resourceToken: secondaryResourceToken
+    tags: tags
+  }
+}
+
+module azureFrontDoor './azureFrontDoor.bicep' = if (isMultiLocationDeployment) {
+  name: 'frontDoor-${primaryResourceToken}'
+  scope: primaryResourceGroup
+  params: {
+    resourceToken: primaryResourceToken
+    tags: tags
+    primaryBackendAddress: primaryResources.outputs.WEB_URI
+    secondaryBackendAddress: isMultiLocationDeployment ? secondaryResources.outputs.WEB_URI : 'none'
+  }
+}
+
+output WEB_URI string = isMultiLocationDeployment ? azureFrontDoor.outputs.WEB_URI : primaryResources.outputs.WEB_URI
 output AZURE_LOCATION string = location
+
+output DEBUG_IS_MULTI_LOCATION_DEPLOYMENT bool = isMultiLocationDeployment
+output DEBUG_SECONDARY_AZURE_LOCATION string = secondaryAzureLocation
+output DEBUG_IS_PROD bool = isProdBool

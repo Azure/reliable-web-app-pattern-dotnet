@@ -1,10 +1,11 @@
+param isProd bool
+
 param location string
+
 param environmentName string
 param principalId string = ''
 param resourceToken string
 param tags object
-
-var isProd = endsWith(toLower(environmentName),'prod') || startsWith(toLower(environmentName),'prod')
 
 // Managed Identity
 @description('A user-assigned managed identity that is used by the App Service app.')
@@ -177,7 +178,7 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
       WEBSITE_VNET_ROUTE_ALL: '1'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
-      APPINSIGHTS_INSTRUMENTATIONKEY: apiApplicationInsights.properties.InstrumentationKey
+      APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
       ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
       XDT_MicrosoftApplicationInsights_Mode: 'recommended'
       InstrumentationEngine_EXTENSION_VERSION: '~1'
@@ -297,6 +298,9 @@ resource webAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   sku: {
     name: appServicePlanSku
   }
+  properties:{
+    
+  }
 }
 
 resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
@@ -305,6 +309,9 @@ resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   tags: tags
   sku: {
     name: appServicePlanSku
+  }
+  properties:{
+
   }
 }
 
@@ -561,7 +568,7 @@ module redisSetup 'azureRedisCache.bicep' = {
   }
 }
 
-module storageSetup 'azureStorageSetup.bicep' = {
+module storageSetup 'azureStorage.bicep' = {
   name: 'storageSetup'
   scope: resourceGroup()
   params: {
@@ -719,5 +726,5 @@ resource webVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
   }
 }
 
-output WEB_URI string = 'https://${web.properties.defaultHostName}'
-output API_URI string = 'https://${api.properties.defaultHostName}'
+output WEB_URI string = web.properties.defaultHostName
+output API_URI string = api.properties.defaultHostName
