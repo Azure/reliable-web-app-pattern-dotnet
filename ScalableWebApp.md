@@ -44,6 +44,8 @@ that we'll discuss for the rest of the guide.
 
 ![Scalable web app architecture diagram](./assets/Guide/ScalableWebAppArchitectureDiagram.png)
 
+> TODO - update diagram with mulitregional deployment
+
 ## Well Architected Scalable Web Application Pillars
 
 The five pillars of the Azure Well-Architected Framework provide guiding
@@ -216,11 +218,7 @@ administration easier to manage.
 ### Endpoint security
 TODO -  elaborate based on best practices [Best practices for endpoint security](https://docs.microsoft.com/azure/architecture/framework/security/design-network-endpoints)
 
-TODO -  describe that public connections refused
-
-### Inner loop dev
-
-TODO - describe connection to Azure resources and provide guidance on the creation of non-prod environments to support individual dev streams
+TODO -  describe that public connections are refused
 
 ## Cost Optimization
 
@@ -233,33 +231,24 @@ optimization.
 
 ### Cache-Aside Pattern
 
-> [Cache-Aside Pattern](https://docs.microsoft.com/azure/architecture/patterns/cache-aside) is for DATA CACHING, e.g. tickets. Redis, in this
-> solution, is also used for caching the msal access token.
-> 
-> 1. TODO - Move the cache aside pattern to scale(performance efficiency)/operational excellence.
-> 
->     a.  Talk about cache aside cost in terms of avoiding selecting a
->         larger sku. Scale vertically easier. Easier to manage and
->         configure caches vs. read replicas or other databases.
-> 
-> 2. TODO - Talk about reusing the same redis cache for cost optimization even
->     though it's caching different things. (Pattern: Reuse common
->     infrastructure?)
+The [Cache-Aside Pattern](https://docs.microsoft.com/azure/architecture/patterns/cache-aside)
+is a performance optimization pattern that can be used to manage costs. When the Relecloud
+team identified that one of the most frequently visited pages in the app is the Upcoming Concerts
+Page. This page produces a well-known output for every user and the team identified that they could
+cache the data for this page to reduce their load on Azure SQL. Reducing their load on Azure SQL
+enables the team to select a smaller compute SKU for Azure SQL so the team can manage their costs.
 
-The Relecloud web app uses Azure SQL to store information about
-Concerts, Users, and Tickets. Relational databases are great for storing
-this type of data but they're difficult to scale on-demand. When using
-Azure SQL, we can quickly scale to improve the performance of the web
-app without changing code but Azure will restart the database engine
-each time we scale.
+Another cost optimization the team used in this solution is to share the single Azure Cache for
+Redis instance for multiple types of data. In this solution Redis handles the web frontend session
+for carts, MSAL authentication tokens, and the UpcomingConcerts data managed by the Web API app.
+The smallest Redis SKU is capable of handling all of these requirements and the team has decided
+that they can manage the risk of overwriting data by reusing Redis keys to achieve a lower operating cost.
 
 Adding an Azure Cache for Redis service helped us address the following
 requirements:
 
 - Reduce database costs by reducing the number of operations performed
-
 - Reduce the impact that bursts of traffic can have on Azure SQL
-
 - Improve service availability by reducing database scaling events
 
 The caching process begins when the web app starts as we connect to the
@@ -710,6 +699,10 @@ the web app.
 When finished the console will display the URI for the web app. You can use this URI to view the deployed solution in a browser.
 
 ![screenshot of Relecloud app home page](./assets/Guide/WebAppHomePage.png)
+
+## Inner loop dev
+
+TODO - describe connection to Azure resources and provide guidance on the creation of non-prod environments to support individual dev streams
 
 # Choosing the right services
 
