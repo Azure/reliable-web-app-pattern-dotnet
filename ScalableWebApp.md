@@ -665,6 +665,8 @@ database so the tickets can be displayed in the web app's Tickets page.
 
 # Deploying the solution
 
+> TODO - update with new multiregional steps
+
 This solution uses the Azure Dev CLI to deploy the code. Deploying the
 code requires the creation of Azure services, configuration of
 permissions, and there are some steps that must be done by hand.
@@ -1196,8 +1198,11 @@ Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
 # Resulting service level and cost
 
+> TODO - update with multiregional deployment SLA of 99.98%
+> TODO - update with multiregional deployment cost
+
 The deployment of this solution achieves an SLO of about 99.6% and will
-have a minimum estimated cost of \$929.97 when deployed to the East US
+have a minimum estimated cost of $929.97 when deployed to the East US
 region.
 
 This solution uses multiple Azure Services with varying SLAs to achieve
