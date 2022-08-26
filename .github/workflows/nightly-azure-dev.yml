@@ -24,6 +24,10 @@ jobs:
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Set AZD resource group
+        # temporary work around for known issue with multiple resource groups
+        run: azd env set AZURE_RESOURCE_GROUP ${{ secrets.AZURE_ENV_NAME }}nightly-rg
+
       - name: Azure Dev Deploy
         run: azd deploy --no-prompt
         env:
