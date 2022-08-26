@@ -26,9 +26,8 @@ var tags = {
 
 var isMultiLocationDeployment = secondaryAzureLocation == '' ? false : true
 
-//var primaryResourceGroupName = isMultiLocationDeployment ? 'primary-${name}-rg' : '${name}-rg'
 var primaryResourceGroupName = '${name}-rg'
-var secondaryResourceGroupName = 'secondary-${name}-rg'
+var secondaryResourceGroupName = '${name}-secondary-rg'
 
 var primaryResourceToken = toLower(uniqueString(subscription().id, primaryResourceGroupName, location))
 var secondaryResourceToken = toLower(uniqueString(subscription().id, secondaryResourceGroupName, secondaryAzureLocation))
@@ -39,9 +38,11 @@ resource primaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
   tags: tags
 }
 
-resource secondaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = if (isMultiLocationDeployment) {
+// temporary workaround for multiple resource group bug
+// `azd down` expects to be able to delete this resource because it was listed by the azure deployment output even when it is not deployed
+resource secondaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: secondaryResourceGroupName
-  location: secondaryAzureLocation
+  location: isMultiLocationDeployment ? secondaryAzureLocation : location
   tags: tags
 }
 
@@ -60,7 +61,6 @@ module primaryResources './resources.bicep' = {
 
 module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
   name: 'secondary-${primaryResourceToken}'
-  // scope: isMultiLocationDeployment ? secondaryResourceGroup : primaryResourceGroup
   scope: secondaryResourceGroup
   params: {
     isProd: isProdBool
