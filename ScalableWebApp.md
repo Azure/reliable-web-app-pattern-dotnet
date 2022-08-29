@@ -62,12 +62,11 @@ The following sections examine how the Relecloud web app has been
 implemented to align with these tenets and, consequently, what benefits
 are realized.
 
-- Focus on E2E application architecture and solutions (as opposed to
-    individual products)
+- Demonstrates end-to-end (E2E) application architecture and solutions, composed of several products (instead of individual or small combinations of products)
 
-- Include outcome-driven recommendations and narrative, principles and benefits (e.g., the why) before what and how including ROI benefits of increased confidence, improved productivity, optimized cost, etc.
+- Includes outcome-oriented recommendations, principles, and benefits (e.g., the why) including ROI benefits of increased confidence, improved productivity, optimized cost, etc. before deliving into what and how
 
-- Include a customer journey with a starting point and destination (and intermediate phases, as appropriate), as opposed to the common snapshot destination approach
+- Demonstrates a stage in a modernization journey with a starting point and destination, as opposed to the common snapshot, final destination approach. Subsequent intermediate phases will accompany this guidance in the future.
 
 ## Reliability
 
@@ -1231,8 +1230,8 @@ Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 > TODO - update with multiregional deployment cost
 
 The deployment of this solution achieves an SLO of about 99.6% and will
-have a minimum estimated cost of $929.97 when deployed to the East US
-region.
+have a minimum estimated cost of $929.97 per month when deployed to the East US
+Azure region. This will serve the needs of Relecloud\'s development environments.
 
 This solution uses multiple Azure Services with varying SLAs to achieve
 a composite availability SLO of 99.61%. To begin, we define that the
@@ -1269,7 +1268,7 @@ to 99.9% for write operations.
 
 ## Cost
 
-This solution has an estimated minimum cost of $929.97 to run the
+This solution has an estimated minimum cost of $929.97 per month to run the
 production environment. Additional costs will vary as the web apps scale
 based on load and the solution will also have additional costs for the
 data transmitted from the Azure data center. The primary forces driving
@@ -1312,9 +1311,9 @@ In this guide we provided the content to build a web app based on other resource
 Use the following resources to learn more about Microsoft's best practices and recommendations for building solutions on Azure.
 
 For further guidance on how to build Azure solutions that align with Microsoft's best practices and recommendations 
-* [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/overview) - Helps an organization prepare and execute their strategy to build solutions on Azure
+* [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/overview) - Helps an organization prepare and execute their strategy to build solutions on Azure.
 * [Azure Architecture Center fundamentals](https://docs.microsoft.com/en-us/azure/architecture/guide/) - Provides a library of content that presents a structured approach for designing applications on Azure that are scalable, secure, resilient, and highly available.
-* [Well Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/) - Describes the best practices and design principles that should be applied when designing Azure solutions that align with Microsoft's recommended best practices
+* [Well Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/) - Describes the best practices and design principles that should be applied when designing Azure solutions that align with Microsoft's recommended best practices.
 * [Azure Architectures](https://docs.microsoft.com/en-us/azure/architecture/browse/) - Provides architecture diagrams and technology descriptions for reference architectures, real world examples of cloud architectures, and solution ideas for common workloads on Azure.
 
 ## Additional sources for Azure Migration
@@ -1322,7 +1321,8 @@ For further guidance on how to build Azure solutions that align with Microsoft's
 The following tools and resources can help you with migrating on-prem resources to Azure.
 
 * [Azure Migrate](https://docs.microsoft.com/en-us/azure/migrate/migrate-services-overview) - Azure Migrate provides a simplified migration, modernization, and optimization service for Azure that handles assessment, migration of web apps, SQL server, and Virtual Machines.
-* [Azure Database Migration Guides](https://docs.microsoft.com/en-us/data-migration/) - Provides resources for different database types, and different tools designed for your migration scenario
+* [Azure Database Migration Guides](https://docs.microsoft.com/en-us/data-migration/) - Provides resources for different database types, and different tools designed for your migration scenario.
+* [Azure App Service Landing Zone Accelerator](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/app-platform/app-services/landing-zone-accelerator) - Deployment architecture guidance for hardening and scaling Azure App Service deployments.
 
 ## Additional sources for upgrading .NET Framework apps
 
@@ -1330,8 +1330,8 @@ This solution includes a dotnet web app capable of running on Linux that was dep
 The Azure App Service windows platform enables customers to move .NET Framework web apps to Azure without upgrading to newer framework versions.
 For customers wanting Linux App Service plans, or new features and performance improvements added to the latest versions of dotnet, we recommend the following resources.
 
-* [Overview of porting from .NET Framework to .NET](https://docs.microsoft.com/en-us/dotnet/core/porting/) - Is a starting point for finding additional guidance based on your specific type of .NET app.
-* [Overview of the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview) - Is a console tool that can help automate many of the tasks associated with upgrading .NET framework projects
+* [Overview of porting from .NET Framework to .NET](https://docs.microsoft.com/en-us/dotnet/core/porting/) - A starting point for finding additional guidance based on your specific type of .NET app.
+* [Overview of the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview) - A console tool that can help automate many of the tasks associated with upgrading .NET framework projects.
 * [Migrating from ASP.NET to ASP.NET Core in Visual Studio](https://devblogs.microsoft.com/dotnet/introducing-project-migrations-visual-studio-extension/) - The ASP.NET Core team is developing a Visual Studio extension that can assist with incremental migrations of web apps.
 
 
