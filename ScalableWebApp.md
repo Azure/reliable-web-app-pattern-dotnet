@@ -1224,44 +1224,52 @@ Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
 # Resulting service level and cost
 
-> TODO - update with multiregional deployment SLA of 99.98%
+The deployment of this solution has a 99.98% availability SLO and will
+have a minimum estimated cost of $2,039.60 per month when deployed to
+the East US and West US 2 Azure regions. This will serve the needs of
+Relecloud's development environments.
 
-The deployment of this solution achieves an SLO of about 99.6% and will
-have a minimum estimated cost of $929.97 per month when deployed to the East US
-Azure region. This will serve the needs of Relecloud\'s development environments.
+## Service Level Objective
+This solution uses multiple Azure Services with varying SLAs to
+achieve a composite availability SLO of 99.9%.
 
-This solution uses multiple Azure Services with varying SLAs to achieve
-a composite availability SLO of 99.61%. To begin, we define that the
-service is available when customers are able to purchase tickets. As
-such this means we determine the SLO for the solution by identifying the
-SLA for the underlying components.
+To establish this metric we define that the solution is available
+when customers can purchase tickets. This means we determine the
+SLO for the solution by identifying the SLA of the services that
+must each be available to complete the checkout process.
 
 | Azure Service | SLA |
 | --- | --- |
 | [Azure Active Directory](https://azure.microsoft.com/support/legal/sla/active-directory/v1_1/) | 99.99% |
 | [Azure App Configuration](<https://azure.microsoft.com/support/legal/sla/app-configuration/v1_0/>) | 99.9% |
-| [Azure App Service](https://azure.microsoft.com/support/legal/sla/app-service/) | 99.95% |
+| [Azure App Service: Front-end](https://azure.microsoft.com/support/legal/sla/app-service/) | 99.95% |
+| [Azure App Service: API](https://azure.microsoft.com/support/legal/sla/app-service/) | 99.95% |
 | [Azure Cache for Redis](https://azure.microsoft.com/support/legal/sla/cache/) |99.9% |
 | [Azure Key Vault](https://azure.microsoft.com/support/legal/sla/key-vault/v1_0/) | 99.99% |
 | [Azure Private Link](https://azure.microsoft.com/support/legal/sla/private-link/v1_0/) | 99.99%|
 | [Azure Storage Accounts](https://azure.microsoft.com/support/legal/sla/storage/v1_5/) |  99.9% |
 | [Azure SQL Database](https://azure.microsoft.com/support/legal/sla/azure-sql-database/v1_8/) |  99.99% |
 
-All of these components must be functioning to meet the business
-objective of selling tickets. When combined as a solution we multiply
-each of these SLAs to identify the percentage of time that all systems
-are available.
+All of these components must be available to meet the business
+objective of selling tickets. To understand the impact that one
+of these services has to our availability
+[we multiply each of these SLAs](https://docs.microsoft.com/en-us/azure/architecture/framework/resiliency/business-metrics#composite-slas)
+to find the percentage of time that all services are available.
 
-The Azure Cache for Redis service may be optional in some deployments
-but is required for this solution. We could reduce our dependency on the
-cache by opting not to store data from SQL Database. However, we do not
-recommend an alternative solution for storing the MSAL tokens that
-provide secure connections between the front-end and API tier of the web
-app for authenticated users. This SLO is also designed with the
-understanding that the code can write to Azure storage when a user
-purchases a ticket. While the SLA for Azure Storage Accounts can be
-increased for read operations, the SLA for all service levels is limited
-to 99.9% for write operations.
+When combined the agreements assert that tickets could be sold
+98.66% of the time. This availability meant there could be as
+much as 117 hours of downtime in a year.
+
+This availability, and risk to brand damage, were unacceptable
+for Relecloud so they deploy their web app to two regions in an
+Active/Passive failover scenario.
+
+This enables the team to use the [multiregional availability formula](https://docs.microsoft.com/en-us/azure/architecture/framework/resiliency/business-metrics#slas-for-multiregion-deployments)
+(`(1 − N) ^ R`) to calculate availability and reach 99.98%
+availability. But, to use two regions the team must
+also add Azure Front Door which has an availibility SLA of
+99.99% so the composite availability for this solution is
+99.972%.
 
 ## Cost
 This templates includes conditionals to deploy applications with
