@@ -1225,7 +1225,6 @@ Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 # Resulting service level and cost
 
 > TODO - update with multiregional deployment SLA of 99.98%
-> TODO - update with multiregional deployment cost
 
 The deployment of this solution achieves an SLO of about 99.6% and will
 have a minimum estimated cost of $929.97 per month when deployed to the East US
@@ -1265,40 +1264,59 @@ increased for read operations, the SLA for all service levels is limited
 to 99.9% for write operations.
 
 ## Cost
+This templates includes conditionals to deploy applications with
+different SKUs appropriate for production and non-prod workloads.
+The following sections provide additional detail by workload.
 
-This solution has an estimated minimum cost of $929.97 per month to run the
-production environment. Additional costs will vary as the web apps scale
-based on load and the solution will also have additional costs for the
-data transmitted from the Azure data center. The primary forces driving
-this estimate are Azure App Service, and Azure SQL Database.
+### Production
+This solution has an estimated minimum cost of $2,039.60 per month to run
+the production environment from two Azure regions. Additional costs will
+vary as the web apps scale based on load and the solution will also have
+additional costs for the data transmitted from the Azure data center. The
+primary forces driving this estimate are Azure SQL Database and Azure App
+Service.
 
 This solution deploys an Azure SQL Database Premium SKU that uses the
 DTU pricing model. The selected SKU provides 500gB for database
 storage and 125 DTU of capacity for SQL compute tasks. The compute
 configuration for this solution is specific to this sample and Azure SQL
 provides many options to choose the right costs for your solution. In
-this deployment the Azure SQL component represents about 49% of the
-estimated hosting costs. We recommend that you review how your solution
-behaves in production as scaling the database up, or down, can provide
+this deployment the Azure SQL component represents about 45% of the
+estimated costs. We recommend that you review how your solution
+behaves in production as changing your database SKU can provide
 significant cost savings or performance gains.
 
 This solution also deploys a minimum of two Azure App Services to run
 the front-end and API tier websites for this solution. These web apps
 target the P1V2 SKU which enables the website to use horizontal scaling
 rules to reduce costs when there are fewer users on the website.
-Together, these components represent about 31% of the estimated hosting
+Together, these components represent about 29% of the estimated hosting
 costs.
 
-10% of the remaining estimated cost comes from using Azure Cache for
-Redis. To reduce costs the Azure Cache for Redis resource is shared
-between the front-end web app and the API backend which uses Redis for two
-different roles. The currently selected SKU is the smallest recommended
-for production workloads and is more than enough capacity to handle the
-needs for both web apps.
+Azure Cache for Redis represents about 10% of the estimated cost. To
+reduce costs the Azure Cache for Redis resource is shared by the front-end
+web app and the API backend which uses Redis for two different types of
+data. The selected C1 SKU is more than enough capacity to handle the needs
+for both web apps.
 
+> We recommend that customers review these prices with their account team.
+> Prices vary by region and can be impacted by Enterprise Agreements,
+> Dev/Test Pricing, or Reserved capacity pricing.
+
+### Non-prod environments
 For non-production environments this solution chooses pricing tiers
 appropriate for Dev/Test workloads and costs an estimated minimum of
-$278 for each non-production environment.
+$244 for each non-production environment.
+
+The primary drivers of cost for non-production workloads are the
+App Service Plans which represent 44% of the total cost. Customers that
+want to manage these costs for non-production workloads should examine
+if they can use one [App Service Plan](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans)
+to host both the front-end and API web apps.
+
+> We recommend that customers review these prices with their account team.
+> Prices vary by region and non-production pricing can be impacted
+> by Dev/Test pricing as well as other factors.
 
 # Starting with your modernization journey
 
