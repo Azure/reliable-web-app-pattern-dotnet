@@ -62,12 +62,11 @@ The following sections examine how the Relecloud web app has been
 implemented to align with these tenets and, consequently, what benefits
 are realized.
 
-- Focus on E2E application architecture and solutions (as opposed to
-    individual products)
+- Demonstrates end-to-end (E2E) application architecture and solutions, composed of several products (instead of individual or small combinations of products)
 
-- Include outcome-driven recommendations and narrative, principles and benefits (e.g., the why) before what and how including ROI benefits of increased confidence, improved productivity, optimized cost, etc.
+- Includes outcome-oriented recommendations, principles, and benefits (e.g., the why) including ROI benefits of increased confidence, improved productivity, optimized cost, etc. before deliving into what and how
 
-- Include a customer journey with a starting point and destination (and intermediate phases, as appropriate), as opposed to the common snapshot destination approach
+- Demonstrates a stage in a modernization journey with a starting point and destination, as opposed to the common snapshot, final destination approach. Subsequent intermediate phases will accompany this guidance in the future.
 
 ## Reliability
 
@@ -1231,8 +1230,8 @@ Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 > TODO - update with multiregional deployment cost
 
 The deployment of this solution achieves an SLO of about 99.6% and will
-have a minimum estimated cost of $929.97 when deployed to the East US
-region.
+have a minimum estimated cost of $929.97 per month when deployed to the East US
+Azure region. This will serve the needs of Relecloud\'s development environments.
 
 This solution uses multiple Azure Services with varying SLAs to achieve
 a composite availability SLO of 99.61%. To begin, we define that the
@@ -1269,7 +1268,7 @@ to 99.9% for write operations.
 
 ## Cost
 
-This solution has an estimated minimum cost of $929.97 to run the
+This solution has an estimated minimum cost of $929.97 per month to run the
 production environment. Additional costs will vary as the web apps scale
 based on load and the solution will also have additional costs for the
 data transmitted from the Azure data center. The primary forces driving

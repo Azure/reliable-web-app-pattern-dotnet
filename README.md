@@ -4,8 +4,8 @@ This repository provides resources to help developers build a Scalable web app o
 
 3 components of the Scalable web app are:
 * [A Guide](ScalableWebApp.md) that demonstrates the guidance and explains the context surrounding the decisions that were made to build this solution
-* A sample solution that demonstrates how these decisions were implemented as code
-* A sample deployment pipeline with bicep resources that demonstrate how the infrastructure decisions were implemented
+* A starting point solution that demonstrates how these decisions were implemented as code
+* A starting point deployment pipeline with bicep resources that demonstrate how the infrastructure decisions were implemented
 
 # Getting started
 
