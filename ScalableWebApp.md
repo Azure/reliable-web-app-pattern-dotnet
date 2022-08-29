@@ -44,8 +44,6 @@ that we'll discuss for the rest of the guide.
 
 ![Scalable web app architecture diagram](./assets/Guide/ScalableWebAppArchitectureDiagram.png)
 
-> TODO - update diagram with multiregional deployment
-
 ## Well Architected Scalable Web Application Pillars
 
 The five pillars of the Azure Well-Architected Framework provide guiding
