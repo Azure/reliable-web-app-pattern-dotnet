@@ -1231,7 +1231,7 @@ Relecloud's development environments.
 
 ## Service Level Objective
 This solution uses multiple Azure Services with varying SLAs to
-achieve a composite availability SLO of 99.9%.
+achieve a composite availability SLO of 99.98%.
 
 To establish this metric we define that the solution is available
 when customers can purchase tickets. This means we determine the
@@ -1257,7 +1257,7 @@ of these services has to our availability
 to find the percentage of time that all services are available.
 
 When combined the agreements assert that tickets could be sold
-98.66% of the time. This availability meant there could be as
+99.56% of the time. This availability meant there could be as
 much as 117 hours of downtime in a year.
 
 This availability, and risk to brand damage, were unacceptable
@@ -1265,11 +1265,11 @@ for Relecloud so they deploy their web app to two regions in an
 Active/Passive failover scenario.
 
 This enables the team to use the [multiregional availability formula](https://docs.microsoft.com/en-us/azure/architecture/framework/resiliency/business-metrics#slas-for-multiregion-deployments)
-(`(1 − N) ^ R`) to calculate availability and reach 99.98%
+(`(1 − N) ^ R`) to calculate availability and reach 99.99%
 availability. But, to use two regions the team must
 also add Azure Front Door which has an availibility SLA of
 99.99% so the composite availability for this solution is
-99.972%.
+99.98%.
 
 ## Cost
 This templates includes conditionals to deploy applications with
