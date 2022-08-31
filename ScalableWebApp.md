@@ -737,6 +737,7 @@ steps to follow their experience by running the commands from the folder where t
 Use this command to get started with deployment by creating an
 `azd` environment on your workstation.
 
+<!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
 ```bash
 myEnvironmentName=relecloudresources
 azd env new -e $myEnvironmentName
