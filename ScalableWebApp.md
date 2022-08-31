@@ -730,10 +730,9 @@ azd version
 
 ## Deploy the code
 
-Relecloud's developers use the command line to deploy the code.
-This means their experience from the devbox is the same
-experience that runs from the GitHub workflow. You can use
-these steps to follow their experience.
+Relecloud's developers use the `azd` command line experience to deploy the code. This means their local workflow is the same
+experience that runs from the GitHub action. You can use these
+steps to follow their experience by running the commands from the folder where this guide is stored after cloning this repo.
 
 Use this command to get started with deployment by creating an
 `azd` environment on your workstation.
@@ -787,18 +786,18 @@ Relecloud uses the following command to deploy the Azure
 services defined in the bicep files by running the provision
 command.
 
+> This step will take several minutes based on the region
+> and deployment options you selected.
+
 ```bash
 azd provision
 ```
 
-> This step will take several minutes based on the region
-> and deployment options you selected.
-
-<br />
-
-> You have now deployed Azure App Service, SQL Database, and
-> supporting services to your Azure subscription that you can
-> see in the [Azure Portal](http://portal.azure.com).
+> When the command finishes you have deployed Azure App
+> Service, SQL Database, and supporting services to your
+> subscription. If you log into the the
+> [Azure Portal](http://portal.azure.com) you can find them
+> in the resource group named `$myEnvironmentName-rg`.
 
 <br />
 
