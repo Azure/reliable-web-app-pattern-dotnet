@@ -704,68 +704,148 @@ database so the tickets can be displayed in the web app's Tickets page.
 
 # Deploying the solution
 
-> TODO - update with new multiregional steps
-
-This solution uses the Azure Dev CLI to deploy the code. Deploying the
-code requires the creation of Azure services, configuration of
-permissions, and there are some steps that must be done by hand.
+This solution uses the Azure Dev CLI to set up Azure services
+and deploy the code. Deploying the code requires the creation of
+Azure services, configuration of permissions, and creating
+Azure AD App Registrations.
 
 ## Pre-requisites
 
-This guide assumes you have access to a bash terminal. Windows users can
-access a Linux shell with WSL ([Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/about)).
+This guide assumes you have access to a bash terminal. Windows
+users can access a Linux shell with WSL ([Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/about)).
 
-Install the Azure CLI. Run the following command to verify that you have
-a minimum version of 2.38.0.
+[Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+Run the following command to verify that you're running version
+2.38.0 or higher.
 
 ```bash
 az version
 ```
 
-You will need an Azure subscription with permission to create resources
-in a resource group to deploy this solution. You will also need to
-install the Azure Dev CLI to deploy the code and services.
-
-Run the following command to verify that the Azure Dev CLI is installed
+[Install the Azure Dev CLI](https://docs.microsoft.com/en-us/azure/developer/azure-developer-cli/get-started?tabs=bare-metal%2Cwindows&pivots=programming-language-csharp#configure-your-development-environment).
+Run the following command to verify that the Azure Dev CLI is installed.
 ```bash
 azd version
 ```
 
 ## Deploy the code
 
-The infrastructure and code are now ready to deploy. In this reference
-sample we included a Github workflow that will deploy the code. To
-invoke the same behavior from your dev box we only need to run two
-commands with Azure Dev CLI.
+Relecloud's developers use the `azd` command line experience to deploy the code. This means their local workflow is the same
+experience that runs from the GitHub action. You can use these
+steps to follow their experience by running the commands from the folder where this guide is stored after cloning this repo.
+
+Use this command to get started with deployment by creating an
+`azd` environment on your workstation.
+
+<!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
+```bash
+myEnvironmentName=relecloudresources
+azd env new -e $myEnvironmentName
+```
+
+> The name 'relecloudresources' is configurable for your needs but must be matched with other names used in later steps.
+
+<br />
+
+**Choose Prod or Non-prod environment**
+
+The Relecloud team uses the same bicep templates to deploy
+their production, and non-prod, environments. To do this
+they set `azd` environment parameters that change the behavior
+of the next steps.
+
+> If you skip forward to the next step, and change nothing,
+> then the bicep templates will default to non-prod settings
+> for a single Azure region.
+
+Relecloud devs deploy the production environment by running the
+following command to choose the SKUs they want in production.
+
+```bash
+azd env set IS_PROD true
+```
+
+Relecloud devs also use the following command to choose a second
+Azure location because the production environment is
+multiregional.
+
+```bash
+azd env set SECONDARY_AZURE_LOCATION westus3
+```
+
+> You can find a list of available Azure regions by running
+> the following Azure CLI command.
+> ```
+> az account list-locations --query "[].name" -o tsv
+> ```
+
+<br />
 
 **Provision the infrastructure**
 
-You will be asked to create the environment, select an Azure region, and
-to select the Azure subscription you would like to use.
+Relecloud uses the following command to deploy the Azure
+services defined in the bicep files by running the provision
+command.
+
+> This step will take several minutes based on the region
+> and deployment options you selected.
 
 ```bash
-azd provision -e relecloudresourcesdev
+azd provision
 ```
+
+> When the command finishes you have deployed Azure App
+> Service, SQL Database, and supporting services to your
+> subscription. If you log into the the
+> [Azure Portal](http://portal.azure.com) you can find them
+> in the resource group named `$myEnvironmentName-rg`.
+
+<br />
 
 **Create App Registrations**
 
-Run the following command to create two app registrations and setup the
-App Configuration Service and Key Vault values that are needed to run
-the web app.
+Relecloud devs have automated the process of creating Azure
+AD resources that support the authentication fetures of the
+web app. They use the following command to create two new
+App Registrations within Azure AD. The command is also
+responsible for saving configuration data to Key Vault and
+App Configuration so that the web app can read this data.
 
-```bash 
-./infra/createAppRegistrations.sh -g relecloudresourcesdev-rg
+```bash
+./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
 ```
+
+> If you see an error that says `/bin/bash^M: bad interpreter:`
+> then you will need to open the `createAppRegistrations.sh`
+> file and change the line endings from `CRLF` to `LF`. This
+> can be done with VS Code.
 
 **Deploy the code**
 
+To finish the deployment process the Relecloud devs run the
+folowing `azd` commands to build, package, and deploy the dotnet
+code for the front-end and API web apps.
+
 ```bash
- azd deploy --no-prompt
+ azd env set AZURE_RESOURCE_GROUP "$myEnvironmentName-rg"
+ azd deploy
 ```
 
-When finished the console will display the URI for the web app. You can use this URI to view the deployed solution in a browser.
+> When finished the console will display the URI for the web
+> app. You can use this URI to view the deployed solution in a
+> browser.
 
 ![screenshot of Relecloud app home page](./assets/Guide/WebAppHomePage.png)
+
+<br />
+
+> You should use the `azd down` command to tear down an
+> environment when you have finished with these services. If
+> you want to recreate this deployment you will also need to
+> delete the two Azure AD app services that were created. You
+> can find them in Azure AD by searching for their environment
+> name. You will also need to purge the Key Vault and App
+> Configuration Service instances that were deployed.
 
 ## Inner loop dev
 
@@ -1343,7 +1423,7 @@ to host both the front-end and API web apps.
 > account team. Prices vary by region and non-production pricing
 > can be impacted by Dev/Test pricing as well as other factors.
 
-# Starting with your modernization journey
+# Starting your modernization journey
 
 In this guide we provided the content to build a web app based on other resources such as the Azure Architecture Center. In this section we'll highlight those source materials that you can use to learn more about Azure and modernization.
 
