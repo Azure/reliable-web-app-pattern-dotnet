@@ -815,14 +815,20 @@ App Configuration so that the web app can read this data.
 ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
 ```
 
+> If you see an error that says `/bin/bash^M: bad interpreter:`
+> then you will need to open the `createAppRegistrations.sh`
+> file and change the line endings from `CRLF` to `LF`. This
+> can be done with VS Code.
+
 **Deploy the code**
 
 To finish the deployment process the Relecloud devs run the
-folowing `azd` command to build, package, and deploy the dotnet
+folowing `azd` commands to build, package, and deploy the dotnet
 code for the front-end and API web apps.
 
 ```bash
- azd deploy --no-prompt
+ azd env set AZURE_RESOURCE_GROUP "$myEnvironmentName-rg"
+ azd deploy
 ```
 
 > When finished the console will display the URI for the web
@@ -838,7 +844,8 @@ code for the front-end and API web apps.
 > you want to recreate this deployment you will also need to
 > delete the two Azure AD app services that were created. You
 > can find them in Azure AD by searching for their environment
-> name.
+> name. You will also need to purge the Key Vault and App
+> Configuration Service instances that were deployed.
 
 ## Inner loop dev
 
