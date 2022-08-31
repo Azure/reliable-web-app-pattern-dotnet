@@ -1343,7 +1343,7 @@ to host both the front-end and API web apps.
 > account team. Prices vary by region and non-production pricing
 > can be impacted by Dev/Test pricing as well as other factors.
 
-# Starting with your modernization journey
+# Starting your modernization journey
 
 In this guide we provided the content to build a web app based on other resources such as the Azure Architecture Center. In this section we'll highlight those source materials that you can use to learn more about Azure and modernization.
 
