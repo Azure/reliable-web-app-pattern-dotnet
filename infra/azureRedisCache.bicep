@@ -10,15 +10,23 @@ var redisCacheSkuName = isProd ? 'Standard' : 'Basic'
 var redisCacheFamilyName = isProd ? 'C' : 'C'
 var redisCacheCapacity = isProd ? 1 : 0
 
-resource redisCache 'Microsoft.Cache/Redis@2019-07-01' = {
+resource redisCache 'Microsoft.Cache/Redis@2022-05-01' = {
   name: '${resourceToken}-rediscache'
   location: location
   tags: tags
   properties: {
+    redisVersion: '6.0'
     sku: {
       name: redisCacheSkuName
       family: redisCacheFamilyName
       capacity: redisCacheCapacity
+    }
+    enableNonSslPort: false
+    publicNetworkAccess: 'Disabled'
+    redisConfiguration: {
+      'maxmemory-reserved': '30'
+      'maxfragmentationmemory-reserved': '30'
+      'maxmemory-delta': '30'
     }
   }
 }
@@ -87,7 +95,6 @@ resource privateDnsZoneNameForRedis_link 'Microsoft.Network/privateDnsZones/virt
     }
   }
 }
-
 
 output keyVaultRedisConnStrName string = kvSecretRedis.name
 output privateDnsZoneId string = privateDnsZoneNameForRedis.id

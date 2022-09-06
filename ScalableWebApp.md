@@ -805,7 +805,7 @@ azd provision
 **Create App Registrations**
 
 Relecloud devs have automated the process of creating Azure
-AD resources that support the authentication fetures of the
+AD resources that support the authentication features of the
 web app. They use the following command to create two new
 App Registrations within Azure AD. The command is also
 responsible for saving configuration data to Key Vault and
