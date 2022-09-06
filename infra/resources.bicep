@@ -301,6 +301,11 @@ resource webAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   properties:{
     
   }
+  dependsOn:[
+    // found that Redis network connectivity was not available if web app is deployed first (until restart)
+    // delaying deployment allows us to skip the restart
+    redisSetup
+  ]
 }
 
 resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
@@ -313,6 +318,11 @@ resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   properties:{
 
   }
+  dependsOn:[
+    // found that Redis network connectivity was not available if web app is deployed first (until restart)
+    // delaying deployment allows us to skip the restart
+    redisSetup
+  ]
 }
 
 resource webAppScaleRule 'Microsoft.Insights/autoscalesettings@2021-05-01-preview' = if (isProd) {
