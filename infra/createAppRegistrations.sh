@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${#resourceGroupName} -eq 0 ]]; then
-  echo 'FATAL ERROR: Missing required parameter --resourceGroupName' 1>&2
+  echo 'FATAL ERROR: Missing required parameter --resource-group' 1>&2
   exit 6
 fi
 
