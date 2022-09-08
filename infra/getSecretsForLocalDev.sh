@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
       echo "    getSecretsForLocalDev.sh : Will show a json snippet you can save in Visual Studio secrets.json file to run the code locally."
       echo ""
       echo "Arguments"
-      echo "    --resource-group -g : Name of resource group containing the environment that was creaed by the azd command."
+      echo "    --resource-group -g : Name of resource group containing the environment that was created by the azd command."
       echo ""
       echo " Must select one or more of the following flags"
       echo "    --api -a : Print the json snippet for the api web app. Defaults to False."
