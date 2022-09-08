@@ -1,3 +1,4 @@
+param managedIdentity object
 param location string
 param resourceToken string
 param tags object
@@ -93,6 +94,25 @@ resource privateDnsZoneNameForRedis_link 'Microsoft.Network/privateDnsZones/virt
     virtualNetwork: {
       id: vnet.id
     }
+  }
+}
+
+resource makeRedisAccessibleForDevs 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (!isProd) {
+  name: 'makeRedisAccessibleForDevs'
+  location: location
+  tags: tags
+  kind:'AzureCLI'
+  identity:{
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentity.id}': {} 
+    }
+  }
+  properties: {
+    azCliVersion: '2.37.0'
+    retentionInterval: 'P1D'
+    scriptContent: loadTextContent('azureRedisCachePublicDevAccess.sh')
+    arguments:' --subscriptionId \'${subscription().id}\' --resource-group \'${resourceGroup().name}\' --redisCacheName \'${redisCache.name}\''
   }
 }
 

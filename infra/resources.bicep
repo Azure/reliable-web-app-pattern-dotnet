@@ -568,6 +568,14 @@ module redisSetup 'azureRedisCache.bicep' = {
   name: 'redisSetup'
   scope: resourceGroup()
   params: {
+    managedIdentity: {
+      name: managedIdentity.name
+      properties: {
+        clientId: managedIdentity.properties.clientId
+        principalId: managedIdentity.properties.principalId
+        tenantId: managedIdentity.properties.tenantId
+      }
+    }
     isProd: isProd
     location: location
     resourceToken: resourceToken
