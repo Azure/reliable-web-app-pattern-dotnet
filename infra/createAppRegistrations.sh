@@ -22,7 +22,7 @@ while [[ $# -gt 0 ]]; do
       echo "    createAppRegistrations.sh : Will create two app registrations for the scalable-web-app-pattern-dotnet and register settings with App Configuration Svc and Key Vault."
       echo ""
       echo "Arguments"
-      echo "    --resource-group -g : Name of resource group containing the environment that was creaed by the azd command."
+      echo "    --resource-group -g : Name of resource group containing the environment that was created by the azd command."
       echo ""
       exit 1
       ;;
