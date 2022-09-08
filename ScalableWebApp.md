@@ -165,7 +165,7 @@ every API call just to find out that the web app is not properly
 working.
 
 In the same `Startup.cs` class we see the method that adds this
-behavior is named ` GetCircuitBreakerPolicy()`. This behavior is also
+behavior is named `GetCircuitBreakerPolicy()`. This behavior is also
 provided by the Polly library and the behavior we want is described with
 the same fluent method extensions.
 
@@ -847,9 +847,72 @@ code for the front-end and API web apps.
 > name. You will also need to purge the Key Vault and App
 > Configuration Service instances that were deployed.
 
-## Inner loop dev
+## Local Development
 
-TODO - describe connection to Azure resources and provide guidance on the creation of non-prod environments to support individual dev streams
+Relecloud developers use Visual Studio to develop locally and they co-share
+an Azure SQL database for local dev. The team chooses this workflow to
+help them practice early integration of changes as modifying the
+database and other shared resources can impact multiple workstreams.
+
+To connect to the shared database the dev team uses connection strings
+from Key Vault and App Configuration Service. Dev's use the following
+script to retrieve data and store it as User Secrets on their workstation
+for the front-end web app.
+
+Using the `secrets.json` file helps the team keep their credentials
+secure. The file is stored outside of the source control directory so
+the data is never accidentally checked-in. And the dev's don't share credentials in ways that can create security leaks such as email or file
+shares.
+
+Managing secrets from Key Vault and App Configuration ensures that only
+authorized team members can access the data and also centralizes the
+administration of these secrets so they can be easily changed.
+
+New Relecloud team members should setup their environment by following
+these steps.
+
+1. Opening the Visual Studio solution `./src/Relecloud.sln`
+2. Setup the **Relecloud.Web** project
+    1. Right-click on the **Relecloud.Web** project
+    2. From the context menu choose **Manage User Secrets**
+    3. From a command prompt run the bash command
+
+        ```bash
+        ./infra/getSecretsForLocalDev.sh -g relecloudresources-rg --web
+        ```
+
+        > If you see an error that says `/bin/bash^M: bad interpreter:`
+        > then you will need to open the `getSecretsForLocalDev.sh`
+        > file and change the line endings from `CRLF` to `LF`. This
+        > can be done with VS Code.
+
+    4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
+project.
+
+3. Setup the **Relecloud.Web.Api** project
+    1. Right-click on the **Relecloud.Web.Api** project
+    2. From the context menu choose **Manage User Secrets**
+    3. From a command prompt run the bash command
+
+        ```bash
+        ./infra/getSecretsForLocalDev.sh -g relecloudresources-rg --api
+        ```
+
+        > If you see an error that says `/bin/bash^M: bad interpreter:`
+        > then you will need to open the `getSecretsForLocalDev.sh`
+        > file and change the line endings from `CRLF` to `LF`. This
+        > can be done with VS Code.
+
+    4. Copy the output into the `secrets.json` file for the
+**Relecloud.Web.Api** project.
+
+**For Demo purposes**
+
+This section provides steps to make the dev resources accessible for
+a demo from your workstation.
+
+1. Change the Azure SQL Database Firewall to allow remote connections
+2. Change the Azure Cache for Redis instance to allow remote connections
 
 # Choosing the right services
 
@@ -873,7 +936,9 @@ We have chosen a set of services based on the following criteria:
     having to manage infrastructure. This is where the Relecloud
     Concerts web app will be deployed.
 
-- [Azure Active Directory]().
+- [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-whatis)
+    Azure Active Directory (Azure AD) is a cloud-based identity and access management service. This service helps your
+    employees access external resources, such as Microsoft 365, the Azure portal, and thousands of other SaaS applications.
 
 - [Azure SQL Database](https://docs.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql) is
     a general-purpose relational database managed service in Microsoft
@@ -1193,8 +1258,7 @@ object.
 
 # Simulating the patterns
 
-Here are some things you can try to see these patterns in action while
-running this solution in Azure.
+Here are some things you can try to see how these patterns support the availability and scalability of this solution in Azure.
 
 ### Queue-based load leveling
 
@@ -1301,6 +1365,7 @@ Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
 ![image of Azure Cache for Redis Console shows data for upcoming concerts](./assets/Guide/Simulating_RedisConsoleShowUpcomingConcerts.png)
 
+<br />
 
 # Resulting service level and cost
 
@@ -1356,7 +1421,7 @@ for Relecloud so they deploy their web app to two regions. Using
 two regions changes the calculation to use the
 [multiregional availability formula](https://docs.microsoft.com/en-us/azure/architecture/framework/resiliency/business-metrics#slas-for-multiregion-deployments)
 which is 
-(`1 - (1 − N) ^ R`) to reach 99.99% availability. But, to use two
+`(1 - (1 − N) ^ R)` to reach 99.99% availability. But, to use two
 regions the team must also add Azure Front Door which has an
 availibility SLA of 99.99% so the composite availability for
 this solution is 99.98%.
@@ -1422,6 +1487,8 @@ to host both the front-end and API web apps.
 > We recommend that customers review these prices with their
 > account team. Prices vary by region and non-production pricing
 > can be impacted by Dev/Test pricing as well as other factors.
+
+<br/>
 
 # Starting your modernization journey
 
