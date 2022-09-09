@@ -49,7 +49,7 @@ if [[ ${#resourceGroupName} -eq 0 ]]; then
   exit 6
 fi
 
-if [[ ${#subscriptionId} -eq 0]]; then
+if [[ ${#subscriptionId} -eq 0 ]]; then
   echo "FATAL ERROR: Missing required parameter --subscription" 1>&2
   exit 7
 fi
@@ -63,4 +63,4 @@ az rest \
     --method PATCH \
     --uri "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.Cache/Redis/$redisCacheName?api-version=2020-06-01" \
     --headers 'Content-Type=application/json' \
-    --body "{ \"properties\": { \"publicNetworkAccess\":\"Disabled\" } }"
+    --body "{ \"properties\": { \"publicNetworkAccess\":\"Enabled\" } }"
