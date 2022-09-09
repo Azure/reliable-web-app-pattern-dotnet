@@ -40,10 +40,10 @@ $GrantDbOwner="IF NOT EXISTS (SELECT * FROM sys.database_principals p JOIN sys.d
 # Step 6: Connect as SQL Admin acct and execute SQL cmd
 Invoke-Sqlcmd -ServerInstance $ServerUri -database $CatalogName -Username $SqlAdminLogin -Password $SqlAdminPwd -Query $GrantDbOwner
 
-# # Step 7: Restrict access to Azure AD users
- Enable-AzSqlServerActiveDirectoryOnlyAuthentication -ServerName $ServerName -ResourceGroupName $ResourceGroupName
+# Step 7: Restrict access to Azure AD users
+Enable-AzSqlServerActiveDirectoryOnlyAuthentication -ServerName $ServerName -ResourceGroupName $ResourceGroupName
 
-# # Step 8: IF PROD: Then restrict network access
-# #if ($IsProd) {
-   Set-AzSqlServer -ServerName $ServerName -PublicNetworkAccess 'disabled' -ResourceGroupName $ResourceGroupName
-# #}
+# Step 8: IF PROD: Then restrict network access
+if ($IsProd) {
+  Set-AzSqlServer -ServerName $ServerName -PublicNetworkAccess 'disabled' -ResourceGroupName $ResourceGroupName
+}
