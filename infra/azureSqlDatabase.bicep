@@ -1,12 +1,14 @@
-@description('A user assigned managed identity object')
-param managedIdentity object
-param location string
-param resourceToken string
-param tags object
-param isProd bool
+@description('The id for the user-assigned managed identity that runs deploymentScripts')
+param devOpsManagedIdentityId string
 
-@description('The objectId of the user executing the deployment')
-param principalId string = ''
+@description('Expecting the user-assigned managed identity that represents the API web app. Will become the SQL db admin')
+param managedIdentity object
+
+@description('A generated identifier used to create unique resources')
+param resourceToken string
+
+@description('Enables the template to choose different SKU by environment')
+param isProd bool
 
 param sqlAdministratorLogin string
 
@@ -15,6 +17,9 @@ param sqlAdministratorPassword string
 
 @description('Ensures that the idempotent scripts are executed each time the deployment is executed')
 param uniqueScriptId string = newGuid()
+
+param location string
+param tags object
 
 resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
   name: '${resourceToken}-sql-server'
@@ -74,6 +79,12 @@ resource createSqlUserScript 'Microsoft.Resources/deploymentScripts@2020-10-01' 
   location: location
   tags: tags
   kind: 'AzurePowerShell'
+  identity:{
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${devOpsManagedIdentityId}': {}
+    }
+  }
   properties: {
     forceUpdateTag: uniqueScriptId
     azPowerShellVersion: '7.4'

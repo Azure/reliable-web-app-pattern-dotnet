@@ -1,11 +1,22 @@
-param managedIdentity object
-param location string
+@description('The id for the user-assigned managed identity that runs deploymentScripts')
+param devOpsManagedIdentityId string
+
+@description('A generated identifier used to create unique resources')
 param resourceToken string
-param tags object
+
+@description('Enables the template to choose different SKU by environment')
 param isProd bool
+
 param privateEndpointNameForRedis string
 param privateEndpointVnetName string
 param privateEndpointSubnetName string
+
+@description('Ensures that the idempotent scripts are executed each time the deployment is executed')
+param uniqueScriptId string = newGuid()
+
+param location string
+param tags object
+
 
 var redisCacheSkuName = isProd ? 'Standard' : 'Basic'
 var redisCacheFamilyName = isProd ? 'C' : 'C'
@@ -105,14 +116,15 @@ resource makeRedisAccessibleForDevs 'Microsoft.Resources/deploymentScripts@2020-
   identity:{
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentity.id}': {} 
+      '${devOpsManagedIdentityId}': {}
     }
   }
   properties: {
+    forceUpdateTag: uniqueScriptId
     azCliVersion: '2.37.0'
     retentionInterval: 'P1D'
     scriptContent: loadTextContent('azureRedisCachePublicDevAccess.sh')
-    arguments:' --subscriptionId \'${subscription().id}\' --resource-group \'${resourceGroup().name}\' --redisCacheName \'${redisCache.name}\''
+    arguments:' --subscription ${subscription().subscriptionId} --resource-group ${resourceGroup().name} --name ${redisCache.name}'
   }
 }
 
