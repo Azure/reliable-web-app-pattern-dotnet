@@ -62,7 +62,7 @@ if [[ ${#resourceGroupName} -eq 0 ]]; then
   exit 6
 fi
 
-if [[ $web_app -eq 0 && $api_app -eq 0 ]]; then
+if [[ $web_app == '' && $api_app == '' ]]; then
   echo 'FATAL ERROR: Missing required flag --web or --api' 1>&2
   exit 7
 fi
