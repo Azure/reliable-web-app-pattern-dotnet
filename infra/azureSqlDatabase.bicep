@@ -91,7 +91,7 @@ resource createSqlUserScript 'Microsoft.Resources/deploymentScripts@2020-10-01' 
     retentionInterval: 'P1D'
     cleanupPreference: 'OnSuccess'
     arguments: '-ServerName \'${sqlServer.name}\' -ResourceGroupName \'${resourceGroup().name}\' -ServerUri \'${sqlServer.properties.fullyQualifiedDomainName}\' -CatalogName \'${sqlCatalogName}\' -ApplicationId \'${managedIdentity.properties.principalId}\' -ManagedIdentityName \'${managedIdentity.name}\' -SqlAdminLogin \'${sqlAdministratorLogin}\' -SqlAdminPwd \'${sqlAdministratorPassword}\' -IsProd ${isProd ? '1' : '0'}'
-    scriptContent: loadTextContent('createSqlUserAcct.ps1')
+    scriptContent: loadTextContent('createSqlAcctForManagedIdentity.ps1')
   }
   dependsOn:[
     sqlDatabase
