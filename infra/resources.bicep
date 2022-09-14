@@ -24,14 +24,26 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-
 var appConfigurationRoleDefinitionId = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 @description('Grant the \'Data Reader\' role to the user-assigned managed identity, at the scope of the resource group.')
-resource appConfigRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, resourceToken)
+resource appConfigRoleAssignmentForWebApps 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, managedIdentity.name, resourceToken)
   scope: resourceGroup()
   properties: {
     principalType: 'ServicePrincipal'
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
     principalId: managedIdentity.properties.principalId
     description: 'Grant the "Data Reader" role to the user-assigned managed identity so it can access the azure app configuration service.'
+  }
+}
+
+@description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
+resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, principalId, resourceToken)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
+    principalId: managedIdentity.properties.principalId
+    description: 'Grant the "Data Reader" role to the principal identity so it can access the azure app configuration service.'
   }
 }
 
@@ -243,7 +255,7 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
       ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
       APPLICATIONINSIGHTS_CONNECTION_STRING: apiApplicationInsights.properties.ConnectionString
-      'App:AppConfig:Uri': appConfigSvc.properties.endpoint
+      'Api:AppConfig:Uri': appConfigSvc.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
       WEBSITE_DNS_SERVER: '168.63.129.16' 

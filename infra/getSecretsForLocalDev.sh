@@ -13,11 +13,6 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       shift # past value
       ;;
-    --secondary-resource-group|-sg)
-      secondaryResourceGroupName="$2"
-      shift # past argument
-      shift # past value
-      ;;
     --web|-w)
       web_app=true
       shift # past argument
@@ -78,7 +73,9 @@ fi
 # assumes there is only one vault deployed to this resource group that will match this filter
 keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name" -o tsv)
 
-appConfigSvcName=$(az appconfig list -g "$resourceGroupName" --query "[].name" -o tsv)
+appConfigSvcName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.AppConfiguration/configurationStores'].name" -o tsv)
+
+appConfigUri=$(az appconfig show -n $appConfigSvcName -g $resourceGroupName --query "endpoint" -o tsv 2> /dev/null)
 
 if [[ $debug ]]; then
     echo "Derived inputs"
@@ -102,7 +99,8 @@ if [[ $web_app ]]; then
     frontEndAttendeeScope=$(az appconfig kv show -n $appConfigSvcName --key App:RelecloudApi:AttendeeScope -o tsv --query value 2> /dev/null) 
 
     # get 'App:RelecloudApi:BaseUri' from App Configuration svc
-    frontEndBaseUri=$(az appconfig kv show -n $appConfigSvcName --key App:RelecloudApi:BaseUri -o tsv --query value 2> /dev/null) 
+    # frontEndBaseUri=$(az appconfig kv show -n $appConfigSvcName --key App:RelecloudApi:BaseUri -o tsv --query value 2> /dev/null) 
+    frontEndBaseUri="https://localhost:7242"
 
     # get 'AzureAd:ClientId' from App Configuration svc
     frontEndAzureAdClientId=$(az appconfig kv show -n $appConfigSvcName --key AzureAd:ClientId -o tsv --query value 2> /dev/null) 
@@ -112,6 +110,7 @@ if [[ $web_app ]]; then
 
     echo ""
     echo "{"
+    echo "   \"App:AppConfig:Uri\": \"$appConfigUri\","
     echo "   \"App:RedisCache:ConnectionString\": \"$frontEndRedisConnStr\","
     echo "   \"App:RelecloudApi:AttendeeScope\": \"$frontEndAttendeeScope\","
     echo "   \"App:RelecloudApi:BaseUri\": \"$frontEndBaseUri\","
@@ -142,6 +141,7 @@ if [[ $api_app ]]; then
 
     echo ""
     echo "{"
+    echo "   \"Api:AppConfig:Uri\": \"$appConfigUri\","
     echo "   \"Api:AzureAd:ClientId\": \"$apiAppAzureAdClientId\","
     echo "   \"Api:AzureAd:TenantId\": \"$apiAppAzureAdTenantId\","
     echo "   \"App:RedisCache:ConnectionString\": \"$apiAppRedisConnStr\","

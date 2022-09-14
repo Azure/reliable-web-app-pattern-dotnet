@@ -906,13 +906,28 @@ project.
     4. Copy the output into the `secrets.json` file for the
 **Relecloud.Web.Api** project.
 
-**For Demo purposes**
+4. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
+5. Choose **Multiple startup projects**
+6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
+7. Click **Ok** to close the popup
+8. Add your IP address to the SQL Database firewall as an allowed connection
 
-This section provides steps to make the dev resources accessible for
-a demo from your workstation.
+```bash
+myIpAddress="youripaddress"
+mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n mydevbo
+x --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+```
 
-1. Change the Azure SQL Database Firewall to allow remote connections
-2. Change the Azure Cache for Redis instance to allow remote connections
+9. When connecting to Azure SQL database you'll connect with your Azure AD account.
+Run the following command to give your Azure AD account permission to access the database.
+
+```bash
+./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+```
+
+10. Press F5 to start debugging the website
+
 
 # Choosing the right services
 
