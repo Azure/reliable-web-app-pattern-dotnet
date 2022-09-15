@@ -66,7 +66,7 @@ echo "connecting to: $databaseServerFqdn"
 echo "opening: $databaseName"
 
 # disable Azure AD only admin access
-# az sql server ad-only-auth disable -n $databaseServer -g $resourceGroupName
+az sql server ad-only-auth disable -n $databaseServer -g $resourceGroupName
 
 cat <<SCRIPT_END > createSqlUser.sql
 DECLARE @myObjectId varchar(100) = '$objectIdForCurrentUser'
@@ -87,4 +87,4 @@ export SQLCMDPASSWORD=$sqlPassword
 export SQLCMDPASSWORD=clear
 
 # enable Azure AD only admin access
-# az sql server ad-only-auth enable -n $databaseServer -g $resourceGroupName
+az sql server ad-only-auth enable -n $databaseServer -g $resourceGroupName
