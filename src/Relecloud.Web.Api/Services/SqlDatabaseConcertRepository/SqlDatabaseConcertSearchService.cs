@@ -21,22 +21,40 @@ namespace Relecloud.Web.Services.AzureSearchService
 
         public Task<SearchResponse<ConcertSearchResult>> SearchAsync(SearchRequest request)
         {
-            var concertResults = this.database.Concerts
-                .Select(c => new ConcertSearchResult{
+            var query = request.Query.ToLower();
+
+
+            var concertsStartingWithName = this.database.Concerts
+                .Where(c => c.Title.ToLower().StartsWith(query))
+                .Select(c => new ConcertSearchResult
+                {
                     Artist = c.Artist,
                     Description = c.Description,
                     Genre = c.Genre,
                     Id = c.Id.ToString(),
                     Price = c.Price,
                     Title = c.Title
-                })
-                .ToList();
-            
+                });
+            var artistsStartingWithName = this.database.Concerts
+                .Where(c => c.Artist.ToLower().StartsWith(query))
+                .Select(c => new ConcertSearchResult
+                {
+                    Artist = c.Artist,
+                    Description = c.Description,
+                    Genre = c.Genre,
+                    Id = c.Id.ToString(),
+                    Price = c.Price,
+                    Title = c.Title
+                });
+
+            var concertResults = concertsStartingWithName.Union(artistsStartingWithName).ToList();
+
             var searchResponse = new SearchResponse<ConcertSearchResult>(request, concertResults, new List<SearchFacet>());
             searchResponse.TotalCount = concertResults.Count;
 
             return Task.FromResult(searchResponse);
         }
+
 
         #endregion
 
