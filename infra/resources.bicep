@@ -40,7 +40,7 @@ resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssign
   name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, principalId, resourceToken)
   scope: resourceGroup()
   properties: {
-    principalType: 'ServicePrincipal'
+    principalType: 'User'
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
     principalId: principalId
     description: 'Grant the "Data Reader" role to the principal identity so it can access the azure app configuration service.'
