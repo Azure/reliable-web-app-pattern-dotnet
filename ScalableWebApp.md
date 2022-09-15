@@ -743,8 +743,6 @@ myEnvironmentName=relecloudresources
 azd env new -e $myEnvironmentName
 ```
 
-> The name 'relecloudresources' is configurable for your needs but must be matched with other names used in later steps.
-
 <br />
 
 **Choose Prod or Non-prod environment**
@@ -754,9 +752,10 @@ their production, and non-prod, environments. To do this
 they set `azd` environment parameters that change the behavior
 of the next steps.
 
-> If you skip forward to the next step, and change nothing,
-> then the bicep templates will default to non-prod settings
-> for a single Azure region.
+> If you skip the next two optional steps, and change nothing,
+> then the bicep templates will default to non-prod settings.
+
+*OPTIONAL: 1*
 
 Relecloud devs deploy the production environment by running the
 following command to choose the SKUs they want in production.
@@ -764,6 +763,8 @@ following command to choose the SKUs they want in production.
 ```bash
 azd env set IS_PROD true
 ```
+
+*OPTIONAL: 2*
 
 Relecloud devs also use the following command to choose a second
 Azure location because the production environment is
@@ -828,6 +829,9 @@ code for the front-end and API web apps.
 
 ```bash
  azd env set AZURE_RESOURCE_GROUP "$myEnvironmentName-rg"
+```
+
+```bash
  azd deploy
 ```
 
@@ -871,23 +875,25 @@ administration of these secrets so they can be easily changed.
 New Relecloud team members should setup their environment by following
 these steps.
 
-1. Opening the Visual Studio solution `./src/Relecloud.sln`
+1. Open the Visual Studio solution `./src/Relecloud.sln`
 2. Setup the **Relecloud.Web** project
     1. Right-click on the **Relecloud.Web** project
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
 
         ```bash
-        ./infra/getSecretsForLocalDev.sh -g relecloudresources-rg --web
+        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
         ```
 
         > If you see an error that says `/bin/bash^M: bad interpreter:`
-        > then you will need to open the `getSecretsForLocalDev.sh`
-        > file and change the line endings from `CRLF` to `LF`. This
-        > can be done with VS Code.
+        > then you will need to change the line endings from `CRLF` to `LF`.
+        > This can be done with the following cmd.
+        > ```bash
+        > sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
+        > ```
 
     4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
-project.
+    project.
 
 3. Setup the **Relecloud.Web.Api** project
     1. Right-click on the **Relecloud.Web.Api** project
@@ -895,36 +901,50 @@ project.
     3. From a command prompt run the bash command
 
         ```bash
-        ./infra/getSecretsForLocalDev.sh -g relecloudresources-rg --api
+        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
         ```
 
         > If you see an error that says `/bin/bash^M: bad interpreter:`
-        > then you will need to open the `getSecretsForLocalDev.sh`
-        > file and change the line endings from `CRLF` to `LF`. This
-        > can be done with VS Code.
+        > then you will need to change the line endings from `CRLF` to `LF`.
+        > This can be done with the following cmd.
+        > ```bash
+        > sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
+        > ```
 
-    4. Copy the output into the `secrets.json` file for the
-**Relecloud.Web.Api** project.
+    4. Copy the output into the `secrets.json` file for the 
+    **Relecloud.Web.Api** project.
 
 4. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
 5. Choose **Multiple startup projects**
-6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
+6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.\
 7. Click **Ok** to close the popup
-8. Add your IP address to the SQL Database firewall as an allowed connection
+8. Add your IP address to the SQL Database firewall as an allowed connection by using the following three commands
 
-```bash
-myIpAddress="youripaddress"
-mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
-az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n mydevbo
-x --start-ip-address $myIpAddress --end-ip-address $myIpAddress
-```
+    ```bash
+    myIpAddress=$(wget -q -O - ipinfo.io/ip)
+    ```
+
+    ```bash
+    mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+    ```
+
+    ```bash
+    az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n mydevbox --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+    ```
 
 9. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
 
-```bash
-./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
-```
+    ```bash
+    ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+    ```
+
+    > If you see an error that says `/bin/bash^M: bad interpreter:`
+    > then you will need to change the line endings from `CRLF` to `LF`.
+    > This can be done with the following cmd.
+    > ```bash
+    > sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
+    > ```
 
 10. Press F5 to start debugging the website
 
