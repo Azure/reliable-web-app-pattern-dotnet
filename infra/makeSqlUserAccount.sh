@@ -62,11 +62,14 @@ databaseName=$(az resource list -g $resourceGroupName --query "[?type=='Microsof
 sqlAdmin=$(az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorLogin --query value -o tsv)
 sqlPassword=$(az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorPassword --query value -o tsv)
 
+echo "connecting to: $databaseServerFqdn"
+echo "opening: $databaseName"
+
 # disable Azure AD only admin access
-az sql server ad-only-auth disable -n $databaseServer -g $resourceGroupName
+# az sql server ad-only-auth disable -n $databaseServer -g $resourceGroupName
 
 cat <<SCRIPT_END > createSqlUser.sql
-DECLARE @myObjectId varchar(100) = '000eb194-9c94-4022-adbd-cb5c1010a5dde'
+DECLARE @myObjectId varchar(100) = '$objectIdForCurrentUser'
 DECLARE @sid binary(16) = CAST(CAST(@myObjectId as uniqueidentifier) as binary(16))
 
 DECLARE @sql nvarchar(max) = N'CREATE user [keschlob@microsoft.com] WITH TYPE = E, SID = 0x' + convert(varchar(1000), @sid, 2);
@@ -84,4 +87,4 @@ export SQLCMDPASSWORD=$sqlPassword
 export SQLCMDPASSWORD=clear
 
 # enable Azure AD only admin access
-az sql server ad-only-auth enable -n $databaseServer -g $resourceGroupName
+# az sql server ad-only-auth enable -n $databaseServer -g $resourceGroupName
