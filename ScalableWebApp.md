@@ -817,9 +817,11 @@ App Configuration so that the web app can read this data.
 ```
 
 > If you see an error that says `/bin/bash^M: bad interpreter:`
-> then you will need to open the `createAppRegistrations.sh`
-> file and change the line endings from `CRLF` to `LF`. This
-> can be done with VS Code.
+> then you will need to change the line endings from `CRLF` to `LF`.
+> This can be done with the following cmd.
+> ```bash
+> sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
+> ```
 
 **Deploy the code**
 
@@ -916,7 +918,7 @@ these steps.
 
 4. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
 5. Choose **Multiple startup projects**
-6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.\
+6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
 7. Click **Ok** to close the popup
 8. Add your IP address to the SQL Database firewall as an allowed connection by using the following three commands
 
