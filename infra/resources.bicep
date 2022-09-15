@@ -42,7 +42,7 @@ resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssign
   properties: {
     principalType: 'ServicePrincipal'
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
-    principalId: managedIdentity.properties.principalId
+    principalId: principalId
     description: 'Grant the "Data Reader" role to the principal identity so it can access the azure app configuration service.'
   }
 }
