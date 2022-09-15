@@ -72,18 +72,25 @@ cat <<SCRIPT_END > createSqlUser.sql
 DECLARE @myObjectId varchar(100) = '$objectIdForCurrentUser'
 DECLARE @sid binary(16) = CAST(CAST(@myObjectId as uniqueidentifier) as binary(16))
 
-DECLARE @sql nvarchar(max) = N'CREATE user [keschlob@microsoft.com] WITH TYPE = E, SID = 0x' + convert(varchar(1000), @sid, 2);
+DECLARE @sql nvarchar(max) = N'CREATE user [$azureAdUsername] WITH TYPE = E, SID = 0x' + convert(varchar(1000), @sid, 2);
 
-IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'keschlob@microsoft.com')
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'$azureAdUsername')
 	EXEC sys.sp_executesql @sql;
+
+SCRIPT_END
+
+export SQLCMDPASSWORD=$sqlPassword
+./sqlcmd -S "tcp:$databaseServerFqdn,1433" -U $sqlAdmin -i createSqlUser.sql
+
+cat <<SCRIPT_END > updateSqlUserPerms.sql
 
 IF NOT EXISTS (SELECT * FROM sys.database_principals p JOIN sys.database_role_members db_owner_role ON db_owner_role.member_principal_id = p.principal_id JOIN sys.database_principals role_names ON role_names.principal_id = db_owner_role.role_principal_id AND role_names.[name] = 'db_owner' WHERE p.[name]=N'$azureAdUsername')
   ALTER ROLE db_owner ADD MEMBER [$azureAdUsername];
 
 SCRIPT_END
 
-export SQLCMDPASSWORD=$sqlPassword
-./sqlcmd -S "tcp:$databaseServerFqdn,1433" -d $databaseName -U $sqlAdmin -i createSqlUser.sql
+./sqlcmd -S "tcp:$databaseServerFqdn,1433" -d $databaseName -U $sqlAdmin -i updateSqlUserPerms.sql
+
 export SQLCMDPASSWORD=clear
 
 # enable Azure AD only admin access

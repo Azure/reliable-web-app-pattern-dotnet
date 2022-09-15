@@ -350,4 +350,5 @@ MigrationBackup/
 .ionide/
 .azure/
 createSqlUser.sql
+updateSqlUserPerms.sql
 sqlcmd*
