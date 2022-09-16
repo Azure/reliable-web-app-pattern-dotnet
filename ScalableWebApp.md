@@ -861,24 +861,25 @@ help them practice early integration of changes as modifying the
 database and other shared resources can impact multiple workstreams.
 
 To connect to the shared database the dev team uses connection strings
-from Key Vault and App Configuration Service. Dev's use the following
-script to retrieve data and store it as User Secrets on their workstation
-for the front-end web app.
+from Key Vault and App Configuration Service. Devs use the following
+script to retrieve data and store it as
+[User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows)
+on their workstation.
 
 Using the `secrets.json` file helps the team keep their credentials
 secure. The file is stored outside of the source control directory so
-the data is never accidentally checked-in. And the dev's don't share credentials in ways that can create security leaks such as email or file
-shares.
+the data is never accidentally checked-in. And the devs don't share
+credentials over email or other ways that could compromise their
+security.
 
 Managing secrets from Key Vault and App Configuration ensures that only
 authorized team members can access the data and also centralizes the
 administration of these secrets so they can be easily changed.
 
-New Relecloud team members should setup their environment by following
-these steps.
+New team members should setup their environment by following these steps.
 
 1. Open the Visual Studio solution `./src/Relecloud.sln`
-2. Setup the **Relecloud.Web** project
+2. Setup the **Relecloud.Web** project User Secrets
     1. Right-click on the **Relecloud.Web** project
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
@@ -897,7 +898,7 @@ these steps.
     4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
     project.
 
-3. Setup the **Relecloud.Web.Api** project
+3. Setup the **Relecloud.Web.Api** project User Secrets
     1. Right-click on the **Relecloud.Web.Api** project
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
@@ -920,7 +921,7 @@ these steps.
 5. Choose **Multiple startup projects**
 6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
 7. Click **Ok** to close the popup
-8. Add your IP address to the SQL Database firewall as an allowed connection by using the following three commands
+8. Add your IP address to the SQL Database firewall as an allowed connection by using the following commands
 
     ```bash
     myIpAddress=$(wget -q -O - ipinfo.io/ip)
@@ -931,7 +932,7 @@ these steps.
     ```
 
     ```bash
-    az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n mydevbox --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+    az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
     ```
 
 9. When connecting to Azure SQL database you'll connect with your Azure AD account.
