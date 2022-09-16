@@ -39,7 +39,8 @@ resource allowSqlAdminScript 'Microsoft.Resources/deploymentScripts@2020-10-01' 
     azPowerShellVersion: '7.4'
     retentionInterval: 'P1D'
     cleanupPreference: 'OnSuccess'
-    scriptContent: 'Disable-AzSqlServerActiveDirectoryOnlyAuthentication -ServerName ${sqlServerName} -ResourceGroupName ${resourceGroup().name}'
+    arguments: '-SqlServerName \'${sqlServerName}\' -ResourceGroupName \'${resourceGroup().name}\''
+    scriptContent: loadTextContent('enableSqlAdminForServer.ps1')
   }
 }
 
