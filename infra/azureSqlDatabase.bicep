@@ -21,8 +21,30 @@ param uniqueScriptId string = newGuid()
 param location string
 param tags object
 
+var sqlServerName = '${resourceToken}-sql-server'
+
+resource allowSqlAdminScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'allowSqlAdminScript'
+  location: location
+  tags: tags
+  kind: 'AzurePowerShell'
+  identity:{
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${devOpsManagedIdentityId}': {}
+    }
+  }
+  properties: {
+    forceUpdateTag: uniqueScriptId
+    azPowerShellVersion: '7.4'
+    retentionInterval: 'P1D'
+    cleanupPreference: 'OnSuccess'
+    scriptContent: 'Disable-AzSqlServerActiveDirectoryOnlyAuthentication -ServerName ${sqlServerName} -ResourceGroupName ${resourceGroup().name}'
+  }
+}
+
 resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
-  name: '${resourceToken}-sql-server'
+  name: sqlServerName
   location: location
   tags: tags
   properties: {
@@ -36,6 +58,9 @@ resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
     }
     version: '12.0'
   }
+  dependsOn:[
+    allowSqlAdminScript
+  ]
 }
 
 var sqlCatalogName = '${resourceToken}-sql-database'
@@ -43,6 +68,7 @@ var skuTierName = isProd ? 'Premium' : 'Standard'
 var dtuCapacity = isProd ? 125 : 10
 var requestedBackupStorageRedundancy = isProd ? 'Geo' : 'Local'
 var readScale = isProd ? 'Enabled' : 'Disabled'
+
 
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
   name: '${sqlServer.name}/${sqlCatalogName}'
