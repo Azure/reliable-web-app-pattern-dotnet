@@ -1,14 +1,19 @@
+@description('Enables the template to choose different SKU by environment')
 param isProd bool
+
+@description('The id for the user-assigned managed identity that runs deploymentScripts')
+param devOpsManagedIdentityId string
 
 param location string
 
-param environmentName string
+@description('The user running the deployment will be given access to the deployed resources such as Key Vault and App Config svc')
 param principalId string = ''
+
+@description('A generated identifier used to create unique resources')
 param resourceToken string
 param tags object
 
-// Managed Identity
-@description('A user-assigned managed identity that is used by the App Service app.')
+@description('A user-assigned managed identity that is used by the App Service app')
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
   name: 'web-${resourceToken}-identity'
   location: location
@@ -16,19 +21,29 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-
 }
 
 @description('Built in \'Data Reader\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
-// Allows read access to App Configuration data
 var appConfigurationRoleDefinitionId = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
-// Role assignment
 @description('Grant the \'Data Reader\' role to the user-assigned managed identity, at the scope of the resource group.')
-resource appConfigRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, resourceToken)
+resource appConfigRoleAssignmentForWebApps 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, managedIdentity.name, resourceToken)
   scope: resourceGroup()
   properties: {
     principalType: 'ServicePrincipal'
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
     principalId: managedIdentity.properties.principalId
     description: 'Grant the "Data Reader" role to the user-assigned managed identity so it can access the azure app configuration service.'
+  }
+}
+
+@description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
+resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, principalId, resourceToken)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'User'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
+    principalId: principalId
+    description: 'Grant the "Data Reader" role to the principal identity so it can access the azure app configuration service.'
   }
 }
 
@@ -240,7 +255,7 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
       ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
       APPLICATIONINSIGHTS_CONNECTION_STRING: apiApplicationInsights.properties.ConnectionString
-      'App:AppConfig:Uri': appConfigSvc.properties.endpoint
+      'Api:AppConfig:Uri': appConfigSvc.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
       WEBSITE_DNS_SERVER: '168.63.129.16' 
@@ -543,10 +558,12 @@ module sqlSetup 'azureSqlDatabase.bicep' = {
   name: 'sqlSetup'
   scope: resourceGroup()
   params: {
+    devOpsManagedIdentityId: devOpsManagedIdentityId
     isProd: isProd
     location: location
     managedIdentity: {
       name: managedIdentity.name
+      id: managedIdentity.id
       properties: {
         clientId: managedIdentity.properties.clientId
         principalId: managedIdentity.properties.principalId
@@ -568,6 +585,7 @@ module redisSetup 'azureRedisCache.bicep' = {
   name: 'redisSetup'
   scope: resourceGroup()
   params: {
+    devOpsManagedIdentityId: devOpsManagedIdentityId
     isProd: isProd
     location: location
     resourceToken: resourceToken

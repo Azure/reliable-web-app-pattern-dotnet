@@ -165,7 +165,7 @@ every API call just to find out that the web app is not properly
 working.
 
 In the same `Startup.cs` class we see the method that adds this
-behavior is named ` GetCircuitBreakerPolicy()`. This behavior is also
+behavior is named `GetCircuitBreakerPolicy()`. This behavior is also
 provided by the Polly library and the behavior we want is described with
 the same fluent method extensions.
 
@@ -743,8 +743,6 @@ myEnvironmentName=relecloudresources
 azd env new -e $myEnvironmentName
 ```
 
-> The name 'relecloudresources' is configurable for your needs but must be matched with other names used in later steps.
-
 <br />
 
 **Choose Prod or Non-prod environment**
@@ -754,9 +752,10 @@ their production, and non-prod, environments. To do this
 they set `azd` environment parameters that change the behavior
 of the next steps.
 
-> If you skip forward to the next step, and change nothing,
-> then the bicep templates will default to non-prod settings
-> for a single Azure region.
+> If you skip the next two optional steps, and change nothing,
+> then the bicep templates will default to non-prod settings.
+
+*OPTIONAL: 1*
 
 Relecloud devs deploy the production environment by running the
 following command to choose the SKUs they want in production.
@@ -764,6 +763,8 @@ following command to choose the SKUs they want in production.
 ```bash
 azd env set IS_PROD true
 ```
+
+*OPTIONAL: 2*
 
 Relecloud devs also use the following command to choose a second
 Azure location because the production environment is
@@ -816,9 +817,11 @@ App Configuration so that the web app can read this data.
 ```
 
 > If you see an error that says `/bin/bash^M: bad interpreter:`
-> then you will need to open the `createAppRegistrations.sh`
-> file and change the line endings from `CRLF` to `LF`. This
-> can be done with VS Code.
+> then you will need to change the line endings from `CRLF` to `LF`.
+> This can be done with the following cmd.
+> ```bash
+> sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
+> ```
 
 **Deploy the code**
 
@@ -828,6 +831,9 @@ code for the front-end and API web apps.
 
 ```bash
  azd env set AZURE_RESOURCE_GROUP "$myEnvironmentName-rg"
+```
+
+```bash
  azd deploy
 ```
 
@@ -847,9 +853,104 @@ code for the front-end and API web apps.
 > name. You will also need to purge the Key Vault and App
 > Configuration Service instances that were deployed.
 
-## Inner loop dev
+## Local Development
 
-TODO - describe connection to Azure resources and provide guidance on the creation of non-prod environments to support individual dev streams
+Relecloud developers use Visual Studio to develop locally and they co-share
+an Azure SQL database for local dev. The team chooses this workflow to
+help them practice early integration of changes as modifying the
+database and other shared resources can impact multiple workstreams.
+
+To connect to the shared database the dev team uses connection strings
+from Key Vault and App Configuration Service. Devs use the following
+script to retrieve data and store it as
+[User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows)
+on their workstation.
+
+Using the `secrets.json` file helps the team keep their credentials
+secure. The file is stored outside of the source control directory so
+the data is never accidentally checked-in. And the devs don't share
+credentials over email or other ways that could compromise their
+security.
+
+Managing secrets from Key Vault and App Configuration ensures that only
+authorized team members can access the data and also centralizes the
+administration of these secrets so they can be easily changed.
+
+New team members should setup their environment by following these steps.
+
+1. Open the Visual Studio solution `./src/Relecloud.sln`
+2. Setup the **Relecloud.Web** project User Secrets
+    1. Right-click on the **Relecloud.Web** project
+    2. From the context menu choose **Manage User Secrets**
+    3. From a command prompt run the bash command
+
+        ```bash
+        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
+        ```
+
+        > If you see an error that says `/bin/bash^M: bad interpreter:`
+        > then you will need to change the line endings from `CRLF` to `LF`.
+        > This can be done with the following cmd.
+        > ```bash
+        > sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
+        > ```
+
+    4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
+    project.
+
+3. Setup the **Relecloud.Web.Api** project User Secrets
+    1. Right-click on the **Relecloud.Web.Api** project
+    2. From the context menu choose **Manage User Secrets**
+    3. From a command prompt run the bash command
+
+        ```bash
+        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
+        ```
+
+        > If you see an error that says `/bin/bash^M: bad interpreter:`
+        > then you will need to change the line endings from `CRLF` to `LF`.
+        > This can be done with the following cmd.
+        > ```bash
+        > sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
+        > ```
+
+    4. Copy the output into the `secrets.json` file for the 
+    **Relecloud.Web.Api** project.
+
+4. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
+5. Choose **Multiple startup projects**
+6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
+7. Click **Ok** to close the popup
+8. Add your IP address to the SQL Database firewall as an allowed connection by using the following commands
+
+    ```bash
+    myIpAddress=$(wget -q -O - ipinfo.io/ip)
+    ```
+
+    ```bash
+    mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+    ```
+
+    ```bash
+    az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+    ```
+
+9. When connecting to Azure SQL database you'll connect with your Azure AD account.
+Run the following command to give your Azure AD account permission to access the database.
+
+    ```bash
+    ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+    ```
+
+    > If you see an error that says `/bin/bash^M: bad interpreter:`
+    > then you will need to change the line endings from `CRLF` to `LF`.
+    > This can be done with the following cmd.
+    > ```bash
+    > sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
+    > ```
+
+10. Press F5 to start debugging the website
+
 
 # Choosing the right services
 
@@ -873,7 +974,9 @@ We have chosen a set of services based on the following criteria:
     having to manage infrastructure. This is where the Relecloud
     Concerts web app will be deployed.
 
-- [Azure Active Directory]().
+- [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-whatis)
+    Azure Active Directory (Azure AD) is a cloud-based identity and access management service. This service helps your
+    employees access external resources, such as Microsoft 365, the Azure portal, and thousands of other SaaS applications.
 
 - [Azure SQL Database](https://docs.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql) is
     a general-purpose relational database managed service in Microsoft
@@ -1193,8 +1296,7 @@ object.
 
 # Simulating the patterns
 
-Here are some things you can try to see these patterns in action while
-running this solution in Azure.
+Here are some things you can try to see how these patterns support the availability and scalability of this solution in Azure.
 
 ### Queue-based load leveling
 
@@ -1301,6 +1403,7 @@ Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
 ![image of Azure Cache for Redis Console shows data for upcoming concerts](./assets/Guide/Simulating_RedisConsoleShowUpcomingConcerts.png)
 
+<br />
 
 # Resulting service level and cost
 
@@ -1356,7 +1459,7 @@ for Relecloud so they deploy their web app to two regions. Using
 two regions changes the calculation to use the
 [multiregional availability formula](https://docs.microsoft.com/en-us/azure/architecture/framework/resiliency/business-metrics#slas-for-multiregion-deployments)
 which is 
-(`1 - (1 − N) ^ R`) to reach 99.99% availability. But, to use two
+`(1 - (1 − N) ^ R)` to reach 99.99% availability. But, to use two
 regions the team must also add Azure Front Door which has an
 availibility SLA of 99.99% so the composite availability for
 this solution is 99.98%.
@@ -1422,6 +1525,8 @@ to host both the front-end and API web apps.
 > We recommend that customers review these prices with their
 > account team. Prices vary by region and non-production pricing
 > can be impacted by Dev/Test pricing as well as other factors.
+
+<br/>
 
 # Starting your modernization journey
 

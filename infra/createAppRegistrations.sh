@@ -22,7 +22,7 @@ while [[ $# -gt 0 ]]; do
       echo "    createAppRegistrations.sh : Will create two app registrations for the scalable-web-app-pattern-dotnet and register settings with App Configuration Svc and Key Vault."
       echo ""
       echo "Arguments"
-      echo "    --resource-group -g : Name of resource group containing the environment that was creaed by the azd command."
+      echo "    --resource-group -g : Name of resource group containing the environment that was created by the azd command."
       echo ""
       exit 1
       ;;
@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${#resourceGroupName} -eq 0 ]]; then
-  echo 'FATAL ERROR: Missing required parameter --resourceGroupName' 1>&2
+  echo "FATAL ERROR: Missing required parameter --resource-group" 1>&2
   exit 6
 fi
 
@@ -94,6 +94,7 @@ tenantId=$(az account show --query "tenantId" -o tsv)
 userObjectId=$(az account show --query "id" -o tsv)
 
 echo "tenantId='$tenantId'"
+echo ""
 
 frontEndWebObjectId=$(az ad app list --filter "displayName eq '$frontEndWebAppName'" --query "[].id" -o tsv)
 
@@ -129,14 +130,15 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
   
       currentRetryCount=$((currentRetryCount + 1))
       if [[ $currentRetryCount -gt $maxNumberOfRetries ]]; then
-        echo 'FATAL ERROR: Tried to create a client secret too many times' 1>&2
+        echo "FATAL ERROR: Tried to create a client secret too many times" 1>&2
         exit 14
       fi
 
       if [[ $isWebAppCreated -eq 0 ]]; then
         echo "... trying to create clientSecret for front-end attempt #$currentRetryCount"
       else
-        echo '... created clientSecret for front-end'
+        echo "... created clientSecret for front-end"
+        echo ""
       fi
 
       # sleep until the app registration is created
@@ -233,7 +235,7 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
       sleep 3 
     done
 
-    echo "assigned scope to api"
+    echo "... assigned scope to api"
 
     permId=''
     currentRetryCount=0
@@ -281,6 +283,7 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
         fi
       else
         echo "front-end web app is now preAuthorized"
+        echo ""
       fi
 
       sleep 3

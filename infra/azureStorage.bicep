@@ -32,7 +32,7 @@ resource kvSecretStorageAcct 'Microsoft.KeyVault/vaults/secrets@2021-11-01-previ
   parent: existingKv
   name: 'App--StorageAccount--QueueConnectionString'
   properties: {
-    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0]};EndpointSuffix=core.windows.net'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
   }
 }
 

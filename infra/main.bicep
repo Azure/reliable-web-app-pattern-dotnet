@@ -38,6 +38,16 @@ resource primaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
   tags: tags
 }
 
+module devOpsIdentitySetup './devOpsIdentitySetup.bicep' = {
+  name: 'devOpsIdentitySetup'
+  scope: primaryResourceGroup
+  params: {
+    tags: tags
+    location: location
+    resourceToken: primaryResourceToken
+  }
+}
+
 // temporary workaround for multiple resource group bug
 // `azd down` expects to be able to delete this resource because it was listed by the azure deployment output even when it is not deployed
 resource secondaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -50,9 +60,9 @@ module primaryResources './resources.bicep' = {
   name: 'primary-${primaryResourceToken}'
   scope: primaryResourceGroup
   params: {
+    devOpsManagedIdentityId: devOpsIdentitySetup.outputs.devOpsManagedIdentityId
     isProd: isProdBool
     location: location
-    environmentName: name
     principalId: principalId
     resourceToken: primaryResourceToken
     tags: tags
@@ -63,9 +73,9 @@ module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
   name: 'secondary-${primaryResourceToken}'
   scope: secondaryResourceGroup
   params: {
+    devOpsManagedIdentityId: devOpsIdentitySetup.outputs.devOpsManagedIdentityId
     isProd: isProdBool
     location: secondaryAzureLocation
-    environmentName: name
     principalId: principalId
     resourceToken: secondaryResourceToken
     tags: tags

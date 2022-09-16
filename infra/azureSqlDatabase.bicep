@@ -1,12 +1,14 @@
-@description('A user assigned managed identity object')
-param managedIdentity object
-param location string
-param resourceToken string
-param tags object
-param isProd bool
+@description('The id for the user-assigned managed identity that runs deploymentScripts')
+param devOpsManagedIdentityId string
 
-@description('The objectId of the user executing the deployment')
-param principalId string = ''
+@description('Expecting the user-assigned managed identity that represents the API web app. Will become the SQL db admin')
+param managedIdentity object
+
+@description('A generated identifier used to create unique resources')
+param resourceToken string
+
+@description('Enables the template to choose different SKU by environment')
+param isProd bool
 
 param sqlAdministratorLogin string
 
@@ -16,8 +18,34 @@ param sqlAdministratorPassword string
 @description('Ensures that the idempotent scripts are executed each time the deployment is executed')
 param uniqueScriptId string = newGuid()
 
+param location string
+param tags object
+
+var sqlServerName = '${resourceToken}-sql-server'
+
+resource allowSqlAdminScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'allowSqlAdminScript'
+  location: location
+  tags: tags
+  kind: 'AzurePowerShell'
+  identity:{
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${devOpsManagedIdentityId}': {}
+    }
+  }
+  properties: {
+    forceUpdateTag: uniqueScriptId
+    azPowerShellVersion: '7.4'
+    retentionInterval: 'P1D'
+    cleanupPreference: 'OnSuccess'
+    arguments: '-SqlServerName \'${sqlServerName}\' -ResourceGroupName \'${resourceGroup().name}\''
+    scriptContent: loadTextContent('enableSqlAdminForServer.ps1')
+  }
+}
+
 resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
-  name: '${resourceToken}-sql-server'
+  name: sqlServerName
   location: location
   tags: tags
   properties: {
@@ -31,6 +59,9 @@ resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
     }
     version: '12.0'
   }
+  dependsOn:[
+    allowSqlAdminScript
+  ]
 }
 
 var sqlCatalogName = '${resourceToken}-sql-database'
@@ -38,6 +69,7 @@ var skuTierName = isProd ? 'Premium' : 'Standard'
 var dtuCapacity = isProd ? 125 : 10
 var requestedBackupStorageRedundancy = isProd ? 'Geo' : 'Local'
 var readScale = isProd ? 'Enabled' : 'Disabled'
+
 
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
   name: '${sqlServer.name}/${sqlCatalogName}'
@@ -74,13 +106,19 @@ resource createSqlUserScript 'Microsoft.Resources/deploymentScripts@2020-10-01' 
   location: location
   tags: tags
   kind: 'AzurePowerShell'
+  identity:{
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${devOpsManagedIdentityId}': {}
+    }
+  }
   properties: {
     forceUpdateTag: uniqueScriptId
     azPowerShellVersion: '7.4'
     retentionInterval: 'P1D'
     cleanupPreference: 'OnSuccess'
     arguments: '-ServerName \'${sqlServer.name}\' -ResourceGroupName \'${resourceGroup().name}\' -ServerUri \'${sqlServer.properties.fullyQualifiedDomainName}\' -CatalogName \'${sqlCatalogName}\' -ApplicationId \'${managedIdentity.properties.principalId}\' -ManagedIdentityName \'${managedIdentity.name}\' -SqlAdminLogin \'${sqlAdministratorLogin}\' -SqlAdminPwd \'${sqlAdministratorPassword}\' -IsProd ${isProd ? '1' : '0'}'
-    scriptContent: loadTextContent('createSqlUserAcct.ps1')
+    scriptContent: loadTextContent('createSqlAcctForManagedIdentity.ps1')
   }
   dependsOn:[
     sqlDatabase
