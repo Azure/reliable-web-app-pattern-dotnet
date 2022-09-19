@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Relecloud.FunctionApp": {
-      "commandName": "Project",
-      "commandLineArgs": "--port 5860"
-    }
-  }
-}

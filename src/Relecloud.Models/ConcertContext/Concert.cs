@@ -16,8 +16,6 @@
         public DateTimeOffset UpdatedOn { get; set; }
         public string UpdatedBy { get; set; } = string.Empty;
 
-        public TicketManagementServiceProviders TicketManagementServiceProvider { get; set; }
-
         /// <summary>
         /// Required when the selected Ticket Management Service is not ReleCloud Api
         /// </summary>

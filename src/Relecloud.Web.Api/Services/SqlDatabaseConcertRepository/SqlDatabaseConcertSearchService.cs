@@ -23,7 +23,6 @@ namespace Relecloud.Web.Services.AzureSearchService
         {
             var query = request.Query.ToLower();
 
-
             var concertsStartingWithName = this.database.Concerts
                 .Where(c => c.Title.ToLower().StartsWith(query))
                 .Select(c => new ConcertSearchResult
@@ -54,7 +53,6 @@ namespace Relecloud.Web.Services.AzureSearchService
 
             return Task.FromResult(searchResponse);
         }
-
 
         #endregion
 

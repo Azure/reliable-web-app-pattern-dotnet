@@ -33,23 +33,8 @@
 		<PackageReference Include="Microsoft.Identity.Web" Version="1.23.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="NSwag.ApiDescription.Client" Version="13.0.5">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 		<PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<OpenApiReference Include="OpenAPIs\swagger.json" CodeGenerator="NSwagCSharp" Namespace="ServiceProviders.Payment" ClassName="MockPaymentGateway">
-			<SourceUri>https://relecloudconcerts-payment-app.azurewebsites.net/api/swagger.json</SourceUri>
-			<Options>/GenerateExceptionClasses:false /AdditionalNamespaceUsages:Relecloud.Web.Models</Options>
-		</OpenApiReference>
-		<OpenApiReference Include="OpenAPIs\swagger1.json" CodeGenerator="NSwagCSharp" Namespace="ServiceProviders.TicketManagement" ClassName="MockTicketManagementService">
-			<SourceUri>https://relecloudconcerts-ticketmanagement-app.azurewebsites.net/api/swagger.json</SourceUri>
-			<Options>/GenerateExceptionClasses:false /AdditionalNamespaceUsages:Relecloud.Web.Models</Options>
-		</OpenApiReference>
 	</ItemGroup>
 
 	<ItemGroup>

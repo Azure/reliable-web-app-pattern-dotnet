@@ -12,7 +12,7 @@ using Relecloud.Web.Models.ConcertContext;
 using Relecloud.Web.Models.Services;
 using Relecloud.Web.Services;
 using Relecloud.Web.Services.ApiConcertService;
-using Relecloud.Web.Services.DummyServices;
+using Relecloud.Web.Services.MockServices;
 using Relecloud.Web.Services.RelecloudApiServices;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -67,7 +67,7 @@ namespace Relecloud.Web
             var baseUri = Configuration["App:RelecloudApi:BaseUri"];
             if (string.IsNullOrWhiteSpace(baseUri))
             {
-                services.AddScoped<ITicketPurchaseService, DummyTicketPurchaseService>();
+                services.AddScoped<ITicketPurchaseService, MockTicketPurchaseService>();
             }
             else
             {
@@ -87,7 +87,7 @@ namespace Relecloud.Web
             var baseUri = Configuration["App:RelecloudApi:BaseUri"];
             if (string.IsNullOrWhiteSpace(baseUri))
             {
-                services.AddScoped<IConcertSearchService, DummyConcertSearchService>();
+                services.AddScoped<IConcertSearchService, MockConcertSearchService>();
             }
             else
             {
@@ -124,7 +124,7 @@ namespace Relecloud.Web
             string baseUri = Configuration["App:RelecloudApi:BaseUri"];
             if (string.IsNullOrWhiteSpace(baseUri))
             {
-                services.AddScoped<IConcertContextService, DummyConcertContextService>();
+                services.AddScoped<IConcertContextService, MockConcertContextService>();
             }
             else
             {

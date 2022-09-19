@@ -1,9 +1,9 @@
 ﻿using Relecloud.Web.Models.Search;
 using Relecloud.Web.Models.Services;
 
-namespace Relecloud.Web.Services.DummyServices
+namespace Relecloud.Web.Services.MockServices
 {
-    public class DummyConcertSearchService : IConcertSearchService
+    public class MockConcertSearchService : IConcertSearchService
     {
         public void Initialize()
         {

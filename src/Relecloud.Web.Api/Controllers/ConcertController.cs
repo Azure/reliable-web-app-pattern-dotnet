@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 using Relecloud.Web.Api.Infrastructure;
 using Relecloud.Web.Api.Services;
+using Relecloud.Web.Api.Services.TicketManagementService;
 using Relecloud.Web.Models.ConcertContext;
 using Relecloud.Web.Models.Services;
 using System.Net;
@@ -18,13 +19,13 @@ namespace Relecloud.Web.Api.Controllers
         public const int DefaultNumberOfConcerts = 10;
 
         private readonly ILogger<ConcertController> logger;
-        private readonly ITIcketServiceProxy ticketServiceProxy;
+        private readonly ITicketManagementService ticketService;
         private readonly IConcertRepository concertRepository;
 
-        public ConcertController(ILogger<ConcertController> logger, ITIcketServiceProxy ticketServiceProxy, IConcertRepository concertRepository)
+        public ConcertController(ILogger<ConcertController> logger, ITicketManagementService ticketService, IConcertRepository concertRepository)
         {
             this.logger = logger;
-            this.ticketServiceProxy = ticketServiceProxy;
+            this.ticketService = ticketService;
             this.concertRepository = concertRepository;
         }
 
@@ -78,10 +79,6 @@ namespace Relecloud.Web.Api.Controllers
                 }
 
                 var newConcertResult = await this.concertRepository.CreateConcertAsync(model);
-                if (model.TicketManagementServiceProvider == TicketManagementServiceProviders.RelecloudApi)
-                {
-                    await this.concertRepository.CreateOrUpdateTicketNumbersAsync(newConcertResult.NewId, model.NumberOfTicketsForSale.GetValueOrDefault());
-                }
 
                 return CreatedAtRoute("GetConcertById", new { id = newConcertResult.NewId }, model);
             }
@@ -132,21 +129,8 @@ namespace Relecloud.Web.Api.Controllers
                         ErrorMessages = ModelState.ServerError("Cannot make a concert visible if tickets are not available for sale")
                     });
                 }
-                else if (existingConcert.TicketManagementServiceProvider != model.TicketManagementServiceProvider
-                    && await HaveTicketsBeenSoldAsync(existingConcert.Id))
-                {
-                    return BadRequest(new UpdateResult
-                    {
-                        Success = false,
-                        ErrorMessages = ModelState.ServerError("Cannot change ticket management service after tickets have been sold")
-                    });
-                }
 
                 await this.concertRepository.UpdateConcertAsync(model);
-                if (model.TicketManagementServiceProvider == TicketManagementServiceProviders.RelecloudApi)
-                {
-                    await this.concertRepository.CreateOrUpdateTicketNumbersAsync(model.Id, model.NumberOfTicketsForSale.GetValueOrDefault());
-                }
 
                 return Accepted(model);
             }
@@ -236,7 +220,7 @@ namespace Relecloud.Web.Api.Controllers
         
         private async Task<bool> HaveTicketsBeenSoldAsync(int concertId)
         {
-            var result = await this.ticketServiceProxy.HaveTicketsBeenSoldAsync(concertId);
+            var result = await this.ticketService.HaveTicketsBeenSoldAsync(concertId);
             TicketManagementResultGuardClause(result);
             return result.HaveTicketsBeenSold;
         }
@@ -248,7 +232,7 @@ namespace Relecloud.Web.Api.Controllers
 
         private async Task<int> CountAvailableTicketsAsync(int concertId)
         {
-            var result = await this.ticketServiceProxy.CountAvailableTicketsAsync(concertId);
+            var result = await this.ticketService.CountAvailableTicketsAsync(concertId);
             TicketManagementResultGuardClause(result);
             return result.CountOfAvailableTickets;
         }

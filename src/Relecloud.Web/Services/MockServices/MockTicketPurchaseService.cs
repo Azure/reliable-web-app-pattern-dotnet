@@ -1,8 +1,8 @@
 ﻿using Relecloud.Web.Models.TicketManagement;
 
-namespace Relecloud.Web.Services.DummyServices
+namespace Relecloud.Web.Services.MockServices
 {
-    public class DummyTicketPurchaseService : ITicketPurchaseService
+    public class MockTicketPurchaseService : ITicketPurchaseService
     {
         public Task<PurchaseTicketsResult> PurchaseTicketAsync(PurchaseTicketsRequest request)
         {

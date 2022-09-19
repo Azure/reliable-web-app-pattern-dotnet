@@ -3,17 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32104.313
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Relecloud.FunctionApp", "Relecloud.FunctionApp\Relecloud.FunctionApp.csproj", "{B5D006E3-19FB-4A37-AA32-6100117B48C1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Relecloud.Mocks.PaymentGateway", "Relecloud.Mocks.PaymentGateway\Relecloud.Mocks.PaymentGateway.csproj", "{BDEF91CC-6CC1-47F7-88D2-B662F7CF4ECA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Relecloud.Web.Api", "Relecloud.Web.Api\Relecloud.Web.Api.csproj", "{13320B78-0B26-4026-ADCE-FE84E1735097}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Relecloud.Web.Models", "Relecloud.Models\Relecloud.Web.Models.csproj", "{CFDE9EEE-4994-43DF-8F99-123E88BEDDE8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Relecloud.Web", "Relecloud.Web\Relecloud.Web.csproj", "{58966CC0-F7FC-467F-8DEF-6D8EC4B2DC3D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Relecloud.Mocks.TicketManagementService", "Relecloud.Mocks.TicketManagementService\Relecloud.Mocks.TicketManagementService.csproj", "{700BAC0B-76F1-4015-8974-3E1B5B472E69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,14 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B5D006E3-19FB-4A37-AA32-6100117B48C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5D006E3-19FB-4A37-AA32-6100117B48C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5D006E3-19FB-4A37-AA32-6100117B48C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5D006E3-19FB-4A37-AA32-6100117B48C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDEF91CC-6CC1-47F7-88D2-B662F7CF4ECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDEF91CC-6CC1-47F7-88D2-B662F7CF4ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDEF91CC-6CC1-47F7-88D2-B662F7CF4ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDEF91CC-6CC1-47F7-88D2-B662F7CF4ECA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{13320B78-0B26-4026-ADCE-FE84E1735097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{13320B78-0B26-4026-ADCE-FE84E1735097}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13320B78-0B26-4026-ADCE-FE84E1735097}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,10 +27,6 @@ Global
 		{58966CC0-F7FC-467F-8DEF-6D8EC4B2DC3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58966CC0-F7FC-467F-8DEF-6D8EC4B2DC3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58966CC0-F7FC-467F-8DEF-6D8EC4B2DC3D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{700BAC0B-76F1-4015-8974-3E1B5B472E69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{700BAC0B-76F1-4015-8974-3E1B5B472E69}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{700BAC0B-76F1-4015-8974-3E1B5B472E69}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{700BAC0B-76F1-4015-8974-3E1B5B472E69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

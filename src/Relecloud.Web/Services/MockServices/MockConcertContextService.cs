@@ -1,9 +1,9 @@
 ﻿using Relecloud.Web.Models.ConcertContext;
 using Relecloud.Web.Models.Services;
 
-namespace Relecloud.Web.Services.DummyServices
+namespace Relecloud.Web.Services.MockServices
 {
-    public class DummyConcertContextService : IConcertContextService
+    public class MockConcertContextService : IConcertContextService
     {
         public Task<Concert?> GetConcertByIdAsync(int id)
         {
