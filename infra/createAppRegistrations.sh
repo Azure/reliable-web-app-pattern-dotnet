@@ -109,7 +109,7 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
         --display-name $frontEndWebAppName \
         --sign-in-audience AzureADMyOrg \
         --app-roles '[{ "allowedMemberTypes": [ "User" ], "description": "Relecloud Administrator", "displayName": "Relecloud Administrator", "isEnabled": "true", "value": "Administrator" }]' \
-        --web-redirect-uris "$frontEndWebAppUri/signin-oidc https://localhost:/signin-oidc" \
+        --web-redirect-uris "$frontEndWebAppUri/signin-oidc https://localhost:7227/signin-oidc" \
         --enable-id-token-issuance \
         --query appId --output tsv)
 
