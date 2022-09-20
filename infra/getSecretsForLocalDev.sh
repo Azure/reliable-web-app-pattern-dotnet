@@ -124,8 +124,8 @@ fi
 
 if [[ $api_app ]]; then
 
-    # App:StorageAccount:QueueConnectionString
-    apiAppQueueConnStr=$(az keyvault secret show --vault-name $keyVaultName --name App--StorageAccount--QueueConnectionString -o tsv --query "value" 2> /dev/null) 
+    # App:StorageAccount:ConnectionString
+    apiAppQueueConnStr=$(az keyvault secret show --vault-name $keyVaultName --name App--StorageAccount--ConnectionString -o tsv --query "value" 2> /dev/null) 
 
     # get 'App:RedisCache:ConnectionString' from Key Vault
     apiAppRedisConnStr=$(az keyvault secret show --vault-name $keyVaultName --name App--RedisCache--ConnectionString -o tsv --query "value" 2> /dev/null) 

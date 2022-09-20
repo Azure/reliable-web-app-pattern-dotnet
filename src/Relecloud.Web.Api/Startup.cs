@@ -1,16 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
-using Polly;
-using Polly.Contrib.WaitAndRetry;
-using Polly.Extensions.Http;
 using Relecloud.Web.Api.Infrastructure;
 using Relecloud.Web.Api.Services;
 using Relecloud.Web.Api.Services.MockServices;
+using Relecloud.Web.Api.Services.Search;
 using Relecloud.Web.Api.Services.SqlDatabaseConcertRepository;
 using Relecloud.Web.Api.Services.TicketManagementService;
 using Relecloud.Web.Models.Services;
-using Relecloud.Web.Services.AzureSearchService;
+using Relecloud.Web.Services.Search;
 using System.Diagnostics;
 
 namespace Relecloud.Web.Api
@@ -53,26 +51,19 @@ namespace Relecloud.Web.Api
             services.AddMicrosoftIdentityWebApiAuthentication(Configuration, "Api:AzureAd");
         }
 
-        private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
-        {
-            var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(500), retryCount: 3);
-
-            return HttpPolicyExtensions
-              .HandleTransientHttpError()
-              .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-              .WaitAndRetryAsync(delay);
-        }
-
-        private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
-        }
-
         private void AddTicketManagementService(IServiceCollection services)
         {
-            services.AddScoped<ITicketManagementService, MockTicketManagementService>();
+            var sqlDatabaseConnectionString = Configuration["App:SqlDatabase:ConnectionString"];
+            if (string.IsNullOrWhiteSpace(sqlDatabaseConnectionString))
+            {
+                services.AddScoped<ITicketManagementService, MockTicketManagementService>();
+                services.AddScoped<ITicketRenderingService, MockTicketRenderingService>();
+            }
+            else
+            {
+                services.AddScoped<ITicketManagementService, TicketManagementService>();
+                services.AddScoped<ITicketRenderingService, TicketRenderingService>();
+            }
         }
 
         private void AddAzureSearchService(IServiceCollection services)

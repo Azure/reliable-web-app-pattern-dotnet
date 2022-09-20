@@ -3,12 +3,12 @@ using Relecloud.Web.Models.ConcertContext;
 using Relecloud.Web.Models.Search;
 using Relecloud.Web.Models.Services;
 
-namespace Relecloud.Web.Services.AzureSearchService
+namespace Relecloud.Web.Api.Services.Search
 {
     public class SqlDatabaseConcertSearchService : IConcertSearchService
     {
         private readonly ConcertDataContext database;
-        
+
         #region Constructors
 
         public SqlDatabaseConcertSearchService(ConcertDataContext database)
@@ -24,7 +24,7 @@ namespace Relecloud.Web.Services.AzureSearchService
         {
             var query = request.Query.ToLower();
 
-            var concertsStartingWithName = this.database.Concerts
+            var concertsStartingWithName = database.Concerts
                 .Where(c => c.Title.ToLower().Contains(query))
                 .Select(c => new ConcertSearchResult
                 {
@@ -36,7 +36,7 @@ namespace Relecloud.Web.Services.AzureSearchService
                     Title = c.Title,
                     StartTime = c.StartTime
                 });
-            var artistsStartingWithName = this.database.Concerts
+            var artistsStartingWithName = database.Concerts
                 .Where(c => c.Artist.ToLower().Contains(query))
                 .Select(c => new ConcertSearchResult
                 {
@@ -59,7 +59,7 @@ namespace Relecloud.Web.Services.AzureSearchService
             {
                 concertResults = concertResults.OrderBy(c => c.Price);
             }
-            else if(request.SortOn == nameof(Concert.StartTime) && request.SortDescending)
+            else if (request.SortOn == nameof(Concert.StartTime) && request.SortDescending)
             {
                 concertResults = concertResults.OrderByDescending(c => c.StartTime);
             }
@@ -86,16 +86,16 @@ namespace Relecloud.Web.Services.AzureSearchService
             }
 
             query = query.ToLower();
-            var concertsStartingWithName = this.database.Concerts
+            var concertsStartingWithName = database.Concerts
                             .Where(c => c.Title.ToLower().StartsWith(query))
                             .Select(c => c.Title);
-            var artistsStartingWithName = this.database.Concerts
+            var artistsStartingWithName = database.Concerts
                             .Where(c => c.Artist.ToLower().StartsWith(query))
                             .Select(c => c.Artist);
 
             var concertResults = concertsStartingWithName
                             .Union(artistsStartingWithName);
-            
+
             return Task.FromResult<ICollection<string>>(concertResults.ToList());
         }
 

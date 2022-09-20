@@ -6,7 +6,7 @@ using Relecloud.Web.Models.ConcertContext;
 using Relecloud.Web.Models.Search;
 using Relecloud.Web.Models.Services;
 
-namespace Relecloud.Web.Services.AzureSearchService
+namespace Relecloud.Web.Services.Search
 {
     public class AzureSearchConcertSearchService : IConcertSearchService
     {
