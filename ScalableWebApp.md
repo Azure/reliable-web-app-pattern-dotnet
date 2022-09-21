@@ -567,9 +567,7 @@ We have chosen a set of services based on the following criteria:
 - [Azure Cache for Redis](https://docs.microsoft.com/azure/azure-cache-for-redis/cache-overview)
     provides an in-memory data store based on the Redis software.
 
-- [Azure Application Gateway](https://docs.microsoft.com/azure/application-gateway/overview)
-    is a web traffic load balancer that enables you to manage traffic to
-    your web applications.
+- [Azure Front Door](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-overview) is an OSI Layer 7 global load balancer that can manage traffic to your web applications.
 
 - [Azure Web Application Firewall](https://docs.microsoft.com/azure/web-application-firewall/overview)
     provides centralized protection of your web applications from common
@@ -679,76 +677,6 @@ option for your app.
 
 <br />
 
-### Azure Storage
-
-Many solutions hosted on Azure make at least some use of Azure Storage.
-Our app processes ticket purchases by processing purchase messages off a
-queue, then generating a printable ticket to a concert. We chose to use
-Storage Queues to hold purchases that are pending PDF generation and
-Blob Storage for the resulting PDFs.
-
-We have the following requirements for our queue:
-
-- we do not need to ensure a specific order for message delivery
-
-- message consumption will be idempotent, so at-most-once delivery is
-    not required
-
-- we want to be able to pull a batch of a dozen work items from the
-    queue each operation
-
-- we need to be able to audit server-side transaction logs
-
-- we want to authenticate to our queue using Managed Identity
-
-These requirements lead us to use Azure Storage Queues for our queuing
-needs. If you have a queue scenario in your app,
-[review the messaging options available](https://docs.microsoft.com/azure/service-bus-messaging/service-bus-azure-and-service-bus-queues-compared-contrasted)
-in both Storage Queues and Azure Service Bus and determine which is the
-best fit for your app.
-
-We have the following requirements for storing images of tickets:
-
-- endpoints for accessing storage should not be exposed to the public internet
-
-- we want to manage our encryption keys using our own certificates
-
-- data should be encrypted at rest
-
-- data should be encrypted in transit
-
-- our data should be extremely resilient against loss
-
-For Blob Storage, we chose Zone-redundant storage (ZRS). Zone-redundant
-storage replicates data synchronously across three Azure availability
-zones in the primary region. Each availability zone is in a separate
-physical location with independent power, cooling, and networking.
-
-We can use Key Vault to manage our certificate used to encrypt our
-storage account, and 
-[private endpoints](https://docs.microsoft.com/azure/private-link/private-endpoint-overview)
-to allow clients to securely access data over a
-[Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview).
-
-<br />
-
-### Azure Cache for Redis
-
-Our app is expected to attract more than a million daily users. We
-expect tens of thousands of those users to purchase concert tickets. Our
-load is heavily skewed toward viewing concerts and venue details. We
-want to implement a cache that provides us with:
-
-- a managed service
-
-- high data throughput
-
-- low latency reads for commonly accessed, slow changing data
-
-- a unified cache location for all instances of our web app to use
-
-<br />
-
 ### Application Insights / Azure Monitor
 
 Application Insights is a feature of Azure monitor that provides
@@ -780,6 +708,35 @@ concepts to quickly come up to speed on its capabilities:
 - [Application Insights Overview dashboard](https://docs.microsoft.com/azure/azure-monitor/app/overview-dashboard)
 
 - [Log queries in Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/logs/log-query-overview)
+
+<br />
+
+### Azure Cache for Redis
+
+Our app is expected to attract more than a million daily users. We
+expect tens of thousands of those users to purchase concert tickets. Our
+load is heavily skewed toward viewing concerts and venue details. We
+want to implement a cache that provides us with:
+
+- a managed service
+
+- high data throughput
+
+- low latency reads for commonly accessed, slow changing data
+
+- a unified cache location for all instances of our web app to use
+
+<br />
+
+### Azure Front Door
+
+- todo
+
+<br />
+
+### Azure WAF
+
+- todo
 
 <br />
 
@@ -842,6 +799,62 @@ incorporate in .NET apps using the
 object.
 
 <br />
+
+### Azure Storage
+
+Many solutions hosted on Azure make at least some use of Azure Storage.
+Our app processes ticket purchases by processing purchase messages off a
+queue, then generating a printable ticket to a concert. We chose to use
+Storage Queues to hold purchases that are pending PDF generation and
+Blob Storage for the resulting PDFs.
+
+We have the following requirements for our queue:
+
+- we do not need to ensure a specific order for message delivery
+
+- message consumption will be idempotent, so at-most-once delivery is
+    not required
+
+- we want to be able to pull a batch of a dozen work items from the
+    queue each operation
+
+- we need to be able to audit server-side transaction logs
+
+- we want to authenticate to our queue using Managed Identity
+
+These requirements lead us to use Azure Storage Queues for our queuing
+needs. If you have a queue scenario in your app,
+[review the messaging options available](https://docs.microsoft.com/azure/service-bus-messaging/service-bus-azure-and-service-bus-queues-compared-contrasted)
+in both Storage Queues and Azure Service Bus and determine which is the
+best fit for your app.
+
+We have the following requirements for storing images of tickets:
+
+- endpoints for accessing storage should not be exposed to the public internet
+
+- we want to manage our encryption keys using our own certificates
+
+- data should be encrypted at rest
+
+- data should be encrypted in transit
+
+- our data should be extremely resilient against loss
+
+For Blob Storage, we chose Zone-redundant storage (ZRS). Zone-redundant
+storage replicates data synchronously across three Azure availability
+zones in the primary region. Each availability zone is in a separate
+physical location with independent power, cooling, and networking.
+
+We can use Key Vault to manage our certificate used to encrypt our
+storage account, and 
+[private endpoints](https://docs.microsoft.com/azure/private-link/private-endpoint-overview)
+to allow clients to securely access data over a
+[Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview).
+
+<br />
+
+### Azure Private DNS / Private Link
+- todo
 
 # Simulating the patterns
 
