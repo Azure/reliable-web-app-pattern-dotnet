@@ -368,7 +368,7 @@ but the right duration for the cache will vary for every scenario.
 Operational excellence is about the operations processes that keep an
 application running in production. Deployments must be reliable and
 predictable. Automated deployments reduce the chance of human error.
-Fast and routine deployment processes won\'t slow down the release of
+Fast and routine deployment processes won't slow down the release of
 new features or bug fixes. These patterns are used by the Relecloud
 sample to improve operational excellence.
 
@@ -378,8 +378,7 @@ sample to improve operational excellence.
 
 During the creation of the Azure SQL Database the bicep templates will
 deploy the server and create a SQL Admin user account. This account
-has administrative permission to maintain the database and also has the
-power to drop tables.
+has administrative permission to maintain the database.
 
 Keeping the SQL Administrator account helped us address the following
 requirements:
@@ -390,22 +389,23 @@ to be able to access the system
 is guaranteed to have the permissions we need to do any operations
 necessary to restore system health
 - If someone leaves the team, we need to ensure that we can still
-access the database backups no matter who created them.
+access the database backups no matter who created them
 
 One of the risks with having this break glass account is that it could
-create a security concern. The team addresses these risks in two ways.
+create a security concern. The team addresses the risk in two ways.
 
 1. The account is stored in a separate Azure Key Vault and access is
-not granted to any other resources. Admins are the only users that
-can access the vault during an outage scenario and the credentials are
-not shared with other teams.
+not granted to any other resources. The credentials are not shared with
+other teams and admins are the only users that can access the vault during
+an outage scenario.
 
 2. The production Azure SQL Database is configured to block network
-connections unless they come through the Private Endpoint. And the
-database is also configured only to allow Azure AD connections. These
+connections unless they come through the Private Endpoint. And, the
+database is configured only to allow Azure AD connections. These
 two settings must be modified before the SQL Admin account in Key
 Vault can be used.
 
+<!-- There should be more than one owner -->
 <!-- https://docs.microsoft.com/en-us/azure/defender-for-cloud/recommendations-reference#identityandaccess-recommendations -->
 > This practice is not automated but is recommended for
 other areas such as Azure Subscriptions and
@@ -418,7 +418,7 @@ by using the Azure Dev CLI to deploy their solution and their code. The
 Azure Dev CLI uses bicep templates to create Azure resources,
 setup configuration, and deploy the web app from a GitHub Action.
 
-Automating the deployment helped achieve the following goals
+Automating the deployment helped achieve the following goals:
 - The team needs to ensure consistency between environments. This leads
 to more predictable behaviors in production and helps the dev team troubleshoot
 production issues by being able to recreate the environment.
@@ -430,9 +430,9 @@ change will be applied to other environments including production.
 members quickly set up a new environment and reduces the operational toil
 related to maintaining production.
 
-Saving the infrastructure definitions as code also enables Relecloud to
+Defining the infrastructure as code also enables Relecloud to
 audit and review all production changes deployed to Azure because they
-are each part of a specific commit specific release to Azure.
+are deployed with the code by the GitHub action.
 
 > Read [Repeatable Infrastructure](https://docs.microsoft.com/azure/architecture/framework/devops/automation-infrastructure)
 > to learn more about improving operational efficiency with automation.
@@ -443,7 +443,7 @@ To see how our application is behaving we're integrating with
 Application Insights. The setup for monitoring request throughput,
 average request duration, errors, and monitoring dependencies is
 accomplished by adding a NuGet package reference to
-*Microsoft.ApplicationInsights.AspNetCore* and registering it with the
+**Microsoft.ApplicationInsights.AspNetCore** and registering it with the
 ASP.NET Core Dependency Injection container.
 
 ```cs
@@ -481,12 +481,12 @@ recorded in Application Insights as Events. The three custom events are:
 - Remove from Cart
 - Checkout Cart
 
-To track these Events, we use the TelemetryClient object provided through
+To track these Events, we use the `TelemetryClient` object provided through
 Dependency Injection. Here's an example from the CartController of how
-we track the AddToCart event. You can also see that we capture
-additional details about the event, the concertId and the number of
-tickets, that we can use for more complex reporting and monitoring needs
-in Azure.
+the code tracks the AddToCart event. You can also see additional details
+captured with the even such as concertId and the number of tickets. Using
+[Kusto Query Language (KQL)](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/)
+we can examine this data for reporting and monitoring in Azure.
 
 ```cs
 this.telemetryClient.TrackEvent("AddToCart", new Dictionary<string, string> {
@@ -498,21 +498,21 @@ this.telemetryClient.TrackEvent("AddToCart", new Dictionary<string, string> {
 <sup>Sample code show how to track a business event with additional data for
 reporting [Link to CartController.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Controllers/CartController.cs#L81)</sup>
 
-These custom events can be found in the Azure Portal on the Events tab
+These custom events can be found in the Azure Portal on the **Events** tab
 for the Application Insights resource.
 
 ![image of Azure Monitor's Custom Events graphing](./assets/Guide/AzureMonitorCustomEvents.png)
 
 <sup>Screenshot of Azure Portal shows custom events</sup>
 
-Using the Azure Log Analytics Workspace you can create custom queries so
-that you can make dashboards and charts that reflect how your business
-monitors the application.
+Using the Azure Log Analytics Workspace you can create KQL queries to find
+and organize data for dashboards and charts that reflect the business metrics
+that should be monitored to understand how the application is behaving.
 
 ![image of a custom query run in Log Analytics](./assets/Guide/AzureMonitorLogAnalyticsQueries.png)
 
-<sup>Screenshot of Azure Portal shows that details for AddToCart event
-includes ConcertId and ticket Count</sup>
+<sup>Screenshot of Azure Portal shows that details for **AddToCart** event
+includes **ConcertId** and ticket **Count**</sup>
 
 ## Performance Efficiency
 
