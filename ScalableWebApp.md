@@ -243,125 +243,140 @@ the web app from attackers that exploit common security scenarios.
 Cost optimization principles balance business goals with budget
 justification to create a cost-effective workload. Cost optimization is about
 looking at ways to reduce unnecessary expenses and improve operational
-efficiencies. These patterns are used by the Relecloud sample to improve cost
-optimization.
+efficiencies. The Relecloud team applies the following concepts to improve
+cost optimization.
 
-### Cache-Aside Pattern
+### Choose the correct resources
 
-The [Cache-Aside Pattern](https://docs.microsoft.com/azure/architecture/patterns/cache-aside)
-is a performance optimization pattern that can be used to manage costs. The
-Relecloud team applied this pattern after identified that the top query on
-their Azure SQL Database comes from **Upcoming Concerts Page**. This page
-produces a well-known output for every user and the team identified that they
-could cache the data for this page to reduce their load on Azure SQL. Reducing
-their load on Azure SQL enables the team to select a smaller Azure SQL SKU so
-the team can manage their costs.
+For prod environments the team chooses the SKU options that provide
+the SLA, features, and scale necessary for production. For non-production
+environments the team chooses different SKUs with lower capacity and
+availability to manage costs.
 
-Another cost optimization the team used in this solution is the decision to
-share the single Azure Cache for Redis instance for multiple types of data.
-In this solution Redis handles the web front-end session for carts, MSAL
-authentication tokens, and the UpcomingConcerts data managed by the web API.
+In the Azure Cache for Redis deployment we can see that the `isProd` parameter controls the selection of the SKU for an environment.
 
-The smallest Redis SKU is capable of handling all of these requirements so
-the team has decided to resuse the Redis Cache to achieve a lower operating
-costs.
+```bicep
+var redisCacheSkuName = isProd ? 'Standard' : 'Basic'
+var redisCacheFamilyName = isProd ? 'C' : 'C'
+var redisCacheCapacity = isProd ? 1 : 0
+```
 
-Adding an Azure Cache for Redis service helped us address the following
-requirements:
+<sup>Sample code shows how to choose Azure Cache for Redis SKU. [Link to azureRedisCache.bicep](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4704f6f43bb9669ebd97716e9e7b6e8ba97d6ebf/infra/azureRedisCache.bicep#L21)</sup>
 
-- Reduce database costs by reducing the number of operations performed
-- Reduce the impact that bursts of traffic can have on Azure SQL
-- Improve service availability by reducing database scaling events
+In production the StandardC1 offers:
 
-The caching process begins when the web app starts. As the app starts it
-connects to the cache and registers with the ASP.NET Core dependency injection
-container. You can see this in Startup.cs
+- 1GB cache
+- Dedicated service
+- 99.9% Availability SLA
+- Up to 1,000 connections
 
-```cs
-private void AddAzureCacheForRedis(IServiceCollection services)
-{
-    if (!string.IsNullOrWhiteSpace(Configuration["App:RedisCache:ConnectionString"]))
-    {
-        services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = Configuration["App:RedisCache:ConnectionString"];
-        });
-    }
-    else
-    {
-        services.AddDistributedMemoryCache();
-    }
+*Costs: 102.67 per month*
+
+For non-prod environments the BasicC0 SKU offers:
+
+- 250MB cache
+- Shared infrastructure
+- No SLA
+- Up to 256 connections
+
+*Costs: 16.37 per month*
+
+This provides behavior similar to production so that devs can perform
+integration testing while costing only 16% as much as prod by adjusting
+the requirements to align with non-prod usage patterns.
+
+> Microsoft recommends that customers evaluate
+> [Dev/Test pricing](https://azure.microsoft.com/en-au/pricing/dev-test/)
+> options that can provide significant savings fir non-prod environments.
+> Microsoft also recommends that customers work with their account team to
+> understand reserved pricing options that can reduce the cost of production
+> workloads.
+
+<!-- todo - add budgets - https://github.com/Azure/scalable-web-app-pattern-dotnet/issues/78
+
+### Set up budgets and maintain cost constraints
+After estimating the initial cost, set budgets and alerts at different scopes to measure the cost. One cost driver can be unrestricted resources. These resources typically need to scale and consume more cost to meet demand.
+-->
+
+### Optimize workloads, aim for scalable costs
+
+A key benefit of the cloud is the ability to scale dynamically. The workload cost should scale linearly with demand.
+
+The Relecloud team uses autoscale rules with Azure Monitor to horizontally
+scale the number of Azure App Services based on CPU percentage. 
+
+```bicep
+resource webAppScaleRule 'Microsoft.Insights/autoscalesettings@2021-05-01-preview' = if (isProd) {
+  name: '${resourceToken}-web-plan-autoscale'
+  location: location
+  tags: tags
+  properties: {
+    targetResourceUri: webAppServicePlan.id
+    enabled: true
+    profiles: [
+      {
+        name: 'Auto created scale condition'
+        capacity: {
+          maximum: '10'
+          default: '1'
+          minimum: '1'
+        }
+        rules: [
+          ...
+        ]
+      }
+    ]
+  }
 }
 ```
 
-<sup>Sample code demonstrates how the web app connects to Azure Cache for
-Redis. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L50)</sup>
+<sup>Abbreviated sample code shows autoscalesettings for web apps. [Link to resources.bicep](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4704f6f43bb9669ebd97716e9e7b6e8ba97d6ebf/infra/resources.bicep#L343)</sup>
 
-Once the app is started, the cache is empty until the first request is
-made to the **Upcoming Concerts Page**. ASP.NET Core uses the `SqlDatabaseConcertRepository` to retrieve data from Azure SQL so it can be
-shown on the page. Here's what the `GetUpcomingConcertsAsync` method looks
-like from this repository.
+Adding these rules, to production only, enables the web app to scale from 1 instance up to 10 instances. As demand decreases the web app will also scale
+back down to 1 instance so that the cost of the website is not based on the
+peak volume of users.
 
-```cs
-public async Task<ICollection<Concert>> GetUpcomingConcertsAsync(int count)
-{
-    IList<Concert>? concerts;
-    var concertsJson = await this.cache.GetStringAsync(CacheKeys.UpcomingConcerts);
-    if (concertsJson != null)
-    {
-        // We have cached data, deserialize the JSON data.
-        concerts = JsonSerializer.Deserialize<IList<Concert>>(concertsJson);
-    }
-    else
-    {
-        // There's nothing in the cache, retrieve data from the repository and cache it for one hour.
-        concerts = await this.database.Concerts.AsNoTracking()
-            .Where(c => c.StartTime > DateTimeOffset.UtcNow && c.IsVisible)
-            .OrderBy(c => c.StartTime)
-            .Take(count)
-            .ToListAsync();
-        concertsJson = JsonSerializer.Serialize(concerts);
-        var cacheOptions = new DistributedCacheEntryOptions {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-        };
-        await this.cache.SetStringAsync(CacheKeys.UpcomingConcerts, concertsJson, cacheOptions);
-    }
-    return concerts ?? new List<Concert>();
+Using this feature enables the Relecloud web app to choose smaller
+instances of Azure App Service and align with a highly variable workload.
+
+### Dynamically allocate and de-allocate resources
+
+To match performance needs customers should dynamically allocate and
+de-allocate resources. As a best practice, dynamically allocating resources
+includes choosing a single region deployment for non-prod environments and
+a multiregional deployment for the Relecloud production environment.
+
+```bicep
+var isMultiLocationDeployment = secondaryAzureLocation == '' ? false : true
+
+...
+
+module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
+  name: 'secondary-${primaryResourceToken}'
+  scope: secondaryResourceGroup
+  params: {
+    devOpsManagedIdentityId: devOpsIdentitySetup.outputs.devOpsManagedIdentityId
+    isProd: isProdBool
+    location: secondaryAzureLocation
+    principalId: principalId
+    resourceToken: secondaryResourceToken
+    tags: tags
+  }
 }
 ```
-<sup>Sample code demonstrates how to use Redis with Azure SQL. [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L67)</sup>
 
-The purpose of this method is to access the database and retrieve
-the ten latest Concerts. It filters by time, sorts, and returns data to the
-Controller that will display the results.
+<sup>Abbreviated sample code shows dynamically choosing multiregional deploment. [Link to main.bicep](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4704f6f43bb9669ebd97716e9e7b6e8ba97d6ebf/infra/main.bicep#L53)</sup>
 
-But this method is a little longer. Before asking the database for those Concerts, it asks Azure Cache for Redis if it knows what the latest concerts
-should be. It uses the IDistributedCache that was injected by ASP.NET Core's
-dependency injection. If we don't find data, that's when we ask Azure
-SQL. And, since we had to ask SQL, we save the answer in cache so that
-we don't have to ask again. In this example the information will only be
-cached for 1 hour. We do this to keep the information in cache relevant
-but the right duration for the cache will vary for every scenario.
+The Relecloud team uses this `secondaryAzureLocation` parameter to dynamically
+choose the correct Azure region and understand if the deployment should align
+with the production SLA of 99.98% or the non-prod SLA of 99.56% availability.
 
-> In this sample the Concerts are not editable. Remember that when you
-> use a cache you will want change cached data it whenever a user makes
-> an update. You can achieve this with an event driven system or by
-> ensuring that the cached data is only accessed directly from the
-> repository class that is responsible for handling the create and edit
-> events. When using the Repository Pattern, you can manage stale data by
-> clearing the cache key as shown in the CreateConcertAsync method.
-> 
-> ```cs
-> public async Task<CreateResult> CreateConcertAsync(Concert newConcert)
-> {
->     database.Add(newConcert);
->     await this.database.SaveChangesAsync();
->     this.cache.Remove(CacheKeys.UpcomingConcerts);
->     return CreateResult.SuccessResult(newConcert.Id);
-> }
-> ```
-> <sup>Sample code demonstrates how to invalidate cache when using Repository Pattern.
-> [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L28)</sup>
+Infrastructure as code, often listed as an operational excellence practice, is
+also a way the team manages costs. Since the team can use `azd` to create
+an entire environment from scratch they can also delete non-production
+environments when they're not in use. This enables the team to reduce costs
+as the QA team only tests during business hours and the non-prod environments
+can be completely removed during company holidays.
 
 ## Operational Excellence
 
@@ -522,7 +537,123 @@ anticipate increases in cloud environments to meet business
 requirements. These patterns are used by the Relecloud sample to improve
 performance efficiency.
 
-### todo - add app pattern and story
+### Cache-Aside Pattern
+
+The [Cache-Aside Pattern](https://docs.microsoft.com/azure/architecture/patterns/cache-aside)
+is a performance optimization pattern that can be used to manage costs. The
+Relecloud team applied this pattern after identified that the top query on
+their Azure SQL Database comes from **Upcoming Concerts Page**. This page
+produces a well-known output for every user and the team identified that they
+could cache the data for this page to reduce their load on Azure SQL. Reducing
+their load on Azure SQL enables the team to select a smaller Azure SQL SKU so
+the team can manage their costs.
+
+Another cost optimization the team used in this solution is the decision to
+share the single Azure Cache for Redis instance for multiple types of data.
+In this solution Redis handles the web front-end session for carts, MSAL
+authentication tokens, and the UpcomingConcerts data managed by the web API.
+
+The smallest Redis SKU is capable of handling all of these requirements so
+the team has decided to resuse the Redis Cache to achieve a lower operating
+costs.
+
+Adding an Azure Cache for Redis service helped us address the following
+requirements:
+
+- Reduce database costs by reducing the number of operations performed
+- Reduce the impact that bursts of traffic can have on Azure SQL
+- Improve service availability by reducing database scaling events
+
+The caching process begins when the web app starts. As the app starts it
+connects to the cache and registers with the ASP.NET Core dependency injection
+container. You can see this in Startup.cs
+
+```cs
+private void AddAzureCacheForRedis(IServiceCollection services)
+{
+    if (!string.IsNullOrWhiteSpace(Configuration["App:RedisCache:ConnectionString"]))
+    {
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = Configuration["App:RedisCache:ConnectionString"];
+        });
+    }
+    else
+    {
+        services.AddDistributedMemoryCache();
+    }
+}
+```
+
+<sup>Sample code demonstrates how the web app connects to Azure Cache for
+Redis. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L50)</sup>
+
+Once the app is started, the cache is empty until the first request is
+made to the **Upcoming Concerts Page**. ASP.NET Core uses the `SqlDatabaseConcertRepository` to retrieve data from Azure SQL so it can be
+shown on the page. Here's what the `GetUpcomingConcertsAsync` method looks
+like from this repository.
+
+```cs
+public async Task<ICollection<Concert>> GetUpcomingConcertsAsync(int count)
+{
+    IList<Concert>? concerts;
+    var concertsJson = await this.cache.GetStringAsync(CacheKeys.UpcomingConcerts);
+    if (concertsJson != null)
+    {
+        // We have cached data, deserialize the JSON data.
+        concerts = JsonSerializer.Deserialize<IList<Concert>>(concertsJson);
+    }
+    else
+    {
+        // There's nothing in the cache, retrieve data from the repository and cache it for one hour.
+        concerts = await this.database.Concerts.AsNoTracking()
+            .Where(c => c.StartTime > DateTimeOffset.UtcNow && c.IsVisible)
+            .OrderBy(c => c.StartTime)
+            .Take(count)
+            .ToListAsync();
+        concertsJson = JsonSerializer.Serialize(concerts);
+        var cacheOptions = new DistributedCacheEntryOptions {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+        };
+        await this.cache.SetStringAsync(CacheKeys.UpcomingConcerts, concertsJson, cacheOptions);
+    }
+    return concerts ?? new List<Concert>();
+}
+```
+<sup>Sample code demonstrates how to use Redis with Azure SQL. [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L67)</sup>
+
+The purpose of this method is to access the database and retrieve
+the ten latest Concerts. It filters by time, sorts, and returns data to the
+Controller that will display the results.
+
+But this method is a little longer. Before asking the database for those Concerts, it asks Azure Cache for Redis if it knows what the latest concerts
+should be. It uses the IDistributedCache that was injected by ASP.NET Core's
+dependency injection. If we don't find data, that's when we ask Azure
+SQL. And, since we had to ask SQL, we save the answer in cache so that
+we don't have to ask again. In this example the information will only be
+cached for 1 hour. We do this to keep the information in cache relevant
+but the right duration for the cache will vary for every scenario.
+
+> In this sample the Concerts are not editable. Remember that when you
+> use a cache you will want change cached data it whenever a user makes
+> an update. You can achieve this with an event driven system or by
+> ensuring that the cached data is only accessed directly from the
+> repository class that is responsible for handling the create and edit
+> events. When using the Repository Pattern, you can manage stale data by
+> clearing the cache key as shown in the CreateConcertAsync method.
+> 
+> ```cs
+> public async Task<CreateResult> CreateConcertAsync(Concert newConcert)
+> {
+>     database.Add(newConcert);
+>     await this.database.SaveChangesAsync();
+>     this.cache.Remove(CacheKeys.UpcomingConcerts);
+>     return CreateResult.SuccessResult(newConcert.Id);
+> }
+> ```
+> <sup>Sample code demonstrates how to invalidate cache when using Repository Pattern.
+> [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L28)</sup>
+
 
 # Deploying the solution and local development
 
