@@ -696,17 +696,11 @@ data from a variety of Azure services. Review the following
 concepts to quickly come up to speed on its capabilities:
 
 - [Smart detection in application insights](https://docs.microsoft.com/azure/azure-monitor/app/proactive-diagnostics)
-
 - [Application Map: Triaging Distributed Applications](https://docs.microsoft.com/azure/azure-monitor/app/app-map?tabs=net)
-
 - [Profile live App Service apps with Application Insights](https://docs.microsoft.com/azure/azure-monitor/app/profiler)
-
 - [Usage analysis with Application Insights](https://docs.microsoft.com/azure/azure-monitor/app/usage-overview)
-
 - [Getting started with Azure Metrics Explorer](https://docs.microsoft.com/azure/azure-monitor/essentials/metrics-getting-started)
-
 - [Application Insights Overview dashboard](https://docs.microsoft.com/azure/azure-monitor/app/overview-dashboard)
-
 - [Log queries in Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/logs/log-query-overview)
 
 <br />
@@ -719,24 +713,54 @@ load is heavily skewed toward viewing concerts and venue details. We
 want to implement a cache that provides us with:
 
 - a managed service
-
 - high data throughput
-
 - low latency reads for commonly accessed, slow changing data
-
 - a unified cache location for all instances of our web app to use
 
 <br />
 
 ### Azure Front Door
 
-- todo
+Azure Front Door is the load balancer we choose to manage how we route
+traffic between regions. This choice sets up additional features such as
+Web Application Firewall and positions us to use a Content Delivery Network
+to provide site acceleration as traffic to the web app increases.
+
+Azure Front Door provides:
+- traffic acceleration with Anycast to reach the nearest Azure point of presence and find the fastest route to our web app
+- support for custom domain names with flexible domain validation
+- load balance and route traffic across origins and use intelligent health probe monitoring
+- built-in reports with an all-in-one dashboard for both Front Door and security patterns
+- ability to configure alerts that integrate with Azure Monitor
+- support to log each request and failed health probes
+- layer 3-4 DDoS protection
+
+There are different Load balancer products in Azure. Make note of your current
+system capabilities and what requirements you have for your new app
+running in Azure, then [choose the best load balancer option](https://learn.microsoft.com/en-us/azure/architecture/guide/technology-choices/load-balancing-overview?toc=%2Fazure%2Ffrontdoor%2Fstandard-premium%2Ftoc.json)
+for your app.
 
 <br />
 
-### Azure WAF
+### Azure Web Application Firewall (WAF)
+Azure Web Application Firewall (WAF) on Azure Front Door provides centralized
+protection for the web application. WAF prevents malicious attacks close to
+the attack sources, before they enter your virtual network. You get global
+protection at scale without sacrificing performance. This also provides a
+platform the team can monitor and configure to address security concerns from
+botnets.
 
-- todo
+Azure WAF provides protection against the following threat categories:
+
+- Cross-site scripting
+- Java attacks
+- Local file inclusion
+- PHP injection attacks
+- Remote command execution
+- Remote file inclusion
+- Session fixation
+- SQL injection protection
+- Protocol attackers
 
 <br />
 
@@ -853,8 +877,19 @@ to allow clients to securely access data over a
 
 <br />
 
-### Azure Private DNS / Private Link
-- todo
+### Azure Private DNS / Azure Private Link
+
+Azure Private Link enables you to access PaaS Services (such as, Azure Cache for Redis and SQL Database) over a private endpoint in your virtual network.
+Traffic between your virtual network and the service travels across the Microsoft backbone network. Exposing your service to the public internet is no longer necessary.
+
+Using Azure Private DNS with Azure Private Link enables your solution to communicate securely with Azure services like Azure SQL Database.
+Azure Private DNS integrates with Azure App Service to extend DNS resolution so that the private IP address is provided for public hostnames.
+This enables a web app to connect to Azure SQL Database which requires connections to use the public hostname when connecting to the private IP address.
+
+Azure Private Link provides the following benefits:
+- Privately access services on the Azure platform
+- Access services running in Azure from on-premises over ExpressRoute private peering
+- Reduces the network footprint of data stores to protect against data leakage
 
 # Simulating the patterns
 
