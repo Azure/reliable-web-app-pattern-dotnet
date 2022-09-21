@@ -151,20 +151,19 @@ could be sent to the API if an error happens.
 
 ### Circuit Breaker
 
-In the previous section we showed how the Retry Pattern can help users
+In the previous section we saw how the Retry Pattern can help users
 bypass errors in our web app by retrying operations that are likely to
 succeed. But what if a real error happens? In that scenario we don't
-want our users to keep waiting because when they retry an operation it
-is not likely to succeed. This is why the Relecloud web app pairs the
-Retry Pattern with the [Circuit Breaker pattern](https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker).
-The purpose of the Circuit breaker is to help our customers understand the difference
-between a transient error and one that will impact their experience. If
-the database is unavailable, perhaps because a configuration is not set
-correctly, then we don't want every user to wait up to 3 seconds for
-every API call just to find out that the web app is not properly
-working.
+want our users to keep waiting because the operation is not likely to
+succeed when we retry. This is why the Relecloud web app pairs the
+Retry Pattern with the
+[Circuit Breaker pattern](https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker).
+The purpose of the Circuit breaker is to provide the best experience for
+the web app users. If the database is unavailable then we don't want every
+user to wait up to 3 seconds for every API call just to find out that the
+web app is not properly working.
 
-In the same `Startup.cs` class we see the method that adds this
+In the same `Startup.cs` class you can see the method that adds this
 behavior is named `GetCircuitBreakerPolicy()`. This behavior is also
 provided by the Polly library and the behavior we want is described with
 the same fluent method extensions.
@@ -181,11 +180,12 @@ private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
 <sup>Sample code shows how to use Polly to add Circuit Breaker behavior to
 web API calls. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L115)</sup>
 
-In this sample we can see that if the front-end web app observes more
-than five errors it will stop the retry behavior we previously described
-and will immediately return an error to the user. This "fail fast"
-behavior will last for 30 seconds before the next web API service call
-is made so that the web app is not likely to be immediately overloaded
+In the Polly library the `HandleTransientHttpError()` will trigger the policy
+if the web app receives a 5XX or 408 HTTP status code. And, if the front-end
+web app observes more than five errors it will stop the retry behavior that
+was previously described and immediately return an error to the user. This
+"fail fast" behavior will last for 30 seconds before the next API service call
+is made so that the web app is less likely to be immediately overloaded
 with requests as it is trying to startup after an error.
 
 ## Security
