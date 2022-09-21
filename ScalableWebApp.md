@@ -193,7 +193,7 @@ with requests as it is trying to startup after an error.
 Security design principles describe a securely architected system hosted
 on cloud or on-premises datacenters (or a combination of both).
 Application of these principles dramatically increases the likelihood
-your security architecture assures confidentiality, integrity, and
+your architecture assures confidentiality, integrity, and
 availability. These patterns are used by the Relecloud sample to improve
 security.
 
@@ -215,26 +215,27 @@ administration easier to manage.
 ### Endpoint security
 
 The Relecloud team also manages their security risk by applying networking
-constraints on their Azure resources. By default, Azure SQL Database, Azure
+constraints to their Azure resources. By default, Azure SQL Database, Azure
 Cache for Redis, and Azure App Service are all publicly accessible resources.
 
 The team secures their data, their secrets, and ensures the integrity of the
 system by using Azure Private Endpoints and blocking public network access.
 Azure Private Link is a service that enables Azure resources to connect
 directly to an Azure Virtual Network where they receive a private IP address.
-Since these resources have private IP addresses this enables the team to
-block all public internet connections.
+Because these resources have private IP addresses the team can block all
+public internet connections.
 
 Using this Virtual Network approach also enables the team to prepare for
-future network scenarios including hybrid networking if the web app ever
+future network scenarios, including hybrid networking, if the web app
 needs to access on-prem resources.
 
 The team also uses Azure Front Door with Web Application Firewall. The Web
 Application Firewall provides an additional layer of security to protect
-the web app from attackers that exploit common security scenarios. 
+the web app from attackers that exploit common security scenarios.
 
 > Read the [Best practices for endpoint security](https://docs.microsoft.com/azure/architecture/framework/security/design-network-endpoints)
-> if you would like to learn more about how to secure traffic to and from your Azure resources
+> doc if you would like to learn more about how to secure traffic to and
+> from your Azure resources
 
 
 ## Cost Optimization
