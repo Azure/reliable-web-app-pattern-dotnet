@@ -10,7 +10,7 @@ This repository provides resources to help developers build a Scalable web app o
 # Deploy to Azure
 
 The reference scenario in this sample is for Relecloud
-Concerts, a fictional company that sells concert tickets.Their website, currently employee-facing, is an illustrative example of an eCommerce application. This reference application uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions, and creating Azure AD App Registrations.
+Concerts, a fictional company that sells concert tickets. Their website, is an illustrative example of an eCommerce application. This reference application uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions, and creating Azure AD App Registrations.
 ## Pre-requisites
 
 This guide assumes you have access to a bash terminal. Windows users can access a Linux shell with WSL 2 ([Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install)).
