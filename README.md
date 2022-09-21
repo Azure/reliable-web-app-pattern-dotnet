@@ -22,7 +22,10 @@ This guide assumes you have access to a bash terminal. Windows users can access 
     ```bash
     az version
     ```
-
+    After the installation, run the following command to [sign in to Azure interactively](https://learn.microsoft.com/cli/azure/authenticate-azure-cli#sign-in-interactively).
+    ```bash
+    az login
+    ```
 1. [Install the Azure Dev CLI](https://docs.microsoft.com/en-us/azure/developer/azure-developer-cli/get-started?tabs=bare-metal%2Cwindows&pivots=programming-language-csharp#configure-your-development-environment).
     Run the following command to verify that the Azure Dev CLI is installed.
     ```bash
