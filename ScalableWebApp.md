@@ -847,32 +847,6 @@ object.
 
 Here are some things you can try to see how these patterns support the availability and scalability of this solution in Azure.
 
-### Queue-based load leveling
-
-This pattern offloads the ticket rendering process from our web app to
-the Azure function. We can easily see this in action by navigating
-through the checkout process.
-
-![image of shopping cart page with one item in cart](./assets/Guide/Simulating_CheckoutPage.png)
-
-Try buying a ticket, then do it again and try buying twenty tickets. The
-value of this pattern is that our web app will remain performant and
-highly available no matter how many tickets you purchase so that we can
-always accept more customer orders.
-
-Here's how that looks from Application Insights where the response times
-are similar for both checkout processes.
-
-> Note that App Insights graphs can take a couple of minutes to aggregate the
-> latest information. To see your events and data as they happen use the
-> [Live Metric stream](https://docs.microsoft.com/en-us/azure/azure-monitor/app/live-stream)
-
-![image of common requests displayed in app insights](./assets/Guide/Simulating_AppInsightsTopRequests.png)
-
-In the screenshot above we can see the checkout flow for the first
-request with one ticket as 588ms and the checkout for the second request
-with twenty tickets was 162ms.
-
 ### Retry and Circuit Breakers
 
 These patterns improve the reliability of the solution by attempting to
