@@ -23,15 +23,15 @@ challenges including extended timelines to build and ship new features
 and difficulty scaling different components of the application under
 higher load. Relecloud\'s near-term objective is to modernize the
 application to sustain additional volume while maturing development team
-practices for modern development and operations. Intermediate- and
-longer-term goals include opening the application to direct customers
-online through multiple web and mobile experiences, improving
+practices for modern development and operations. Intermediate and
+longer-term goals include opening the application directly to online 
+customers through multiple web and mobile experiences, improving
 availability targets, significantly reducing the time required to
 deliver new features to the application, and scaling different
-components of the system independently to handle traffic spikes with
-ease all without compromising security. They have chosen Azure as the
+components of the system independently to handle traffic spikes
+without compromising security. They have chosen Azure as the
 destination for their application due to its robust global platform and
-tremendous managed service capabilities that will support Relecloud\'s
+tremendous managed service capabilities that will support Relecloud's
 growth objectives for years to come.
 
 The reference that follows demonstrates the first phase of their
