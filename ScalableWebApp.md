@@ -969,9 +969,10 @@ the checkout process.
 | [Azure Storage Accounts](https://azure.microsoft.com/support/legal/sla/storage/v1_5/) |  99.9% |
 | [Azure SQL Database](https://azure.microsoft.com/support/legal/sla/azure-sql-database/v1_8/) |  99.99% |
 
-To understand the impact that one of these services has to our
-availability [we multiply each of these SLAs](https://docs.microsoft.com/en-us/azure/architecture/framework/resiliency/business-metrics#composite-slas)
-to find the percentage of time that all services are available.
+To find the impact that one of these services has to our
+availability [we multiply each of these SLAs](https://docs.microsoft.com/en-us/azure/architecture/framework/resiliency/business-metrics#composite-slas).
+By combining the numbers we reach the percentage of time that
+all services are available.
 
 When combined the SLAs assert that tickets could be sold
 99.56% of the time. This availability meant there could be as
@@ -985,7 +986,7 @@ which is
 `(1 - (1 − N) ^ R)` to reach 99.99% availability. But, to use two
 regions the team must also add Azure Front Door which has an
 availibility SLA of 99.99% so the composite availability for
-this solution is 99.98%.
+this solution becomes 99.98%.
 
 ## Cost
 The Relecloud team wants to use lower price SKUs for non-prod
