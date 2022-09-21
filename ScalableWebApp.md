@@ -241,26 +241,30 @@ the web app from attackers that exploit common security scenarios.
 ## Cost Optimization
 
 Cost optimization principles balance business goals with budget
-justification to create a cost-effective workload while avoiding
-capital-intensive solutions. Cost optimization is about looking at ways
-to reduce unnecessary expenses and improve operational efficiencies.
-These patterns are used by the Relecloud sample to improve cost
+justification to create a cost-effective workload. Cost optimization is about
+looking at ways to reduce unnecessary expenses and improve operational
+efficiencies. These patterns are used by the Relecloud sample to improve cost
 optimization.
 
 ### Cache-Aside Pattern
 
 The [Cache-Aside Pattern](https://docs.microsoft.com/azure/architecture/patterns/cache-aside)
-is a performance optimization pattern that can be used to manage costs. When the Relecloud
-team identified that one of the most frequently visited pages in the app is the Upcoming Concerts
-Page. This page produces a well-known output for every user and the team identified that they could
-cache the data for this page to reduce their load on Azure SQL. Reducing their load on Azure SQL
-enables the team to select a smaller compute SKU for Azure SQL so the team can manage their costs.
+is a performance optimization pattern that can be used to manage costs. The
+Relecloud team applied this pattern after identified that the top query on
+their Azure SQL Database comes from **Upcoming Concerts Page**. This page
+produces a well-known output for every user and the team identified that they
+could cache the data for this page to reduce their load on Azure SQL. Reducing
+their load on Azure SQL enables the team to select a smaller Azure SQL SKU so
+the team can manage their costs.
 
-Another cost optimization the team used in this solution is to share the single Azure Cache for
-Redis instance for multiple types of data. In this solution Redis handles the web front-end session
-for carts, MSAL authentication tokens, and the UpcomingConcerts data managed by the web API app.
-The smallest Redis SKU is capable of handling all of these requirements and the team has decided
-that they can manage the risk of overwriting data by reusing Redis keys to achieve a lower operating cost.
+Another cost optimization the team used in this solution is the decision to
+share the single Azure Cache for Redis instance for multiple types of data.
+In this solution Redis handles the web front-end session for carts, MSAL
+authentication tokens, and the UpcomingConcerts data managed by the web API.
+
+The smallest Redis SKU is capable of handling all of these requirements so
+the team has decided to resuse the Redis Cache to achieve a lower operating
+costs.
 
 Adding an Azure Cache for Redis service helped us address the following
 requirements:
@@ -269,8 +273,8 @@ requirements:
 - Reduce the impact that bursts of traffic can have on Azure SQL
 - Improve service availability by reducing database scaling events
 
-The caching process begins when the web app starts as we connect to the
-cache and register it with the ASP.NET Core dependency injection
+The caching process begins when the web app starts. As the app starts it
+connects to the cache and registers with the ASP.NET Core dependency injection
 container. You can see this in Startup.cs
 
 ```cs
@@ -294,10 +298,9 @@ private void AddAzureCacheForRedis(IServiceCollection services)
 Redis. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L50)</sup>
 
 Once the app is started, the cache is empty until the first request is
-made to the page that displays the upcoming concerts. When this page is
-loaded ASP.NET Core will use the SqlDatabaseConcertRepository to
-retrieve data from Azure SQL so it can be shown on the page. Let's
-examine the method GetUpcomingConcertsAsync from this repository.
+made to the **Upcoming Concerts Page**. ASP.NET Core uses the `SqlDatabaseConcertRepository` to retrieve data from Azure SQL so it can be
+shown on the page. Here's what the `GetUpcomingConcertsAsync` method looks
+like from this repository.
 
 ```cs
 public async Task<ICollection<Concert>> GetUpcomingConcertsAsync(int count)
@@ -328,24 +331,24 @@ public async Task<ICollection<Concert>> GetUpcomingConcertsAsync(int count)
 ```
 <sup>Sample code demonstrates how to use Redis with Azure SQL. [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L67)</sup>
 
-The main purpose of this method is to access the database and retrieve
-the ten latest Concerts. We filter by time, sort, and return data to the
-Controller that will render the results. But this method is a little
-longer. Before we ask the database for those Concerts, we'll ask Azure
-Cache for Redis if it knows what the latest concerts should be. We do
-this by using the IDistributedCache that's injected by ASP.NET Core's
+The purpose of this method is to access the database and retrieve
+the ten latest Concerts. It filters by time, sorts, and returns data to the
+Controller that will display the results.
+
+But this method is a little longer. Before asking the database for those Concerts, it asks Azure Cache for Redis if it knows what the latest concerts
+should be. It uses the IDistributedCache that was injected by ASP.NET Core's
 dependency injection. If we don't find data, that's when we ask Azure
-SQL. And, since we had to ask SQL, we store the answer in cache so that
+SQL. And, since we had to ask SQL, we save the answer in cache so that
 we don't have to ask again. In this example the information will only be
 cached for 1 hour. We do this to keep the information in cache relevant
 but the right duration for the cache will vary for every scenario.
 
 > In this sample the Concerts are not editable. Remember that when you
-> use a cache you will want to invalidate it whenever the data is
-> modified. You can achieve this with an event driven system or by
+> use a cache you will want change cached data it whenever a user makes
+> an update. You can achieve this with an event driven system or by
 > ensuring that the cached data is only accessed directly from the
-> repository class that is responsible for the create and edit events.
-> When using the Repository Pattern, you can manage stale data by
+> repository class that is responsible for handling the create and edit
+> events. When using the Repository Pattern, you can manage stale data by
 > clearing the cache key as shown in the CreateConcertAsync method.
 > 
 > ```cs
