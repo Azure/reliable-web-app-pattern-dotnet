@@ -705,7 +705,7 @@ database so the tickets can be displayed in the web app's Tickets page.
 # Deploying the solution and local development
 
 This solution uses the Azure Dev CLI to set up Azure services
-and deploy the code. [Follow the guidelines in the ReadMe](README.md) of the repository to deploy the code to Azure and local development.
+and deploy the code. [Follow the guidelines in the ReadMe](README.md#deploy-to-azure) of the repository to deploy the code to Azure and local development.
 
 # Choosing the right services
 
