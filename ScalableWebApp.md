@@ -57,14 +57,14 @@ are:
 5. Performance Efficiency
 
 The following sections examine how the Relecloud web app has been
-implemented to align with these tenets and, consequently, what benefits
-are realized.
+implemented to align with these guiding principles and, consequently,
+what benefits are realized.
 
 - Demonstrates end-to-end (E2E) application architecture and solutions, composed of several products (instead of individual or small combinations of products)
 
 - Includes outcome-oriented recommendations, principles, and benefits (e.g., the why) including ROI benefits of increased confidence, improved productivity, optimized cost, etc. before deliving into what and how
 
-- Demonstrates a stage in a modernization journey with a starting point and destination, as opposed to the common snapshot, final destination approach. Subsequent intermediate phases will accompany this guidance in the future.
+- Demonstrates one stage in a modernization journey as a starting point and destination, as opposed to the common snapshot, final destination approach. More phases will accompany this guidance in the future.
 
 ## Reliability
 
@@ -86,16 +86,16 @@ Faults include the momentary loss of network connectivity to components
 and services, the temporary unavailability of a service, or timeouts
 that occur when a service is busy.
 
-The Relecloud web app does this with the [Retry Pattern](https://docs.microsoft.com/azure/architecture/patterns/retry)
+The Relecloud web app handles this with the [Retry Pattern](https://docs.microsoft.com/azure/architecture/patterns/retry)
 because these faults are typically self-correcting and if a service call
 is retried after a short delay, then it is likely to succeed. Adding the
-Retry Pattern helped us build a web app that insulates the user
+Retry Pattern helped the team build a web app that insulates the user
 experience from these transient errors.
 
-To implement the Retry Pattern in ASP.NET Core we use the
-[Polly](https://github.com/App-vNext/Polly) library. This enables us to
-use fluent APIs that describe the behavior we want in one central
-location of our app. In the following screenshot we can see that the
+To implement the Retry Pattern in ASP.NET Core they use the
+[Polly](https://github.com/App-vNext/Polly) library. This enables them to
+use fluent APIs that describe the behavior they want in one central
+location of the app. In the following screenshot you can see that the
 Retry Pattern is setup for all service calls made to the concert search
 service.
 
@@ -140,14 +140,14 @@ Retry Pattern for all of the requests that are made through this object.
 
 In the `GetRetryPolicy()` method we also see how to create the
 behavior with the Polly library. To build this we use an
-HttpPolicyExtensions object and whenever a transient error is detected
+`HttpPolicyExtensions` object and whenever a transient error is detected
 the Polly library will wait and retry after a delay. This built-in
 backoff method will retry the error up to three times with increasingly
 larger delays. For example, if this service call fails then after
 about half a second the same method will be retried. An advantage to
-using this built-in method is that the Retry Pattern is not exactly but
-includes some randomness to help smooth out bursts of traffic that could
-be sent to the API if an error happens.
+using this built-in method is that the next request is made after a delay
+that includes some randomness to help smooth out bursts of traffic that
+could be sent to the API if an error happens.
 
 ### Circuit Breaker
 
