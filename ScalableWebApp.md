@@ -583,11 +583,6 @@ We have chosen a set of services based on the following criteria:
     is a service to centrally manage application settings and feature
     flags
 
-- [Azure Functions](https://docs.microsoft.com/azure/azure-functions/functions-overview)
-    is a serverless solution that runs on demand. It provides triggers
-    and bindings that enable devs to quickly build code to process
-    events.
-
 - [Azure Storage](https://docs.microsoft.com/azure/storage/common/storage-introduction)
     provides storage for files and queue storage for message driven
     communication.
@@ -734,29 +729,6 @@ storage account, and
 [private endpoints](https://docs.microsoft.com/azure/private-link/private-endpoint-overview)
 to allow clients to securely access data over a
 [Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview).
-
-<br />
-
-### Azure Functions
-
-When users purchase tickets, they're placed in a Storage Queue for
-processing. Azure Functions provides us with a simple mechanism to bind
-to the queue and trigger our business logic as orders are completed and
-need to have their admission tickets rendered for printing.
-
-- our ticket generation app should be event-driven and not require polling
-
-- our ticket generation app should scale to handle demand without user interaction
-
-- we want communication with our queues to avoid the public internet
-
-- we only want to pay for the compute time that we are using
-
-- we want to avoid any cold start penalties
-
-We chose Azure Functions to host our ticket generation logic. Because we
-have a no cold start requirement, we will choose the Premium SKU for
-Functions.
 
 <br />
 
