@@ -2,7 +2,7 @@ name: Add to App-Patterns project
 
 on:
   issues:
-    types:[opened, labeled]
+    types: [opened, labeled]
 
 jobs:
   add-to-project:
