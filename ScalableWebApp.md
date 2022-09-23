@@ -371,8 +371,8 @@ The Relecloud team uses this `secondaryAzureLocation` parameter to dynamically
 choose the correct Azure region and understand if the deployment should align
 with the production SLA of 99.98% or the non-prod SLA of 99.56% availability.
 
-Infrastructure as code, often listed as an operational excellence practice, is
-also a way the team manages costs. Since the team can use `azd` to create
+Infrastructure as code, often listed as an operational best practice, is
+also a way the team manages costs. Since the team can create
 an entire environment from scratch they can also delete non-production
 environments when they're not in use. This enables the team to reduce costs
 as the QA team only tests during business hours and the non-prod environments
