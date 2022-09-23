@@ -499,7 +499,7 @@ recorded in Application Insights as Events. The three custom events are:
 To track these Events, we use the `TelemetryClient` object provided through
 Dependency Injection. Here's an example from the CartController of how
 the code tracks the AddToCart event. You can also see additional details
-captured with the even such as concertId and the number of tickets. Using
+captured with the event such as concertId and the number of tickets. Using
 [Kusto Query Language (KQL)](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/)
 we can examine this data for reporting and monitoring in Azure.
 
