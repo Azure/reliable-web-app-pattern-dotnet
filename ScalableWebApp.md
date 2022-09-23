@@ -287,7 +287,7 @@ the requirements to align with non-prod usage patterns.
 
 > Microsoft recommends that customers evaluate
 > [Dev/Test pricing](https://azure.microsoft.com/en-au/pricing/dev-test/)
-> options that can provide significant savings fir non-prod environments.
+> options that can provide significant savings for non-prod environments.
 > Microsoft also recommends that customers work with their account team to
 > understand reserved pricing options that can reduce the cost of production
 > workloads.
