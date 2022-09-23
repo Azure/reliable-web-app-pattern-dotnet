@@ -159,9 +159,9 @@ succeed when we retry. This is why the Relecloud web app pairs the
 Retry Pattern with the
 [Circuit Breaker pattern](https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker).
 The purpose of the Circuit breaker is to provide the best experience for
-the web app users. If the database is unavailable then we don't want every
-user to wait up to 3 seconds for every API call just to find out that the
-web app is not properly working.
+the Relecloud web app users. If the database is unavailable then users
+should not be forced to wait up to 3 seconds for every API call just to
+find out that the web app is not properly working.
 
 In the same `Startup.cs` class you can see the method that adds this
 behavior is named `GetCircuitBreakerPolicy()`. This behavior is also
