@@ -185,8 +185,8 @@ if the web app receives a 5XX or 408 HTTP status code. And, if the front-end
 web app observes more than five errors it will stop the retry behavior that
 was previously described and immediately return an error to the user. This
 "fail fast" behavior will last for 30 seconds before the next API service call
-is made so that the web app is less likely to be immediately overloaded
-with requests as it is trying to startup after an error.
+is made so that the web API app is less likely to be immediately overloaded
+with requests if it is restarting to recover from an error.
 
 ## Security
 
