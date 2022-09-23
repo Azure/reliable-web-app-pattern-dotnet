@@ -243,8 +243,8 @@ the web app from attackers that exploit common security scenarios.
 Cost optimization principles balance business goals with budget
 justification to create a cost-effective workload. Cost optimization is about
 looking at ways to reduce unnecessary expenses and improve operational
-efficiencies. The Relecloud team applies the following concepts to improve
-cost optimization.
+efficiencies. The Relecloud team applies cost optimization principles from
+the Well-Architected Framework.
 
 ### Choose the correct resources
 
