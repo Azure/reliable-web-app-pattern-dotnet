@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Relecloud.Web.Api.Infrastructure;
-using Relecloud.Web.Api.Services.TicketManagementService;
 using Relecloud.Web.Models.ConcertContext;
 using System.Text.Json;
 
@@ -11,13 +10,11 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
     {
         private readonly ConcertDataContext database;
         private readonly IDistributedCache cache;
-        private readonly ITicketNumberGenerator ticketNumberGenerator;
 
-        public SqlDatabaseConcertRepository(ConcertDataContext database, IDistributedCache cache, ITicketNumberGenerator ticketNumberGenerator)
+        public SqlDatabaseConcertRepository(ConcertDataContext database, IDistributedCache cache)
         {
             this.database = database;
             this.cache = cache;
-            this.ticketNumberGenerator = ticketNumberGenerator;
         }
 
         public void Initialize()
@@ -134,55 +131,6 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
         public async Task<User?> GetUserByIdAsync(string id)
         {
             return await this.database.Users.AsNoTracking().Where(u => u.Id == id).SingleOrDefaultAsync();
-        }
-
-        public async Task<UpdateResult> CreateOrUpdateTicketNumbersAsync(int concertId, int numberOfTickets)
-        {
-            var strategy = this.database.Database.CreateExecutionStrategy();
-
-            await strategy.ExecuteAsync(async () =>
-                {
-                    using var transaction = await this.database.Database.BeginTransactionAsync();
-
-                    var existingTicketCount = await this.database.TicketNumbers.CountAsync(tn => tn.ConcertId == concertId);
-
-                    if (existingTicketCount > numberOfTickets)
-                    {
-                        // we neeed to delete some tickets that haven't been sold
-                        var unsoldTickets = await this.database.TicketNumbers.Where(tn => !tn.TicketId.HasValue).ToListAsync();
-                        var ticketsToDelete = existingTicketCount - numberOfTickets;
-
-                        if (unsoldTickets.Count() < ticketsToDelete)
-                        {
-                            throw new InvalidOperationException("Unable to delete sold tickets");
-                        }
-
-                        for (int i = 0; i < ticketsToDelete; i++)
-                        {
-                            var ticket = unsoldTickets[i];
-                            this.database.TicketNumbers.Remove(ticket);
-                        }
-                    }
-                    else if (existingTicketCount < numberOfTickets)
-                    {
-                        // we need to add n-many tickets
-                        var ticketsToAdd = numberOfTickets - existingTicketCount;
-                        for (int i = 0; i < ticketsToAdd; i++)
-                        {
-                            var newTicketNumber = this.ticketNumberGenerator.Generate();
-                            this.database.TicketNumbers.Add(new TicketNumber
-                            {
-                                ConcertId = concertId,
-                                Number = newTicketNumber
-                            });
-                        }
-                    }
-
-                    await this.database.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                });
-
-            return UpdateResult.SuccessResult();
         }
     }
 }

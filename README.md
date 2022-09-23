@@ -153,7 +153,7 @@ code for the front-end and API web apps.
 
 <br />
 
-> You should use the `azd down` command to tear down an
+> You should use the `azd down --force --purge --no-prompt` command to tear down an
 > environment when you have finished with these services. If
 > you want to recreate this deployment you will also need to
 > delete the two Azure AD app services that were created. You

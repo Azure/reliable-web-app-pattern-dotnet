@@ -68,9 +68,8 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
                 var location = locations[random.Next(locations.Length)]; // Random location
                 var price = 5 * random.Next(4, 40); // Random price between 20 and 200
                 var startTime = startDate.AddDays(random.Next(2, 365)); // Random date in the next year
-                var ticketManagementServiceProvider = TicketManagementServiceProviders.MockTicketManagementService;
                 var randomExternalConcertId = "176tghji876tg1"; // the MockTicketManagementService says any ID that starts with 1 and ends with 1 is valid and ready to sell tickets
-                this.Concerts.Add(new Concert { Artist = artist.Name, Genre = artist.Genre, Location = location, Price = price, Title = artist.Tour, Description = artist.Description, StartTime = startTime, IsVisible = true, CreatedBy = "System", CreatedOn = DateTime.UtcNow, UpdatedBy = "System", UpdatedOn = DateTime.UtcNow, TicketManagementServiceConcertId = randomExternalConcertId, TicketManagementServiceProvider = ticketManagementServiceProvider });
+                this.Concerts.Add(new Concert { Artist = artist.Name, Genre = artist.Genre, Location = location, Price = price, Title = artist.Tour, Description = artist.Description, StartTime = startTime, IsVisible = true, CreatedBy = "System", CreatedOn = DateTime.UtcNow, UpdatedBy = "System", UpdatedOn = DateTime.UtcNow, TicketManagementServiceConcertId = randomExternalConcertId });
             }
             this.SaveChanges();
         }

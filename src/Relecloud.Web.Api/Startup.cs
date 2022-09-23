@@ -1,20 +1,14 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
-using Polly;
-using Polly.Contrib.WaitAndRetry;
-using Polly.Extensions.Http;
 using Relecloud.Web.Api.Infrastructure;
 using Relecloud.Web.Api.Services;
 using Relecloud.Web.Api.Services.MockServices;
-using Relecloud.Web.Api.Services.PaymentGatewayService;
+using Relecloud.Web.Api.Services.Search;
 using Relecloud.Web.Api.Services.SqlDatabaseConcertRepository;
-using Relecloud.Web.Api.Services.StorageAccountEventSenderService;
 using Relecloud.Web.Api.Services.TicketManagementService;
 using Relecloud.Web.Models.Services;
-using Relecloud.Web.Services.AzureSearchService;
-using Relecloud.Web.Services.PaymentGatewayService;
+using Relecloud.Web.Services.Search;
 using System.Diagnostics;
 
 namespace Relecloud.Web.Api
@@ -44,7 +38,6 @@ namespace Relecloud.Web.Api
             AddConcertContextServices(services);
             AddDistributedSession(services);
             AddPaymentGatewayService(services);
-            AddEventSenderService(services);
             AddTicketManagementService(services);
 
             // The ApplicationInitializer is injected in the Configure method with all its dependencies and will ensure
@@ -58,48 +51,19 @@ namespace Relecloud.Web.Api
             services.AddMicrosoftIdentityWebApiAuthentication(Configuration, "Api:AzureAd");
         }
 
-        private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
-        {
-            var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(500), retryCount: 3);
-
-            return HttpPolicyExtensions
-              .HandleTransientHttpError()
-              .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-              .WaitAndRetryAsync(delay);
-        }
-
-        private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
-        }
-
         private void AddTicketManagementService(IServiceCollection services)
         {
-            services.AddScoped<ITIcketServiceProxy, TicketServiceProxy>();
-
-            var section = Configuration.GetSection("App:TicketManagement");
-            services.Configure<TicketManagementServiceOptions>(section);
-            var options = section.Get<TicketManagementServiceOptions>();
-
-            if (options is null || string.IsNullOrEmpty(options.BaseUri) || string.IsNullOrEmpty(options.ApiKey))
+            var sqlDatabaseConnectionString = Configuration["App:SqlDatabase:ConnectionString"];
+            if (string.IsNullOrWhiteSpace(sqlDatabaseConnectionString))
             {
                 services.AddScoped<ITicketManagementService, MockTicketManagementService>();
-                services.AddScoped<ITicketServiceFactory, MockTicketServiceFactory>();
+                services.AddScoped<ITicketRenderingService, MockTicketRenderingService>();
             }
             else
             {
-                services.AddTransient(context => new MockTicketServiceAuthenticationHandler(options.ApiKey));
-                services.AddHttpClient<ITicketManagementService, MockTicketManagementServiceFacade>()
-                    .AddHttpMessageHandler<MockTicketServiceAuthenticationHandler>()
-                    .AddPolicyHandler(GetRetryPolicy())
-                    .AddPolicyHandler(GetCircuitBreakerPolicy());
-
-                services.AddScoped<ITicketManagementService, SqlTicketManagementService>();
-                services.AddScoped<ITicketServiceFactory, TicketServiceFactory>();
+                services.AddScoped<ITicketManagementService, TicketManagementService>();
+                services.AddScoped<ITicketRenderingService, TicketRenderingService>();
             }
-
         }
 
         private void AddAzureSearchService(IServiceCollection services)
@@ -122,26 +86,8 @@ namespace Relecloud.Web.Api
             }
         }
 
-        private void AddEventSenderService(IServiceCollection services)
-        {
-            var storageAccountConnectionString = Configuration["App:StorageAccount:QueueConnectionString__queueServiceUri"];
-            var storageAccountEventQueueName = Configuration["App:StorageAccount:EventQueueName"];
-            if (string.IsNullOrWhiteSpace(storageAccountConnectionString) || string.IsNullOrWhiteSpace(storageAccountEventQueueName))
-            {
-                // Add a dummy event sender service in case the Azure Storage account isn't provisioned and configured yet.
-                services.AddScoped<IAzureEventSenderService, MockEventSenderService>();
-            }
-            else
-            {
-                // Add an event sender service based on Azure Storage.
-                services.AddScoped<IAzureEventSenderService>(x => new StorageAccountEventSenderService(storageAccountConnectionString, storageAccountEventQueueName));
-            }
-        }
-
         private void AddConcertContextServices(IServiceCollection services)
         {
-            services.AddSingleton<ITicketNumberGenerator, TicketNumberGenerator>();
-
             var sqlDatabaseConnectionString = Configuration["App:SqlDatabase:ConnectionString"];
 
             if (string.IsNullOrWhiteSpace(sqlDatabaseConnectionString))
@@ -183,22 +129,7 @@ namespace Relecloud.Web.Api
 
         private void AddPaymentGatewayService(IServiceCollection services)
         {
-            var section = Configuration.GetSection("App:Payment");
-            services.Configure<PaymentGatewayOptions>(section);
-            var options = section.Get<PaymentGatewayOptions>();
-
-            if (options is null || string.IsNullOrWhiteSpace(options.BaseUri)|| string.IsNullOrWhiteSpace(options.ApiKey))
-            {
-                services.AddScoped<IPaymentGatewayService, MockPaymentGatewayService>();
-            }
-            else
-            {
-                services.AddTransient(context => new MockPaymentGatewayAuthenticationHandler(options.ApiKey));
-                services.AddHttpClient<IPaymentGatewayService, MockPaymentGatewayServiceFacade>()
-                    .AddHttpMessageHandler<MockPaymentGatewayAuthenticationHandler>()
-                    .AddPolicyHandler(GetRetryPolicy())
-                    .AddPolicyHandler(GetCircuitBreakerPolicy());
-            }
+            services.AddScoped<IPaymentGatewayService, MockPaymentGatewayService>();
         }
 
         public void Configure(WebApplication app, IWebHostEnvironment env)

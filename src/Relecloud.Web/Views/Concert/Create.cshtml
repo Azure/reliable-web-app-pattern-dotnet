@@ -61,27 +61,6 @@
                 <label asp-for="Concert!.IsVisible" class="form-check-label"></label>
                 <span asp-validation-for="Concert!.IsVisible" class="text-danger"></span>
             </div>
-            <div class="mb-3">
-                <label asp-for="Concert!.TicketManagementServiceProvider" class="form-check-label"></label>
-                <select asp-for="Concert!.TicketManagementServiceProvider" asp-items="Model!.GetTicketManagementServiceProviders()" class="form-select"></select>
-                <span asp-validation-for="Concert!.TicketManagementServiceProvider" class="text-danger"></span>
-            </div>
-            
-            @* BEGIN - External Ticket Management Provider fields *@
-            <div class="mb-3" data-ticket-management-fields="@(TicketManagementServiceProviders.MockTicketManagementService.ToString())">
-                <label asp-for="Concert!.TicketManagementServiceConcertId" class="form-check-label"></label>
-                <input asp-for="Concert!.TicketManagementServiceConcertId" class="form-control" />
-                <span asp-validation-for="Concert!.TicketManagementServiceConcertId" class="text-danger"></span>
-            </div>
-            @* END - External Ticket Management Provider fields *@
-            
-            @* BEGIN - Relecloud Ticket Management Provider fields *@
-            <div class="mb-3"  data-ticket-management-fields="@(TicketManagementServiceProviders.RelecloudApi.ToString())">
-                <label asp-for="Concert!.NumberOfTicketsForSale" class="form-check-label"></label>
-                <input asp-for="Concert!.NumberOfTicketsForSale" class="form-control" />
-                <span asp-validation-for="Concert!.NumberOfTicketsForSale" class="text-danger"></span>
-            </div>
-            @* END - Relecloud Ticket Management Provider fields *@
 
             <div class="mb-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -96,6 +75,4 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
-    <script src="/js/editConcert.js" type="text/javascript" ></script>
 }

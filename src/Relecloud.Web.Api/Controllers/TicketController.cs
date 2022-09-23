@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.Resource;
-using Relecloud.Web.Api.Infrastructure;
 using Relecloud.Web.Api.Services;
 using Relecloud.Web.Api.Services.PaymentGatewayService;
+using Relecloud.Web.Api.Services.TicketManagementService;
 using Relecloud.Web.Models.ConcertContext;
 using Relecloud.Web.Models.Services;
 using Relecloud.Web.Models.TicketManagement;
@@ -21,13 +20,13 @@ namespace Relecloud.Web.Api.Controllers
 
         private readonly IConcertRepository concertRepository;
         private readonly IPaymentGatewayService paymentGatewayService;
-        private readonly ITIcketServiceProxy ticketServiceProxy;
+        private readonly ITicketManagementService ticketService;
 
-        public TicketController(ILogger<TicketController> logger, IConcertRepository concertRepository, ITIcketServiceProxy ticketServiceProxy, IPaymentGatewayService paymentGatewayService)
+        public TicketController(ILogger<TicketController> logger, IConcertRepository concertRepository, ITicketManagementService ticketService, IPaymentGatewayService paymentGatewayService)
         {
             this.logger = logger;
             this.concertRepository = concertRepository;
-            this.ticketServiceProxy = ticketServiceProxy;
+            this.ticketService = ticketService;
             this.paymentGatewayService = paymentGatewayService;
         }
 
@@ -122,11 +121,14 @@ namespace Relecloud.Web.Api.Controllers
                     return BadRequest(PurchaseTicketsResult.ErrorResponse("We were unable to process this card. Please review your payment details."));
                 }
 
-                var reserveResult = await this.ticketServiceProxy.ReserveTicketsAsync(purchaseTicketRequest.ConcertIdsAndTicketCounts!, purchaseTicketRequest.UserId!);
-
-                if (reserveResult.Status != ReserveTicketsResultStatus.Success)
+                foreach(var concertAndTickets in purchaseTicketRequest.ConcertIdsAndTicketCounts!)
                 {
-                    return BadRequest(PurchaseTicketsResult.ErrorResponse($"{reserveResult.Status}: Tickets not successfully reserved"));
+                    var reserveResult = await this.ticketService.ReserveTicketsAsync(concertAndTickets.Key, purchaseTicketRequest.UserId!, concertAndTickets.Value);
+
+                    if (reserveResult.Status != ReserveTicketsResultStatus.Success)
+                    {
+                        return BadRequest(PurchaseTicketsResult.ErrorResponse($"{reserveResult.Status}: Tickets not successfully reserved"));
+                    }
                 }
 
                 //built-in assumption: if generating a ticket throws an error then we should not reach this code

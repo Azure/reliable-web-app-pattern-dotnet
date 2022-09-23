@@ -14,11 +14,10 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
   }
   kind: 'StorageV2'
 
-  resource queueService 'queueServices@2021-09-01' = {
-    name: 'default'
-
-    resource queue 'queues@2021-09-01' = {
-      name: 'relecloudconcertevents'
+  resource blobServices 'blobServices@2022-05-01' = {
+    name:'default'
+    resource container 'containers@2022-05-01' = {
+      name: 'tickets'
     }
   }
 }
@@ -30,7 +29,7 @@ resource existingKv 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
 
 resource kvSecretStorageAcct 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: existingKv
-  name: 'App--StorageAccount--QueueConnectionString'
+  name: 'App--StorageAccount--ConnectionString'
   properties: {
     value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
   }
