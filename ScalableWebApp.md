@@ -342,8 +342,8 @@ instances of Azure App Service and align with a highly variable workload.
 ### Dynamically allocate and de-allocate resources
 
 To match performance needs customers should dynamically allocate and
-de-allocate resources. As a best practice, dynamically allocating resources
-includes choosing a single region deployment for non-prod environments and
+de-allocate resources. Relecloud applies this principal by 
+choosing a single region deployment for non-prod environments and
 a multiregional deployment for the Relecloud production environment.
 
 ```bicep
