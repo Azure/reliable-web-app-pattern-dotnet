@@ -109,7 +109,6 @@ resource redisConnAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores
   }
 }
 
-
 resource frontEndClientSecretAppCfg 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
   parent: appConfigSvc
   name: 'AzureAd:ClientSecret'
@@ -147,7 +146,7 @@ resource check_if_client_secret_exists 'Microsoft.Resources/deploymentScripts@20
 
 resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
   parent: appConfigSvc
-  name: 'App:StorageAccount:QueueConnectionString'
+  name: 'App:StorageAccount:ConnectionString'
   properties: {
     value: string({
       uri: '${kv.properties.vaultUri}secrets/${storageSetup.outputs.keyVaultStorageConnStrName}'
