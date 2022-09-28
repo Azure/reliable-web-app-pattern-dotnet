@@ -227,7 +227,7 @@ if ( $apiObjectId.Length -eq 0 ) {
 
         $createdScope = (az ad app show --id $apiWebAppClientId --query 'api.oauth2PermissionScopes[0].value' -o tsv 2> $null)
 
-        if ($createdScope = = $scopeName) {
+        if ($createdScope -eq $scopeName) {
             $isScopeAdded = 1
             Write-Debug "... added scope $scopeName"
         }
