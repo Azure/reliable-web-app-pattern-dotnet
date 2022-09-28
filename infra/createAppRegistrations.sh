@@ -201,7 +201,7 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
       fi
 
       sleep 3
-    done    
+    done
 
     # Expose an API by defining a scope
     # application ID URI will be clientId by default
