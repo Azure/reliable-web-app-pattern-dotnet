@@ -215,7 +215,7 @@ New team members should setup their environment by following these steps.
 8. Add your IP address to the SQL Database firewall as an allowed connection by using the following commands
 
     ```ps1
-    $myIpAddress = (wget -q -O - ipinfo.io/ip)
+    $myIpAddress = (Invoke-WebRequest ipinfo.io/ip)
     ```
 
     ```ps1
