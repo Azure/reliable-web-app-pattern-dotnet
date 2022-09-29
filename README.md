@@ -19,21 +19,25 @@ This guide assumes you have access to a bash terminal. Windows users can access 
     Run the following command to verify that you're running version
     2.38.0 or higher.
 
-    ```bash
+    ```ps1
     az version
     ```
+    
     After the installation, run the following command to [sign in to Azure interactively](https://learn.microsoft.com/cli/azure/authenticate-azure-cli#sign-in-interactively).
-    ```bash
+
+    ```ps1
     az login
     ```
 1. [Install the Azure Dev CLI](https://docs.microsoft.com/en-us/azure/developer/azure-developer-cli/get-started?tabs=bare-metal%2Cwindows&pivots=programming-language-csharp#configure-your-development-environment).
     Run the following command to verify that the Azure Dev CLI is installed.
-    ```bash
+
+    ```ps1
     azd version
     ```
+
 1. [Install .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
     Run the following command to verify that the .NET SDK 6.0 is installed.
-    ```bash
+    ```ps1
     dotnet --version
     ```
 ## Deploy the code
@@ -46,8 +50,8 @@ Use this command to get started with deployment by creating an
 `azd` environment on your workstation.
 
 <!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
-```bash
-myEnvironmentName=relecloudresources
+```ps1
+$myEnvironmentName = "relecloudresources"
 azd env new -e $myEnvironmentName
 ```
 
@@ -68,7 +72,7 @@ of the next steps.
 Relecloud devs deploy the production environment by running the
 following command to choose the SKUs they want in production.
 
-```bash
+```ps1
 azd env set IS_PROD true
 ```
 
@@ -78,13 +82,13 @@ Relecloud devs also use the following command to choose a second
 Azure location because the production environment is
 multiregional.
 
-```bash
+```ps1
 azd env set SECONDARY_AZURE_LOCATION westus3
 ```
 
 > You can find a list of available Azure regions by running
 > the following Azure CLI command.
-> ```
+> ```ps1
 > az account list-locations --query "[].name" -o tsv
 > ```
 
@@ -99,7 +103,7 @@ command.
 > This step will take several minutes based on the region
 > and deployment options you selected.
 
-```bash
+```ps1
 azd provision
 ```
 
@@ -120,16 +124,9 @@ App Registrations within Azure AD. The command is also
 responsible for saving configuration data to Key Vault and
 App Configuration so that the web app can read this data.
 
-```bash
-./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
+```ps1
+./infra/createAppRegistrations.ps1 -g "$myEnvironmentName-rg"
 ```
-
-> If you see an error that says `/bin/bash^M: bad interpreter:`
-> then you will need to change the line endings from `CRLF` to `LF`.
-> This can be done with the following cmd.
-> ```bash
-> sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
-> ```
 
 **Deploy the code**
 
@@ -137,11 +134,11 @@ To finish the deployment process the Relecloud devs run the
 folowing `azd` commands to build, package, and deploy the dotnet
 code for the front-end and API web apps.
 
-```bash
+```ps1
  azd env set AZURE_RESOURCE_GROUP "$myEnvironmentName-rg"
 ```
 
-```bash
+```ps1
  azd deploy
 ```
 
@@ -192,16 +189,9 @@ New team members should setup their environment by following these steps.
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
 
-        ```bash
-        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
+        ```ps1
+        ./infra/getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
         ```
-
-        > If you see an error that says `/bin/bash^M: bad interpreter:`
-        > then you will need to change the line endings from `CRLF` to `LF`.
-        > This can be done with the following cmd.
-        > ```bash
-        > sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
-        > ```
 
     4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
     project.
@@ -211,16 +201,9 @@ New team members should setup their environment by following these steps.
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
 
-        ```bash
-        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
+        ```ps1
+        ./infra/getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
         ```
-
-        > If you see an error that says `/bin/bash^M: bad interpreter:`
-        > then you will need to change the line endings from `CRLF` to `LF`.
-        > This can be done with the following cmd.
-        > ```bash
-        > sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
-        > ```
 
     4. Copy the output into the `secrets.json` file for the 
     **Relecloud.Web.Api** project.
@@ -231,31 +214,24 @@ New team members should setup their environment by following these steps.
 7. Click **Ok** to close the popup
 8. Add your IP address to the SQL Database firewall as an allowed connection by using the following commands
 
-    ```bash
-    myIpAddress=$(wget -q -O - ipinfo.io/ip)
+    ```ps1
+    $myIpAddress = (wget -q -O - ipinfo.io/ip)
     ```
 
-    ```bash
-    mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+    ```ps1
+    $mySqlServer = (az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
     ```
 
-    ```bash
+    ```ps1
     az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
     ```
 
 9. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
 
-    ```bash
-    ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+    ```ps1
+    ./infra/makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
     ```
-
-    > If you see an error that says `/bin/bash^M: bad interpreter:`
-    > then you will need to change the line endings from `CRLF` to `LF`.
-    > This can be done with the following cmd.
-    > ```bash
-    > sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
-    > ```
 
 10. Press F5 to start debugging the website
 
