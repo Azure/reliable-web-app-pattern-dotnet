@@ -163,7 +163,7 @@ if ($frontEndWebObjectId.Length -eq 0) {
 }
 else {
     Write-Host "frontend app registration objectId=$frontEndWebObjectId already exists. Delete the '$frontEndWebAppName' app registration to recreate or reset the settings."
-    $frontEndWebAppClientId = $(az ad app show --id $frontEndWebObjectId --query "id" -o tsv)
+    $frontEndWebAppClientId = (az ad app show --id $frontEndWebObjectId --query "appId" -o tsv)
     $canSetSecondAzureLocation = 2
 }
 

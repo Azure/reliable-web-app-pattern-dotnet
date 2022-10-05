@@ -158,7 +158,7 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
     echo "Set appconfig value for: 'AzureAd:ClientId'"
 else
     echo "frontend app registration objectId=$frontEndWebObjectId already exists. Delete the '$frontEndWebAppName' app registration to recreate or reset the settings."
-    frontEndWebAppClientId=$(az ad app show --id $frontEndWebObjectId --query "id" -o tsv)
+    frontEndWebAppClientId=$(az ad app show --id $frontEndWebObjectId --query "appId" -o tsv)
     canSetSecondAzureLocation=2
 fi
 
