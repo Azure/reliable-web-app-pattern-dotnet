@@ -235,9 +235,9 @@ New team members should setup their environment by following these steps.
         <td>PowerShell</td>
         <td>
 
-            ```ps1
-            .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
-            ```
+        ```ps1
+        .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
+        ```
 
         </td>
         </tr>
@@ -266,9 +266,9 @@ New team members should setup their environment by following these steps.
         <td>PowerShell</td>
         <td>
 
-            ```ps1
-            .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
-            ```
+        ```ps1
+        .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
+        ```
 
         </td>
         </tr>
@@ -325,7 +325,7 @@ Run the following command to give your Azure AD account permission to access the
     <td>
 
     ```ps1
-    ./infra/makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
+    .\infra\makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
     ```
 
     </td>
