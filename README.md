@@ -291,7 +291,7 @@ New team members should setup their environment by following these steps.
 5. Choose **Multiple startup projects**
 6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
 7. Click **Ok** to close the popup
-8. Add your IP address to the SQL Database firewall as an allowed connection by using the following commands
+8. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
 
     <table>
     <tr>
