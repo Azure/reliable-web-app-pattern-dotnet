@@ -49,17 +49,35 @@ Use this command to get started with deployment by creating an
 
 <!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
 
-PowerShell
+
+<table>
+    <thead>
+        <tr>
+            <th>PowerShell</th>
+            <th>Bash</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+
 ```ps1
 $myEnvironmentName = "relecloudresources"
 azd env new -e $myEnvironmentName
 ```
 
-Bash
+        </td>
+        <td>
+
 ```bash
 myEnvironmentName = "relecloudresources"
 azd env new -e $myEnvironmentName
 ```
+
+        </td>
+    </tr>
+    </tbody>
+</table>
 
 <br />
 
