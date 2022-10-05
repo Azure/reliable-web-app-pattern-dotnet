@@ -13,8 +13,6 @@ The reference scenario in this sample is for Relecloud
 Concerts, a fictional company that sells concert tickets. Their website, is an illustrative example of an eCommerce application. This reference application uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions, and creating Azure AD App Registrations.
 ## Pre-requisites
 
-This guide assumes you have access to a bash terminal. Windows users can access a Linux shell with WSL 2 ([Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install)).
-
 1. [Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
     Run the following command to verify that you're running version
     2.38.0 or higher.
@@ -55,6 +53,13 @@ $myEnvironmentName = "relecloudresources"
 azd env new -e $myEnvironmentName
 ```
 
+> bash users
+> 
+> ```bash
+> myEnvironmentName = "relecloudresources"
+> azd env new -e $myEnvironmentName
+> ```
+
 <br />
 
 **Choose Prod or Non-prod environment**
@@ -88,6 +93,7 @@ azd env set SECONDARY_AZURE_LOCATION westus3
 
 > You can find a list of available Azure regions by running
 > the following Azure CLI command.
+> 
 > ```ps1
 > az account list-locations --query "[].name" -o tsv
 > ```
@@ -127,6 +133,12 @@ App Configuration so that the web app can read this data.
 ```ps1
 ./infra/createAppRegistrations.ps1 -g "$myEnvironmentName-rg"
 ```
+
+> bash users
+> 
+> ```bash
+> ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
+> ```
 
 **Deploy the code**
 
@@ -192,6 +204,11 @@ New team members should setup their environment by following these steps.
         ```ps1
         ./infra/getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
         ```
+        > bash users
+        > 
+        > ```bash
+        > ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
+        > ```
 
     4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
     project.
@@ -204,6 +221,11 @@ New team members should setup their environment by following these steps.
         ```ps1
         ./infra/getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
         ```
+        > bash users
+        > 
+        > ```bash
+        > ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
+        > ```
 
     4. Copy the output into the `secrets.json` file for the 
     **Relecloud.Web.Api** project.
@@ -217,14 +239,29 @@ New team members should setup their environment by following these steps.
     ```ps1
     $myIpAddress = (Invoke-WebRequest ipinfo.io/ip)
     ```
+    > bash users
+    > 
+    > ```bash
+    > myIpAddress=$(wget -q -O - ipinfo.io/ip)
+    > ```
 
     ```ps1
     $mySqlServer = (az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
     ```
+    > bash users
+    > 
+    > ```bash
+    > mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+    > ```
 
     ```ps1
     az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
     ```
+    > bash users
+    > 
+    > ```bash
+    > az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+    > ```
 
 9. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
@@ -232,6 +269,11 @@ Run the following command to give your Azure AD account permission to access the
     ```ps1
     ./infra/makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
     ```
+    > bash users
+    > 
+    > ```bash
+    > ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+    > ```
 
 10. Press F5 to start debugging the website
 
