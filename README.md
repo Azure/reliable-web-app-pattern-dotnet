@@ -150,20 +150,17 @@ responsible for saving configuration data to Key Vault and
 App Configuration so that the web app can read this data.
 
 <table>
-<thead>
 <tr>
-<th>PowerShell</th>
-<th>Bash</th>
-</tr>
-</thead>
-<tbody>
-<tr>
+<td>PowerShell</td>
 <td>
 
 ```ps1
 ./infra/createAppRegistrations.ps1 -g "$myEnvironmentName-rg"
 ```
 </td>
+</tr>
+<tr>
+<td>Bash</td>
 <td>
 
 ```bash
@@ -172,7 +169,6 @@ App Configuration so that the web app can read this data.
 
 </td>
 </tr>
-</tbody>
 </table>
 
 **Deploy the code**
