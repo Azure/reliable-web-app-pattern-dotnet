@@ -149,7 +149,7 @@ App Registrations within Azure AD. The command is also
 responsible for saving configuration data to Key Vault and
 App Configuration so that the web app can read this data.
 
-<table>
+<table width="100%">
 <tr>
 <td>PowerShell</td>
 <td>
