@@ -48,17 +48,18 @@ Use this command to get started with deployment by creating an
 `azd` environment on your workstation.
 
 <!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
+
+PowerShell
 ```ps1
 $myEnvironmentName = "relecloudresources"
 azd env new -e $myEnvironmentName
 ```
 
-> bash users
-> 
-> ```bash
-> myEnvironmentName = "relecloudresources"
-> azd env new -e $myEnvironmentName
-> ```
+Bash
+```bash
+myEnvironmentName = "relecloudresources"
+azd env new -e $myEnvironmentName
+```
 
 <br />
 
