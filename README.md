@@ -51,32 +51,32 @@ Use this command to get started with deployment by creating an
 
 
 <table>
-    <thead>
-        <tr>
-            <th>PowerShell</th>
-            <th>Bash</th>
-        </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td>
+<thead>
+<tr>
+<th>PowerShell</th>
+<th>Bash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
 
 ```ps1
 $myEnvironmentName = "relecloudresources"
 azd env new -e $myEnvironmentName
 ```
 
-        </td>
-        <td>
+</td>
+<td>
 
 ```bash
 myEnvironmentName = "relecloudresources"
 azd env new -e $myEnvironmentName
 ```
 
-        </td>
-    </tr>
-    </tbody>
+</td>
+</tr>
+</tbody>
 </table>
 
 <br />
