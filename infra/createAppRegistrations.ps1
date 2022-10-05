@@ -5,7 +5,7 @@
 
     <This command should only be run after using the azd command to deploy resources to Azure>
 .DESCRIPTION
-    The Relecloud web app uses Azure AD to authetnicate and authorize the users that can
+    The Relecloud web app uses Azure AD to authenticate and authorize the users that can
     make concert ticket purchases. To prove that the website is a trusted, and secure, resource
     the web app must handshake with Azure AD by providing the configuration settings like the following.
     - TenantID identifies which Azure AD instance holds the users that should be authorized
