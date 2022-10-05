@@ -293,44 +293,58 @@ New team members should setup their environment by following these steps.
 7. Click **Ok** to close the popup
 8. Add your IP address to the SQL Database firewall as an allowed connection by using the following commands
 
-    <table>
-    <tr>
-    <td>PowerShell</td>
-    <td>
+<table>
+<tr>
+<td>PowerShell</td>
+<td>
 
-    ```ps1
-    $myIpAddress = (Invoke-WebRequest ipinfo.io/ip)
-    $mySqlServer = (az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
-    az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
-    ```
+```ps1
+$myIpAddress = (Invoke-WebRequest ipinfo.io/ip)
+$mySqlServer = (az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+```
 
-    </td>
-    </tr>
-    <tr>
-    <td>Bash</td>
-    <td>
-            
-    ```bash
-    myIpAddress=$(wget -q -O - ipinfo.io/ip)
-    mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
-    az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
-    ```
+</td>
+</tr>
+<tr>
+<td>Bash</td>
+<td>
+        
+```bash
+myIpAddress=$(wget -q -O - ipinfo.io/ip)
+mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+```
 
-    </td>
-    </tr>
-    </table>
+</td>
+</tr>
+</table>
 
 9. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
 
-    ```ps1
-    ./infra/makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
-    ```
-    > bash users
-    > 
-    > ```bash
-    > ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
-    > ```
+<table>
+<tr>
+<td>PowerShell</td>
+<td>
+
+```ps1
+./infra/makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
+```
+
+</td>
+</tr>
+<tr>
+<td>Bash</td>
+<td>
+        
+```bash
+./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+```
+
+</td>
+</tr>
+</table>
 
 10. Press F5 to start debugging the website
 
