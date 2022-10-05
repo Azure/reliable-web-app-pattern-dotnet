@@ -149,15 +149,31 @@ App Registrations within Azure AD. The command is also
 responsible for saving configuration data to Key Vault and
 App Configuration so that the web app can read this data.
 
+<table>
+<thead>
+<tr>
+<th>PowerShell</th>
+<th>Bash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+
 ```ps1
 ./infra/createAppRegistrations.ps1 -g "$myEnvironmentName-rg"
 ```
+</td>
+<td>
 
-> bash users
-> 
-> ```bash
-> ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
-> ```
+```bash
+./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
+```
+
+</td>
+</tr>
+</tbody>
+</table>
 
 **Deploy the code**
 
