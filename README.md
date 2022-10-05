@@ -50,15 +50,10 @@ Use this command to get started with deployment by creating an
 <!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
 
 
+
 <table>
-<thead>
 <tr>
-<th>PowerShell</th>
-<th>Bash</th>
-</tr>
-</thead>
-<tbody>
-<tr>
+<td>PowerShell</td>
 <td>
 
 ```ps1
@@ -67,6 +62,9 @@ azd env new -e $myEnvironmentName
 ```
 
 </td>
+</tr>
+<tr>
+<td>Bash</td>
 <td>
 
 ```bash
@@ -76,7 +74,6 @@ azd env new -e $myEnvironmentName
 
 </td>
 </tr>
-</tbody>
 </table>
 
 <br />
@@ -149,7 +146,7 @@ App Registrations within Azure AD. The command is also
 responsible for saving configuration data to Key Vault and
 App Configuration so that the web app can read this data.
 
-<table width="100%">
+<table>
 <tr>
 <td>PowerShell</td>
 <td>
@@ -157,6 +154,7 @@ App Configuration so that the web app can read this data.
 ```ps1
 ./infra/createAppRegistrations.ps1 -g "$myEnvironmentName-rg"
 ```
+
 </td>
 </tr>
 <tr>
@@ -232,14 +230,28 @@ New team members should setup their environment by following these steps.
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
 
-        ```ps1
-        ./infra/getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
+        <table>
+        <tr>
+        <td>PowerShell</td>
+        <td>
+
+                ```ps1
+                ./infra/getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
+                ```
+
+        </td>
+        </tr>
+        <tr>
+        <td>Bash</td>
+        <td>
+                
+        ```bash
+        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
         ```
-        > bash users
-        > 
-        > ```bash
-        > ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
-        > ```
+
+        </td>
+        </tr>
+        </table>
 
     4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
     project.
@@ -249,14 +261,28 @@ New team members should setup their environment by following these steps.
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
 
-        ```ps1
-        ./infra/getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
+        <table>
+        <tr>
+        <td>PowerShell</td>
+        <td>
+
+                ```ps1
+                ./infra/getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
+                ```
+
+        </td>
+        </tr>
+        <tr>
+        <td>Bash</td>
+        <td>
+                
+        ```bash
+        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
         ```
-        > bash users
-        > 
-        > ```bash
-        > ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
-        > ```
+
+        </td>
+        </tr>
+        </table>
 
     4. Copy the output into the `secrets.json` file for the 
     **Relecloud.Web.Api** project.
@@ -267,32 +293,32 @@ New team members should setup their environment by following these steps.
 7. Click **Ok** to close the popup
 8. Add your IP address to the SQL Database firewall as an allowed connection by using the following commands
 
+    <table>
+    <tr>
+    <td>PowerShell</td>
+    <td>
+
     ```ps1
     $myIpAddress = (Invoke-WebRequest ipinfo.io/ip)
-    ```
-    > bash users
-    > 
-    > ```bash
-    > myIpAddress=$(wget -q -O - ipinfo.io/ip)
-    > ```
-
-    ```ps1
     $mySqlServer = (az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
-    ```
-    > bash users
-    > 
-    > ```bash
-    > mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
-    > ```
-
-    ```ps1
     az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
     ```
-    > bash users
-    > 
-    > ```bash
-    > az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
-    > ```
+
+    </td>
+    </tr>
+    <tr>
+    <td>Bash</td>
+    <td>
+            
+    ```bash
+    myIpAddress=$(wget -q -O - ipinfo.io/ip)
+    mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+    az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+    ```
+
+    </td>
+    </tr>
+    </table>
 
 9. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
