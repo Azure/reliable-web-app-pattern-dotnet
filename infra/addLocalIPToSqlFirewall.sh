@@ -14,7 +14,7 @@ while [[ $# -gt 0 ]]; do
       echo "<This command should only be run after using the azd command to deploy resources to Azure>"
       echo ""
       echo "Command"
-      echo "    addLocalIPToSqlFirewall.sh : is used by devs to update the SQL firewall so they can access Azure resources from their local workstation"
+      echo "    addLocalIPToSqlFirewall.sh : Makes a web request to a public site to retrieve the user's public IP address and then adds that IP address to the Azure SQL Database Firewall as an allowed connection."
       echo ""
       echo "Arguments"
       echo "    --resource-group -g : Name of resource group where this Redis Cache is deployed."
