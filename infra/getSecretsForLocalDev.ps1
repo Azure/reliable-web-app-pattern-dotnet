@@ -1,10 +1,12 @@
 <#
 .SYNOPSIS
     Will show a json snippet you can save in Visual Studio secrets.json file to run the code locally.
+.DESCRIPTION
+    Supports the local development workflow by retrieving the secrets and configuration necessary
+    to run the web app sample locally. The secrets and configurations displayed as outputs from this
+    command should be copied into a secrets.json file to keep secrets out of source control.
 
     <This command should only be run after using the azd command to deploy resources to Azure>
-.DESCRIPTION
-    Test
 .PARAMETER ResourceGroupName
     Name of resource group containing the environment that was created by the azd command.
 .PARAMETER Web
