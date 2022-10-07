@@ -25,19 +25,12 @@
     A required parameter for the name of resource group that contains the environment that was
     created by the azd command. The cmdlet will populate the App Config Svc and Key
     Vault services in this resource group with Azure AD app registration config data.
-.PARAMETER SecondaryResourceGroupName
-    An optional parameter that describes the name of the second resource group that contains the
-    resources deployed by the azd command. The cmdlet will populate the App Config Svc and Key
-    Vault services in this resource group with Azure AD app registration config data.
 #>
 
 Param(
     [Alias("g")]
     [Parameter(Mandatory = $true, HelpMessage = "Name of the resource group that was created by azd")]
-    [String]$ResourceGroupName,
-    
-    [Alias("sg")]
-    [String]$SecondaryResourceGroupName
+    [String]$ResourceGroupName
 )
 
 $canSetSecondAzureLocation = 1
@@ -67,6 +60,12 @@ $frontEndWebAppUri = "https://$frontEndWebAppName.$appServiceRootUri"
 $resourceToken = $frontEndWebAppName.substring(4, 13)
 $environmentName = $ResourceGroupName.substring(0, $ResourceGroupName.Length - 3)
 
+$secondaryResourceGroupName = $ResourceGroupName.Substring(0,$ResourceGroupName.Length-2) + "secondary-rg"
+$group2Exists = (az group exists -n $secondaryResourceGroupName)
+if ($group2Exists -eq 'false') {
+    $secondaryResourceGroupName = ''
+}
+
 Write-Debug "Derived inputs"
 Write-Debug "----------------------------------------------"
 Write-Debug "keyVaultName=$keyVaultName"
@@ -74,6 +73,7 @@ Write-Debug "appConfigSvcName=$appConfigSvcName"
 Write-Debug "frontEndWebAppUri=$frontEndWebAppUri"
 Write-Debug "resourceToken=$resourceToken"
 Write-Debug "environmentName=$environmentName"
+Write-Debug "secondaryResourceGroupName=$secondaryResourceGroupName"
 Write-Debug ""
 
 if ($keyVaultName.Length -eq 0) {
@@ -317,12 +317,12 @@ else {
 
 ############## Copy the App Configuration and Key Vault settings to second azure location ##############
 
-if ($SecondaryResourceGroupName.Length -gt 0 && $canSetSecondAzureLocation -eq 1) {
+if ($secondaryResourceGroupName.Length -gt 0 && $canSetSecondAzureLocation -eq 1) {
     
   # assumes there is only one vault deployed to this resource group that will match this filter
-  $secondaryKeyVaultName = (az keyvault list -g "$SecondaryResourceGroupName" --query "[? name.starts_with(@,'rc-') ].name" -o tsv)
+  $secondaryKeyVaultName = (az keyvault list -g "$secondaryResourceGroupName" --query "[? name.starts_with(@,'rc-') ].name" -o tsv)
 
-  $secondaryAppConfigSvcName = (az appconfig list -g "$SecondaryResourceGroupName" --query "[].name" -o tsv)
+  $secondaryAppConfigSvcName = (az appconfig list -g "$secondaryResourceGroupName" --query "[].name" -o tsv)
 
   Write-Debug ""
   Write-Debug "Derived inputs for second azure location"
@@ -330,8 +330,8 @@ if ($SecondaryResourceGroupName.Length -gt 0 && $canSetSecondAzureLocation -eq 1
   Write-Debug "secondaryKeyVaultName=$secondaryKeyVaultName"
   Write-Debug "secondaryAppConfigSvcName=$secondaryAppConfigSvcName"
 
-  Write-Debug ""
-  Write-Debug "Now configuring secondary key vault"
+  Write-Host ""
+  Write-Host "Now configuring secondary key vault"
 
   # save 'AzureAd:ClientSecret' to Key Vault
   az keyvault secret set --name 'AzureAd--ClientSecret' --vault-name $secondaryKeyVaultName --value $frontEndWebAppClientSecret --only-show-errors > $null
