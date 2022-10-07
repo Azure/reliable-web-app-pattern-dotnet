@@ -344,6 +344,9 @@ Run the following command to give your Azure AD account permission to access the
 
 10. Press F5 to start debugging the website
 
+> These steps grant access to SQL server in the primary resource group.
+> You can use the same commands if you want to test with the secondary resource
+> group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
 # Troubleshooting
 
