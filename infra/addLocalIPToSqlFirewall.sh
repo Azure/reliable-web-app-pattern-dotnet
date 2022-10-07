@@ -40,20 +40,3 @@ fi
 myIpAddress=$(wget -q -O - ipinfo.io/ip)
 mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
 az sql server firewall-rule create -g $resourceGroupName -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
-
-#### support multi-regional deployment ####
-
-substring="-rg"
-secondaryResourceGroupName=(${resourceGroupName%%$substring*})
-secondaryResourceGroupName+="-secondary-rg"
-group2Exists=$(az group exists -n $secondaryResourceGroupName)
-if [[ $group2Exists -eq 'false' ]]; then
-    secondaryResourceGroupName=''
-fi
-
-
-if [[ ${#secondaryResourceGroupName} -gt 0 ]]; then
-  mySqlServer=$(az resource list -g $secondaryResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
-  az sql server firewall-rule create -g $secondaryResourceGroupName -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
-
-fi

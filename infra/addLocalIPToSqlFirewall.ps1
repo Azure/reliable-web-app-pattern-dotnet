@@ -49,25 +49,3 @@ $customRuleName = "devbox_$((Get-Date).ToString("yyyy-mm-dd_HH-MM-ss"))"
 Write-Debug "`$customRuleName = '$customRuleName'"
 
 az sql server firewall-rule create -g $ResourceGroupName -s $mySqlServer -n $customRuleName --start-ip-address $myIpAddress --end-ip-address $myIpAddress
-
-#### support multi-regional deployment ####
-
-$secondaryResourceGroupName = $ResourceGroupName.Substring(0, $ResourceGroupName.Length - 2) + "secondary-rg"
-$group2Exists = (az group exists -n $secondaryResourceGroupName)
-if ($group2Exists -eq 'false') {
-    $secondaryResourceGroupName = ''
-}
-
-Write-Debug "`$secondaryResourceGroupName='$secondaryResourceGroupName'"
-
-if ($secondaryResourceGroupName.Length -gt 0) {
-    Write-Debug 'Searching for secondary sql server'
-    $mySqlServer = (az resource list -g $secondaryResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
-
-    Write-Debug "`$mySqlServer='$mySqlServer'"
-
-    if ($mySqlServer.Length -gt 0) {
-        Write-Debug 'Setting firewall on secondary sql'
-        az sql server firewall-rule create -g $secondaryResourceGroupName -s $mySqlServer -n "devbox_$(Get-Date).ToString("yyyy-mm-dd_HH-MM-ss")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
-    }
-}
