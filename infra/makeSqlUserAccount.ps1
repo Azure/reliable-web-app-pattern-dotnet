@@ -15,7 +15,19 @@ Param(
   [String]$ResourceGroupName
 )
 
-Install-Module -Name SqlServer -Force
+if (Get-Module -ListAvailable -Name SqlServer) {
+  Write-Host "SQL Already Installed"
+} 
+else {
+  try {
+      Install-Module -Name SqlServer -AllowClobber -Confirm:$False -Force  
+  }
+  catch [Exception] {
+      $_.message 
+      exit
+  }
+}
+
 Import-Module -Name SqlServer
 
 $groupExists = (az group exists -n $ResourceGroupName)
