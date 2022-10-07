@@ -16,15 +16,15 @@ Param(
 )
 
 if (Get-Module -ListAvailable -Name SqlServer) {
-  Write-Host "SQL Already Installed"
+  Write-Debug "SQL Already Installed"
 } 
 else {
   try {
-      Install-Module -Name SqlServer -AllowClobber -Confirm:$False -Force  
+    Install-Module -Name SqlServer -AllowClobber -Confirm:$False -Force  
   }
   catch [Exception] {
-      $_.message 
-      exit
+    $_.message 
+    exit
   }
 }
 
@@ -40,18 +40,25 @@ else {
 }
 
 $azureAdUsername = (az ad signed-in-user show --query userPrincipalName -o tsv)
+Write-Debug "`$azureAdUsername='$azureAdUsername'"
 $objectIdForCurrentUser = (az ad signed-in-user show --query id -o tsv)
+Write-Debug "`$objectIdForCurrentUser='$objectIdForCurrentUser'"
 
 $keyVaultName = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.KeyVault/vaults' && name.starts_with(@, 'admin')].name" -o tsv)
 
-$databaseServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
-$databaseServerFqdn = (az sql server show -n $databaseServer -g $ResourceGroupName --query fullyQualifiedDomainName -o tsv)
-$databaseName = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName" -o tsv)
-$sqlAdmin=$(az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorLogin --query value -o tsv)
-$sqlPassword=$(az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorPassword --query value -o tsv)
+Write-Debug "`$keyVaultName='$keyVaultName'"
 
-Write-Debug "connecting to: $databaseServerFqdn"
-Write-Debug "opening: $databaseName"
+$databaseServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+Write-Debug "`$databaseServer='$databaseServer'"
+
+$databaseServerFqdn = (az sql server show -n $databaseServer -g $ResourceGroupName --query fullyQualifiedDomainName -o tsv)
+Write-Debug "`$databaseServerFqdn='$databaseServerFqdn'"
+
+$databaseName = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName" -o tsv)
+Write-Debug "`$databaseName='$databaseName'"
+
+$sqlAdmin = (az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorLogin --query value -o tsv)
+$sqlPassword = (az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorPassword --query value -o tsv)
 
 # disable Azure AD only admin access
 az sql server ad-only-auth disable -n $databaseServer -g $ResourceGroupName
@@ -65,16 +72,22 @@ foreach ($byte in $guid.ToByteArray()) {
 $Sid = "0x" + $byteGuid
 
 # Prepare SQL cmd to CREATE USER
-$createUserSQL = "IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'$ManagedIdentityName') create user [$ManagedIdentityName] with sid = $Sid, type = E;"
+$createUserSQL = "IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'$azureAdUsername') create user [$azureAdUsername] with sid = $Sid, type = E;"
 
 # Connect as SQL Admin acct and execute SQL cmd
-Invoke-Sqlcmd -ServerInstance $ServerdatabaseServerFqdnUri -database $databaseName -Username $sqlAdmin -Password $sqlPassword -Query $createUserSQL
+Invoke-Sqlcmd -ServerInstance $databaseServerFqdn -database $databaseName -Username $sqlAdmin -Password $sqlPassword -Query $createUserSQL
+Write-Debug "Created user"
+
+Invoke-Sqlcmd -ServerInstance $databaseServerFqdn -database 'master' -Username $sqlAdmin -Password $sqlPassword -Query $createUserSQL
+Write-Debug "Created for root db"
 
 # Prepare SQL cmd to grant db_owner role
-$grantDbOwner = "IF NOT EXISTS (SELECT * FROM sys.database_principals p JOIN sys.database_role_members db_owner_role ON db_owner_role.member_principal_id = p.principal_id JOIN sys.database_principals role_names ON role_names.principal_id = db_owner_role.role_principal_id AND role_names.[name] = 'db_owner' WHERE p.[name]=N'$ManagedIdentityName') ALTER ROLE db_owner ADD MEMBER [$ManagedIdentityName];"
+$grantDbOwner = "IF NOT EXISTS (SELECT * FROM sys.database_principals p JOIN sys.database_role_members db_owner_role ON db_owner_role.member_principal_id = p.principal_id JOIN sys.database_principals role_names ON role_names.principal_id = db_owner_role.role_principal_id AND role_names.[name] = 'db_owner' WHERE p.[name]=N'$azureAdUsername') ALTER ROLE db_owner ADD MEMBER [$azureAdUsername];"
 
 # Connect as SQL Admin acct and execute SQL cmd
 Invoke-Sqlcmd -ServerInstance $databaseServerFqdn -database $databaseName -Username $sqlAdmin -Password $sqlPassword -Query $grantDbOwner
+
+Write-Debug "Granted db_owner"
 
 # enable Azure AD only admin access
 az sql server ad-only-auth enable -n $databaseServer -g $ResourceGroupName
