@@ -40,6 +40,10 @@ Write-Debug "----------------------------------------------"
 Write-Debug "resourceGroupName='$resourceGroupName'"
 Write-Debug ""
 
+if ($ResourceGroupName -eq "-rg") {
+    Write-Error "FATAL ERROR: $ResourceGroupName could not be found in the current subscription"
+    exit 5
+}
 $groupExists = (az group exists -n $ResourceGroupName)
 if ($groupExists -eq 'false') {
     Write-Error "FATAL ERROR: $ResourceGroupName could not be found in the current subscription"
@@ -329,6 +333,11 @@ if ($secondaryResourceGroupName.Length -gt 0 && $canSetSecondAzureLocation -eq 1
   Write-Debug "----------------------------------------------"
   Write-Debug "secondaryKeyVaultName=$secondaryKeyVaultName"
   Write-Debug "secondaryAppConfigSvcName=$secondaryAppConfigSvcName"
+
+  if ($secondaryKeyVaultName.Length -eq 0) {
+    Write-Debug "No secondary vault to configure"
+    exit 0
+  }
 
   Write-Host ""
   Write-Host "Now configuring secondary key vault"
