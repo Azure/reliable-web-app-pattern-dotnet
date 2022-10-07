@@ -9,11 +9,6 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       shift # past value
       ;;
-    --secondary-resource-group|-sg)
-      secondaryResourceGroupName="$2"
-      shift # past argument
-      shift # past value
-      ;;
     --help*)
       echo ""
       echo "<This command should only be run after using the azd command to deploy resources to Azure>"
@@ -66,6 +61,14 @@ resourceToken=${frontEndWebAppName:4:13}
 locationOfHyphen=$(echo $resourceGroupName | awk -F "-" '{print length($0)-length($NF)}')
 environmentName=${resourceGroupName:0:$locationOfHyphen-1}
 
+substring="-rg"
+secondaryResourceGroupName=(${resourceGroupName%%$substring*})
+secondaryResourceGroupName+="-secondary-rg"
+group2Exists = $(az group exists -n $secondaryResourceGroupName)
+if [[ $group2Exists -eq 'false' ]]; then
+    secondaryResourceGroupName = ''
+fi
+
 echo "Derived inputs"
 echo "----------------------------------------------"
 echo "keyVaultName=$keyVaultName"
@@ -73,6 +76,7 @@ echo "appConfigSvcName=$appConfigSvcName"
 echo "frontEndWebAppUri=$frontEndWebAppUri"
 echo "resourceToken=$resourceToken"
 echo "environmentName=$environmentName"
+echo "secondaryResourceGroupName=$secondaryResourceGroupName"
 echo ""
 
 if [[ ${#keyVaultName} -eq 0 ]]; then
