@@ -30,6 +30,11 @@ else {
 
 Import-Module -Name SqlServer
 
+if ($ResourceGroupName -eq "-rg") {
+  Write-Error "FATAL ERROR: $ResourceGroupName could not be found in the current subscription"
+  exit 5
+}
+
 $groupExists = (az group exists -n $ResourceGroupName)
 if ($groupExists -eq 'false') {
   Write-Error "FATAL ERROR: $ResourceGroupName could not be found in the current subscription"
