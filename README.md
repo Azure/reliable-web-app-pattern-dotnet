@@ -345,3 +345,19 @@ Run the following command to give your Azure AD account permission to access the
 10. Press F5 to start debugging the website
 
 
+# Troubleshooting
+
+## Cannot execute shellscript `/bin/bash^M: bad interpreter`
+This error happens when Windows users checked out code from a Windows environment
+and try to execute the code from Windows Subsystem for Linux (WSL). The issue is
+caused by Git tools that automatically convert `LF` characters based on the local
+environment.
+
+Run the following commands to change the windows line endings to linux line endings:
+
+```bash
+sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
+sed "s/$(printf '\r')\$//" -i ./infra/addLocalIPToSqlFirewall.sh
+sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
+sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
+```
