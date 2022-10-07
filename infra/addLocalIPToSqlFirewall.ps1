@@ -12,12 +12,62 @@
     A required parameter for the name of resource group that contains the environment that was
     created by the azd command. The cmdlet will populate the App Config Svc and Key
     Vault services in this resource group with Azure AD app registration config data.
-.PARAMETER SecondaryResourceGroupName
-    An optional parameter that describes the name of the second resource group that contains the
-    resources deployed by the azd command. The cmdlet will populate the App Config Svc and Key
-    Vault services in this resource group with Azure AD app registration config data.
 #>
 
+Param(
+    [Alias("g")]
+    [Parameter(Mandatory = $true)][string]
+    $ResourceGroupName
+)
+
+if ($ResourceGroupName -eq "-rg") {
+    Write-Error "FATAL ERROR: $ResourceGroupName could not be found in the current subscription"
+    exit 5
+}
+
+$groupExists = (az group exists -n "$ResourceGroupName")
+if ($groupExists -eq 'false') {
+    Write-Error "FATAL ERROR: $ResourceGroupName could not be found in the current subscription"
+    exit 6
+}
+else {
+    Write-Debug "Found resource group named: $ResourceGroupName"
+}
+
+Write-Debug "`$ResourceGroupName = '$ResourceGroupName'"
+
 $myIpAddress = (Invoke-WebRequest ipinfo.io/ip)
-$mySqlServer = (az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
-az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+
+Write-Debug "`$myIpAddress = '$myIpAddress'"
+
+$mySqlServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+
+Write-Debug "`$mySqlServer = '$mySqlServer'"
+
+$customRuleName = "devbox_$((Get-Date).ToString("yyyy-mm-dd_HH-MM-ss"))"
+
+Write-Debug "`$customRuleName = '$customRuleName'"
+
+az sql server firewall-rule create -g $ResourceGroupName -s $mySqlServer -n $customRuleName --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+
+#### support multi-regional deployment ####
+
+$secondaryResourceGroupName = $ResourceGroupName.Substring(0, $ResourceGroupName.Length - 2) + "secondary-rg"
+$group2Exists = (az group exists -n $secondaryResourceGroupName)
+if ($group2Exists -eq 'false') {
+    $secondaryResourceGroupName = ''
+}
+
+Write-Debug "`$secondaryResourceGroupName='$secondaryResourceGroupName'"
+
+if ($secondaryResourceGroupName.Length -gt 0) {
+    Write-Debug 'Searching for secondary sql server'
+    $mySqlServer = (az resource list -g $secondaryResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+
+    Write-Debug "`$mySqlServer='$mySqlServer'"
+
+    if ($mySqlServer.Length -gt 0) {
+        Write-Debug 'Setting firewall on secondary sql'
+        az sql server firewall-rule create -g $secondaryResourceGroupName -s $mySqlServer -n "devbox_$(Get-Date).ToString("yyyy-mm-dd_HH-MM-ss")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+    }
+}
