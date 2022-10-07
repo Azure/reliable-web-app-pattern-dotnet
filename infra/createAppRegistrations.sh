@@ -64,9 +64,9 @@ environmentName=${resourceGroupName:0:$locationOfHyphen-1}
 substring="-rg"
 secondaryResourceGroupName=(${resourceGroupName%%$substring*})
 secondaryResourceGroupName+="-secondary-rg"
-group2Exists = $(az group exists -n $secondaryResourceGroupName)
+group2Exists=$(az group exists -n $secondaryResourceGroupName)
 if [[ $group2Exists -eq 'false' ]]; then
-    secondaryResourceGroupName = ''
+    secondaryResourceGroupName=''
 fi
 
 echo "Derived inputs"
@@ -324,6 +324,11 @@ if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]
   echo "----------------------------------------------"
   echo "secondaryKeyVaultName=$secondaryKeyVaultName"
   echo "secondaryAppConfigSvcName=$secondaryAppConfigSvcName"
+
+  if [[ ${#secondaryKeyVaultName} -eq 0 ]]; then
+    echo "No secondary vault to configure"
+    exit 0
+  fi
 
   echo ""
   echo "Now configuring secondary key vault"
