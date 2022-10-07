@@ -361,3 +361,15 @@ sed "s/$(printf '\r')\$//" -i ./infra/addLocalIPToSqlFirewall.sh
 sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
 sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
 ```
+
+## Login failed for user '<token-identified principal>' SQL Server, Error 18456
+This error happens when attempting to connect to the Azure SQL Server with as
+an Active Directory user, or service principal, that has not been added as a SQL
+user.
+
+To fix this issue you need to connect to the SQL Database using the SQL Admin account
+and to add the Azure AD user.
+
+Documentation can help with this task: [Create contained users mapped to Azure AD identities](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure?tabs=azure-powershell&view=azuresql#create-contained-users-mapped-to-azure-ad-identities)
+
+This error can also happen if you still need to run the `makeSqlUserAccount.ps1` script.
