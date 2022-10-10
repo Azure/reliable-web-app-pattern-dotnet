@@ -9,11 +9,6 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       shift # past value
       ;;
-    --secondary-resource-group|-sg)
-      secondaryResourceGroupName="$2"
-      shift # past argument
-      shift # past value
-      ;;
     --help*)
       echo ""
       echo "<This command should only be run after using the azd command to deploy resources to Azure>"
@@ -66,6 +61,14 @@ resourceToken=${frontEndWebAppName:4:13}
 locationOfHyphen=$(echo $resourceGroupName | awk -F "-" '{print length($0)-length($NF)}')
 environmentName=${resourceGroupName:0:$locationOfHyphen-1}
 
+substring="-rg"
+secondaryResourceGroupName=(${resourceGroupName%%$substring*})
+secondaryResourceGroupName+="-secondary-rg"
+group2Exists=$(az group exists -n $secondaryResourceGroupName)
+if [[ $group2Exists -eq 'false' ]]; then
+    secondaryResourceGroupName=''
+fi
+
 echo "Derived inputs"
 echo "----------------------------------------------"
 echo "keyVaultName=$keyVaultName"
@@ -73,6 +76,7 @@ echo "appConfigSvcName=$appConfigSvcName"
 echo "frontEndWebAppUri=$frontEndWebAppUri"
 echo "resourceToken=$resourceToken"
 echo "environmentName=$environmentName"
+echo "secondaryResourceGroupName=$secondaryResourceGroupName"
 echo ""
 
 if [[ ${#keyVaultName} -eq 0 ]]; then
@@ -158,7 +162,7 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
     echo "Set appconfig value for: 'AzureAd:ClientId'"
 else
     echo "frontend app registration objectId=$frontEndWebObjectId already exists. Delete the '$frontEndWebAppName' app registration to recreate or reset the settings."
-    frontEndWebAppClientId=$(az ad app show --id $frontEndWebObjectId --query "id" -o tsv)
+    frontEndWebAppClientId=$(az ad app show --id $frontEndWebObjectId --query "appId" -o tsv)
     canSetSecondAzureLocation=2
 fi
 
@@ -201,7 +205,7 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
       fi
 
       sleep 3
-    done    
+    done
 
     # Expose an API by defining a scope
     # application ID URI will be clientId by default
@@ -320,6 +324,11 @@ if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]
   echo "----------------------------------------------"
   echo "secondaryKeyVaultName=$secondaryKeyVaultName"
   echo "secondaryAppConfigSvcName=$secondaryAppConfigSvcName"
+
+  if [[ ${#secondaryKeyVaultName} -eq 0 ]]; then
+    echo "No secondary vault to configure"
+    exit 0
+  fi
 
   echo ""
   echo "Now configuring secondary key vault"

@@ -13,27 +13,29 @@ The reference scenario in this sample is for Relecloud
 Concerts, a fictional company that sells concert tickets. Their website, is an illustrative example of an eCommerce application. This reference application uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions, and creating Azure AD App Registrations.
 ## Pre-requisites
 
-This guide assumes you have access to a bash terminal. Windows users can access a Linux shell with WSL 2 ([Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install)).
-
 1. [Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
     Run the following command to verify that you're running version
     2.38.0 or higher.
 
-    ```bash
+    ```ps1
     az version
     ```
+    
     After the installation, run the following command to [sign in to Azure interactively](https://learn.microsoft.com/cli/azure/authenticate-azure-cli#sign-in-interactively).
-    ```bash
+
+    ```ps1
     az login
     ```
 1. [Install the Azure Dev CLI](https://docs.microsoft.com/en-us/azure/developer/azure-developer-cli/get-started?tabs=bare-metal%2Cwindows&pivots=programming-language-csharp#configure-your-development-environment).
     Run the following command to verify that the Azure Dev CLI is installed.
-    ```bash
+
+    ```ps1
     azd version
     ```
+
 1. [Install .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
     Run the following command to verify that the .NET SDK 6.0 is installed.
-    ```bash
+    ```ps1
     dotnet --version
     ```
 ## Deploy the code
@@ -46,10 +48,33 @@ Use this command to get started with deployment by creating an
 `azd` environment on your workstation.
 
 <!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
-```bash
-myEnvironmentName=relecloudresources
+
+
+
+<table>
+<tr>
+<td>PowerShell</td>
+<td>
+
+```ps1
+$myEnvironmentName = "relecloudresources"
 azd env new -e $myEnvironmentName
 ```
+
+</td>
+</tr>
+<tr>
+<td>Bash</td>
+<td>
+
+```bash
+myEnvironmentName = "relecloudresources"
+azd env new -e $myEnvironmentName
+```
+
+</td>
+</tr>
+</table>
 
 <br />
 
@@ -68,7 +93,7 @@ of the next steps.
 Relecloud devs deploy the production environment by running the
 following command to choose the SKUs they want in production.
 
-```bash
+```ps1
 azd env set IS_PROD true
 ```
 
@@ -78,13 +103,14 @@ Relecloud devs also use the following command to choose a second
 Azure location because the production environment is
 multiregional.
 
-```bash
+```ps1
 azd env set SECONDARY_AZURE_LOCATION westus3
 ```
 
 > You can find a list of available Azure regions by running
 > the following Azure CLI command.
-> ```
+> 
+> ```ps1
 > az account list-locations --query "[].name" -o tsv
 > ```
 
@@ -99,7 +125,7 @@ command.
 > This step will take several minutes based on the region
 > and deployment options you selected.
 
-```bash
+```ps1
 azd provision
 ```
 
@@ -120,16 +146,28 @@ App Registrations within Azure AD. The command is also
 responsible for saving configuration data to Key Vault and
 App Configuration so that the web app can read this data.
 
+<table>
+<tr>
+<td>PowerShell</td>
+<td>
+
+```ps1
+.\infra\createAppRegistrations.ps1 -g "$myEnvironmentName-rg"
+```
+
+</td>
+</tr>
+<tr>
+<td>Bash</td>
+<td>
+
 ```bash
 ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
 ```
 
-> If you see an error that says `/bin/bash^M: bad interpreter:`
-> then you will need to change the line endings from `CRLF` to `LF`.
-> This can be done with the following cmd.
-> ```bash
-> sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
-> ```
+</td>
+</tr>
+</table>
 
 **Deploy the code**
 
@@ -137,11 +175,11 @@ To finish the deployment process the Relecloud devs run the
 folowing `azd` commands to build, package, and deploy the dotnet
 code for the front-end and API web apps.
 
-```bash
+```ps1
  azd env set AZURE_RESOURCE_GROUP "$myEnvironmentName-rg"
 ```
 
-```bash
+```ps1
  azd deploy
 ```
 
@@ -192,16 +230,28 @@ New team members should setup their environment by following these steps.
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
 
+        <table>
+        <tr>
+        <td>PowerShell</td>
+        <td>
+
+        ```ps1
+        .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
+        ```
+
+        </td>
+        </tr>
+        <tr>
+        <td>Bash</td>
+        <td>
+                
         ```bash
         ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
         ```
 
-        > If you see an error that says `/bin/bash^M: bad interpreter:`
-        > then you will need to change the line endings from `CRLF` to `LF`.
-        > This can be done with the following cmd.
-        > ```bash
-        > sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
-        > ```
+        </td>
+        </tr>
+        </table>
 
     4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
     project.
@@ -211,16 +261,28 @@ New team members should setup their environment by following these steps.
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
 
+        <table>
+        <tr>
+        <td>PowerShell</td>
+        <td>
+
+        ```ps1
+        .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
+        ```
+
+        </td>
+        </tr>
+        <tr>
+        <td>Bash</td>
+        <td>
+                
         ```bash
         ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
         ```
 
-        > If you see an error that says `/bin/bash^M: bad interpreter:`
-        > then you will need to change the line endings from `CRLF` to `LF`.
-        > This can be done with the following cmd.
-        > ```bash
-        > sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
-        > ```
+        </td>
+        </tr>
+        </table>
 
     4. Copy the output into the `secrets.json` file for the 
     **Relecloud.Web.Api** project.
@@ -229,34 +291,88 @@ New team members should setup their environment by following these steps.
 5. Choose **Multiple startup projects**
 6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
 7. Click **Ok** to close the popup
-8. Add your IP address to the SQL Database firewall as an allowed connection by using the following commands
+8. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
 
-    ```bash
-    myIpAddress=$(wget -q -O - ipinfo.io/ip)
+    <table>
+    <tr>
+    <td>PowerShell</td>
+    <td>
+
+    ```ps1
+    .\infra\addLocalIPToSqlFirewall.ps1 -g "$myEnvironmentName-rg"
     ```
 
+    </td>
+    </tr>
+    <tr>
+    <td>Bash</td>
+    <td>
+            
     ```bash
-    mySqlServer=$(az resource list -g "$myEnvironmentName-rg" --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+    ./infra/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
     ```
 
-    ```bash
-    az sql server firewall-rule create -g "$myEnvironmentName-rg" -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
-    ```
+    </td>
+    </tr>
+    </table>
 
 9. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
 
+    <table>
+    <tr>
+    <td>PowerShell</td>
+    <td>
+
+    ```ps1
+    .\infra\makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
+    ```
+
+    </td>
+    </tr>
+    <tr>
+    <td>Bash</td>
+    <td>
+            
     ```bash
     ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
     ```
 
-    > If you see an error that says `/bin/bash^M: bad interpreter:`
-    > then you will need to change the line endings from `CRLF` to `LF`.
-    > This can be done with the following cmd.
-    > ```bash
-    > sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
-    > ```
+    </td>
+    </tr>
+    </table>
 
 10. Press F5 to start debugging the website
 
+> These steps grant access to SQL server in the primary resource group.
+> You can use the same commands if you want to test with the secondary resource
+> group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
+# Troubleshooting
+
+## Cannot execute shellscript `/bin/bash^M: bad interpreter`
+This error happens when Windows users checked out code from a Windows environment
+and try to execute the code from Windows Subsystem for Linux (WSL). The issue is
+caused by Git tools that automatically convert `LF` characters based on the local
+environment.
+
+Run the following commands to change the windows line endings to linux line endings:
+
+```bash
+sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
+sed "s/$(printf '\r')\$//" -i ./infra/addLocalIPToSqlFirewall.sh
+sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
+sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
+```
+
+## Login failed for user '<token-identified principal>' SQL Server, Error 18456
+This error happens when attempting to connect to the Azure SQL Server with as
+an Active Directory user, or service principal, that has not been added as a SQL
+user.
+
+To fix this issue you need to connect to the SQL Database using the SQL Admin account
+and to add the Azure AD user.
+
+Documentation can help with this task: [Create contained users mapped to Azure AD identities](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure?tabs=azure-powershell&view=azuresql#create-contained-users-mapped-to-azure-ad-identities)
+
+This error can also happen if you still need to run the `makeSqlUserAccount.ps1` script.
