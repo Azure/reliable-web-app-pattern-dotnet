@@ -35,18 +35,6 @@ resource appConfigRoleAssignmentForWebApps 'Microsoft.Authorization/roleAssignme
   }
 }
 
-@description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
-resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, principalId, resourceToken)
-  scope: resourceGroup()
-  properties: {
-    principalType: 'User'
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
-    principalId: principalId
-    description: 'Grant the "Data Reader" role to the principal identity so it can access the azure app configuration service.'
-  }
-}
-
 resource kv 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
   location: location
