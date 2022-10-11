@@ -57,7 +57,7 @@ Use this command to get started with deployment by creating an
 <td>
 
 ```ps1
-$myEnvironmentName = "relecloudresources"
+$myEnvironmentName="relecloudresources"
 azd env new -e $myEnvironmentName
 ```
 
@@ -68,7 +68,7 @@ azd env new -e $myEnvironmentName
 <td>
 
 ```bash
-myEnvironmentName = "relecloudresources"
+myEnvironmentName="relecloudresources"
 azd env new -e $myEnvironmentName
 ```
 
