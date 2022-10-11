@@ -365,7 +365,7 @@ sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
 sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
 ```
 
-## Login failed for user '<token-identified principal>' SQL Server, Error 18456
+## Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
 This error happens when attempting to connect to the Azure SQL Server with as
 an Active Directory user, or service principal, that has not been added as a SQL
 user.
