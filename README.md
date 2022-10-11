@@ -13,7 +13,7 @@ The reference scenario in this sample is for Relecloud
 Concerts, a fictional company that sells concert tickets. Their website, is an illustrative example of an eCommerce application. This reference application uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions, and creating Azure AD App Registrations.
 ## Pre-requisites
 
-1. [Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+1. [Install the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli).
     Run the following command to verify that you're running version
     2.38.0 or higher.
 
@@ -26,14 +26,14 @@ Concerts, a fictional company that sells concert tickets. Their website, is an i
     ```ps1
     az login
     ```
-1. [Install the Azure Dev CLI](https://docs.microsoft.com/en-us/azure/developer/azure-developer-cli/get-started?tabs=bare-metal%2Cwindows&pivots=programming-language-csharp#configure-your-development-environment).
+1. [Install the Azure Dev CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd).
     Run the following command to verify that the Azure Dev CLI is installed.
 
     ```ps1
     azd version
     ```
 
-1. [Install .NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+1. [Install .NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
     Run the following command to verify that the .NET SDK 6.0 is installed.
     ```ps1
     dotnet --version
