@@ -10,7 +10,20 @@ This repository provides resources to help developers build a Scalable web app o
 # Deploy to Azure
 
 The reference scenario in this sample is for Relecloud
-Concerts, a fictional company that sells concert tickets. Their website, is an illustrative example of an eCommerce application. This reference application uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions, and creating Azure AD App Registrations.
+Concerts, a fictional company that sells concert tickets. Their website, is an illustrative example of an eCommerce application. This reference application uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions, 
+and creating Azure AD App Registrations.
+
+### Pricing: What does it cost to run this on Azure?
+
+The Relecloud team uses lower-price SKUs for non-prod workloads to manage costs while building testing environments. For production, the app is designed to run on two different Azure Regions for high availability. 
+
+| Environment | SLA | Estimated Cost(per month) | Comments |
+| ------------- | ------------- | ------------- | ------------- |
+| ✅**Dev/Test** | 99.56% | $244 per environment | Lower price SKUs used.  |
+| ✅**Production** | 99.98% | $2,039.60 | Premium SKUs used for **High Availability**.   |
+
+> Cost is estimated based on the **East US** and **West US 3** Azure Regions. For detailed cost analysis, refer to the cost section in the [accompanying guide](./ScalableWebApp.md#cost).
+
 ## Pre-requisites
 
 1. [Install the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli).
