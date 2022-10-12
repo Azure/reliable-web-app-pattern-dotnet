@@ -7,6 +7,10 @@ This repository provides resources to help developers build a Scalable web app o
 * A starting point solution that demonstrates how these decisions were implemented as code
 * A starting point deployment pipeline with bicep resources that demonstrate how the infrastructure decisions were implemented
 
+To Get Started on Scalable Web App Patterns, [Watch the Introduction Video (8 mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg):
+
+[![screenshot azd env new](./assets/Guide/Intro-video.png)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg)
+
 # Deploy to Azure
 
 The reference scenario in this sample is for Relecloud
