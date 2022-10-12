@@ -89,7 +89,9 @@ azd env new -e $myEnvironmentName
 </tr>
 </table>
 
-<br />
+When prompted, select the preferred Azure Subscription and the Location:
+
+![screenshot azd env new](./assets/Guide/Azd-Env-New.png)
 
 ### (Optional Steps) Choose Prod or Non-prod environment
 
