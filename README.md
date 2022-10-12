@@ -224,7 +224,7 @@ azd down --force --purge --no-prompt
 
  ![screenshot of Azure AD App Registrations](./assets/Guide/AD-AppRegistrations.png)
  
- You will also need to purge the Key Vault and App Configuration Service instances that were deployed.
+ You will also need to purge the App Configuration Service instance that was deployed.
 
  **Purge App Configurations**
 
