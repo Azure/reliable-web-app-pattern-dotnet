@@ -78,7 +78,7 @@ azd env new -e $myEnvironmentName
 
 <br />
 
-**Choose Prod or Non-prod environment**
+### (Optional Steps) Choose Prod or Non-prod environment
 
 The Relecloud team uses the same bicep templates to deploy
 their production, and non-prod, environments. To do this
@@ -88,7 +88,7 @@ of the next steps.
 > If you skip the next two optional steps, and change nothing,
 > then the bicep templates will default to non-prod settings.
 
-*OPTIONAL: 1*
+*Step: 1*
 
 Relecloud devs deploy the production environment by running the
 following command to choose the SKUs they want in production.
@@ -97,7 +97,7 @@ following command to choose the SKUs they want in production.
 azd env set IS_PROD true
 ```
 
-*OPTIONAL: 2*
+*Step: 2*
 
 Relecloud devs also use the following command to choose a second
 Azure location because the production environment is
@@ -116,7 +116,7 @@ azd env set SECONDARY_AZURE_LOCATION westus3
 
 <br />
 
-**Provision the infrastructure**
+### Provision the infrastructure
 
 Relecloud uses the following command to deploy the Azure
 services defined in the bicep files by running the provision
@@ -137,7 +137,7 @@ azd provision
 
 <br />
 
-**Create App Registrations**
+#### Create App Registrations
 
 Relecloud devs have automated the process of creating Azure
 AD resources that support the authentication features of the
@@ -162,14 +162,14 @@ App Configuration so that the web app can read this data.
 <td>
 
 ```bash
-./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
+bash ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
 ```
 
 </td>
 </tr>
 </table>
 
-**Deploy the code**
+#### Deploy the code
 
 To finish the deployment process the Relecloud devs run the
 folowing `azd` commands to build, package, and deploy the dotnet
@@ -183,21 +183,38 @@ code for the front-end and API web apps.
  azd deploy
 ```
 
-> When finished the console will display the URI for the web
-> app. You can use this URI to view the deployed solution in a
-> browser.
+When finished the console will display the URI for the web app. You can use this URI to view the deployed solution in a browser.
 
 ![screenshot of Relecloud app home page](./assets/Guide/WebAppHomePage.png)
 
 <br />
 
-> You should use the `azd down --force --purge --no-prompt` command to tear down an
-> environment when you have finished with these services. If
-> you want to recreate this deployment you will also need to
-> delete the two Azure AD app services that were created. You
-> can find them in Azure AD by searching for their environment
-> name. You will also need to purge the Key Vault and App
-> Configuration Service instances that were deployed.
+> If you face any issues with the deployment, see the [Troubleshooting section](./README.md#troubleshooting) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
+
+### Clean up Azure Resources
+
+To tear down an enviroment, and clean up the Azure resource group, use the folloing command:
+
+```ps1
+azd down --force --purge --no-prompt
+```
+
+ If you want to recreate this deployment you will also need to delete the two Azure AD app registrations that were created. You can find them in Azure AD by searching for their environment name. 
+ 
+ **Delete App Registrations** 
+
+ ![screenshot of Azure AD App Registrations](./assets/Guide/AD-AppRegistrations.png)
+ 
+ You will also need to purge the Key Vault and App Configuration Service instances that were deployed.
+
+ **Purge App Configurations**
+
+ ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
+
+ **Purge Key vault Vaults**
+
+ ![screenshot of Purging App Configurations](./assets/Guide/KeyVault-Purge.png)
+
 
 ## Local Development
 
@@ -246,7 +263,7 @@ New team members should setup their environment by following these steps.
         <td>
                 
         ```bash
-        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
+        bash ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
         ```
 
         </td>
@@ -277,7 +294,7 @@ New team members should setup their environment by following these steps.
         <td>
                 
         ```bash
-        ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
+        bash ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
         ```
 
         </td>
@@ -309,7 +326,7 @@ New team members should setup their environment by following these steps.
     <td>
             
     ```bash
-    ./infra/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
+    bash ./infra/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -335,7 +352,7 @@ Run the following command to give your Azure AD account permission to access the
     <td>
             
     ```bash
-    ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+    bash ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -365,7 +382,14 @@ sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
 sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
 ```
 
+## App doesn't start: 500.30 ASP.NET Core app failed to start
+
+This issue is due to missing configuration on your App Service you should **re-run** the `azd provision` command. The Azure Dev CLI performs incremental deployments that will overlay the correct settings on the existing App Service.
+
+> This is a known issue and we are tracking it [here](https://github.com/Azure/scalable-web-app-pattern-dotnet/issues/87).
+
 ## Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
+
 This error happens when attempting to connect to the Azure SQL Server with as
 an Active Directory user, or service principal, that has not been added as a SQL
 user.
