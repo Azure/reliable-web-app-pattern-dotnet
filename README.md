@@ -358,7 +358,7 @@ to analyze the issue and receive a recommendation.
 <td>
 
 ```ps1
-Write-Host "Not yet implemented"
+.\infra\validateDeployment.ps1 -g "$myEnvironmentName-rg"
 ```
 
 </td>
