@@ -35,8 +35,10 @@ jobs:
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Quality Assurance
-        run: echo 'TODO - perform test automation here'
+      - name: QA - Validate App Settings
+        run: |
+          chmod +x ./infra/validateDeployment.sh
+          ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}nightly-rg
 
       - name: Azure Dev Down
         run: azd down --force --purge --no-prompt
