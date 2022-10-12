@@ -230,11 +230,6 @@ azd down --force --purge --no-prompt
 
  ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
 
- **Purge Key vault Vaults**
-
- ![screenshot of Purging App Configurations](./assets/Guide/KeyVault-Purge.png)
-
-
 ## Local Development
 
 Relecloud developers use Visual Studio to develop locally and they co-share
