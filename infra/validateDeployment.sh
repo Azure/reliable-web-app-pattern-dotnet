@@ -67,8 +67,9 @@ fi
 frontEndWebAppName=$(az resource list -g "$resourceGroupName" --query "[?tags.\"azd-service-name\"=='web'].name" -o tsv)
 
 if [[ ${#frontEndWebAppName} -eq 0 ]]; then
-    echo "Cannot find the API web app" 1>&2
+    echo "Cannot find the front-end web app" 1>&2
     echo "Recommended Action: run the 'azd provision' command again to overlay the missing settings" 1>&2
+    exit 32
 elif [[ $debug ]]; then
     echo "Found front-end web app named '$frontEndWebAppName' "
 fi
@@ -80,7 +81,7 @@ if [[ ${#frontEndAppSvcUri} -eq 0 ]]; then
     echo "Recommended Action: run the 'azd provision' command again to overlay the missing settings" 1>&2
     exit 33
 elif [[ $debug ]]; then
-    echo "Validated that the App Service was configured with setting 'App:AppConfig:Uri' equal to '$frontEndAppSvcUri' "
+    echo "Validated that the App Service was configured with setting 'App:AppConfig:Uri' equal to '$frontEndAppSvcUri'"
 fi
 
 apiWebAppName=$(az resource list -g "$resourceGroupName" --query "[?tags.\"azd-service-name\"=='api'].name" -o tsv)
@@ -88,8 +89,9 @@ apiWebAppName=$(az resource list -g "$resourceGroupName" --query "[?tags.\"azd-s
 if [[ ${#apiWebAppName} -eq 0 ]]; then
     echo "Cannot find the API web app" 1>&2
     echo "Recommended Action: run the 'azd provision' command again to overlay the missing settings" 1>&2
+    exit 34
 elif [[ $debug ]]; then
-    echo "Found API web app named '$apiWebAppName' "
+    echo "Found API web app named '$apiWebAppName'"
 fi
 
 apiAppSvcUri=$(az webapp config appsettings list -n $apiWebAppName -g $resourceGroupName --query "[?name=='Api:AppConfig:Uri'].value" -o tsv)
@@ -97,13 +99,14 @@ apiAppSvcUri=$(az webapp config appsettings list -n $apiWebAppName -g $resourceG
 if [[ ${#apiAppSvcUri} -eq 0 ]]; then
     echo "Missing required Azure App Service configuration setting for api web app: Api:AppConfig:Uri" 1>&2
     echo "Recommended Action: run the 'azd provision' command again to overlay the missing settings"
-    exit 34
+    exit 35
 elif [[ $debug ]]; then
-    echo "Validated that the App Service was configured with setting 'Api:AppConfig:Uri' equal to '$apiAppSvcUri' "
+    echo "Validated that the App Service was configured with setting 'Api:AppConfig:Uri' equal to '$apiAppSvcUri'"
 fi
 
 # end of check for issue 87
 
 
-echo "All settings validated successfully"
+echo "All settings validated successfully..."
+echo "If this script was unable to diagnose your problem then please create a GitHub issue"
 exit 0
