@@ -348,7 +348,35 @@ Run the following command to give your Azure AD account permission to access the
 > You can use the same commands if you want to test with the secondary resource
 > group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
-# Troubleshooting
+# Known issues
+If you encounter issues with your deployment you can try running the following command
+to analyze the issue and receive a recommendation.
+
+<table>
+<tr>
+<td>PowerShell</td>
+<td>
+
+```ps1
+Write-Host "Not yet implemented"
+```
+
+</td>
+</tr>
+<tr>
+<td>Bash</td>
+<td>
+
+```bash
+./infra/validateDeployment.sh -g "$myEnvironmentName-rg"
+```
+
+</td>
+</tr>
+</table>
+
+
+You may also find the following topics helpful.
 
 ## Cannot execute shellscript `/bin/bash^M: bad interpreter`
 This error happens when Windows users checked out code from a Windows environment
