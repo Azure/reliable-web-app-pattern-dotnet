@@ -208,7 +208,7 @@ When finished the console will display the URI for the web app. You can use this
 
 <br />
 
-> If you face any issues with the deployment, see the [Troubleshooting section](./README.md#troubleshooting) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
+> If you face any issues with the deployment, see the [Known issues section](#known-issues) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
 
 ### Clean up Azure Resources
 
@@ -373,13 +373,72 @@ Run the following command to give your Azure AD account permission to access the
     </tr>
     </table>
 
-10. Press F5 to start debugging the website
+10. Grant your account access to Azure App Configuration Service
+
+    <table>
+    <tr>
+    <td>PowerShell</td>
+    <td>
+
+    ```ps1
+    $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
+    $currentUserObjectId=(az ad signed-in-user show --query "id" -o tsv)
+    $scopeId=(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
+    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
+    ```
+
+    </td>
+    </tr>
+    <tr>
+    <td>Bash</td>
+    <td>
+            
+    ```bash
+    appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
+    currentUserObjectId=$(az ad signed-in-user show --query "id" -o tsv)
+    scopeId=$(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
+    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
+    ```
+
+    </td>
+    </tr>
+    </table>
+
+11. Press F5 to start debugging the website
 
 > These steps grant access to SQL server in the primary resource group.
 > You can use the same commands if you want to test with the secondary resource
 > group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
-# Troubleshooting
+# Known issues
+If you encounter issues with your deployment you can try running the following command
+to analyze the issue and receive a recommendation.
+
+<table>
+<tr>
+<td>PowerShell</td>
+<td>
+
+```ps1
+.\infra\validateDeployment.ps1 -g "$myEnvironmentName-rg"
+```
+
+</td>
+</tr>
+<tr>
+<td>Bash</td>
+<td>
+
+```bash
+./infra/validateDeployment.sh -g "$myEnvironmentName-rg"
+```
+
+</td>
+</tr>
+</table>
+
+
+You may also find the following topics helpful.
 
 ## Cannot execute shellscript `/bin/bash^M: bad interpreter`
 This error happens when Windows users checked out code from a Windows environment
