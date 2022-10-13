@@ -50,7 +50,7 @@ fi
 groupExists=$(az group exists -n $resourceGroupName)
 if [[ $groupExists = 'false' ]]; then
     echo "Missing required resource group. The resource group '$resourceGroupName' does not exist" 1>&2
-    echo "Recommended Action: run the `azd provision` command again to overlay the missing settings"
+    echo "Recommended Action: run the 'azd provision' command again to overlay the missing settings"
     exit 32
 elif [[ $debug ]]; then
     echo "Validated that the resource group does exist"
