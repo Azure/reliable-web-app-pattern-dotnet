@@ -35,7 +35,7 @@ jobs:
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: QA - Validate App Settings
+      - name: QA - Validate Deployment
         run: |
           chmod +x ./infra/validateDeployment.sh
           ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}nightly-rg
