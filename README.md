@@ -208,7 +208,7 @@ When finished the console will display the URI for the web app. You can use this
 
 <br />
 
-> If you face any issues with the deployment, see the [Troubleshooting section](./README.md#troubleshooting) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
+> If you face any issues with the deployment, see the [Known issues section](./README.md#known_issues) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
 
 ### Clean up Azure Resources
 
