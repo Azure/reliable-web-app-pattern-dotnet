@@ -453,6 +453,7 @@ sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
 sed "s/$(printf '\r')\$//" -i ./infra/addLocalIPToSqlFirewall.sh
 sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
 sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
+sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
 ```
 
 ## App doesn't start: 500.30 ASP.NET Core app failed to start
