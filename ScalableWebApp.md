@@ -635,7 +635,7 @@ cached for 1 hour. We do this to keep the information in cache relevant
 but the right duration for the cache will vary for every scenario.
 
 > In this sample the Concerts are not editable. Remember that when you
-> use a cache you will want change cached data it whenever a user makes
+> use a cache you will want to change cached data whenever a user makes
 > an update. You can achieve this with an event driven system or by
 > ensuring that the cached data is only accessed directly from the
 > repository class that is responsible for handling the create and edit
