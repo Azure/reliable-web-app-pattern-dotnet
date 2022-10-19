@@ -145,6 +145,11 @@ resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/k
 
 var aspNetCoreEnvironment = isProd ? 'Production' : 'Development'
 
+resource existingAppInsightsForWeb 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: 'web-${resourceToken}-appi'
+  scope: resourceGroup()
+}
+
 resource web 'Microsoft.Web/sites@2021-03-01' = {
   name: 'web-${resourceToken}-web-app'
   location: location
@@ -172,7 +177,7 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
     properties: {
       ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
-      APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
+      APPLICATIONINSIGHTS_CONNECTION_STRING: existingAppInsightsForWeb.properties.ConnectionString
       'App:AppConfig:Uri': appConfigSvc.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
@@ -180,7 +185,7 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
       WEBSITE_VNET_ROUTE_ALL: '1'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
-      APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
+      APPINSIGHTS_INSTRUMENTATIONKEY: existingAppInsightsForWeb.properties.InstrumentationKey
       ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
       XDT_MicrosoftApplicationInsights_Mode: 'recommended'
       InstrumentationEngine_EXTENSION_VERSION: '~1'
