@@ -1,13 +1,13 @@
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0,12 * * *'
+  # schedule:
+  #   - cron: '0 0,12 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/azure-dev-cli-apps:daily
+      image: mcr.microsoft.com/azure-dev-cli-apps:latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2

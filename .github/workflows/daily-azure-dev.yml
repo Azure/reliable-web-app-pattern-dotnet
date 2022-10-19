@@ -1,13 +1,13 @@
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 1,13 * * *'
+  schedule:
+    - cron: '0 0,12 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/azure-dev-cli-apps:latest
+      image: mcr.microsoft.com/azure-dev-cli-apps:daily
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -17,8 +17,30 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Azure Dev Provision
+        run: azd provision --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set AZD resource group
+        # temporary work around for known issue with multiple resource groups
+        run: azd env set AZURE_RESOURCE_GROUP ${{ secrets.AZURE_ENV_NAME }}daily-rg
+
+      - name: Azure Dev Deploy
+        run: azd deploy --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: QA - Validate Deployment
+        run: |
+          chmod +x ./infra/validateDeployment.sh
+          ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}daily-rg
+
       - name: Azure Dev Down
-        continue-on-error: true
         run: azd down --force --purge --no-prompt
         env:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily
@@ -29,7 +51,6 @@ jobs:
       # Resource names are reserved for a period of time after deletion
       # https://docs.microsoft.com/en-us/azure/azure-app-configuration/faq#why-can-t-i-create-an-app-configuration-store-with-the-same-name-as-one-that-i-just-deleted
       - name: Purge App Configuration Service
-        continue-on-error: true
         run: |
           chmod +x ./infra/appConfigSvcPurge.sh
           ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}daily-rg
