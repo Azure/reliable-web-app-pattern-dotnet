@@ -1,13 +1,13 @@
 on:
   workflow_dispatch:
-#  schedule:
-#    - cron: '0 1,13 * * *'
+  schedule:
+    - cron: '0 1,13 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/azure-dev-cli-apps:latest
+      image: mcr.microsoft.com/azure-dev-cli-apps:daily
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
         continue-on-error: true
         run: azd down --force --purge --no-prompt
         env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}nightly
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
@@ -32,4 +32,4 @@ jobs:
         continue-on-error: true
         run: |
           chmod +x ./infra/appConfigSvcPurge.sh
-          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}nightly-rg
+          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}daily-rg
