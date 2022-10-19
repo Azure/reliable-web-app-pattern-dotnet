@@ -224,7 +224,6 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
   tags: union(tags, {
       'azd-service-name': 'api'
     })
-  kind: 'app,linux'
   properties: {
     serverFarmId: apiAppServicePlan.id
     siteConfig: {
