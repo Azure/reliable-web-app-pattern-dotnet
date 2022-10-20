@@ -156,8 +156,12 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
     siteConfig: {
       alwaysOn: true
       ftpsState: 'FtpsOnly'
+
+      // Set to true to route all outbound app traffic into virtual network (see https://learn.microsoft.com/azure/app-service/overview-vnet-integration#application-routing)
+      vnetRouteAllEnabled: false
     }
     httpsOnly: true
+    virtualNetworkSubnetId: vnet::webSubnet.id
   }
   
   identity: {
@@ -176,8 +180,8 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
       'App:AppConfig:Uri': appConfigSvc.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-      WEBSITE_DNS_SERVER: '168.63.129.16' 
-      WEBSITE_VNET_ROUTE_ALL: '1'
+      // WEBSITE_DNS_SERVER: '168.63.129.16' 
+      // WEBSITE_VNET_ROUTE_ALL: '1'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
       APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
@@ -225,8 +229,12 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
     siteConfig: {
       alwaysOn: true
       ftpsState: 'FtpsOnly'
+
+      // Set to true to route all outbound app traffic into virtual network (see https://learn.microsoft.com/azure/app-service/overview-vnet-integration#application-routing)
+      vnetRouteAllEnabled: false
     }
     httpsOnly: true
+    virtualNetworkSubnetId: vnet::apiSubnet.id
   }
 
   identity: {
@@ -245,8 +253,8 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
       'Api:AppConfig:Uri': appConfigSvc.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-      WEBSITE_DNS_SERVER: '168.63.129.16' 
-      WEBSITE_VNET_ROUTE_ALL: '1'
+      // WEBSITE_DNS_SERVER: '168.63.129.16' 
+      // WEBSITE_VNET_ROUTE_ALL: '1'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
       APPINSIGHTS_INSTRUMENTATIONKEY: apiApplicationInsights.properties.InstrumentationKey
@@ -649,6 +657,14 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
       }
     ]
   }
+
+  resource apiSubnet 'subnets' existing = {
+    name: subnetApiAppService
+  }
+
+  resource webSubnet 'subnets' existing = {
+    name: subnetWebAppService
+  }
 }
 
 resource privateEndpointForSql 'Microsoft.Network/privateEndpoints@2020-07-01' = {
@@ -723,22 +739,22 @@ resource redisPvtEndpointDnsGroupName 'Microsoft.Network/privateEndpoints/privat
   }
 }
 
-resource apiVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
-  parent: api
-  name: 'virtualNetwork'
-  properties: {
-    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetApiAppService)
-    swiftSupported: true
-  }
-}
+// resource apiVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
+//   parent: api
+//   name: 'virtualNetwork'
+//   properties: {
+//     subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetApiAppService)
+//     swiftSupported: true
+//   }
+// }
 
-resource webVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
-  parent: web
-  name: 'virtualNetwork'
-  properties: {
-    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetWebAppService)
-    swiftSupported: true
-  }
+// resource webVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
+//   parent: web
+//   name: 'virtualNetwork'
+//   properties: {
+//     subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetWebAppService)
+//     swiftSupported: true
+//   }
 }
 
 output WEB_URI string = web.properties.defaultHostName
