@@ -161,6 +161,8 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
       vnetRouteAllEnabled: false
     }
     httpsOnly: true
+
+    // Enable regional virtual network integration.
     virtualNetworkSubnetId: vnet::webSubnet.id
   }
 
@@ -231,6 +233,8 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
       vnetRouteAllEnabled: false
     }
     httpsOnly: true
+
+    // Enable regional virtual network integration.
     virtualNetworkSubnetId: vnet::apiSubnet.id
   }
 
