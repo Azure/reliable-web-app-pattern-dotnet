@@ -145,11 +145,6 @@ resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/k
 
 var aspNetCoreEnvironment = isProd ? 'Production' : 'Development'
 
-resource existingAppInsightsForWeb 'Microsoft.Insights/components@2020-02-02' existing = {
-  name: 'web-${resourceToken}-appi'
-  scope: resourceGroup()
-}
-
 resource web 'Microsoft.Web/sites@2021-03-01' = {
   name: 'web-${resourceToken}-web-app'
   location: location
@@ -183,12 +178,12 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
     properties: {
       ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
-      APPLICATIONINSIGHTS_CONNECTION_STRING: existingAppInsightsForWeb.properties.ConnectionString
+      APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
       'App:AppConfig:Uri': appConfigSvc.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
-      APPINSIGHTS_INSTRUMENTATIONKEY: existingAppInsightsForWeb.properties.InstrumentationKey
+      APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY
       ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
       XDT_MicrosoftApplicationInsights_Mode: 'recommended'
       InstrumentationEngine_EXTENSION_VERSION: '~1'
@@ -254,12 +249,12 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
     properties: {
       ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
-      APPLICATIONINSIGHTS_CONNECTION_STRING: apiApplicationInsights.properties.ConnectionString
+      APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
       'Api:AppConfig:Uri': appConfigSvc.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
-      APPINSIGHTS_INSTRUMENTATIONKEY: apiApplicationInsights.properties.InstrumentationKey
+      APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY
       ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
       XDT_MicrosoftApplicationInsights_Mode: 'recommended'
       InstrumentationEngine_EXTENSION_VERSION: '~1'
@@ -481,31 +476,6 @@ module webApplicationInsightsResources './applicationinsights.bicep' = {
   }
 }
 
-resource apiLogAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
-  name: 'api-${resourceToken}-log'
-  location: location
-  tags: tags
-  properties: any({
-    retentionInDays: 30
-    features: {
-      searchVersion: 1
-    }
-    sku: {
-      name: 'PerGB2018'
-    }
-  })
-}
-
-resource apiApplicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: 'api-${resourceToken}-appi'
-  location: location
-  kind: 'web'
-  tags: tags
-  properties: {
-    Application_Type: 'web'
-    WorkspaceResourceId: apiLogAnalyticsWorkspace.id
-  }
-}
 
 resource adminVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'admin-${resourceToken}-kv' // keyvault name cannot start with a number
