@@ -20,30 +20,30 @@ jobs:
       - name: Azure Dev Provision
         run: azd provision --no-prompt
         env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
           AZURE_LOCATION: southcentralus
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Set AZD resource group
         # temporary work around for known issue with multiple resource groups
-        run: azd env set AZURE_RESOURCE_GROUP ${{ secrets.AZURE_ENV_NAME }}daily-rg
+        run: azd env set AZURE_RESOURCE_GROUP ${{ secrets.AZURE_ENV_NAME }}daily2-rg
 
       - name: Azure Dev Deploy
         run: azd deploy --no-prompt
         env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
           AZURE_LOCATION: southcentralus
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: QA - Validate Deployment
         run: |
           chmod +x ./infra/validateDeployment.sh
-          ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}daily-rg
+          ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}daily2-rg
 
       - name: Azure Dev Down
         run: azd down --force --purge --no-prompt
         env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
           AZURE_LOCATION: southcentralus
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
@@ -53,4 +53,4 @@ jobs:
       - name: Purge App Configuration Service
         run: |
           chmod +x ./infra/appConfigSvcPurge.sh
-          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}daily-rg
+          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}daily2-rg

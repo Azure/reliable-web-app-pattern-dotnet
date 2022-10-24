@@ -21,7 +21,7 @@ jobs:
         continue-on-error: true
         run: azd down --force --purge --no-prompt
         env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
           AZURE_LOCATION: southcentralus
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
@@ -32,4 +32,4 @@ jobs:
         continue-on-error: true
         run: |
           chmod +x ./infra/appConfigSvcPurge.sh
-          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}daily-rg
+          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}daily2-rg
