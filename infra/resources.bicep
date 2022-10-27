@@ -35,18 +35,6 @@ resource appConfigRoleAssignmentForWebApps 'Microsoft.Authorization/roleAssignme
   }
 }
 
-@description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
-resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, principalId, resourceToken)
-  scope: resourceGroup()
-  properties: {
-    principalType: 'User'
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
-    principalId: principalId
-    description: 'Grant the "Data Reader" role to the principal identity so it can access the azure app configuration service.'
-  }
-}
-
 resource kv 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
   location: location
@@ -123,24 +111,24 @@ resource frontEndClientSecretAppCfg 'Microsoft.AppConfiguration/configurationSto
   ]
 }
 
-var frontEndClientSecretName='AzureAd--ClientSecret'
+var frontEndClientSecretName = 'AzureAd--ClientSecret'
 
 resource check_if_client_secret_exists 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'check_if_client_secret_exists'
   location: location
   tags: tags
-  kind:'AzureCLI'
-  identity:{
+  kind: 'AzureCLI'
+  identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentity.id}': {} 
+      '${managedIdentity.id}': {}
     }
   }
   properties: {
     azCliVersion: '2.37.0'
     retentionInterval: 'P1D'
     scriptContent: 'result=$(az keyvault secret list --vault-name ${kv.name} --query "[?name==\'${frontEndClientSecretName}\'].name" -o tsv); if [[ \${#result} -eq 0 ]]; then az keyvault secret set --name \'AzureAd--ClientSecret\' --vault-name ${kv.name} --value 1 --only-show-errors > /dev/null; fi'
-    arguments:'--resourceToken \'${resourceToken}\''
+    arguments: '--resourceToken \'${resourceToken}\''
   }
 }
 
@@ -168,14 +156,20 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
     siteConfig: {
       alwaysOn: true
       ftpsState: 'FtpsOnly'
+
+      // Set to true to route all outbound app traffic into virtual network (see https://learn.microsoft.com/azure/app-service/overview-vnet-integration#application-routing)
+      vnetRouteAllEnabled: false
     }
     httpsOnly: true
+
+    // Enable regional virtual network integration.
+    virtualNetworkSubnetId: vnet::webSubnet.id
   }
-  
+
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentity.id}': {} 
+      '${managedIdentity.id}': {}
     }
   }
 
@@ -187,12 +181,9 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
       APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
       'App:AppConfig:Uri': appConfigSvc.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
-      // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-      WEBSITE_DNS_SERVER: '168.63.129.16' 
-      WEBSITE_VNET_ROUTE_ALL: '1'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
-      APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
+      APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY
       ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
       XDT_MicrosoftApplicationInsights_Mode: 'recommended'
       InstrumentationEngine_EXTENSION_VERSION: '~1'
@@ -231,20 +222,25 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
   tags: union(tags, {
       'azd-service-name': 'api'
     })
-  kind: 'app,linux'
   properties: {
     serverFarmId: apiAppServicePlan.id
     siteConfig: {
       alwaysOn: true
       ftpsState: 'FtpsOnly'
+
+      // Set to true to route all outbound app traffic into virtual network (see https://learn.microsoft.com/azure/app-service/overview-vnet-integration#application-routing)
+      vnetRouteAllEnabled: false
     }
     httpsOnly: true
+
+    // Enable regional virtual network integration.
+    virtualNetworkSubnetId: vnet::apiSubnet.id
   }
 
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentity.id}': {} 
+      '${managedIdentity.id}': {}
     }
   }
 
@@ -253,15 +249,12 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
     properties: {
       ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
-      APPLICATIONINSIGHTS_CONNECTION_STRING: apiApplicationInsights.properties.ConnectionString
+      APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
       'Api:AppConfig:Uri': appConfigSvc.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
-      // https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-      WEBSITE_DNS_SERVER: '168.63.129.16' 
-      WEBSITE_VNET_ROUTE_ALL: '1'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
-      APPINSIGHTS_INSTRUMENTATIONKEY: apiApplicationInsights.properties.InstrumentationKey
+      APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY
       ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
       XDT_MicrosoftApplicationInsights_Mode: 'recommended'
       InstrumentationEngine_EXTENSION_VERSION: '~1'
@@ -303,7 +296,7 @@ resource appConfigSvc 'Microsoft.AppConfiguration/configurationStores@2022-05-01
   }
 }
 
-var appServicePlanSku = (isProd) ?  'P1v2' : 'B1'
+var appServicePlanSku = (isProd) ? 'P1v2' : 'B1'
 
 resource webAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${resourceToken}-web-plan'
@@ -312,10 +305,10 @@ resource webAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   sku: {
     name: appServicePlanSku
   }
-  properties:{
-    
+  properties: {
+
   }
-  dependsOn:[
+  dependsOn: [
     // found that Redis network connectivity was not available if web app is deployed first (until restart)
     // delaying deployment allows us to skip the restart
     redisSetup
@@ -329,10 +322,10 @@ resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   sku: {
     name: appServicePlanSku
   }
-  properties:{
+  properties: {
 
   }
-  dependsOn:[
+  dependsOn: [
     // found that Redis network connectivity was not available if web app is deployed first (until restart)
     // delaying deployment allows us to skip the restart
     redisSetup
@@ -483,31 +476,6 @@ module webApplicationInsightsResources './applicationinsights.bicep' = {
   }
 }
 
-resource apiLogAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
-  name: 'api-${resourceToken}-log'
-  location: location
-  tags: tags
-  properties: any({
-    retentionInDays: 30
-    features: {
-      searchVersion: 1
-    }
-    sku: {
-      name: 'PerGB2018'
-    }
-  })
-}
-
-resource apiApplicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: 'api-${resourceToken}-appi'
-  location: location
-  kind: 'web'
-  tags: tags
-  properties: {
-    Application_Type: 'web'
-    WorkspaceResourceId: apiLogAnalyticsWorkspace.id
-  }
-}
 
 resource adminVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'admin-${resourceToken}-kv' // keyvault name cannot start with a number
@@ -661,6 +629,14 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
       }
     ]
   }
+
+  resource apiSubnet 'subnets' existing = {
+    name: subnetApiAppService
+  }
+
+  resource webSubnet 'subnets' existing = {
+    name: subnetWebAppService
+  }
 }
 
 resource privateEndpointForSql 'Microsoft.Network/privateEndpoints@2020-07-01' = {
@@ -732,24 +708,6 @@ resource redisPvtEndpointDnsGroupName 'Microsoft.Network/privateEndpoints/privat
         }
       }
     ]
-  }
-}
-
-resource apiVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
-  parent: api
-  name: 'virtualNetwork'
-  properties: {
-    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetApiAppService)
-    swiftSupported: true
-  }
-}
-
-resource webVirtualNetwork 'Microsoft.Web/sites/networkConfig@2019-08-01' = {
-  parent: web
-  name: 'virtualNetwork'
-  properties: {
-    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, subnetWebAppService)
-    swiftSupported: true
   }
 }
 

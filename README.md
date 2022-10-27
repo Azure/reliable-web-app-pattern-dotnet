@@ -205,7 +205,7 @@ When finished the console will display the URI for the web app. You can use this
 
 ![screenshot of Relecloud app home page](./assets/Guide/WebAppHomePage.png)
 
-> If you face any issues with the deployment, see the [Troubleshooting section](./README.md#troubleshooting) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
+> If you face any issues with the deployment, see the [Known issues section](#known-issues) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
 
 ### Clean up Azure Resources
 
@@ -221,16 +221,11 @@ azd down --force --purge --no-prompt
 
  ![screenshot of Azure AD App Registrations](./assets/Guide/AD-AppRegistrations.png)
  
- You will also need to purge the Key Vault and App Configuration Service instances that were deployed.
+ You will also need to purge the App Configuration Service instance that was deployed.
 
  **Purge App Configurations**
 
  ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
-
- **Purge Key vault Vaults**
-
- ![screenshot of Purging App Configurations](./assets/Guide/KeyVault-Purge.png)
-
 
 ## Local Development
 
@@ -375,13 +370,72 @@ Run the following command to give your Azure AD account permission to access the
     </tr>
     </table>
 
-10. Press F5 to start debugging the website
+10. Grant your account access to Azure App Configuration Service
+
+    <table>
+    <tr>
+    <td>PowerShell</td>
+    <td>
+
+    ```ps1
+    $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
+    $currentUserObjectId=(az ad signed-in-user show --query "id" -o tsv)
+    $scopeId=(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
+    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
+    ```
+
+    </td>
+    </tr>
+    <tr>
+    <td>Bash</td>
+    <td>
+            
+    ```bash
+    appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
+    currentUserObjectId=$(az ad signed-in-user show --query "id" -o tsv)
+    scopeId=$(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
+    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
+    ```
+
+    </td>
+    </tr>
+    </table>
+
+11. Press F5 to start debugging the website
 
 > These steps grant access to SQL server in the primary resource group.
 > You can use the same commands if you want to test with the secondary resource
 > group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
-# Troubleshooting
+# Known issues
+If you encounter issues with your deployment you can try running the following command
+to analyze the issue and receive a recommendation.
+
+<table>
+<tr>
+<td>PowerShell</td>
+<td>
+
+```ps1
+.\infra\validateDeployment.ps1 -g "$myEnvironmentName-rg"
+```
+
+</td>
+</tr>
+<tr>
+<td>Bash</td>
+<td>
+
+```bash
+./infra/validateDeployment.sh -g "$myEnvironmentName-rg"
+```
+
+</td>
+</tr>
+</table>
+
+
+You may also find the following topics helpful.
 
 ## Cannot execute shellscript `/bin/bash^M: bad interpreter`
 This error happens when Windows users checked out code from a Windows environment
@@ -396,6 +450,7 @@ sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
 sed "s/$(printf '\r')\$//" -i ./infra/addLocalIPToSqlFirewall.sh
 sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
 sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
+sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
 ```
 
 ## App doesn't start: 500.30 ASP.NET Core app failed to start
