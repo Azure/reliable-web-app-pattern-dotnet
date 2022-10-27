@@ -30,6 +30,7 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
             var ticket = this.database.Tickets
                 .Include(ticket => ticket.Concert)
                 .Include(ticket => ticket.User)
+                .Include(ticket => ticket.Customer)
                 .Where(ticket => ticket.Id == ticketId).FirstOrDefault();
             if (ticket == null)
             {
@@ -60,6 +61,11 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
                 logger.LogWarning("Cannot find the user related to this ticket");
                 return ticketImageBlob;
             }
+            if (ticket.Customer == null)
+            {
+                logger.LogWarning("Cannot find the customer related to this ticket");
+                return ticketImageBlob;
+            }
 
             using (var headerFont = new Font("Arial", 18, FontStyle.Bold))
             using (var textFont = new Font("Arial", 12, FontStyle.Regular))
@@ -72,7 +78,7 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
                 // Print concert details.
                 graphics.DrawString(ticket.Concert.Artist, headerFont, Brushes.DarkSlateBlue, new PointF(10, 10));
                 graphics.DrawString($"{ticket.Concert.Location}   |   {ticket.Concert.StartTime.UtcDateTime}", textFont, Brushes.Gray, new PointF(10, 40));
-                graphics.DrawString($"{ticket.User.DisplayName}   |   {ticket.Concert.Price.ToString("c")}", textFont, Brushes.Gray, new PointF(10, 60));
+                graphics.DrawString($"{ticket.Customer.Email}   |   {ticket.Concert.Price.ToString("c")}", textFont, Brushes.Gray, new PointF(10, 60));
 
                 // Print a fake barcode.
                 var random = new Random();
