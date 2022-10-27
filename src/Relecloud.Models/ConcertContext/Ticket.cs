@@ -11,6 +11,9 @@
         public string UserId { get; set; } = string.Empty;
         public User? User { get; set; }
 
+        public int CustomerId { get; set; }
+        public Customer? Customer { get; set; }
+
         public string TicketNumber { get; set; } = string.Empty;
     }
 }

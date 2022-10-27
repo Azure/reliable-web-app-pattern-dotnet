@@ -6,6 +6,7 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
     public class ConcertDataContext : DbContext
     {
         public DbSet<Concert> Concerts => Set<Concert>();
+        public DbSet<Customer> Customers => Set<Customer>();
         public DbSet<User> Users => Set<User>();
         public DbSet<Ticket> Tickets => Set<Ticket>();
 
@@ -19,11 +20,14 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Concert>()
+                .Ignore(c => c.NumberOfTicketsForSale);
+            modelBuilder.Entity<Customer>()
+                .HasIndex(c => new { c.Email })
+                .IsUnique();
             modelBuilder.Entity<TicketNumber>()
                 .HasIndex(tn => new { tn.Number, tn.ConcertId })
                 .IsUnique();
-            modelBuilder.Entity<Concert>()
-                .Ignore(c => c.NumberOfTicketsForSale);
         }
 
         public void Initialize()

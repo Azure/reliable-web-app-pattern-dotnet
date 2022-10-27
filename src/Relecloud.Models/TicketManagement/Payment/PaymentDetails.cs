@@ -11,6 +11,18 @@ namespace Relecloud.Web.Models.TicketManagement.Payment
         public string NameOnCard { get; set; } = string.Empty;
 
         [Required]
+        [MaxLength(70)]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(16)]
+        public string Email { get; set; }
+
+        [Required]
+        [MaxLength(16)]
+        public string Phone { get; set; }
+
+        [Required]
         [MaxLength(16)]
         [DisplayName("Card number")]
         // sample code -  a stronger credit card validation process is recommended
