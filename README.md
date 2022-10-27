@@ -135,7 +135,6 @@ azd env set SECONDARY_AZURE_LOCATION westus3
 > az account list-locations --query "[].name" -o tsv
 > ```
 
-<br />
 
 ### Provision the infrastructure
 
@@ -155,8 +154,6 @@ azd provision
 > subscription. If you log into the the
 > [Azure Portal](http://portal.azure.com) you can find them
 > in the resource group named `$myEnvironmentName-rg`.
-
-<br />
 
 ### Create App Registrations
 
