@@ -10,7 +10,13 @@
 }
 else
 {
-    <h2>You've booked @Model.TotalCount for our customers. Nice Job!</h2>
+    var ticketsText = "tickets";
+    if (Model.TotalCount == 1)
+    {
+        ticketsText = "ticket";
+    }
+
+    <h2>You've booked @Model.TotalCount @ticketsText for our customers. Nice Job!</h2>
     <div class="list-group">
         @foreach (var ticket in Model.Tickets)
         {
