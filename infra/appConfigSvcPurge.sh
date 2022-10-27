@@ -3,6 +3,7 @@
 # This script is a temporary workaround to a known issue
 # Executed from Github workflow it will handle purging soft-deleted Azure App Configuration Service instances
 # https://github.com/Azure/azure-dev/issues/248
+# https://github.com/Azure/azure-dev/issues/1018
 
 POSITIONAL_ARGS=()
 
