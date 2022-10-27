@@ -11,7 +11,7 @@ To Get Started on Scalable Web App Patterns, [Watch the Introduction Video (8 mi
 
 [![screenshot azd env new](./assets/Guide/Intro-video.png)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg)
 
-# Deploy to Azure
+# Getting Started
 
 The reference scenario in this sample is for Relecloud
 Concerts, a fictional company that sells concert tickets. Their website, is an illustrative example of an eCommerce application. This reference application uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions, 
@@ -29,6 +29,8 @@ The Relecloud team uses lower-price SKUs for non-prod workloads to manage costs 
 > Cost is estimated based on the **East US** and **West US 3** Azure Regions. For detailed cost analysis, refer to the cost section in the [accompanying guide](./ScalableWebApp.md#cost).
 
 ## Pre-requisites
+
+1. To run the scripts, Windows users require [Powershell 7.2 (LTS)](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) or above. Alternatively, you can use a bash terminal using [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install). macOS users can use a bash terminal.
 
 1. [Install the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli).
     Run the following command to verify that you're running version
@@ -55,7 +57,7 @@ The Relecloud team uses lower-price SKUs for non-prod workloads to manage costs 
     ```ps1
     dotnet --version
     ```
-## Deploy the code
+## Deploying to Azure
 
 Relecloud's developers use the `azd` command line experience to deploy the code. This means their local workflow is the same
 experience that runs from the GitHub action. You can use these
@@ -156,7 +158,7 @@ azd provision
 
 <br />
 
-#### Create App Registrations
+### Create App Registrations
 
 Relecloud devs have automated the process of creating Azure
 AD resources that support the authentication features of the
@@ -188,7 +190,7 @@ bash ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
 </tr>
 </table>
 
-#### Deploy the code
+### Deploy the code
 
 To finish the deployment process the Relecloud devs run the
 folowing `azd` commands to build, package, and deploy the dotnet
