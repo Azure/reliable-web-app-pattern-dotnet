@@ -44,7 +44,7 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
             };
         }
 
-        public async Task<ReserveTicketsResult> ReserveTicketsAsync(int concertId, string userId, int numberOfTickets)
+        public async Task<ReserveTicketsResult> ReserveTicketsAsync(int concertId, string userId, int numberOfTickets, int customerId)
         {
             var newTickets = new List<Ticket>();
             for(int i=0; i<numberOfTickets; i++)
@@ -53,6 +53,7 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
                 {
                     ConcertId= concertId,
                     UserId= userId,
+                    CustomerId = customerId
                     //TicketNumber = not used. planned for use when tickets become limited due to seating
                 };
                 database.Tickets.Add(newTicket);

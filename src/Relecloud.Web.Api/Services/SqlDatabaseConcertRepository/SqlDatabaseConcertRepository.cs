@@ -132,5 +132,41 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
         {
             return await this.database.Users.AsNoTracking().Where(u => u.Id == id).SingleOrDefaultAsync();
         }
+
+        public async Task<Customer?> GetCustomerByEmailAsync(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return null;
+            }
+
+            return await this.database.Customers.AsNoTracking()
+                .Where(u => u.Email.ToLower() == email.ToLower()).SingleOrDefaultAsync();
+        }
+
+        public async Task<CreateResult> CreateCustomerAsync(Customer newCustomer)
+        {
+            if (string.IsNullOrEmpty(newCustomer.Email))
+            {
+                throw new ArgumentNullException(nameof(newCustomer.Email));
+            }
+
+            var customer = await this.database.Customers
+                .FirstOrDefaultAsync(c => c.Email.ToLower() == newCustomer.Email.ToLower());
+            if (customer == null)
+            {
+                customer = new Customer
+                {
+                    Id = newCustomer.Id,
+                    Email = newCustomer.Email,
+                    Name = newCustomer.Name,
+                    Phone = newCustomer.Phone,
+                };
+                this.database.Customers.Add(customer);
+                await this.database.SaveChangesAsync();
+            }
+
+            return CreateResult.SuccessResult(customer.Id);
+        }
     }
 }

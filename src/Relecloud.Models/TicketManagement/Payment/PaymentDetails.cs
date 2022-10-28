@@ -6,9 +6,21 @@ namespace Relecloud.Web.Models.TicketManagement.Payment
     public class PaymentDetails : IValidatableObject
     {
         [Required]
-        [MaxLength(70)]
+        [MaxLength(75)]
         [DisplayName("Name on card")]
         public string NameOnCard { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(75)]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(75)]
+        public string Email { get; set; }
+
+        [Required]
+        [MaxLength(16)]
+        public string Phone { get; set; }
 
         [Required]
         [MaxLength(16)]

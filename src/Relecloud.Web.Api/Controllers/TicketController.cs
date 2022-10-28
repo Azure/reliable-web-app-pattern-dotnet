@@ -121,9 +121,25 @@ namespace Relecloud.Web.Api.Controllers
                     return BadRequest(PurchaseTicketsResult.ErrorResponse("We were unable to process this card. Please review your payment details."));
                 }
 
+                var customer = await this.concertRepository.GetCustomerByEmailAsync(purchaseTicketRequest.PaymentDetails.Email);
+                var customerId = customer?.Id ?? 0;
+                if (customerId == 0)
+                {
+                    var createResult = await this.concertRepository.CreateCustomerAsync(new Customer
+                    {
+                        Name = purchaseTicketRequest.PaymentDetails.Name,
+                        Email = purchaseTicketRequest.PaymentDetails.Email,
+                        Phone = purchaseTicketRequest.PaymentDetails.Phone,
+                    });
+                    if (createResult.Success)
+                    {
+                        customerId = createResult.NewId;
+                    }
+                }
+
                 foreach(var concertAndTickets in purchaseTicketRequest.ConcertIdsAndTicketCounts!)
                 {
-                    var reserveResult = await this.ticketService.ReserveTicketsAsync(concertAndTickets.Key, purchaseTicketRequest.UserId!, concertAndTickets.Value);
+                    var reserveResult = await this.ticketService.ReserveTicketsAsync(concertAndTickets.Key, purchaseTicketRequest.UserId!, concertAndTickets.Value, customerId);
 
                     if (reserveResult.Status != ReserveTicketsResultStatus.Success)
                     {

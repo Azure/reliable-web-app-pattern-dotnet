@@ -62,5 +62,15 @@ namespace Relecloud.Web.Api.Services.MockServices
         public void Initialize()
         {
         }
+
+        public Task<CreateResult> CreateCustomerAsync(Customer newCustomer)
+        {
+            return Task.FromResult(new CreateResult());
+        }
+
+        public Task<Customer?> GetCustomerByEmailAsync(string email)
+        {
+            return Task.FromResult<Customer?>(null);
+        }
     }
 }

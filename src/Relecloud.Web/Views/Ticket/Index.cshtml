@@ -1,7 +1,7 @@
 ﻿@model TicketViewModel
 
 @{
-    ViewData["Title"] = "Your Tickets";
+    ViewData["Title"] = "Tickets you've booked";
 }
 <h1>@ViewData["Title"]</h1>
 @if (Model == null || Model.Tickets == null || !Model.Tickets.Any())
@@ -10,6 +10,13 @@
 }
 else
 {
+    var ticketsText = "tickets";
+    if (Model.TotalCount == 1)
+    {
+        ticketsText = "ticket";
+    }
+
+    <h2>You've booked @Model.TotalCount @ticketsText for our customers. Nice Job!</h2>
     <div class="list-group">
         @foreach (var ticket in Model.Tickets)
         {
@@ -26,7 +33,7 @@ else
                 </h4>
                 @if (string.IsNullOrEmpty(ticket.ImageUrl))
                 {
-                    <div class="offset-top-md alert alert-warning">Your ticket is being generated, please check back later.</div>
+                    <div class="offset-top-md alert alert-warning">The customer's ticket is being generated, please check back later.</div>
                 }
                 else
                 {

@@ -21,7 +21,7 @@ namespace Relecloud.Web.Api.Services.MockServices
             });
         }
 
-        public Task<ReserveTicketsResult> ReserveTicketsAsync(int concertId, string userId, int numberOfTickets)
+        public Task<ReserveTicketsResult> ReserveTicketsAsync(int concertId, string userId, int numberOfTickets, int customerId)
         {
             return Task.FromResult(new ReserveTicketsResult
             {

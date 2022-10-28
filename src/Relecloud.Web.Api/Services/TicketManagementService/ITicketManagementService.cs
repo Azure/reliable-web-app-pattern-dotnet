@@ -6,6 +6,6 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
     {
         Task<CountAvailableTicketsResult> CountAvailableTicketsAsync(int concertId);
         Task<HaveTicketsBeenSoldResult> HaveTicketsBeenSoldAsync(int concertId);
-        Task<ReserveTicketsResult> ReserveTicketsAsync(int concertId, string userId, int numberOfTickets);
+        Task<ReserveTicketsResult> ReserveTicketsAsync(int concertId, string userId, int numberOfTickets, int customerId);
     }
 }
