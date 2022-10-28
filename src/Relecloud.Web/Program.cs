@@ -41,11 +41,18 @@ if (hasRequiredConfigSettings)
     startup.ConfigureServices(builder.Services);
 }
 
+var hasAzureAdSettings = !string.IsNullOrEmpty(builder.Configuration["AzureAd:ClientId"]);
+
 var app = builder.Build();
 
-if (hasRequiredConfigSettings)
+if (hasRequiredConfigSettings && hasAzureAdSettings)
 {
     startup.Configure(app, app.Environment);
+}
+else if (!hasAzureAdSettings)
+{
+    app.MapGet("/", () => $"" +
+    "Could not find required Azure AD settings. Check your App Config Service, you may need to run the createAppRegistrations script.");
 }
 else
 {
