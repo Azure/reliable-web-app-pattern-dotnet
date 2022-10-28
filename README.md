@@ -446,8 +446,9 @@ environment.
 Run the following commands to change the windows line endings to linux line endings:
 
 ```bash
-sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
+sed "s/$(printf '\r')\$//" -i ./infra/appConfigSvcPurge.sh
 sed "s/$(printf '\r')\$//" -i ./infra/addLocalIPToSqlFirewall.sh
+sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
 sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
 sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
 sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
