@@ -4,17 +4,22 @@ using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddAzureAppConfiguration(options =>
+var hasRequiredConfigSettings = !string.IsNullOrEmpty(builder.Configuration["Api:AppConfig:Uri"]);
+
+if (hasRequiredConfigSettings)
 {
-    options
-        .Connect(new Uri(builder.Configuration["Api:AppConfig:Uri"]), new DefaultAzureCredential())
-        .ConfigureKeyVault(kv =>
-        {
-            // In this setup, we must provide Key Vault access to setup
-            // App Congiruation even if we do not access Key Vault settings
-            kv.SetCredential(new DefaultAzureCredential());
-        });
-});
+    builder.Configuration.AddAzureAppConfiguration(options =>
+    {
+        options
+            .Connect(new Uri(builder.Configuration["Api:AppConfig:Uri"]), new DefaultAzureCredential())
+            .ConfigureKeyVault(kv =>
+            {
+                // In this setup, we must provide Key Vault access to setup
+                // App Congiruation even if we do not access Key Vault settings
+                kv.SetCredential(new DefaultAzureCredential());
+            });
+    });
+}
 
 // enable developers to override settings with user secrets
 builder.Configuration.AddUserSecrets<Program>(optional: true);
@@ -31,10 +36,20 @@ if (builder.Environment.IsDevelopment())
 var startup = new Startup(builder.Configuration);
 
 // Add services to the container.
-startup.ConfigureServices(builder.Services);
+if (hasRequiredConfigSettings)
+{
+    startup.ConfigureServices(builder.Services);
+}
 
 var app = builder.Build();
 
-startup.Configure(app, app.Environment);
+if (hasRequiredConfigSettings)
+{
+    startup.Configure(app, app.Environment);
+}
+else
+{
+    app.MapGet("/", () => "Could not find required settings. Check your App Service's Configuration section to verify the required settings.");
+}
 
 app.Run();
