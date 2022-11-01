@@ -49,6 +49,7 @@ module devOpsIdentitySetup './devOpsIdentitySetup.bicep' = {
 }
 
 // temporary workaround for multiple resource group bug
+// https://github.com/Azure/azure-dev/issues/690
 // `azd down` expects to be able to delete this resource because it was listed by the azure deployment output even when it is not deployed
 resource secondaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: secondaryResourceGroupName
