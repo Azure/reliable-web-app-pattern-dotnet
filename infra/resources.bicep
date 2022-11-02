@@ -213,6 +213,9 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
         }
       }
     }
+    dependsOn: [
+      appSettings
+    ]
   }
 }
 
@@ -284,6 +287,9 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
         }
       }
     }
+    dependsOn: [
+      appSettings
+    ]
   }
 }
 
