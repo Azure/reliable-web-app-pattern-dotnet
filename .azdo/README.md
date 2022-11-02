@@ -2,6 +2,9 @@
 
 This document will show you how to configure an Azure DevOps pipeline that uses the Azure Developer CLI. This can be configured by running the  `azd pipeline config --provider azdo` command.
 
+> Note: Before you can run this `azd` command you must ensure that the remote origin for source control is set to your Azure DevOps Organization.
+> Note: The `azd` command expects the origin URL in a specific format. Please review [this issue](https://github.com/Azure/azure-dev/issues/1072) for guidance.
+
 You will find a default Azure DevOps pipeline file in `./.azdo/pipelines/azure-dev.yml`. It will provision your Azure resources and deploy your code upon pushes and pull requests.
 
 You are welcome to use that file as-is or modify it to suit your needs.
