@@ -53,7 +53,7 @@ if ($groupExists -eq 'false') {
 ### validate web app settings ###
 
 # checking for known issue 87
-# https://github.com/Azure/scalable-web-app-pattern-dotnet/issues/87
+# https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/87
 
 $frontEndWebAppName=$(az resource list -g "$ResourceGroupName" --query "[? tags.\`"azd-service-name\`" == 'web' ].name" -o tsv)
 

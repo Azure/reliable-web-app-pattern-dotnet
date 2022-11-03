@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates two Azure AD app registrations for the scalable-web-app-pattern-dotnet
+    Creates two Azure AD app registrations for the reliable-web-app-pattern-dotnet
     and saves the configuration data in App Configuration Svc and Key Vault.
 
     <This command should only be run after using the azd command to deploy resources to Azure>
