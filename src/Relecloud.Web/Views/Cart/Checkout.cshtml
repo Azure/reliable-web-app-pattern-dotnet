@@ -53,7 +53,6 @@
                 <div class="mb-3">
                     <label asp-for="PaymentDetails!.CardNumber" class="form-label"></label>
                     <select asp-for="PaymentDetails!.CardNumber" asp-items="Model.GetSampleCardNumbers()" class="form-select"></select>
-                    <input asp-for="PaymentDetails!.CardNumber" class="form-control" />
                     <span asp-validation-for="PaymentDetails!.CardNumber" class="text-danger"></span>
                 </div>
                 <div class="mb-3">
