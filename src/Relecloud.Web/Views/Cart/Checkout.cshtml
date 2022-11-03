@@ -52,12 +52,8 @@
                 </div>
                 <div class="mb-3">
                     <label asp-for="PaymentDetails!.CardNumber" class="form-label"></label>
-                    <environment names="Development">
-                        <select asp-for="PaymentDetails!.CardNumber" asp-items="Model.GetSampleCardNumbers()" class="form-select"></select>
-                    </environment>
-                    <environment exclude="Development">
-                        <input asp-for="PaymentDetails!.CardNumber" class="form-control" />
-                    </environment>
+                    <select asp-for="PaymentDetails!.CardNumber" asp-items="Model.GetSampleCardNumbers()" class="form-select"></select>
+                    <input asp-for="PaymentDetails!.CardNumber" class="form-control" />
                     <span asp-validation-for="PaymentDetails!.CardNumber" class="text-danger"></span>
                 </div>
                 <div class="mb-3">
@@ -67,12 +63,7 @@
                 </div>
                 <div class="mb-3">
                     <label asp-for="PaymentDetails!.SecurityCode" class="form-label"></label>
-                    <environment names="Development">
-                        <select asp-for="PaymentDetails!.SecurityCode" asp-items="Model.GetSampleSecurityCodes()" class="form-select"></select>
-                    </environment>
-                    <environment exclude="Development">
-                        <input asp-for="PaymentDetails!.SecurityCode" class="form-control" />
-                    </environment>
+                    <select asp-for="PaymentDetails!.SecurityCode" asp-items="Model.GetSampleSecurityCodes()" class="form-select"></select>
                     <span asp-validation-for="PaymentDetails!.SecurityCode" class="text-danger"></span>
                 </div>
             </fieldset>
