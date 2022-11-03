@@ -8,6 +8,7 @@
         {
             return new CreateResult
             {
+                Success = true,
                 NewId = id,
             };
         }
