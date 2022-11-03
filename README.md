@@ -1,13 +1,13 @@
-# Scalable Web App Pattern
+# Reliable Web App Pattern
 
-This repository provides resources to help developers build a Scalable web app on Azure. A Scalable Web App is a set of services, code, and infrastructure deployed in Azure that applies practices from the Well-Architected Framework. This pattern is shared with three components to help you use Azure to build a web app that follows Microsoft's recommended guidance for achieving reliability, scalability, and security in the cloud.
+This repository provides resources to help developers build a Reliable web app on Azure. A Reliable Web App is a set of services, code, and infrastructure deployed in Azure that applies practices from the Well-Architected Framework. This pattern is shared with three components to help you use Azure to build a web app that follows Microsoft's recommended guidance for achieving reliability, scalability, and security in the cloud.
 
-3 components of the Scalable web app are:
-* [A Guide](ScalableWebApp.md) that demonstrates the guidance and explains the context surrounding the decisions that were made to build this solution
+3 components of the Reliable web app are:
+* [A Guide](ReliableWebApp.md) that demonstrates the guidance and explains the context surrounding the decisions that were made to build this solution
 * A starting point solution that demonstrates how these decisions were implemented as code
 * A starting point deployment pipeline with bicep resources that demonstrate how the infrastructure decisions were implemented
 
-To Get Started on Scalable Web App Patterns, [Watch the Introduction Video (8 mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg):
+To Get Started on Reliable Web App Patterns, [Watch the Introduction Video (8 mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg):
 
 [![screenshot azd env new](./assets/Guide/Intro-video.png)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg)
 
@@ -26,7 +26,7 @@ The Relecloud team uses lower-price SKUs for non-prod workloads to manage costs 
 | ✅**Dev/Test** | 99.56% | $244 per environment | Lower price SKUs used.  |
 | ✅**Production** | 99.98% | $2,039.60 | Premium SKUs used for **High Availability**.   |
 
-> Cost is estimated based on the **East US** and **West US 3** Azure Regions. For detailed cost analysis, refer to the cost section in the [accompanying guide](./ScalableWebApp.md#cost).
+> Cost is estimated based on the **East US** and **West US 3** Azure Regions. For detailed cost analysis, refer to the cost section in the [accompanying guide](./ReliableWebApp.md#cost).
 
 ## Pre-requisites
 
@@ -458,7 +458,7 @@ sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
 
 This issue is due to missing configuration on your App Service you should **re-run** the `azd provision` command. The Azure Dev CLI performs incremental deployments that will overlay the correct settings on the existing App Service.
 
-> This is a known issue and we are tracking it [here](https://github.com/Azure/scalable-web-app-pattern-dotnet/issues/87).
+> This is a known issue and we are tracking it [here](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/87).
 
 ## Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
 
