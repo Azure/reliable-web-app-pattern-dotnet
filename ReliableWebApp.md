@@ -42,9 +42,9 @@ upon which they will achieve their longer-term objectives in later
 phases. The following solution diagram shows the reference architecture
 that we'll discuss for the rest of the guide.
 
-![Scalable web app architecture diagram](./assets/Guide/ScalableWebAppArchitectureDiagram.png)
+![Reliable web app architecture diagram](./assets/Guide/ReliableWebAppArchitectureDiagram.png)
 
-## Well Architected Scalable Web Application Pillars
+## Well Architected Reliable Web Application Pillars
 
 The five pillars of the Azure Well-Architected Framework provide guiding
 tenets that improve the quality of cloud applications. The five pillars
@@ -131,7 +131,7 @@ private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
 ```
 
 <sup>Sample code demonstrates how to use **Polly** to retry api calls to the
-Concert Search Service. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L85)</sup>
+Concert Search Service. [Link to Startup.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L85)</sup>
 
 In this sample we see that the dependency injection for the
 `IConcertSearchService` object is configured so that whenever a class,
@@ -178,7 +178,7 @@ private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
 ```
 
 <sup>Sample code shows how to use Polly to add Circuit Breaker behavior to
-web API calls. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L115)</sup>
+web API calls. [Link to Startup.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L115)</sup>
 
 In the Polly library the `HandleTransientHttpError()` will trigger the policy
 if the web app receives a 5XX or 408 HTTP status code. And, if the front-end
@@ -261,7 +261,7 @@ var redisCacheFamilyName = isProd ? 'C' : 'C'
 var redisCacheCapacity = isProd ? 1 : 0
 ```
 
-<sup>Sample code shows how to choose Azure Cache for Redis SKU. [Link to azureRedisCache.bicep](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4704f6f43bb9669ebd97716e9e7b6e8ba97d6ebf/infra/azureRedisCache.bicep#L21)</sup>
+<sup>Sample code shows how to choose Azure Cache for Redis SKU. [Link to azureRedisCache.bicep](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4704f6f43bb9669ebd97716e9e7b6e8ba97d6ebf/infra/azureRedisCache.bicep#L21)</sup>
 
 In production the StandardC1 offers:
 
@@ -292,7 +292,7 @@ the requirements to align with non-prod usage patterns.
 > understand reserved pricing options that can reduce the cost of production
 > workloads.
 
-<!-- todo - add budgets - https://github.com/Azure/scalable-web-app-pattern-dotnet/issues/78
+<!-- todo - add budgets - https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/78
 
 ### Set up budgets and maintain cost constraints
 After estimating the initial cost, set budgets and alerts at different scopes to measure the cost. One cost driver can be unrestricted resources. These resources typically need to scale and consume more cost to meet demand.
@@ -330,7 +330,7 @@ resource webAppScaleRule 'Microsoft.Insights/autoscalesettings@2021-05-01-previe
 }
 ```
 
-<sup>Abbreviated sample code shows autoscalesettings for web apps. [Link to resources.bicep](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4704f6f43bb9669ebd97716e9e7b6e8ba97d6ebf/infra/resources.bicep#L343)</sup>
+<sup>Abbreviated sample code shows autoscalesettings for web apps. [Link to resources.bicep](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4704f6f43bb9669ebd97716e9e7b6e8ba97d6ebf/infra/resources.bicep#L343)</sup>
 
 Adding these rules, to production only, enables the web app to scale from 1 instance up to 10 instances. As demand decreases the web app will also scale
 back down to 1 instance so that the cost of the website is not based on the
@@ -365,7 +365,7 @@ module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
 }
 ```
 
-<sup>Abbreviated sample code shows dynamically choosing multiregional deploment. [Link to main.bicep](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4704f6f43bb9669ebd97716e9e7b6e8ba97d6ebf/infra/main.bicep#L53)</sup>
+<sup>Abbreviated sample code shows dynamically choosing multiregional deploment. [Link to main.bicep](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4704f6f43bb9669ebd97716e9e7b6e8ba97d6ebf/infra/main.bicep#L53)</sup>
 
 The Relecloud team uses this `secondaryAzureLocation` parameter to dynamically
 choose the correct Azure region and understand if the deployment should align
@@ -471,7 +471,7 @@ public void ConfigureServices(IServiceCollection services)
 ```
 
 <sup>Abbreviated sample code shows how to set up Application Insights.
-[Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L38)</sup>
+[Link to Startup.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L38)</sup>
 
 Adding this setting enables us to see the following types of dashboards
 in the Azure Portal.
@@ -511,7 +511,7 @@ this.telemetryClient.TrackEvent("AddToCart", new Dictionary<string, string> {
 ```
 
 <sup>Sample code show how to track a business event with additional data for
-reporting [Link to CartController.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Controllers/CartController.cs#L81)</sup>
+reporting [Link to CartController.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Controllers/CartController.cs#L81)</sup>
 
 These custom events can be found in the Azure Portal on the **Events** tab
 for the Application Insights resource.
@@ -586,7 +586,7 @@ private void AddAzureCacheForRedis(IServiceCollection services)
 ```
 
 <sup>Sample code demonstrates how the web app connects to Azure Cache for
-Redis. [Link to Startup.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L50)</sup>
+Redis. [Link to Startup.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L50)</sup>
 
 Once the app is started, the cache is empty until the first request is
 made to the **Upcoming Concerts Page**. ASP.NET Core uses the `SqlDatabaseConcertRepository` to retrieve data from Azure SQL so it can be
@@ -620,7 +620,7 @@ public async Task<ICollection<Concert>> GetUpcomingConcertsAsync(int count)
     return concerts ?? new List<Concert>();
 }
 ```
-<sup>Sample code demonstrates how to use Redis with Azure SQL. [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L67)</sup>
+<sup>Sample code demonstrates how to use Redis with Azure SQL. [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L67)</sup>
 
 The purpose of this method is to access the database and retrieve
 the ten latest Concerts. It filters by time, sorts, and returns data to the
@@ -652,7 +652,7 @@ but the right duration for the cache will vary for every scenario.
 > }
 > ```
 > <sup>Sample code demonstrates how to invalidate cache when using Repository Pattern.
-> [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/scalable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L28)</sup>
+> [Link to SqlDatabaseConcertRepository.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web.Api/Services/SqlDatabaseConcertRepository/SqlDatabaseConcertRepository.cs#L28)</sup>
 
 
 # Deploying the solution and local development
@@ -788,7 +788,7 @@ Database met all our requirements:
 
 - a fully managed SQL database instance
 
-- scalable to support high user load
+- reliable to support high user load
 
 - high availability and multi-region redundancy
 
