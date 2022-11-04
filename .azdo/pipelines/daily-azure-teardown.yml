@@ -4,7 +4,7 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-container: azdevcliextacr.azurecr.io/azure-dev:daily
+container: mcr.microsoft.com/azure-dev-cli-apps:latest
 variables:
       - name: env_name
         value: $(AZD_AZURE_ENV_NAME)daily
