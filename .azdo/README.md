@@ -1,44 +1,76 @@
 # Azure DevOps Pipeline Configuration
 
-This document will show you how to configure an Azure DevOps pipeline that uses the Azure Developer CLI. This can be configured by running the  `azd pipeline config --provider azdo` command.
+This document will show you how to configure an Azure DevOps pipeline that uses the Azure Developer CLI. 
 
-> Note: Before you can run this `azd` command you must ensure that the remote origin for source control is set to your Azure DevOps Organization.
-> Note: The `azd` command expects the origin URL in a specific format. Please review [this issue](https://github.com/Azure/azure-dev/issues/1072) for guidance.
+You will find a default Azure DevOps pipeline file in `./.azdo/pipelines/daily-azure-dev.yml`. It will provision your Azure resources and deploy your code on a daily schedule.
 
-You will find a default Azure DevOps pipeline file in `./.azdo/pipelines/azure-dev.yml`. It will provision your Azure resources and deploy your code upon pushes and pull requests.
+You are welcome to use the file as-is or modify it to suit your needs.
 
-You are welcome to use that file as-is or modify it to suit your needs.
+> First time setup: This pipeline does not ask you to store credentials that can access Azure AD. As such, you will need to run the `createAppRegistrations.sh` script with your account for a first time setup. This process can be added to the pipeline as an idempotent script but will require an Azure AD account to create the App Registrations.
 
-## Create or Use Existing Azure DevOps Organization
+## Getting Started
+The following steps are required to get started.
+
+1. Create or Use Existing Azure DevOps Organization
+2. Create a Service Connection
+3. Create a pipeline
+
+### 1. Create or Use Existing Azure DevOps Organization
 
 To run a pipeline in Azure DevOps, you'll first need an Azure DevOps organization. You must create an organization using the Azure DevOps portal here: https://dev.azure.com.
 
-Once you have that organization, copy and paste it below, then run the commands to set those environment variables.
+### 2. Create a Service Connection
 
-```bash
-export AZURE_DEVOPS_ORG_NAME="<Azure DevOps Org Name>"
-```
+To deploy resources to Azure this pipeline uses a service connection. Use this link to create a service connection named `azconnection` so that the pipeline can access your Azure subscription.
 
-This can also be set as an Azure Developer CLI environment via the command:
+[Service connections in Azure Pipelines - Azure Pipelines](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml)
 
-```bash
-azd env set AZURE_DEVOPS_ORG_NAME "<Azure DevOps Org Name>"
-```
-> AZURE_DEVOPS_ORG_NAME: The name of the Azure DevOps organization that you just created or existing one that you want to use.
+### 3. Create a pipeline
 
-## Create a Personal Access Token
+The following steps walk-through creating the Azure Pipeline.
 
-The Azure Developer CLI relies on an Azure DevOps Personal Access Token (PAT) to configure an Azure DevOps project. The Azure Developer CLI will prompt you to create a PAT and provide [documentation on the PAT creation process](https://aka.ms/azure-dev/azdo-pat).
+1. Start by navigating to the Azure DevOps Pipeline page
+
+    ![#Azure DevOps Pipeline Page](../assets/AzdoSetup/1CreateAPipeline.png)
+
+    <sup>Image of Azure DevOps Pipeline Page</sup>  
+
+2. Click the `New pipeline` button
+
+3. Choose **Azure Repos Git** and the appropriate git repository
+
+    ![#Azure Pipeline asks where your code is](../assets/AzdoSetup/2CreateAPipeline.png)
+    
+    <sup>Azure Pipeline asks where your code is</sup>  
+
+4. Choose **Existing Azure Pipelines YAML file**
 
 
-```bash
-export AZURE_DEVOPS_EXT_PAT=<PAT>
-```
-> AZURE_DEVOPS_EXT_PAT: The Azure DevOps Personal Access Token that you just created or existing one that you want to use.
+    ![#Azure Pipeline asks to pick a template](../assets/AzdoSetup/3CreateAPipeline.png)
+    
+    <sup>Azure Pipeline asks to pick a template</sup> 
 
-## Invoke the Pipeline configure command
+5. Select the *daily-azure-dev.yml* file from your repo
 
-By running `azd pipeline config --provider azdo` you can instruct the Azure Developer CLI to configure an Azure DevOps Project and Repository with a deployment Pipeline.
+    ![#Pick the daily-azure-dev.yml file](../assets/AzdoSetup/4CreateAPipeline.png)
+    
+    <sup>Pick the daily-azure-dev.yml file</sup> 
+
+6. On the next screen you must provide 3 pipeline variables
+
+    ![#Set Pipeline variables](../assets/AzdoSetup/5CreateAPipeline.png)
+    
+    <sup>Set Pipeline variables</sup> 
+
+    |Variable Name | Value |
+    |----|----|
+    |AZURE_SUBSCRIPTION_ID| {find this GUID in the Azure Portal} |
+    |AZURE_LOCATION| *eastus* |
+    |AZD_AZURE_ENV_NAME | *relecloudresources* |
+
+7. Click the `Run` button to start your first pipeline
+
+> Note: Because the pipeline does not configure your Azure AD resources you must configure the Azure AD App Registrations and place those values into Key Vault and App Configuration Service before the application will run successfully. We provide the `createAppRegistration.sh` script to do this one-time setup.
 
 ## Conclusion
 
