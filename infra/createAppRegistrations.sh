@@ -69,6 +69,8 @@ if [[ $group2Exists -eq 'false' ]]; then
     secondaryResourceGroupName=''
 fi
 
+mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+
 echo "Derived inputs"
 echo "----------------------------------------------"
 echo "keyVaultName=$keyVaultName"
@@ -99,6 +101,10 @@ userObjectId=$(az account show --query "id" -o tsv)
 
 echo "tenantId='$tenantId'"
 echo ""
+
+# Resolves permission constraint that prevents the deploymentScript from running this command
+# https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
+az sql server update -n $mySqlServer -g $resourceGroupName --set publicNetworkAccess="Disabled" > /dev/null
 
 frontEndWebObjectId=$(az ad app list --filter "displayName eq '$frontEndWebAppName'" --query "[].id" -o tsv)
 

@@ -108,7 +108,6 @@ namespace Relecloud.Web
 
             return HttpPolicyExtensions
               .HandleTransientHttpError()
-              .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
               .WaitAndRetryAsync(delay);
         }
 
@@ -116,6 +115,7 @@ namespace Relecloud.Web
         {
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
+                .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
                 .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
         }
 

@@ -48,4 +48,10 @@ $customRuleName = "devbox_$((Get-Date).ToString("yyyy-mm-dd_HH-MM-ss"))"
 
 Write-Debug "`$customRuleName = '$customRuleName'"
 
+# Resolves permission constraint that prevents the deploymentScript from running this command
+# https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
+az sql server update -n $mySqlServer -g $ResourceGroupName --set publicNetworkAccess="Enabled" > $null
+
+Write-Debug "Change Rule"
+
 az sql server firewall-rule create -g $ResourceGroupName -s $mySqlServer -n $customRuleName --start-ip-address $myIpAddress --end-ip-address $myIpAddress
