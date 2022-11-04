@@ -39,4 +39,9 @@ fi
 
 myIpAddress=$(wget -q -O - ipinfo.io/ip)
 mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+
+# Resolves permission constraint that prevents the deploymentScript from running this command
+# https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
+az sql server update -n $mySqlServer -g $resourceGroupName --set publicNetworkAccess="Enabled" > /dev/null
+
 az sql server firewall-rule create -g $resourceGroupName -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress

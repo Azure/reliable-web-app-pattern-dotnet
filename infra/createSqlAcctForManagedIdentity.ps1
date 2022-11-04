@@ -41,7 +41,3 @@ Invoke-Sqlcmd -ServerInstance $ServerUri -database $CatalogName -Username $SqlAd
 # Restrict access to Azure AD users
 Enable-AzSqlServerActiveDirectoryOnlyAuthentication -ServerName $ServerName -ResourceGroupName $ResourceGroupName
 
-# IF PROD: Then restrict network access
-if ($IsProd) {
-  Set-AzSqlServer -ServerName $ServerName -PublicNetworkAccess 'disabled' -ResourceGroupName $ResourceGroupName
-}
