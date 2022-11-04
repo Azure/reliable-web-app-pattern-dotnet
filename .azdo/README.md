@@ -72,9 +72,3 @@ The following steps walk-through creating the Azure Pipeline.
 
 > Note: Because the pipeline does not configure your Azure AD resources you must configure the Azure AD App Registrations and place those values into Key Vault and App Configuration Service before the application will run successfully. We provide the `createAppRegistration.sh` script to do this one-time setup.
 
-## Conclusion
-
-That is everything you need to have in place to get the Azure DevOps pipeline running. You can verify that it is working by going to the Azure DevOps portal (https://dev.azure.com) and finding the project you just created.
-
-
-
