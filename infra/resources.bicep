@@ -717,6 +717,7 @@ resource redisPvtEndpointDnsGroupName 'Microsoft.Network/privateEndpoints/privat
   }
 }
 
+// private link for Key vault
 
 resource privateDnsZoneNameForKv 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: 'privatelink.vaultcore.azure.net'
@@ -740,7 +741,7 @@ resource privateDnsZoneNameForKv_link 'Microsoft.Network/privateDnsZones/virtual
   }
 }
 
-resource kvPvtEndpointDnsGroupName 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
+resource pvtEndpointDnsGroupNameForKv 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
   name: '${privateEndpointForKv.name}/mydnsgroupname'
   properties: {
     privateDnsZoneConfigs: [
@@ -775,6 +776,67 @@ resource privateEndpointForKv 'Microsoft.Network/privateEndpoints@2020-07-01' = 
     ]
   }
 }
+
+// private link for App Config Svc
+
+resource privateDnsZoneNameForAppConfig 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'privatelink.azconfig.io'
+  location: 'global'
+  tags: tags
+  dependsOn: [
+    vnet
+  ]
+}
+
+resource privateDnsZoneNameForAppConfig_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDnsZoneNameForAppConfig
+  name: '${privateDnsZoneNameForAppConfig.name}-link'
+  location: 'global'
+  tags: tags
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: vnet.id
+    }
+  }
+}
+
+resource pvtEndpointDnsGroupNameForAppConfig 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-07-01' = {
+  name: '${privateEndpointForAppConfig.name}/mydnsgroupname'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'config1'
+        properties: {
+          privateDnsZoneId: privateDnsZoneNameForAppConfig.id
+        }
+      }
+    ]
+  }
+}
+
+resource privateEndpointForAppConfig 'Microsoft.Network/privateEndpoints@2020-07-01' = {
+  name: 'privateEndpointForAppConfig'
+  location: location
+  tags: tags
+  properties: {
+    subnet: {
+      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, privateEndpointSubnetName)
+    }
+    privateLinkServiceConnections: [
+      {
+        name: appConfigSvc.name
+        properties: {
+          privateLinkServiceId: appConfigSvc.id
+          groupIds: [
+            'configurationStores'
+          ]
+        }
+      }
+    ]
+  }
+}
+
 
 output WEB_URI string = web.properties.defaultHostName
 output API_URI string = api.properties.defaultHostName
