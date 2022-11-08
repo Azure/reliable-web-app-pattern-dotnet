@@ -1,5 +1,7 @@
 # Reliable web application
 
+This guidance deploys a sample eCommerce web application that sells concert tickets. It uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions,and creating Azure AD App Registrations.
+
 This guide demonstrates how principles from the [Well-Architected Framework](https://docs.microsoft.com/azure/architecture/framework/) and [Twelve-Factor Applications](https://12factor.net/) can be applied to migrate and modernize a legacy, line-of-business (LOB) web app to the cloud. A reference architecture is included to showcase a production ready solution which can be easily deployed for learning and experimentation.
 
 The deployable artifacts create a modernized LOB web application that has improved reliability, security, performance, and more mature operational practices at a predictable cost. This phase also provides a foundation upon which they will achieve their longer-term objectives in later phases. The following solution diagram shows the reference architecture that we'll discuss for the rest of the guide.

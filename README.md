@@ -16,7 +16,3 @@ This repository contains the following guidance to show you how to build a relia
 To Get Started on Reliable Web App Patterns, [Watch the Introduction Video (8 mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg):
 
 [![screenshot azd env new](./assets/Guide/Intro-video.jpg)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg)
-
-## Getting Started
-
-This guidance deploys a sample eCommerce web application that sells concert tickets. It uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions,and creating Azure AD App Registrations.
