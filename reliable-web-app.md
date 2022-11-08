@@ -40,7 +40,12 @@ For our architecture, we have chosen a set of services based on the following cr
 - Our target SLA is 99.9%
 - We expect an average daily user load will be around 1,000 users
 
-**App Service** - App Service is a key piece of our hosting infrastructure. App Service
+**App Service** - hosts
+    web applications allowing autoscaling and high availability without
+    having to manage infrastructure. This is where the Relecloud
+    Concerts web app will be deployed.
+
+App Service is a key piece of our hosting infrastructure. App Service
 Web Apps meets the following requirements for hosting our app:
 
 - the service provides a 99.95% uptime SLA for our app
@@ -236,8 +241,11 @@ We can use Key Vault to manage our certificate used to encrypt our
 storage account, and  [private endpoints](https://docs.microsoft.com/azure/private-link/private-endpoint-overview) to allow clients to securely access data over a
 [Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview).
 
-**Azure Private DNS / Azure Private Link** - Azure Private Link enables you to access PaaS Services (such as, Azure Cache for Redis and SQL Database) over a private endpoint in your virtual network.
-Traffic between your virtual network and the service travels across the Microsoft backbone network. Exposing your service to the public internet is no longer necessary.
+**Private DNS Zone & Private Link**
+[Azure Private DNS](https://docs.microsoft.com/azure/dns/private-dns-overview) provides a reliable and secure DNS service for your virtual network. Azure Private DNS manages and resolves domain names in the virtual
+    network without the need to configure a custom DNS solution.
+
+[Azure Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview) enables you to access PaaS Services (such as, Azure Cache for Redis and SQL Database) over a private endpoint in your virtual network. Traffic between your virtual network and the service travels across the Microsoft backbone network. Exposing your service to the public internet is no longer necessary.
 
 Using Azure Private DNS with Azure Private Link enables your solution to communicate securely with Azure services like Azure SQL Database.
 Azure Private DNS integrates with Azure App Service to extend DNS resolution so that the private IP address is provided for public hostnames.
@@ -890,14 +898,3 @@ and deploy the code. [Follow the implementation guidelines](implementation.md) t
 - [Azure Storage](https://docs.microsoft.com/azure/storage/common/storage-introduction)
     provides storage for files and queue storage for message driven
     communication.
-
-- [Azure Private DNS](https://docs.microsoft.com/azure/dns/private-dns-overview)
-    provides a reliable and secure DNS service for your virtual network.
-    Azure Private DNS manages and resolves domain names in the virtual
-    network without the need to configure a custom DNS solution.
-
-- [Azure Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview)
-    enables you to access Azure PaaS Services over a Private Endpoint in
-    your virtual network. A Private Endpoint is a network interface that
-    uses a private IP address from your virtual network. This connects
-    you privately and securely to a service such as Azure SQL Database.
