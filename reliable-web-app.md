@@ -8,13 +8,22 @@ The deployable artifacts create a modernized LOB web application that has improv
 
 ## Use cases
 
-This reliable application pattern can help attain short- and long-term goals. We’ve identified a few of these goals in the table below.
+This reliable application pattern can help attain short- and long-term goals.
 
-| Type | Goals |
-| --- | --- |
-| Short term | <ul><li>modernize a web application to sustain additional volume</li><li>maturing development team practices for modern development and operations</li></ul>|
-| Long term |<ul><li>maturing development team practices for modern development and operations</li><li>open an application to online customers with web and mobile experiences</li><li>improve availability</li><li>reduce the time required to deliver new features to the application</li><li>scale different components of the system independently to handle traffic spikes without compromising security</li></ul>|
-| Cost | The solution provides three cost-optimized environments. The production environment costs between $2,000 and $3,000 per month with SLAs of 99.98%. The development and testing environments cost between $200-$300 per month per environment with SLAs of 99.56%.
+**Short-term goals** 
+
+- modernize a web application to sustain additional volume
+- mature development team practices for modern development and operations
+
+**Long term goals**
+
+- maturing development team practices for modern development and operations
+- open an application to online customers with web and mobile experiences
+- improve availability
+- reduce the time required to deliver new features to the application
+- scale different components of the system independently to handle traffic spikes without compromising security
+
+**Predictable cost** - The solution provides three cost-optimized environments. The production environment costs between $2,000 and $3,000 per month with SLAs of 99.98%. The development and testing environments cost between $200-$300 per month per environment with SLAs of 99.56%.
 
 ## Architecture
 
@@ -243,24 +252,7 @@ Azure Private Link provides the following benefits:
 ## Considerations
 
 The five pillars of the Azure Well-Architected Framework provide guiding
-tenets that improve the quality of cloud applications. The five pillars
-are:
-
-1. Reliability
-2. Security
-3. Cost Optimization
-4. Operational Excellence
-5. Performance Efficiency
-
-The following sections examine how the web app has been
-implemented to align with these guiding principles and, consequently,
-what benefits are realized.
-
-- Demonstrates end-to-end (E2E) application architecture and solutions, composed of several products (instead of individual or small combinations of products)
-
-- Includes outcome-oriented recommendations, principles, and benefits (e.g., the why) including ROI benefits of increased confidence, improved productivity, optimized cost, etc. before delving into what and how
-
-- Demonstrates one stage in a modernization journey as a starting point and destination, as opposed to the common snapshot, final destination approach. More phases will accompany this guidance in the future.
+tenets that improve the quality of cloud applications.
 
 ### Reliability
 
