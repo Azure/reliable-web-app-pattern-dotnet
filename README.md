@@ -12,7 +12,8 @@ This repository contains the following guidance to show you how to build a relia
 - [Security](SECURITY.md)
 - [Support](SUPPORT.md)
 
+## Watch Video to Get Started
 
-To Get Started on Reliable Web App Patterns, [Watch the Introduction Video (8 mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg):
+To Get Started on Reliable Web App Patterns, [watch the Introduction Video (8 mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg):
 
 [![screenshot azd env new](./assets/Guide/Intro-video.jpg)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EaFYz80v2W1CoGKwFxbvuIEBLO6xenwwtv03apn3yv6mMg)
