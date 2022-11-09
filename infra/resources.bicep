@@ -20,6 +20,9 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-
   tags: tags
 }
 
+@description('Ensures that the idempotent scripts are executed each time the deployment is executed')
+param uniqueScriptId string = newGuid()
+
 @description('Built in \'Data Reader\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
 var appConfigurationRoleDefinitionId = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
@@ -76,6 +79,9 @@ resource baseApiUrlAppConfigSetting 'Microsoft.AppConfiguration/configurationSto
   properties: {
     value: 'https://${api.properties.defaultHostName}'
   }
+  dependsOn: [
+    openAppConfigSvcForEdits
+  ]
 }
 
 resource sqlConnStrAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
@@ -84,6 +90,9 @@ resource sqlConnStrAppConfigSetting 'Microsoft.AppConfiguration/configurationSto
   properties: {
     value: 'Server=tcp:${sqlSetup.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlSetup.outputs.sqlCatalogName};Authentication=Active Directory Default'
   }
+  dependsOn: [
+    openAppConfigSvcForEdits
+  ]
 }
 
 resource redisConnAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
@@ -95,6 +104,9 @@ resource redisConnAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores
     })
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
+  dependsOn: [
+    openAppConfigSvcForEdits
+  ]
 }
 
 resource frontEndClientSecretAppCfg 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
@@ -107,14 +119,14 @@ resource frontEndClientSecretAppCfg 'Microsoft.AppConfiguration/configurationSto
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   dependsOn: [
-    check_if_client_secret_exists
+    checkIfClientSecretExists
   ]
 }
 
 var frontEndClientSecretName = 'AzureAd--ClientSecret'
 
-resource check_if_client_secret_exists 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: 'check_if_client_secret_exists'
+resource checkIfClientSecretExists 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'checkIfClientSecretExists'
   location: location
   tags: tags
   kind: 'AzureCLI'
@@ -130,6 +142,9 @@ resource check_if_client_secret_exists 'Microsoft.Resources/deploymentScripts@20
     scriptContent: 'result=$(az keyvault secret list --vault-name ${kv.name} --query "[?name==\'${frontEndClientSecretName}\'].name" -o tsv); if [[ \${#result} -eq 0 ]]; then az keyvault secret set --name \'AzureAd--ClientSecret\' --vault-name ${kv.name} --value 1 --only-show-errors > /dev/null; fi'
     arguments: '--resourceToken \'${resourceToken}\''
   }
+  dependsOn: [
+    openAppConfigSvcForEdits
+  ]
 }
 
 resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
@@ -141,6 +156,9 @@ resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/k
     })
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
+  dependsOn: [
+    openAppConfigSvcForEdits
+  ]
 }
 
 var aspNetCoreEnvironment = isProd ? 'Production' : 'Development'
@@ -837,6 +855,56 @@ resource privateEndpointForAppConfig 'Microsoft.Network/privateEndpoints@2020-07
   }
 }
 
+// app config vars cannot be set without public network access
+// the above config settings must depend on this block to ensure
+// access is allowed before we try saving the setting
+resource openAppConfigSvcForEdits 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'openAppConfigSvcForEdits'
+  location: location
+  tags: tags
+  kind: 'AzureCLI'
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${devOpsManagedIdentityId}': {}
+    }
+  }
+  properties: {
+    forceUpdateTag: uniqueScriptId
+    azCliVersion: '2.37.0'
+    retentionInterval: 'P1D'
+    scriptContent: 'az appconfig update --name ${appConfigSvc.name} --resource-group ${resourceGroup().name} --enable-public-network true'
+  }
+}
+
+resource closeAppConfiSvcForEdits 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (isProd) {
+  name: 'closeAppConfiSvcForEdits'
+  location: location
+  tags: tags
+  kind: 'AzureCLI'
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${devOpsManagedIdentityId}': {}
+    }
+  }
+  properties: {
+    forceUpdateTag: uniqueScriptId
+    azCliVersion: '2.37.0'
+    retentionInterval: 'P1D'
+    scriptContent: 'az appconfig update --name ${appConfigSvc.name} --resource-group ${resourceGroup().name} --enable-public-network false'
+  }
+  // app config vars cannot be set without public network access
+  // now that they are set - we block public access for prod
+  // and leave public access enabled to support local dev scenarios
+  dependsOn:[
+    baseApiUrlAppConfigSetting
+    sqlConnStrAppConfigSetting
+    redisConnAppConfigKvRef
+    frontEndClientSecretAppCfg
+    storageAppConfigKvRef
+  ]
+}
 
 output WEB_URI string = web.properties.defaultHostName
 output API_URI string = api.properties.defaultHostName
