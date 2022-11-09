@@ -1,34 +1,18 @@
 # Reliable web application
 
-This guidance deploys a sample eCommerce web application that sells concert tickets. It uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions,and creating Azure AD App Registrations.
-
-This guide demonstrates how principles from the [Well-Architected Framework](https://docs.microsoft.com/azure/architecture/framework/) and [Twelve-Factor Applications](https://12factor.net/) can be applied to migrate and modernize a legacy, line-of-business (LOB) web app to the cloud. A reference architecture is included to showcase a production ready solution which can be easily deployed for learning and experimentation.
-
-The deployable artifacts create a modernized LOB web application that has improved reliability, security, performance, and more mature operational practices at a predictable cost. This phase also provides a foundation upon which they will achieve their longer-term objectives in later phases. The following solution diagram shows the reference architecture that we'll discuss for the rest of the guide.
+The guidance simulates a common developer journey. It applies the principles of the [Well-Architected Framework](https://docs.microsoft.com/azure/architecture/framework/) and [Twelve-Factor Applications](https://12factor.net/) to migrate and modernize a legacy, line-of-business (LOB) web app to the cloud. The guidance addresses the challenges in refactoring a monolithic ASP.NET application with a Microsoft SQL Server database and developing a modern, reliable, and scalable ASP.NET Core application. We provide guidance and deployable artifacts with this guidance. The deployable artifacts create a modernized LOB web application that has improved reliability, security, performance, and more mature operational practices at a predictable cost. It provides a foundation upon which you can achieve longer-term objectives.
 
 ## Use cases
 
+The guidance and deployable serves multiple needs. It provides a pattern for running a cost-efficient web application and provides guidance to meet key objectives.
+
 **Cost-efficient web application** - The solution provides three cost-optimized environments. The production environment costs between $2,000 and $3,000 per month with SLAs of 99.98%. The development and testing environments cost between $200-$300 per month per environment with SLAs of 99.56%.
 
-This reliable application pattern can help attain short- and long-term goals.
-
-**Short-term goals** 
-- modernize a web application to sustain additional volume
-- mature development team practices for modern development and operations
-
-**Long term goals**
-
-- maturing development team practices for modern development and operations
-- open an application to online customers with web and mobile experiences
-- improve availability
-- reduce the time required to deliver new features to the application
-- scale different components of the system independently to handle traffic spikes without compromising security
-
-
+**Key objectives** - This reliable application pattern can help attain . Short-term goals include (1) modernizing a web application to sustain additional volume and (2) maturing development team practices for modern development and operations. You'll want to use this guidance if you're looking to open an application to online customers with web and mobile experiences, improve application availability, reduce the time required to deliver new features to the application, and scale different components of the system independently to handle traffic spikes without compromising security
 
 ## Architecture
 
-The diagram depicts the web application solution that you can deploy with the implementation guidance. Below we outline the Azure services used in this solution and the reasons we chose these services.
+The diagram depicts the web application solution that you can deploy with the implementation guidance.
 
 ![Reliable web app architecture diagram](./assets/Guide/ReliableWebAppArchitectureDiagram.png)
 
@@ -63,10 +47,10 @@ is retried after a short delay, then it is likely to succeed. Adding the
 Retry Pattern helped the team build a web app that insulates the user
 experience from these transient errors.
 
-To implement the Retry Pattern in ASP.NET Core they use the
+To implement the Retry Pattern in ASP.NET Core, they use the
 [Polly](https://github.com/App-vNext/Polly) library. This enables them to
 use fluent APIs that describe the behavior they want in one central
-location of the app. In the following screenshot you can see that the
+location of the app. In the following screenshot, you can see that the
 Retry Pattern is setup for all service calls made to the concert search
 service.
 
@@ -104,25 +88,14 @@ private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
 <sup>Sample code demonstrates how to use **Polly** to retry api calls to the
 Concert Search Service. [Link to Startup.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/4b486d52bccc54c4e89b3ab089f2a7c2f38a1d90/src/Relecloud.Web/Startup.cs#L85)</sup>
 
-In this sample we see that the dependency injection for the
-`IConcertSearchService` object is configured so that whenever a class,
-or controller, makes a service call to the web service we will apply the
-Retry Pattern for all of the requests that are made through this object.
+In this sample we see that the dependency injection for the `IConcertSearchService` object is configured so that whenever a class, or controller, makes a service call to the web service the Retry Pattern applies to all the requests that are made through this object.
 
-In the `GetRetryPolicy()` method we also see how to create the
-behavior with the Polly library. To build this we use an
-`HttpPolicyExtensions` object and whenever a transient error is detected
-the Polly library will wait and retry after a delay. This built-in
-backoff method will retry the error up to three times with increasingly
-larger delays. For example, if this service call fails then after
-about half a second the same method will be retried. An advantage to
-using this built-in method is that the next request is made after a delay
-that includes some randomness to help smooth out bursts of traffic that
-could be sent to the API if an error happens.
+In the `GetRetryPolicy()` method we also see how to create the behavior with the Polly library. To build this, we use an `HttpPolicyExtensions` object and whenever a transient error is detected the Polly library will wait and retry after a delay. This built-in backoff method will retry the error up to three times with increasingly
+larger delays. For example, if this service call fails then after about half a second the same method will be retried. An advantage to using this built-in method is that the next request is made after a delay that includes some randomness to help smooth out bursts of traffic that could be sent to the API if an error happens.
 
 #### Circuit Breaker
 
-In the previous section we saw how the Retry Pattern can help users
+In the previous section, we saw how the Retry Pattern can help users
 bypass errors in our web app by retrying operations that are likely to
 succeed. But what if a real error happens? In that scenario we don't
 want our users to keep waiting because the operation is not likely to
@@ -169,6 +142,13 @@ availability. These patterns are used by the Relecloud sample to improve
 security.
 
 #### Use identity-based authentication
+
+The web app uses a managed identity to access Key Vault, App Configuration, and Storage. There are two types of managed identities to choose from. The web app uses a system-assigned managed identity that is tied to lifecycle of the web app. You can also use a user-assigned managed-identity that has a lifecycle independent and is reusable across resources with the same access requirements.
+
+For more information, see:
+
+- [Managed identity](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview)
+- [Web app managed identity](https://learn.microsoft.com/en-us/azure/active-directory/develop/multi-service-web-app-access-storage?tabs=azure-portal%2Cprogramming-language-csharp#enable-managed-identity-on-an-app)
 
 To achieve their goal of improving security the Relecloud team developed
 the web app to connect to Key Vault and App Configuration with the
@@ -630,8 +610,7 @@ but the right duration for the cache will vary for every scenario.
 
 ## Deploy the solution
 
-This solution uses the Azure Dev CLI to set up Azure services
-and deploy the code. [Follow the implementation guidelines](implementation.md) to deploy the code to Azure and local development.
+This solution uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions,and creating Azure AD App Registrations. [Follow the implementation guidelines](implementation.md) to deploy the code to Azure and local development.
 
 ## Components
 
