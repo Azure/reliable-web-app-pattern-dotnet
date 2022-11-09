@@ -858,8 +858,8 @@ resource privateEndpointForAppConfig 'Microsoft.Network/privateEndpoints@2020-07
 // app config vars cannot be set without public network access
 // the above config settings must depend on this block to ensure
 // access is allowed before we try saving the setting
-resource openAppConfigSvcForEdits 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: 'openAppConfigSvcForEdits'
+resource openConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'openConfigSvcsForEdits'
   location: location
   tags: tags
   kind: 'AzureCLI'
@@ -873,12 +873,29 @@ resource openAppConfigSvcForEdits 'Microsoft.Resources/deploymentScripts@2020-10
     forceUpdateTag: uniqueScriptId
     azCliVersion: '2.37.0'
     retentionInterval: 'P1D'
-    scriptContent: 'az appconfig update --name ${appConfigSvc.name} --resource-group ${resourceGroup().name} --enable-public-network true'
+    environmentVariables: [
+      {
+        name: 'APP_CONFIG_SVC_NAME'
+        value: appConfigSvc.name
+      }
+      {
+        name: 'KEY_VAULT_NAME'
+        value: kv.name
+      }
+      {
+        name: 'RESOURCE_GROUP'
+        secureValue: resourceGroup().name
+      }
+    ]
+    scriptContent: '''
+      az appconfig update --name $APP_CONFIG_SVC_NAME --resource-group $RESOURCE_GROUP --enable-public-network true
+      az keyvault update --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Enabled
+      '''
   }
 }
 
-resource closeAppConfiSvcForEdits 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (isProd) {
-  name: 'closeAppConfiSvcForEdits'
+resource closeConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (isProd) {
+  name: 'closeConfigSvcsForEdits'
   location: location
   tags: tags
   kind: 'AzureCLI'
@@ -892,7 +909,24 @@ resource closeAppConfiSvcForEdits 'Microsoft.Resources/deploymentScripts@2020-10
     forceUpdateTag: uniqueScriptId
     azCliVersion: '2.37.0'
     retentionInterval: 'P1D'
-    scriptContent: 'az appconfig update --name ${appConfigSvc.name} --resource-group ${resourceGroup().name} --enable-public-network false'
+    environmentVariables: [
+      {
+        name: 'APP_CONFIG_SVC_NAME'
+        value: appConfigSvc.name
+      }
+      {
+        name: 'KEY_VAULT_NAME'
+        value: kv.name
+      }
+      {
+        name: 'RESOURCE_GROUP'
+        secureValue: resourceGroup().name
+      }
+    ]
+    scriptContent: '''
+      az appconfig update --name $APP_CONFIG_SVC_NAME --resource-group $RESOURCE_GROUP --enable-public-network false
+      az keyvault update --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Disabled
+      '''
   }
   // app config vars cannot be set without public network access
   // now that they are set - we block public access for prod
