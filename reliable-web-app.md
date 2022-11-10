@@ -160,7 +160,7 @@ security.
 
 #### Use identity-based authentication
 
-The web app uses a managed identity to access Key Vault, App Configuration, and Storage. There are two types of managed identities to choose from. The web app uses a system-assigned managed identity that is tied to lifecycle of the web app. You can also use a user-assigned managed-identity that has a lifecycle independent and is reusable across resources with the same access requirements.
+The web app uses a managed identity to access Key Vault, App Configuration, and Azure SQL Database. There are two types of managed identities to choose from. The web app uses a system-assigned managed identity that is tied to lifecycle of the web app. You can also use a user-assigned managed-identity that has a lifecycle independent and is reusable across resources with the same access requirements.
 
 For more information, see:
 
