@@ -80,7 +80,7 @@ resource baseApiUrlAppConfigSetting 'Microsoft.AppConfiguration/configurationSto
     value: 'https://${api.properties.defaultHostName}'
   }
   dependsOn: [
-    openAppConfigSvcForEdits
+    openConfigSvcsForEdits
   ]
 }
 
@@ -91,7 +91,7 @@ resource sqlConnStrAppConfigSetting 'Microsoft.AppConfiguration/configurationSto
     value: 'Server=tcp:${sqlSetup.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlSetup.outputs.sqlCatalogName};Authentication=Active Directory Default'
   }
   dependsOn: [
-    openAppConfigSvcForEdits
+    openConfigSvcsForEdits
   ]
 }
 
@@ -105,7 +105,7 @@ resource redisConnAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   dependsOn: [
-    openAppConfigSvcForEdits
+    openConfigSvcsForEdits
   ]
 }
 
@@ -143,7 +143,7 @@ resource checkIfClientSecretExists 'Microsoft.Resources/deploymentScripts@2020-1
     arguments: '--resourceToken \'${resourceToken}\''
   }
   dependsOn: [
-    openAppConfigSvcForEdits
+    openConfigSvcsForEdits
   ]
 }
 
@@ -157,7 +157,7 @@ resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/k
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   dependsOn: [
-    openAppConfigSvcForEdits
+    openConfigSvcsForEdits
   ]
 }
 
