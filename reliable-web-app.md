@@ -8,7 +8,7 @@ The guidance and deployable serves multiple needs. It provides a pattern for run
 
 **Cost-efficient web application** - The solution provides two cost-optimized environments. The production environment costs between $2,000 and $3,000 per month with SLAs of 99.98%. The non-prod environments cost between $200-$300 per month per environment with SLAs of 99.56%.
 
-**Key objectives** - This reliable application pattern can help attain . Short-term goals include (1) modernizing a web application to sustain additional volume and (2) maturing development team practices for modern development and operations. You'll want to use this guidance if you're looking to open an application to online customers with web and mobile experiences, improve application availability, reduce the time required to deliver new features to the application, and scale different components of the system independently to handle traffic spikes without compromising security
+**Key objectives** - Short-term goals include (1) modernizing a web application to sustain additional volume and (2) maturing development team practices for modern development and operations. You'll want to use this guidance if you're looking to open an application to online customers with web and mobile experiences, improve application availability, reduce the time required to deliver new features to the application, and scale different components of the system independently to handle traffic spikes without compromising security
 
 ## Architecture
 
