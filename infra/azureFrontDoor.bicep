@@ -100,7 +100,7 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' 
   }
 }
 
-resource frontdoorwebapplicationfirewallpolicies_wafpolicy_name_resource 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@2020-11-01' = {
+resource frontdoorWebApplicationFirewallPolicy 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@2020-11-01' = {
   name: 'wafpolicy${resourceToken}'
   location: 'Global'
   sku: {
@@ -127,7 +127,7 @@ resource profiles_manualryckozesqpn24_name_manualwafpolicy_cfc67469 'Microsoft.C
   properties: {
     parameters: {
       wafPolicy: {
-        id: frontdoorwebapplicationfirewallpolicies_wafpolicy_name_resource.id
+        id: frontdoorWebApplicationFirewallPolicy.id
       }
       associations: [
         {
