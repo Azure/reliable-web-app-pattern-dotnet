@@ -41,7 +41,24 @@ Faults include the momentary loss of network connectivity to components
 and services, the temporary unavailability of a service, or timeouts
 that occur when a service is busy.
 
-The Relecloud web app handles this with the [Retry Pattern](https://docs.microsoft.com/azure/architecture/patterns/retry)
+Many [Azure SDKs include a retry mechanism](https://learn.microsoft.com/en-us/azure/architecture/best-practices/retry-service-specific)
+and can be configured when used in the solution. In this code Entity Framework is configured to retry transient errors.
+
+```cs
+services.AddDbContextPool<ConcertDataContext>(options => options.UseSqlServer(sqlDatabaseConnectionString,
+    sqlServerOptionsAction: sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+        maxRetryCount: 5,
+        maxRetryDelay: TimeSpan.FromSeconds(3),
+        errorNumbersToAdd: null);
+    }));
+```
+
+<sup>Sample code demonstrates how to configure Entity Framework for transient fault handling.
+    [Link to Startup.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/911f841d4b721bef1d9021d487745f873464d11d/src/Relecloud.Web.Api/Startup.cs#L101)</sup>
+
+In other scenarios, with HttpClient, Relecloud uses the [Retry Pattern](https://docs.microsoft.com/azure/architecture/patterns/retry)
 because these faults are typically self-correcting and if a service call
 is retried after a short delay, then it is likely to succeed. Adding the
 Retry Pattern helped the team build a web app that insulates the user
