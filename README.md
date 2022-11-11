@@ -1,6 +1,6 @@
 # Reliable Web App Pattern
 
-This repository provides resources to help developers build a Reliable web app on Azure. A Reliable Web App is a set of services, code, and infrastructure deployed in Azure that applies practices from the Well-Architected Framework. This pattern is shared with three components to help you use Azure to build a web app that follows Microsoft's recommended guidance for achieving reliability, scalability, and security in the cloud.
+This repository provides resources to help developers build a Reliable web app on Azure. A Reliable Web App is a set of services, code, and infrastructure deployed in Azure that applies practices from the Well-Architected Framework. This pattern is designed to help you build a web app that follows Microsoft's recommended guidance for achieving reliability, scalability, and security in the cloud.
 
 **Steps to get started**:
 
