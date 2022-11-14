@@ -526,13 +526,15 @@ resource adminVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   }
 }
 
+var defaultSqlPassword = 'a${toUpper(uniqueString(subscription().id, resourceToken))}3${toUpper(uniqueString(managedIdentity.properties.principalId, resourceToken))}Q'
+
 resource kvSqlAdministratorPassword 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: adminVault
   name: 'sqlAdministratorPassword'
   properties: {
     // uniqueString produces a 13 character result
     // concatenation of 2 unique strings produces a 26 character password unique to your subscription per environment
-    value: '${uniqueString(subscription().id, resourceToken)}${toUpper(uniqueString(managedIdentity.properties.principalId, resourceToken))}'
+    value: defaultSqlPassword
   }
 }
 
