@@ -16,6 +16,9 @@
     },
     "isProd": {
       "value": "${IS_PROD}"
+    },
+    "azureSqlPassword": {
+      "value": "${AZURE_SQL_PASSWORD}"
     }
   }
 }
