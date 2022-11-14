@@ -530,7 +530,7 @@ resource adminVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   }
 }
 
-var defaultSqlPassword = 'a${toUpper(uniqueString(subscription().id, resourceToken))}3${toUpper(uniqueString(managedIdentity.properties.principalId, resourceToken))}Q'
+var defaultSqlPassword = 'a${toUpper(uniqueString(subscription().id, resourceToken))}32${toUpper(uniqueString(managedIdentity.properties.principalId, resourceToken))}Q'
 
 resource kvSqlAdministratorPassword 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: adminVault
