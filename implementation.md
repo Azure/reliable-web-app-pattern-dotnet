@@ -429,11 +429,6 @@ sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
 sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
 ```
 
-## App doesn't start: 500.30 ASP.NET Core app failed to start
-
-This issue is due to missing configuration on your App Service you should **re-run** the `azd provision` command. The Azure Dev CLI performs incremental deployments that will overlay the correct settings on the existing App Service.
-
-> This is a known issue and we are tracking it [here](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/87).
 
 ## Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
 
