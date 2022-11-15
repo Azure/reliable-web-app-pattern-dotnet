@@ -1,4 +1,4 @@
-# Reliable application implementation
+# Deploy the solution
 
 This reference implementation provides you with the instructions and templates you need to deploy this solution. This solution uses the Azure Dev CLI to set up Azure services
 and deploy the code.
