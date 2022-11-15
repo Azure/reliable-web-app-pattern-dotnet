@@ -1,6 +1,14 @@
-﻿using System.Net;
+using System.Net;
 using System.Security.Claims;
 
+/*
+NOTICE: This class is not intended for production scenarios.
+
+This middleware feature is included to demonstrate the Retry and
+Circuit Breaker patterns that are discussed in the guide.
+
+Adding this feature to a production web app may cause stability issues.
+*/
 namespace Relecloud.Web.Api.Infrastructure
 {
     public class RetryTestingMiddleware
