@@ -4,8 +4,6 @@ This pattern is still in the early stages, so you may run into some issues. Here
 1. Data consistency for multi-regional deployments
 1. Challenges that surface when trying the code
 
-<br />
-
 # Data consistency for multi-regional deployments
 
 This sample includes a feature to deploy the code to two Azure regions. The feature is intended to support the high availability scenario by deploying resources that support an active/passive deployment. The sample currently supports the ability to fail-over web-traffic and process requests from a second region but does not support data synchronization between two regions. 
@@ -61,7 +59,6 @@ If you choose to implement regional data consitency for your scenario you should
 * [Configure active geo-replication for Enterprise Azure Cache for Redis instances](https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/cache-how-to-active-geo-replication)
 * [High availability and disaster recovery for Azure Cache for Redis](https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/cache-high-availability#importexport)
 
-<br />
 
 # Challenges that surface when trying the code
 
