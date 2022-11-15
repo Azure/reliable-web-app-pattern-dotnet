@@ -4,60 +4,16 @@ Here are some things you can try to see how these patterns support the availabil
 
 ### Retry and Circuit Breakers
 
-These patterns improve the reliability of the solution by attempting to
-resolve transient errors that can surface when making an API call. To
-observe this, we'll change the baseUri setting in App Configuration and
-examine the App Insights logs to observe that API calls were retried and
-when the circuit is open that we can also observe the "fail fast"
-behavior.
+Transient errors are temporary service interruptions due to network hops and multi-tenancy traffic. Transient failures typically resolve themselves. The best approach for handling is with the retry pattern, not an exception. When a 500 error occurs, the retry pattern sends another request to API. If it's a transient failure, the retry is often successful. For more information, see [Transient Fault Handling](https://learn.microsoft.com/aspnet/aspnet/overview/developing-apps-with-windows-azure/building-real-world-cloud-apps-with-windows-azure/transient-fault-handling)
 
-First, open the Azure App Configuration blade in the Azure Portal.
-Scroll down through the tabs and find the "Configuration Explorer" so
-you can see the settings that the web app uses.
+We built an app configuration setting that lets you simulate a transient error.
+The setting is called `Api:App:RetryDemo`. We've included this configuration in the deployable code. The `Api:App:RetryDemo` setting throws a 503 error when a user HTTP request is sent to the web app API.  `Api:App:RetryDemo` has a value setting that determines intervals between 503 errors. You can edit the value of the setting to determine the intervals. A value of 1 has no intervals. It generates a 503 error for every request. A value of 2 generates a 503 error for every other request.
 
-![image of Configuration Explorer in the App Configuration Service blade on the Azure Portal](./assets/Guide/Simulating_AppConfigSvcConfigurationExplorer.png)
-
-Based on the bicep templates provided this setting
-`App:RelecloudApi:BaseUri` is automatically set to the correct URL so
-that your web app will work every time you deploy to a new environment.
-But what if this was a manual step? Let's replace the ".net" value in
-this configuration with ".com" and observe the behavior. Click save and
-use the Azure Portal to restart the front-end App Service so that this
-value is reloaded.
-
-![image of App Service restart confirmation dialog](./assets/Guide/Simulating_AppServiceRestart.png)
-
-After the web app is restarted, we can click on the "Upcoming" menu link
-and see that all of the concert data has disappeared. Even though our
-data is cached in Redis we can see that the web front-end needs access
-to the web API app to receive that data.
-
-![image of App Service restart confirmation dialog](./assets/Guide/Simulating_UpcomingConcertsPage.png)
-
-And in App Insights we can see that this is not an error the web app
-could recover from so the Circuit Breaker pattern allowed the user to
-see a "fail fast" experience because the circuit was open.
-
-![image of request error in Application Insights shows that the circuit is now open](./assets/Guide/Simulating_AppInsightsTransationDetails.png)
-
-Let's re-open the Azure App Configuration Explorer and fix that setting
-before moving to the next step. Edit the `App:RelecloudApi:BaseUri`
-and replace the ".com" part of the Uri with ".net" as it was originally
-configured.
-
-![image of Configuration Explorer in the App Configuration Service blade on the Azure Portal](./assets/Guide/Simulating_AppConfigSvcConfigurationExplorer.png)
-
-And we must also restart the web app again for this new setting to take effect.
-
-![image of App Service restart confirmation dialog](./assets/Guide/Simulating_AppServiceRestart.png)
+We recommend collecting telemetry for this test. We've configured Application Insights to collect telemetry. When the value of `Api:App:RetryDemo` is 2, the first request to the application API generates a 503 error. But the retry pattern sends a second request that is successful and generates a 200 response.
 
 ### Cache Aside Pattern
 
-The cache aside pattern enables us to offload read queries to SQL server
-and it also provides a layer of redundancy that can keep parts of our
-application running in the event of issue with Azure SQL Database. We
-can observe this behavior in App Insights by testing two different
-pages.
+The cache aside pattern enables us to offload read queries to SQL server and it also provides a layer of redundancy that can keep parts of our application running in the event of issue with Azure SQL Database. We can observe this behavior in App Insights by testing two different pages.
 
 First, visit the "Upcoming Concerts" page and refresh the page a couple
 of times. The first time the page is loaded the web API app will send a
