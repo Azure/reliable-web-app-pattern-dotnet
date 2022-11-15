@@ -7,15 +7,44 @@ This pattern is still in the early stages, so you may run into some issues. Here
 <br />
 
 # Data consistency for multi-regional deployments
-This sample includes a feature to deploy the code to two Azure regions. The feature is intended to support the high availability scenario by providing an active/passive scenario. The sample currently supports the ability to fail-over web-traffic and process requests in the new region but does not support data synchronization between two regions. This can result in users losing trust in the system when they observe that the system is online but their data is missing. In the next sections we examine the stateful parts of the application to explain how data consistency applies to each component.
+
+This sample includes a feature to deploy the code to two Azure regions. The feature is intended to support the high availability scenario by deploying resources that support an active/passive deployment. The sample currently supports the ability to fail-over web-traffic and process requests from a second region but does not support data synchronization between two regions. 
+
+This can result in users losing trust in the system when they observe that the system is online but their data is missing. In the next sections we examine the stateful parts of the application to explain how data consistency applies to each component.
 
 ### Azure SQL Database
 
-(TODO)
+Azure SQL Database is used to store information about concerts, customer ids, and the tickets that they've purchased. This service stores this data and the relationships between this data to help customers see the right details when they login.
+
+Without synchronizing this data customers will not be able to see the tickets that they purchased. And, when the code runs in two regions it will randomly seed the data in different order, so the concert details will not appear the same in both regions.
+
+To address this concern we recommend two Azure SQL Features:
+
+* [Active geo-replication](https://learn.microsoft.com/en-us/azure/azure-sql/database/active-geo-replication-overview) to synchronize data between the two regions
+* [Auto-failover groups](https://learn.microsoft.com/en-us/azure/azure-sql/database/auto-failover-group-sql-db) to handle the failover of the system from one region to another
+
+### Azure Storage
+
+Azure Storage is used to store the tickets that are rendered during the checkout flow. These tickets are images that are durably stored with zone-redundancy to improve SLAs regarding the risk of data loss. The next factor of concern is our ability to read and write to this data source on-demand.
+
+Using geo-redundant storage would increase our ability to read the data but not our ability to write to storage. So in this sample we use two separate storage accounts which have their own availability for write operations to improve our composite availability. However, maintaining two Azure Storage accounts is subject to the same concerns that apply to our Azure SQL database.
+
+To learn more about what you can do to address this concern we recommend the following article:
+* [Use geo-redundancy to design highly available applications](https://learn.microsoft.com/en-us/azure/storage/common/geo-redundant-design?toc=%2Fazure%2Fstorage%2Fblobs%2Ftoc.json)
+
 
 ### External configuration with Key Vault and App Configuration Service
 
-(TODO)
+Azure App Configuration Service and Key Vault are used to store the configuration and secrets. These details enable our app to create service to service connections and control the behavior of our app. In this active/passive scenario we do not include additional complexity for the secrets from two regions to be kept in sync or for the web apps to automatically detect changes to these configurations.
+
+One recommended approach to synchronize data between the two regions is to use devOps workflows to automate the deployment of configuration.
+
+Another approach is to use Azure features to schedule a data synchronization between the two resources deployed to two regions.
+
+Learn more by reading about:
+
+* [Synchronization between Azure App Configuration Stores](https://learn.microsoft.com/en-us/azure/azure-app-configuration/concept-disaster-recovery?tabs=core2x#synchronization-between-configuration-stores)
+
 
 ### Azure Cache for Redis
 
@@ -56,7 +85,6 @@ sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
 sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
 sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
 ```
-
 
 ## Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
 
