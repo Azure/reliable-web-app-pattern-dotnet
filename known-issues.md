@@ -1,5 +1,5 @@
 # Known issues
-This pattern is still in the early stages, so you may run into some issues. Here are the significant known issues that exist in the current version.
+This content is still in the early stages, so you may run into some issues. Here are the significant known issues that exist in the current version.
 
 1. Data consistency for multi-regional deployments
 1. Challenges that surface when trying the code
