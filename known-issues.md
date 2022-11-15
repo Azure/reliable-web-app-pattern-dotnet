@@ -1,14 +1,32 @@
 # Known issues
 This content is still in the early stages, so you may run into some issues. Here are the significant known issues that exist in the current version.
 
+1. Shared Access Signatures for Azure Storage
 1. Data consistency for multi-regional deployments
 1. Challenges that surface when trying the code
+
+# Shared Access Signatures for Azure Storage
+
+This sample uses a connection string with a secret to connect directly to Azure storage. This serves to demonstrate
+how to apply the [Valet Key Pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/valet-key) but is not the best fit for this scenario. In Relecloud's scenario, the [shared
+access signature (SAS)](https://learn.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature) approach provides limited time access to the tickets that were purchased. In a production scenario
+we do not recommend this approach as customers would need to run a schedule job to recycle the shared access signatures
+in order to rotate the secret key associated with the account. Further, the SAS token approach limits the lifetime
+of access to 30-days and a new SAS uri would need to be generated after the current one expires.
+
+Open issue:
+* [Setup network isolation for Azure Storage](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/12)
 
 # Data consistency for multi-regional deployments
 
 This sample includes a feature to deploy to two Azure regions. The feature is intended to support the high availability scenario by deploying resources in an active/passive configuration. The sample currently supports the ability to fail-over web-traffic so requests can be handled from a second region. However it does not support data synchronization between two regions. 
 
 This can result in users losing trust in the system when they observe that the system is online but their data is missing. In the next sections we examine the stateful parts of the application to explain how data consistency applies to each component.
+
+Open issues:
+* [Implement multiregional Azure SQL](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/44)
+* [Implement multiregional Storage](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/122)
+* [Secondary Key Vault not populated by createAppRegistrations.sh](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/135)
 
 ### Azure SQL Database
 
