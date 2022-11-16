@@ -8,6 +8,10 @@ The guidance and deployable serves multiple needs. It provides a pattern for run
 
 **Cost-efficient web application** - The solution provides two cost-optimized environments. The production environment costs between $2,000 and $3,000 per month with SLAs of 99.98%. The non-prod environments cost between $200-$300 per month per environment with SLAs of 99.56%.
 
+Pricing Calculator breakouts
+- [Non-prod](https://azure.com/e/2a048617e85b41b9bc889cacf5cc8059)
+- [Prod](https://azure.com/e/ccfe6f10bd394ad49257c99a9c07f43c)
+
 **Key objectives** - Short-term goals include (1) modernizing a web application to sustain additional volume and (2) maturing development team practices for modern development and operations. You'll want to use this guidance if you're looking to open an application to online customers with web and mobile experiences, improve application availability, reduce the time required to deliver new features to the application, and scale different components of the system independently to handle traffic spikes without compromising security
 
 ## Architecture
@@ -237,7 +241,6 @@ In production the StandardC1 offers:
 - 99.9% Availability SLA
 - Up to 1,000 connections
 
-*Costs: 102.67 per month*
 
 For non-prod environments the BasicC0 SKU offers:
 
@@ -246,7 +249,7 @@ For non-prod environments the BasicC0 SKU offers:
 - No SLA
 - Up to 256 connections
 
-*Costs: 16.37 per month*
+*Costs about 1/5 as much as the StandardC1 SKU*
 
 This provides behavior similar to production so that devs can perform
 integration testing while costing only 16% as much as prod by adjusting
