@@ -3,7 +3,7 @@ This content is still in the early stages, so you may run into some issues. Here
 
 1. Shared Access Signatures for Azure Storage
 1. Data consistency for multi-regional deployments
-1. Challenges that surface when trying the code
+1. Challenges that could surface when trying the code
 
 # Shared Access Signatures for Azure Storage
 
@@ -78,11 +78,26 @@ If you choose to implement regional data consitency for your scenario you should
 * [High availability and disaster recovery for Azure Cache for Redis](https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/cache-high-availability#importexport)
 
 
-# Challenges that surface when trying the code
+# Challenges that could surface when trying the code
 
+* Service request failed. Status: 403 (Forbidden) when running locally
 * Cannot execute shellscript `/bin/bash^M: bad interpreter`
 * Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
 
+## Service request failed. Status: 403 (Forbidden) when running locally
+
+When running the code from Visual Studio you may encounter an error as the app is starting.
+![#image of hitting the exception in Visual Studio](https://user-images.githubusercontent.com/11169376/196296023-8fa320a8-c847-4f19-9c53-ce695142e6b6.png)
+
+The steps for running locally include giving yourself the App Configuration Data Reader role
+so that your account can read data from the App Configuration Service. Based on documentation this
+role assignment can take up to 15-minutes to be fully applied. In team scenarios we recommend working around
+this limitation by assigning the App Configuration Data Reader role to an Azure AD security group and
+having dev team members joining the Security Group as part of joining a dev team.
+
+Open issues:
+* [App Config Svc permission takes time to propagate](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138)
+* [Getting Auth errors when trying to debug locally in Visual Studio](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/98)
 
 ## Cannot execute shellscript `/bin/bash^M: bad interpreter`
 This error happens when Windows users checked out code from a Windows environment
@@ -101,6 +116,8 @@ sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
 sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
 ```
 
+*There are no open items open for this issue.*
+
 ## Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
 
 This error happens when attempting to connect to the Azure SQL Server with as
@@ -113,3 +130,5 @@ and to add the Azure AD user.
 Documentation can help with this task: [Create contained users mapped to Azure AD identities](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure?tabs=azure-powershell&view=azuresql#create-contained-users-mapped-to-azure-ad-identities)
 
 This error can also happen if you still need to run the `makeSqlUserAccount.ps1` script.
+
+*There are no open items open for this issue.*
