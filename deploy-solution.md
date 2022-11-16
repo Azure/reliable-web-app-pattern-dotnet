@@ -32,6 +32,21 @@ and deploy the code.
     ```ps1
     dotnet --version
     ```
+
+## Get the code
+
+Please clone the repo to get started.
+
+```
+git clone https://github.com/Azure/reliable-web-app-pattern-dotnet
+```
+
+And switch to the folder so that `azd` will recognize the solution.
+
+```
+cd reliable-web-app-pattern-dotnet
+```
+
 ## Deploying to Azure
 
 Relecloud's developers use the `azd` command line experience to deploy the code. This means their local workflow is the same

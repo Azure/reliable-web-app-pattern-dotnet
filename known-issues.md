@@ -80,10 +80,16 @@ If you choose to implement regional data consitency for your scenario you should
 
 # Challenges that could surface when trying the code
 
+* Error: no project exists; to create a new project, run 'azd init'
 * The deployment 'relecloudresources' already exists in location
 * Service request failed. Status: 403 (Forbidden) when running locally
 * Cannot execute shellscript `/bin/bash^M: bad interpreter`
 * Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
+
+## Error: no project exists; to create a new project, run 'azd init'
+When using the `azd provision` command it will check your current working directory for an `azure.yaml` file.
+
+This error happens if you are running `azd` from an uninitialized folder. You may need to `cd` into the directory you cloned to run this command.
 
 ## The deployment 'relecloudresources' already exists in location
 This may happen if you use `azd` to choose the *eastus* region and then decide to choose another Azure region.
