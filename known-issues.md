@@ -82,6 +82,7 @@ If you choose to implement regional data consitency for your scenario you should
 
 * Error: no project exists; to create a new project, run 'azd init'
 * The deployment 'relecloudresources' already exists in location
+* DeploymentScriptBootstrapScriptExecutionFailed
 * Service request failed. Status: 403 (Forbidden) when running locally
 * Cannot execute shellscript `/bin/bash^M: bad interpreter`
 * Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
@@ -99,6 +100,29 @@ When the `azd provision` command runs it creates a deployment resource in your s
 Please see the [teardown instructions](deploy-solution.md#clean-up-azure-resources) to address this issue.
 
 *There are no open items open for this issue.*
+
+## DeploymentScriptBootstrapScriptExecutionFailed
+The Relecloud sample uses deployment scripts to run cli or PowerShell commands to configure Azure resources that
+require multiple steps to provision. As an example, the Azure SQL database is created to allow public connection
+and then a script is used create the SQL user that represents the managed identity. After the SQL user is created
+the script will change properties of the Azure SQL instance to prevent public access.
+
+These scripts run in could fail during your deployment. If this happens the error look like the following:
+
+```
+{
+    "status": "failed",
+    "error": {
+        "code": "DeploymentScriptBootstrapScriptExecutionFailed",
+        "message": "A service error occurred, the container group resource failed to start script execution. Correlation Id: bbbbbbbb-6666-4444-8888-555555555555. Please try again later, if the issue persists contact technical support for further investigation."
+    }
+}
+```
+
+The recommended workaround is to retry the `azd provision` command if this happens during your deployment.
+
+Open issue:
+* [Deployment Script Error](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/89)
 
 ## Service request failed. Status: 403 (Forbidden) when running locally
 
