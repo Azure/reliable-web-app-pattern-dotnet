@@ -21,8 +21,8 @@ and deploy the code.
     az login
     ```
 1. [Upgrade the Azure CLI Bicep extension](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli).
-    
-    Run the following command to verify that you're running version 0.8.9 or higher.
+    Run the following command to verify that you're running version 0.12.40 or higher.
+
     ```ps1
     az bicep version
     ```
