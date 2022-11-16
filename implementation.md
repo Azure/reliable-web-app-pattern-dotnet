@@ -20,6 +20,13 @@ and deploy the code.
     ```ps1
     az login
     ```
+1. [Upgrade the Azure CLI Bicep extension](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli).
+    
+    Run the following command to verify that you're running version 0.8.9 or higher.
+    ```ps1
+    az bicep version
+    ```
+
 1. [Install the Azure Dev CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd).
     Run the following command to verify that the Azure Dev CLI is installed.
 
