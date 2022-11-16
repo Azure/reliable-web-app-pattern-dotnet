@@ -90,7 +90,7 @@ This may happen if you use `azd` to choose the *eastus* region and then decide t
 
 When the `azd provision` command runs it creates a deployment resource in your subscription. You must delete this deployment before you can change the Azure region.
 
-Please see the [teardown instructions](deploy-solution.md#teardown) to address this issue.
+Please see the [teardown instructions](deploy-solution.md#clean-up-azure-resources) to address this issue.
 
 *There are no open items open for this issue.*
 

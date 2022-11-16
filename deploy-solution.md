@@ -184,13 +184,21 @@ When finished the console will display the URI for the web app. You can use this
 
 ### Clean up Azure Resources
 
+1. Unprovision the Azure Resources
+2. Clean up App Registrations
+3. Delete the Deployment
+
+#### 1. Unprovision the Azure Resources
 To tear down an enviroment, and clean up the Azure resource group, use the folloing command:
 
 ```ps1
 azd down --force --purge --no-prompt
 ```
 
- If you want to recreate this deployment you will also need to delete the two Azure AD app registrations that were created. You can find them in Azure AD by searching for their environment name. 
+> You can also use the Azure Portal to delete the "relecloudresources" resource groups. This approach will not purge the Key Vault or App Configuration services and they will remain in your subscription for 7 days in a deleted state that does not charge your subscription. This feature enables you to recover the data if the configuration was accidentally deleted.
+
+#### 2. Clean up App Registrations
+You will also need to delete the two Azure AD app registrations that were created. You can find them in Azure AD by searching for their environment name. 
  
  **Delete App Registrations** 
 
@@ -201,6 +209,20 @@ azd down --force --purge --no-prompt
  **Purge App Configurations**
 
  ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
+
+#### 3. Delete the Deployment
+
+Your Azure subscription will retain your deployment request as a stateful object.
+If you would like to change the Azure region for this deployment you will need to
+delete the deployment by running the following command.
+
+```
+az deployment delete --name $myEnvironmentName
+```
+
+> You can list all deployments with the following command
+> `az deployment sub list --query "[].name" -o tsv`
+
 
 ## Local Development
 
