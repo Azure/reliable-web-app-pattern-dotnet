@@ -80,9 +80,19 @@ If you choose to implement regional data consitency for your scenario you should
 
 # Challenges that could surface when trying the code
 
+* The deployment 'relecloudresources' already exists in location
 * Service request failed. Status: 403 (Forbidden) when running locally
 * Cannot execute shellscript `/bin/bash^M: bad interpreter`
 * Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
+
+## The deployment 'relecloudresources' already exists in location
+This may happen if you use `azd` to choose the *eastus* region and then decide to choose another Azure region.
+
+When the `azd provision` command runs it creates a deployment resource in your subscription. You must delete this deployment before you can change the Azure region.
+
+Please see the [teardown instructions](deploy-solution.md#teardown) to address this issue.
+
+*There are no open items open for this issue.*
 
 ## Service request failed. Status: 403 (Forbidden) when running locally
 

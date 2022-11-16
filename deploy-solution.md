@@ -383,3 +383,5 @@ Run the following command to give your Azure AD account permission to access the
 > group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
 
+## Teardown
+(TODO)
