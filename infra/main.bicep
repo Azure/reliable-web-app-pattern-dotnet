@@ -18,6 +18,10 @@ param isProd string = 'false'
 @description('Should specify an Azure region, if not set to none, to trigger multiregional deployment. The second region should be different than the `location` . e.g. `westus3`')
 param secondaryAzureLocation string
 
+@secure()
+@description('Specifies a password that will be used to secure the Azure SQL Database')
+param azureSqlPassword string = ''
+
 var isProdBool = isProd == 'true' ? true : false
 
 var tags = {
@@ -61,6 +65,7 @@ module primaryResources './resources.bicep' = {
   name: 'primary-${primaryResourceToken}'
   scope: primaryResourceGroup
   params: {
+    azureSqlPassword: azureSqlPassword
     devOpsManagedIdentityId: devOpsIdentitySetup.outputs.devOpsManagedIdentityId
     isProd: isProdBool
     location: location
@@ -74,6 +79,7 @@ module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
   name: 'secondary-${primaryResourceToken}'
   scope: secondaryResourceGroup
   params: {
+    azureSqlPassword: azureSqlPassword
     devOpsManagedIdentityId: devOpsIdentitySetup.outputs.devOpsManagedIdentityId
     isProd: isProdBool
     location: secondaryAzureLocation
