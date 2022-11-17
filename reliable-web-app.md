@@ -6,11 +6,12 @@ The guidance simulates a common developer journey. It applies the principles of 
 
 The guidance and deployable serves multiple needs. It provides a pattern for running a cost-efficient web application and provides guidance to meet key objectives.
 
-**Cost-efficient web application** - The solution provides two cost-optimized environments. The production environment costs between $2,000 and $3,000 per month with SLAs of 99.98%. The non-prod environments cost between $200-$300 per month per environment with SLAs of 99.56%.
+**Cost-optimized environments** - The solution uses a production environment and a non-production environment. 
+ Both environments are cost-optimized to deliver maximum value with SLAs of 99.98% for the production environment and 99.56% for the non-production environment. You can review the current estimated cost per month for each environment using the links below. We've prepopulated the calculator with architecture described here. 
 
-Pricing Calculator breakouts
-- [Non-prod](https://azure.com/e/2a048617e85b41b9bc889cacf5cc8059)
-- [Prod](https://azure.com/e/ccfe6f10bd394ad49257c99a9c07f43c)
+Pricing calculator estimates
+- [Non-production environment](https://azure.com/e/2a048617e85b41b9bc889cacf5cc8059)
+- [Production environment](https://azure.com/e/ccfe6f10bd394ad49257c99a9c07f43c)
 
 **Key objectives** - Short-term goals include (1) modernizing a web application to sustain additional volume and (2) maturing development team practices for modern development and operations. You'll want to use this guidance if you're looking to open an application to online customers with web and mobile experiences, improve application availability, reduce the time required to deliver new features to the application, and scale different components of the system independently to handle traffic spikes without compromising security
 
