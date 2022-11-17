@@ -73,9 +73,7 @@ Pricing Calculator breakouts
 
 ### Production
 
-Relecloud's solution has an estimated cost between $2,000 and $3,000
-per month to run the production environment from two Azure
-regions. Additional costs will vary as the web apps scale based
+Additional costs will vary as the web apps scale based
 on load and the solution will also have additional costs for the
 data transmitted from the Azure data center. The primary forces
 driving this estimate are Azure SQL Database and Azure App
