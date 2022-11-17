@@ -111,8 +111,6 @@ the responsibilities of session management and data caching.
 
 ### Non-prod environments
 
-For non-production environments Relecloud devs target different
-SKUs for Dev/Test and their non-prod environments have an
 
 The primary drivers of cost for non-production environments are
 the App Service Plans which represent 44% of the total cost.
