@@ -83,8 +83,7 @@ Their solution deploys an Azure SQL Database Premium SKU that
 uses the DTU pricing model. The selected SKU provides 500gB for
 database storage and 125 DTU of capacity for SQL compute tasks.
 
-> The compute configuration for this solution is specific to
-> this sample. Azure SQL provides many options to choose the
+> Azure SQL provides many options to choose the
 > right fit for your solution. In this deployment the Azure SQL
 > Database represents about 45% of the estimated costs. We
 > recommend that you review how your solution behaves in
@@ -110,7 +109,6 @@ the responsibilities of session management and data caching.
 > pricing.
 
 ### Non-prod environments
-
 
 The primary drivers of cost for non-production environments are
 the App Service Plans which represent 44% of the total cost.
