@@ -4,6 +4,10 @@ param isProd bool
 @description('The id for the user-assigned managed identity that runs deploymentScripts')
 param devOpsManagedIdentityId string
 
+@secure()
+@description('Specifies a password that will be used to secure the Azure SQL Database')
+param azureSqlPassword string = ''
+
 param location string
 
 @description('The user running the deployment will be given access to the deployed resources such as Key Vault and App Config svc')
@@ -526,13 +530,15 @@ resource adminVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   }
 }
 
+var defaultSqlPassword = 'a${toUpper(uniqueString(subscription().id, resourceToken))}32${toUpper(uniqueString(managedIdentity.properties.principalId, resourceToken))}Q'
+
 resource kvSqlAdministratorPassword 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: adminVault
   name: 'sqlAdministratorPassword'
   properties: {
     // uniqueString produces a 13 character result
     // concatenation of 2 unique strings produces a 26 character password unique to your subscription per environment
-    value: '${uniqueString(subscription().id, resourceToken)}${toUpper(uniqueString(managedIdentity.properties.principalId, resourceToken))}'
+    value: (length(azureSqlPassword) == 0 ) ? defaultSqlPassword : azureSqlPassword
   }
 }
 

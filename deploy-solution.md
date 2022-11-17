@@ -20,6 +20,13 @@ and deploy the code.
     ```ps1
     az login
     ```
+1. [Upgrade the Azure CLI Bicep extension](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli).
+    Run the following command to verify that you're running version 0.12.40 or higher.
+
+    ```ps1
+    az bicep version
+    ```
+
 1. [Install the Azure Dev CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd).
     Run the following command to verify that the Azure Dev CLI is installed.
 
@@ -125,6 +132,16 @@ azd env set SECONDARY_AZURE_LOCATION westus3
 > az account list-locations --query "[].name" -o tsv
 > ```
 
+### (Optional) Custom SQL Password
+Relecloud's bicep templates support generating a 30 character hashed
+from the subscription, environment name, and the Azure location.
+
+To override this behavior the team provides their own custom password
+using the following command.
+
+```bash
+azd env set AZURE_SQL_PASSWORD superSECUREP@55W0RD
+```
 
 ### Provision the infrastructure
 
