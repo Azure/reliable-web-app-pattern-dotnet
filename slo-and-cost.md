@@ -115,7 +115,6 @@ the responsibilities of session management and data caching.
 
 For non-production environments Relecloud devs target different
 SKUs for Dev/Test and their non-prod environments have an
-estimated minimum cost between $200-$300 for each environment.
 
 The primary drivers of cost for non-production environments are
 the App Service Plans which represent 44% of the total cost.
