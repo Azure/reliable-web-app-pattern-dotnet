@@ -120,3 +120,6 @@ Customers that want to manage these costs for non-production workloads should ex
 > We recommend that customers review these prices with their
 > account team. Prices vary by region and non-production pricing
 > can be impacted by Dev/Test pricing as well as other factors.
+
+## Next Step
+- [Find additional resources](additional-resources.md)
