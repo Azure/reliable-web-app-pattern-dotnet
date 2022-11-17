@@ -4,7 +4,7 @@ This repository provides resources to help developers build a Reliable web app o
 
 **Steps to get started**:
 
-1. <img src="https://mvcmusicstorestorage.blob.core.windows.net/role-logos/chart image.jpg" height="10px" />[Watch Introduction Video (12~ mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EVeC0AjLPxdBjUke0tRpe_IBua-phq4_qvFP2TcOHLtbZg?e=aQfW6o)
+1. <img src="https://mvcmusicstorestorage.blob.core.windows.net/role-logos/chart image.jpg" height="20px" />[Watch Introduction Video (12~ mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EVeC0AjLPxdBjUke0tRpe_IBua-phq4_qvFP2TcOHLtbZg?e=aQfW6o)
 1. [Read the reference architecture](reliable-web-app.md)
 1. [Deploy solution](implementation.md)
 1. [Developer patterns](patterns.md)
