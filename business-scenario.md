@@ -42,5 +42,5 @@ upon which they will achieve their longer-term objectives in later
 phases. The following solution diagram shows the reference architecture
 that we'll discuss for the rest of the guide.
 
-*Next Step*
+# Next Step
 - [Read the reference architecture](reliable-web-app.md)
