@@ -7,7 +7,7 @@ The guidance simulates a common developer journey. It applies the principles of 
 The guidance and deployable serves multiple needs. It provides a pattern for running a cost-efficient web application and provides guidance to meet key objectives.
 
 **Cost-optimized environments** - The solution uses a production environment and a non-production environment. 
- Both environments are cost-optimized to deliver maximum value with SLAs of 99.98% for the production environment and 99.56% for the non-production environment. You can review the current estimated cost per month for each environment using the links below. We've prepopulated the calculator with architecture described here. 
+ Both environments are cost-optimized to deliver maximum value with SLAs of 99.98% for the production environment and 99.56% for the non-production environment. You can review the current estimated cost per month for each environment using the links below. We've prepopulated the calculator with the architecture described here. 
 
 Pricing calculator estimates
 - [Non-production environment](https://azure.com/e/2a048617e85b41b9bc889cacf5cc8059)
