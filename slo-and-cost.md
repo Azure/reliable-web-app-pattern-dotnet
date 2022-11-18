@@ -120,3 +120,6 @@ to host both the front-end and API web apps.
 > We recommend that customers review these prices with their
 > account team. Prices vary by region and non-production pricing
 > can be impacted by Dev/Test pricing as well as other factors.
+
+## Next Step
+- [Find additional resources](additional-resources.md)

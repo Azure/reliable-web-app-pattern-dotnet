@@ -80,3 +80,6 @@ Azure Cache for Redis.
 Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
 ![image of Azure Cache for Redis Console shows data for upcoming concerts](./assets/Guide/Simulating_RedisConsoleShowUpcomingConcerts.png)
+
+## Next Step
+- [Understand service level objectives and cost](slo-and-cost.md)

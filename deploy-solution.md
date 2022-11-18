@@ -436,6 +436,5 @@ Run the following command to give your Azure AD account permission to access the
 > You can use the same commands if you want to test with the secondary resource
 > group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
-
-## Teardown
-(TODO)
+## Next Step
+- [Developer patterns](patterns.md)

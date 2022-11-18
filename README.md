@@ -5,6 +5,7 @@ This repository provides resources to help developers build a Reliable web app o
 **Steps to get started**:
 
 1. [Watch Introduction Video (12~ mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EVeC0AjLPxdBjUke0tRpe_IBua-phq4_qvFP2TcOHLtbZg?e=aQfW6o)
+1. [Business scenario](business-scenario.md)
 1. [Read the reference architecture](reliable-web-app.md)
 1. [Deploy solution](deploy-solution.md)
     1. [Known Issues](known-issues.md)
