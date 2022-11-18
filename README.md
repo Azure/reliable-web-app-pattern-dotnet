@@ -8,7 +8,7 @@ This repository provides resources to help developers build a Reliable web app o
 1. [Business scenario](business-scenario.md)
 1. [Read the reference architecture](reliable-web-app.md)
 1. [Deploy solution](deploy-solution.md)
-    1. [Known Issues](known-issues.md)
+    1. [Known issues](known-issues.md)
 1. [Developer patterns](patterns.md)
 1. [Understand service level objectives and cost](slo-and-cost.md)
 1. [Find additional resources](additional-resources.md)

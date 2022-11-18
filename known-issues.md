@@ -162,3 +162,6 @@ sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
 ```
 
 *There are no open items open for this issue.*
+
+## Next Step
+- [Deploy solution](deploy-solution.md)
