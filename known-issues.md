@@ -1,11 +1,7 @@
 # Known issues
 This content is still in the early stages, so you may run into some issues. Here are the significant known issues that exist in the current version.
 
-1. Shared Access Signatures for Azure Storage
-1. Data consistency for multi-regional deployments
-1. Challenges that could surface when trying the code
-
-# Shared Access Signatures for Azure Storage
+## Shared Access Signatures for Azure Storage
 
 This sample uses a connection string with a secret to connect directly to Azure storage. This serves to demonstrate
 how to apply the [Valet Key Pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/valet-key) but is not the best fit for this scenario. In Relecloud's scenario, the [shared
@@ -17,7 +13,7 @@ of access to 30-days and a new SAS uri would need to be generated after the curr
 Open issue:
 * [Setup network isolation for Azure Storage](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/12)
 
-# Data consistency for multi-regional deployments
+## Data consistency for multi-regional deployments
 
 This sample includes a feature to deploy to two Azure regions. The feature is intended to support the high availability scenario by deploying resources in an active/passive configuration. The sample currently supports the ability to fail-over web-traffic so requests can be handled from a second region. However it does not support data synchronization between two regions. 
 
@@ -77,16 +73,6 @@ If you choose to implement regional data consitency for your scenario you should
 * [Configure active geo-replication for Enterprise Azure Cache for Redis instances](https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/cache-how-to-active-geo-replication)
 * [High availability and disaster recovery for Azure Cache for Redis](https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/cache-high-availability#importexport)
 
-
-# Challenges that could surface when trying the code
-
-* Error: no project exists; to create a new project, run 'azd init'
-* The deployment 'relecloudresources' already exists in location
-* DeploymentScriptBootstrapScriptExecutionFailed
-* Service request failed. Status: 403 (Forbidden) when running locally
-* Cannot execute shellscript `/bin/bash^M: bad interpreter`
-* Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
-
 ## Error: no project exists; to create a new project, run 'azd init'
 When using the `azd provision` command it will check your current working directory for an `azure.yaml` file.
 
@@ -101,6 +87,25 @@ Please see the [teardown instructions](deploy-solution.md#clean-up-azure-resourc
 
 *There are no open items open for this issue.*
 
+## ContainerOperationFailure
+The Relecloud sample deploys an Azure Storage account with a container. In this scenario the deployment
+of the Azure Storage container failed because the Azure Storage Account did not exist.
+
+```json
+{
+    "status": "Failed",
+    "error": {
+        "code": "ContainerOperationFailure",
+        "message": "The specified resource does not exist.\nRequestId:aaaaaaaa-4444-0000-6666-ffffffffffff\nTime:2022-11-15T16:41:16.8992424Z"
+    }
+}
+```
+
+The recommended workaround is to retry the `azd provision` command if this happens during your deployment.
+
+Open issue:
+* [Azure Storage container operation failure](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/154)
+
 ## DeploymentScriptBootstrapScriptExecutionFailed
 The Relecloud sample uses deployment scripts to run cli or PowerShell commands to configure Azure resources that
 require multiple steps to provision. As an example, the Azure SQL database is created to allow public connection
@@ -109,7 +114,7 @@ the script will change properties of the Azure SQL instance to prevent public ac
 
 These scripts run in could fail during your deployment. If this happens the error look like the following:
 
-```
+```json
 {
     "status": "failed",
     "error": {
@@ -155,20 +160,5 @@ sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
 sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
 sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
 ```
-
-*There are no open items open for this issue.*
-
-## Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
-
-This error happens when attempting to connect to the Azure SQL Server with as
-an Active Directory user, or service principal, that has not been added as a SQL
-user.
-
-To fix this issue you need to connect to the SQL Database using the SQL Admin account
-and to add the Azure AD user.
-
-Documentation can help with this task: [Create contained users mapped to Azure AD identities](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure?tabs=azure-powershell&view=azuresql#create-contained-users-mapped-to-azure-ad-identities)
-
-This error can also happen if you still need to run the `makeSqlUserAccount.ps1` script.
 
 *There are no open items open for this issue.*
