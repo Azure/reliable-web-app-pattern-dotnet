@@ -36,3 +36,6 @@ For customers wanting Linux App Service plans, or new features and performance i
 - [Well-Architected Framework](https://docs.microsoft.com/azure/architecture/framework/)
 - [12 Factor Application](https://12factor.net/)
 - [Retry Pattern](https://docs.microsoft.com/azure/architecture/patterns/retry)
+
+## Next Step
+- [Report security concerns](SECURITY.md)

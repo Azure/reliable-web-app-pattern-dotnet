@@ -898,3 +898,6 @@ Azure Private Link provides the following benefits:
 - Privately access services on the Azure platform
 - Access services running in Azure from on-premises over ExpressRoute private peering
 - Reduces the network footprint of data stores to protect against data leakage
+
+## Next Step
+- [Deploy solution](implementation.md)

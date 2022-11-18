@@ -464,3 +464,6 @@ and to add the Azure AD user.
 Documentation can help with this task: [Create contained users mapped to Azure AD identities](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure?tabs=azure-powershell&view=azuresql#create-contained-users-mapped-to-azure-ad-identities)
 
 This error can also happen if you still need to run the `makeSqlUserAccount.ps1` script.
+
+## Next Step
+- [Developer patterns](patterns.md)
