@@ -1,8 +1,8 @@
 # Resulting service level and cost
 
-Relecloud's solution has a 99.98% availability SLO and has a
-minimum estimated cost of $2,039.60 per month when deployed to
-the East US and West US 2 Azure regions.
+Relecloud's solution has a 99.98% availability SLO and has an
+estimated cost between $2,000 and $3,000 per month when
+deployed to the East US and West US 2 Azure regions.
 
 ## Service Level Objective
 
@@ -67,11 +67,13 @@ To do this they added conditionals to their bicep templates
 so they could choose different SKUs and optionally choose to
 deploy to multiple regions when targeting production.
 
+Pricing Calculator breakouts
+- [Non-prod](https://azure.com/e/2a048617e85b41b9bc889cacf5cc8059)
+- [Prod](https://azure.com/e/ccfe6f10bd394ad49257c99a9c07f43c)
+
 ### Production
 
-Relecloud's solution has an estimated minimum cost of $2,039.60
-per month to run the production environment from two Azure
-regions. Additional costs will vary as the web apps scale based
+Additional costs will vary as the web apps scale based
 on load and the solution will also have additional costs for the
 data transmitted from the Azure data center. The primary forces
 driving this estimate are Azure SQL Database and Azure App
@@ -81,8 +83,7 @@ Their solution deploys an Azure SQL Database Premium SKU that
 uses the DTU pricing model. The selected SKU provides 500gB for
 database storage and 125 DTU of capacity for SQL compute tasks.
 
-> The compute configuration for this solution is specific to
-> this sample. Azure SQL provides many options to choose the
+> Azure SQL provides many options to choose the
 > right fit for your solution. In this deployment the Azure SQL
 > Database represents about 45% of the estimated costs. We
 > recommend that you review how your solution behaves in
@@ -109,13 +110,12 @@ the responsibilities of session management and data caching.
 
 ### Non-prod environments
 
-For non-production environments Relecloud devs target different
-SKUs for Dev/Test and their non-prod environments have an
-estimated minimum cost of $244 for each environment.
-
 The primary drivers of cost for non-production environments are
 the App Service Plans which represent 44% of the total cost.
-Customers that want to manage these costs for non-production workloads should examine if they can use one [App Service Plan](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans) to host both the front-end and API web apps.
+Customers that want to manage these costs for non-production
+workloads should examine if they can use one
+[App Service Plan](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans)
+to host both the front-end and API web apps.
 
 > We recommend that customers review these prices with their
 > account team. Prices vary by region and non-production pricing
