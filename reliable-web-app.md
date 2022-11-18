@@ -361,6 +361,9 @@ are used to grant authorization and create connections between resources.
 To protect that authorization process we recommend that you operationalize
 the rotation of secrets.
 
+> Note: The devOps workflows included in this sample do not automate this
+> process. The following changes discuss the tasks that should be addressed.
+
 In the sample there are three secrets that should be maintained.
 
 1. Azure AD client secret
