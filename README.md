@@ -5,8 +5,10 @@ This repository provides resources to help developers build a Reliable web app o
 **Steps to get started**:
 
 1. <img src="assets/icons/microsoft.png" height="20px" /> [Watch Introduction Video (12~ mins)](https://microsoftapc-my.sharepoint.com/:v:/g/personal/nanil_microsoft_com/EVeC0AjLPxdBjUke0tRpe_IBua-phq4_qvFP2TcOHLtbZg?e=aQfW6o)
+1. <img src="assets/icons/microsoft.png" height="20px" /> [Business scenario](business-scenario.md)
 1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Read the reference architecture](reliable-web-app.md)
 1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Deploy solution](implementation.md)
+    1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Known issues](known-issues.md)
 1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Developer patterns](patterns.md)
 1. <img src="assets/icons/microsoft.png" height="20px" /> [Understand service level objectives and cost](slo-and-cost.md)
 1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Find additional resources](additional-resources.md)
