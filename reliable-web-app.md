@@ -903,4 +903,4 @@ Azure Private Link provides the following benefits:
 - Reduces the network footprint of data stores to protect against data leakage
 
 ## Next Step
-- [Deploy solution](implementation.md)
+- [Deploy solution](deploy-solution.md)
