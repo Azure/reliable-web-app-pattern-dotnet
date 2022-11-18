@@ -354,44 +354,43 @@ Fast and routine deployment processes won't slow down the release of
 new features or bug fixes. These patterns are used by the Relecloud
 sample to improve operational excellence.
 
-#### Emergency Access Accounts
+#### Rotating Secrets
 
-<!-- https://docs.microsoft.com/en-us/azure/active-directory/roles/security-planning#define-at-least-two-emergency-access-accounts -->
+The Relecloud web app uses Key Vault to store secrets. These secrets
+are used to grant authorization and create connections between resources.
+To protect that authorization process we recommend that you operationalize
+the rotation of secrets.
 
-During the creation of the Azure SQL Database the bicep templates will
-deploy the server and create a SQL Admin user account. This account
-has administrative permission to maintain the database.
+> Note: This sample does not currently include the automation to address this
+> responsibility. The following changes discuss the tasks that should be addressed.
 
-Keeping the SQL Administrator account helped us address the following
-requirements:
+In the sample there are three secrets that should be maintained.
 
-- If an admin forgets their password, or goes on vacation, we need
-to be able to access the system
-- If an outage is detected, we need to connect with an account that
-is guaranteed to have the permissions we need to do any operations
-necessary to restore system health
-- If someone leaves the team, we need to ensure that we can still
-access the database backups no matter who created them
+1. Azure AD client secret
+1. Azure Cache for Redis connection string
+1. Azure Storage Account key
 
-One of the risks with having this break glass account is that it could
-create a security concern. The team addresses the risk in two ways.
+*Azure AD Client Secret*
+To rotate the Azure AD client secret you should generate a new client secret
+and then save the new value to Key Vault. With this sample, the team must
+restart the web app so the code will start using the new secret. After
+the web app has been restarted, the team can delete the previous client secret.
 
-1. The account is stored in a separate Azure Key Vault and access is
-not granted to any other resources. The credentials are not shared with
-other teams and admins are the only users that can access the vault during
-an outage scenario.
+*Azure Cache for Redis connection string*
+To rotate the connection string you should change the value in Key Vault
+to the secondary connection string for Azure Cache for Redis. After changing
+the value you will need to restart the web app so the new setting can be used.
+Once the web app has restarted you can use the azure cli or the Azure portal
+to regenerate the access key for Azure Cache for Redis.
 
-2. The production Azure SQL Database is configured to block network
-connections unless they come through the Private Endpoint. And, the
-database is configured only to allow Azure AD connections. These
-two settings must be modified before the SQL Admin account in Key
-Vault can be used.
-
-<!-- There should be more than one owner -->
-<!-- https://docs.microsoft.com/en-us/azure/defender-for-cloud/recommendations-reference#identityandaccess-recommendations -->
-> This practice is not automated but is recommended for
-other areas such as Azure Subscriptions and
-[Azure AD administration](https://docs.microsoft.com/en-us/azure/active-directory/roles/security-planning#define-at-least-two-emergency-access-accounts).
+*Azure Storage Account key*
+Rotating the connection string secret for Azure Storage is the same process
+described for Azure Cache for Redis with an additional step. In this solution
+the code makes ticket images available directly from Azure storage. If you
+choose to do this then you must be prepared to regnerate the shared access
+signature URLs that were generated for each ticket. When the shared access
+signature URL is generated it uses the primary access key to generate a token
+that grants access to the ticket image for a limited time of 30-days.
 
 #### Repeatable Infrastructure
 
