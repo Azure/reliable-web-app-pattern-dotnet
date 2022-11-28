@@ -164,7 +164,7 @@ deliberate attacks and abuse of your valuable data and systems:
 * Integrity
 * Availability
 
-These followingprinciples are used by the Relecloud team to
+The following principles are used by the Relecloud team to
 secure this web app.
 
 #### Use Managed identity
@@ -175,25 +175,25 @@ secure connections between isolated resources. Connection
 strings are the most common example of creating secure
 connections.
 
-For on-prem apps there were two popular options for connection
+For on-prem apps there were two popular choices for connection
 strings. Your connection string could specify a SQL user and
-password in the configuration file, or you could hide the
-password from the configuration file with the *Trusted
-connection* and *Integrated security* features.
+password, or you could hide the password from the configuration
+file with the *Trusted connection* and *Integrated security*
+features.
 
 These features enabled an app to connect to a SQL database with
-an Active Directory account that was often referred to as a
-service account because the service was the only one that
+an Active Directory account. These were often referred to as
+service accounts because the service was the only one that
 should ever be able to login with the password.
 
 In Azure we recommend using managed identity as a similar
 concept. Azure resources that support managed identity also
-provide client libraries that securely handle the authentication.
+provide client libraries to enable this feature.
 
 There are a couple of ways to use managed identity. The first
 option the Relecloud team uses is the `DefaultAzureCredential`
 object when creating a connection between the web app and Azure
-Key vault.
+Key Vault in the `Program.cs` when the app is starting.
 
 ```
     builder.Configuration.AddAzureAppConfiguration(options =>
@@ -211,42 +211,44 @@ Key vault.
 <sup>[Link to Program.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/b05fb3f940b32af9117dcae4319f7d84624fab28/src/Relecloud.Web.Api/Program.cs#L11)</sup>
 
 This is a special object that works with Microsoft client
-libraries to support local development connectivity options
-and managed identity in the cloud.
+libraries to provide local development connectivity options
+and support managed identity in the cloud.
 
-The second way to use Managed Identity is with the text of
+The second way to use managed identity is within the text of
 connection strings. In the Relecloud sample the Azure SQL
-database connection string is not stored in Key Vault but in 
-Azure App Configuration Service because there is no password, or
-secret, associated with the config value. The following is an
-example connection string for Azure SQL database.
+database connection string is stored in Azure App Configuration
+Service, and not Key Vault, because there is no password (or
+secret). The following is an example connection string for Azure
+SQL database.
 
 ```
 Server=tcp:my-sql-server.database.windows.net,1433;Initial Catalog=my-sql-database;Authentication=Active Directory Default
 ```
 <sup>[Link to resources.bicep](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/b05fb3f940b32af9117dcae4319f7d84624fab28/infra/resources.bicep#L95)</sup>
 
-Note that in this sample, the **Authentication** section of the
+Note that in this sample, the *Authentication* section of the
 connection string is how we inform the Microsoft client library
-that we want to connect with managed identity. There are no 
-asswords in the bicep templates, the C# code, the config file,
-or the App Service configuration settings. Managed identity
-keeps connections secure because only Azure resources can
-connect with managed identity. Managed identities do not have
-passwords that can be leaked so you don't need to create a rotation strategy to ensure their integrity.
+that we want to connect with managed identity.
+
+There are no passwords in the bicep templates, the C# code, the
+config file, or the App Service configuration settings. Managed
+identities do not have passwords that can be leaked so you don't
+need to create a rotation strategy to ensure their integrity.
 
 The bicep templates in this project handle the following tasks
-associated with using managed identity.
+associated with using managed identity in a solution.
 
 1. Create the managed identity [example](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/main/infra/resources.bicep#L21)
 1. Associate the identity with a resource (e.g. the web app) [example](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/b05fb3f940b32af9117dcae4319f7d84624fab28/infra/resources.bicep#L194)
 1. Grant the identity permission to access a resource (e.g. the SQL database) [example](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/b05fb3f940b32af9117dcae4319f7d84624fab28/infra/resources.bicep#L34)
-1. Use the connection string to specify that a managed identity connection is being made in one of the two ways shown above
+1. Specify that managed identity is how the connection should be
+made by applying one of the two approaches shown above
 
 For more information, see:
 
 - [Managed identity](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview)
 - [Web app managed identity](https://learn.microsoft.com/en-us/azure/active-directory/develop/multi-service-web-app-access-storage?tabs=azure-portal%2Cprogramming-language-csharp#enable-managed-identity-on-an-app)
+- [Azure services that can use managed identities to access other services](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/managed-identities-status)
 
 #### Use identity-based authentication
 
@@ -272,7 +274,7 @@ integrity, or the availability of your solution. In the managed
 identity section above you can see how to do this with role
 assignments. 
 
-> In this sample we grant the web identity root access to SQL
+> In this sample we grant the managed identity root access to SQL
 server because we use Entity Framework Code First Migrations. If
 you choose another approach to managing your SQL schema you
 should reduce these permissions to read/write access.
@@ -292,7 +294,7 @@ We use Azure Key Vault to ensure secrets are stored securely with software encry
 using industry-standard algorithms and key lengths.
 
 <!-- source: https://learn.microsoft.com/en-us/azure/key-vault/general/overview -->
-Access to a key vault requires proper authentication and
+Access to key vault also requires proper authentication and
 authorization before a caller (user or application) can get
 access. Authentication establishes the identity of the caller,
 while authorization determines the operations that they are allowed to perform. Authentication is done via Azure Active
