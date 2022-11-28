@@ -156,30 +156,35 @@ with requests if it is restarting to recover from an error.
 
 ### Security
 
-Security design principles describe a securely architected
-system hosted on cloud or on-premises datacenters (or a
-combination of both). Applying these principles dramatically
-increases the likelihood your architecture assures
-confidentiality, integrity, and availability. These principles
-are used by the Relecloud team to improve security.
+Security is one of the most important aspects of any
+architecture. It provides the following assurances against
+deliberate attacks and abuse of your valuable data and systems:
+
+* Confidentiality
+* Integrity
+* Availability
+
+These followingprinciples are used by the Relecloud team to
+secure this web app.
 
 #### Use Managed identity
 
-Making the most of the Azure platform means leveraging services
-and features that solve business problems. To do this, you will
-need to create secure connections between isolated resources.
-Connection strings are the most common example of creating
-secure connections.
+Making the most of the Azure platform means leveraging multiple
+services and features. To do this, you will need to create
+secure connections between isolated resources. Connection
+strings are the most common example of creating secure
+connections.
 
 For on-prem apps there were two popular options for connection
-strings from a web app to a SQL server. Your connection string
-could specify a SQL user and password in the configuration file,
-or you could hide the password from the configuration file with
-the *Trusted connection* and *Integrated security* features. 
+strings. Your connection string could specify a SQL user and
+password in the configuration file, or you could hide the
+password from the configuration file with the *Trusted
+connection* and *Integrated security* features.
+
 These features enabled an app to connect to a SQL database with
-an Active Directory account that we described as a service
-account because the service was the only one that should ever
-use the password.
+an Active Directory account that was often referred to as a
+service account because the service was the only one that
+should ever be able to login with the password.
 
 In Azure we recommend using managed identity as a similar
 concept. Azure resources that support managed identity also
@@ -206,15 +211,8 @@ Key vault.
 <sup>[Link to Program.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/b05fb3f940b32af9117dcae4319f7d84624fab28/src/Relecloud.Web.Api/Program.cs#L11)</sup>
 
 This is a special object that works with Microsoft client
-libraries to support managed identity in the cloud and local
-development connectivity options. Note that when this connection
-is created there are no passwords specified. This connection is
-secured by Azure AD and there are no passwords in the bicep
-templates, the C# code, the config file, or the App Service
-configuration settings. Managed identity keeps connections secure
-because only Azure resources can connect with managed identity
-and there is never a password that could be leaked or needs to
-be maintained.
+libraries to support local development connectivity options
+and managed identity in the cloud.
 
 The second way to use Managed Identity is with the text of
 connection strings. In the Relecloud sample the Azure SQL
@@ -230,9 +228,14 @@ Server=tcp:my-sql-server.database.windows.net,1433;Initial Catalog=my-sql-databa
 
 Note that in this sample, the **Authentication** section of the
 connection string is how we inform the Microsoft client library
-that we want to connect with managed identity.
+that we want to connect with managed identity. There are no 
+asswords in the bicep templates, the C# code, the config file,
+or the App Service configuration settings. Managed identity
+keeps connections secure because only Azure resources can
+connect with managed identity. Managed identities do not have
+passwords that can be leaked so you don't need to create a rotation strategy to ensure their integrity.
 
-The bicep templates in this project handle the remaining tasks
+The bicep templates in this project handle the following tasks
 associated with using managed identity.
 
 1. Create the managed identity [example](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/main/infra/resources.bicep#L21)
