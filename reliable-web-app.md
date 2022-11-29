@@ -156,28 +156,24 @@ with requests if it is restarting to recover from an error.
 
 ### Security
 
-Security is one of the most important aspects of any
-architecture. It provides the following assurances against
-deliberate attacks and abuse of your valuable data and systems:
-
-* Confidentiality
-* Integrity
-* Availability
-
-The following principles are used by the Relecloud team to
-secure this web app.
+Security design principles describe a securely architected system
+hosted on cloud or on-premises datacenters (or a combination of
+both). Application of these principles dramatically increases the
+likelihood your architecture assures confidentiality, integrity,
+and availability. The following principles are used by the
+Relecloud team to secure their web app.
 
 #### Use Managed identity
 
 Making the most of the Azure platform means leveraging multiple
 services and features. To do this, you will need to create
-secure connections between isolated resources. Connection
+secure connections between those resources. Connection
 strings are the most common example of creating secure
 connections.
 
 For on-prem apps there were two popular choices for connection
 strings. Your connection string could specify a SQL user and
-password, or you could hide the password from the configuration
+password, or you could hide the password from the config
 file with the *Trusted connection* and *Integrated security*
 features.
 
@@ -191,9 +187,9 @@ concept. Azure resources that support managed identity also
 provide client libraries to enable this feature.
 
 There are a couple of ways to use managed identity. The first
-option the Relecloud team uses is the `DefaultAzureCredential`
+option is the `DefaultAzureCredential`. The sample uses this
 object when creating a connection between the web app and Azure
-Key Vault in the `Program.cs` when the app is starting.
+Key Vault in the `Program.cs` during startup.
 
 ```
     builder.Configuration.AddAzureAppConfiguration(options =>
@@ -211,7 +207,7 @@ Key Vault in the `Program.cs` when the app is starting.
 <sup>[Link to Program.cs](https://github.com/Azure/reliable-web-app-pattern-dotnet/blob/b05fb3f940b32af9117dcae4319f7d84624fab28/src/Relecloud.Web.Api/Program.cs#L11)</sup>
 
 This is a special object that works with Microsoft client
-libraries to provide local development connectivity options
+libraries to provide connectivity options for local dev work
 and support managed identity in the cloud.
 
 The second way to use managed identity is within the text of
@@ -253,26 +249,24 @@ For more information, see:
 #### Use identity-based authentication
 
 By default, Azure resources come with connection strings, and
-secret keys, that grant access to the resource but these
-connections are not identity based. This means they have two
-drawbacks over managed identity. First, they do not identify the
-resource that is connecting. When an app uses the secret key to
-connect you lose traceability to understand who is connecting
-and the context to understand why. Second, you lose the ability
-to govern what permissions should be applied to during a
-connection. Using managed identity enables you to understand who
-is connecting to your resources and it enables you to set
-permissions that govern the actions that can be performed.
+secret keys, but these connections are not identity based. This
+means they have two drawbacks over managed identity.First, they
+do not identify the resource that is connecting. When an app uses
+the secret key to connect you lose traceability to understand who
+is connecting and the context to understand why. Second, you lose
+the ability to govern what permissions should be applied to
+during a connection. Using managed identity enables you to
+understand who is connecting to your resources and it enables you
+to set permissions that govern the actions that can be performed.
 
 <!-- source: https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/managed-identity-best-practice-recommendations#follow-the-principle-of-least-privilege-when-granting-access-->
 Governing the actions that can be performed is a key tenet of
 security. When granting access to a resource we recommend that
-you always grant the least permissions needed to perform the
-desired actions. Using extra permissions when not needed gives
-attackers more opportunity to compromise the confidentiality,
-integrity, or the availability of your solution. In the managed
-identity section above you can see how to do this with role
-assignments. 
+you always grant the least permissions needed. Using extra
+permissions when not needed gives attackers more opportunity to
+compromise the confidentiality, integrity, or the availability of
+your solution. In the managed identity section above you can see
+how to do this with role assignments. 
 
 > In this sample we grant the managed identity root access to SQL
 server because we use Entity Framework Code First Migrations. If
