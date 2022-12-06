@@ -103,7 +103,7 @@ of the Azure Storage container failed because the Azure Storage Account did not 
 
 The recommended workaround is to retry the `azd provision` command if this happens during your deployment.
 
-Open issue:
+Known issue:
 * [Azure Storage container operation failure](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/154)
 
 ## DeploymentScriptBootstrapScriptExecutionFailed
