@@ -745,7 +745,7 @@ but the right duration for the cache will vary for every scenario.
 
 ## Deploy the solution
 
-This solution uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions,and creating Azure AD App Registrations. [Follow the implementation guidelines](implementation.md) to deploy the code to Azure and local development.
+This solution uses the Azure Dev CLI to set up Azure services and deploy the code. Deploying the code requires the creation of Azure services, configuration of permissions,and creating Azure AD App Registrations. [Follow the deployment guidelines](deploy-solution.md) to deploy the code to Azure and local development.
 
 ## Components
 
