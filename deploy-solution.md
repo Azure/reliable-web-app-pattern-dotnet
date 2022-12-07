@@ -212,7 +212,7 @@ When finished the console will display the URI for the web app. You can use this
 
 ![screenshot of Relecloud app home page](./assets/Guide/WebAppHomePage.png)
 
-> If you face any issues with the deployment, see the [Known issues section](#known-issues) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
+> If you face any issues with the deployment, see the [Known issues document](known-issues.md) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
 
 ### Clean up Azure Resources
 
