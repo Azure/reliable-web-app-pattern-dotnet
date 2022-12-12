@@ -14,7 +14,7 @@ This repository provides resources to help developers build a Reliable web app o
 1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Find additional resources](additional-resources.md)
 1. <img src="assets/icons/microsoft.png" height="20px" /> [Report security concerns](SECURITY.md)
 1. <img src="assets/icons/microsoft.png" height="20px" /> [Find Support](SUPPORT.md)
-1. <img src="assets/icons/microsoft.png" height="20px" /> [Contributing](contributing.md)
+1. <img src="assets/icons/microsoft.png" height="20px" /> [Contributing](CONTRIBUTING.md)
 
 [![screenshot azd env new](./assets/Guide/Intro-video.jpg)](https://aka.ms/eap-intro-video)
 
