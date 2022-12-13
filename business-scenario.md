@@ -34,13 +34,13 @@ destination for their application due to its robust global platform and
 tremendous managed service capabilities that will support Relecloud's
 growth objectives for years to come.
 
-The reference that follows demonstrates the first phase of their
+The reference content that follows demonstrates the first phase of their
 journey - a modernized LOB web application that has improved
 reliability, security, performance, and more mature operational
 practices at a predictable cost. This phase also provides a foundation
 upon which they will achieve their longer-term objectives in later
-phases. The following solution diagram shows the reference architecture
-that we'll discuss for the rest of the guide.
+phases. Continue to the next section to learn more about the solution
+architecture, and the recommendations they applied to achieve their goals.
 
 ## Next Step
 - [Read the reference architecture](reliable-web-app.md)
