@@ -12,7 +12,7 @@ availability SLO of 99.98%.
 To calculate this they reviewed their business scenario and
 defined that the system is considered *available* when customers
 can purchase tickets. This means that we can determine the
-solution's availbility by finding the availability of the
+solution's availability by finding the availability of the
 Azure services that must be functioning to complete the checkout
 process.
 
