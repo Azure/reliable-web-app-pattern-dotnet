@@ -10,8 +10,6 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
         public DbSet<User> Users => Set<User>();
         public DbSet<Ticket> Tickets => Set<Ticket>();
 
-        public DbSet<TicketNumber> TicketNumbers => Set<TicketNumber>();
-
         public ConcertDataContext(DbContextOptions<ConcertDataContext> options) : base(options)
         {
         }
@@ -24,9 +22,6 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
                 .Ignore(c => c.NumberOfTicketsForSale);
             modelBuilder.Entity<Customer>()
                 .HasIndex(c => new { c.Email })
-                .IsUnique();
-            modelBuilder.Entity<TicketNumber>()
-                .HasIndex(tn => new { tn.Number, tn.ConcertId })
                 .IsUnique();
         }
 
