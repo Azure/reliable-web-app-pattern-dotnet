@@ -75,9 +75,6 @@ if ($web_app) {
   # get 'AzureAd:ClientSecret' from Key Vault
   $frontEndAzureAdClientSecret = (az keyvault secret show --vault-name $keyVaultName --name AzureAd--ClientSecret -o tsv --query "value" 2> $null) 
       
-  # get 'App:RedisCache:ConnectionString' from Key Vault
-  $frontEndRedisConnStr = (az keyvault secret show --vault-name $keyVaultName --name App--RedisCache--ConnectionString -o tsv --query "value" 2> $null) 
-
   # get 'App:RelecloudApi:AttendeeScope' from App Configuration Svc
   $frontEndAttendeeScope = (az appconfig kv show -n $appConfigSvcName --key App:RelecloudApi:AttendeeScope -o tsv --query value 2> $null) 
 
@@ -94,7 +91,6 @@ if ($web_app) {
   Write-Host ""
   Write-Host "{"
   Write-Host "   `"App:AppConfig:Uri`": `"$appConfigUri`","
-  Write-Host "   `"App:RedisCache:ConnectionString`": `"$frontEndRedisConnStr`","
   Write-Host "   `"App:RelecloudApi:AttendeeScope`": `"$frontEndAttendeeScope`","
   Write-Host "   `"App:RelecloudApi:BaseUri`": `"$frontEndBaseUri`","
   Write-Host "   `"AzureAd:ClientId`": `"$frontEndAzureAdClientId`","
