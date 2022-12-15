@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.Resource;
 using Relecloud.Web.Api.Infrastructure;
 using Relecloud.Web.Api.Services;
 using Relecloud.Web.Api.Services.TicketManagementService;
@@ -217,7 +216,7 @@ namespace Relecloud.Web.Api.Controllers
                 yield return concert;
             }
         }
-        
+
         private async Task<bool> HaveTicketsBeenSoldAsync(int concertId)
         {
             var result = await this.ticketService.HaveTicketsBeenSoldAsync(concertId);

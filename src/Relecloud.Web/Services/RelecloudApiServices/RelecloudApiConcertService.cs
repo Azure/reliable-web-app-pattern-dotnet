@@ -30,7 +30,7 @@ namespace Relecloud.Web.Services.ApiConcertService
             await PrepareAuthenticatedClient();
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "api/Concert");
             httpRequestMessage.Content = JsonContent.Create(newConcert);
-            
+
             var httpResponseMessage = await this.httpClient.SendAsync(httpRequestMessage);
             var responseMessage = await httpResponseMessage.Content.ReadAsStringAsync();
 
@@ -226,7 +226,7 @@ namespace Relecloud.Web.Services.ApiConcertService
             var identity = this.httpContextAccessor.HttpContext?.User?.Identity;
             if (identity != null && identity.IsAuthenticated)
             {
-                var scopes = new[] { this.options.Value.AttendeeScope ?? throw new ArgumentNullException(nameof(this.options.Value.AttendeeScope))};
+                var scopes = new[] { this.options.Value.AttendeeScope ?? throw new ArgumentNullException(nameof(this.options.Value.AttendeeScope)) };
                 var accessToken = await this.tokenAcquisition.GetAccessTokenForUserAsync(scopes);
                 this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                 this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

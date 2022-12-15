@@ -19,7 +19,7 @@ namespace Relecloud.Web.Api.Infrastructure
                 return errorMessages;
             }
 
-            foreach(var error in modelStateDictionary)
+            foreach (var error in modelStateDictionary)
             {
                 var errorMessageList = error.Value.Errors.Where(err => !string.IsNullOrEmpty(err.ToString())).Select(err => err.ToString());
                 if (errorMessageList != null)

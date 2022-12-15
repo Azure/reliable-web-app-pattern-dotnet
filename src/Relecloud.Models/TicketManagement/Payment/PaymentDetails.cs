@@ -51,7 +51,7 @@ namespace Relecloud.Web.Models.TicketManagement.Payment
             if (!string.IsNullOrEmpty(ExpirationMonthYear) && ExpirationMonthYear.Length == 4)
             {
                 var monthSplitString = ExpirationMonthYear.Substring(0, 2);
-                var yearSplitString = ExpirationMonthYear.Substring(2,2);
+                var yearSplitString = ExpirationMonthYear.Substring(2, 2);
                 if (int.TryParse(monthSplitString, out int cardExpirationMonth) && int.TryParse(yearSplitString, out int cardExpirationYear))
                 {
                     if ((DateTimeOffset.UtcNow.Year > cardExpirationYear + 2000)

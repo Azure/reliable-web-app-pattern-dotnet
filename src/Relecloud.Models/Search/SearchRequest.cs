@@ -3,7 +3,7 @@
     public class SearchRequest
     {
         public const int PageSize = 5;
-        
+
         public int CurrentPage { get; set; }
 
         public string Query { get; set; } = string.Empty;

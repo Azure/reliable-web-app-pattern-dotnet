@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using Relecloud.Web.Models.ConcertContext;
+﻿using Relecloud.Web.Models.ConcertContext;
 
 namespace Relecloud.Web.ViewModels
 {
