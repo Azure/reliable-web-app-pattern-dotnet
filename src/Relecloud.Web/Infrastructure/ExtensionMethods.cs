@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Relecloud.Web.Models.ConcertContext;
@@ -100,7 +99,7 @@ namespace Relecloud.Web.Infrastructure
 
             foreach (var errorMessage in errorMessages)
             {
-                foreach(var errorText in errorMessage.Value)
+                foreach (var errorText in errorMessage.Value)
                 {
                     modelStateDictionary.AddModelError(errorMessage.Key, errorText);
                 }

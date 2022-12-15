@@ -24,7 +24,7 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
             // for current scope ticket sales are unlimited
             return Task.FromResult(new CountAvailableTicketsResult
             {
-                CountOfAvailableTickets= 100
+                CountOfAvailableTickets = 100
             });
         }
 
@@ -47,12 +47,12 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
         public async Task<ReserveTicketsResult> ReserveTicketsAsync(int concertId, string userId, int numberOfTickets, int customerId)
         {
             var newTickets = new List<Ticket>();
-            for(int i=0; i<numberOfTickets; i++)
+            for (int i = 0; i < numberOfTickets; i++)
             {
                 var newTicket = new Ticket
                 {
-                    ConcertId= concertId,
-                    UserId= userId,
+                    ConcertId = concertId,
+                    UserId = userId,
                     CustomerId = customerId
                     //TicketNumber = not used. planned for use when tickets become limited due to seating
                 };
@@ -62,7 +62,7 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
 
             await database.SaveChangesAsync();
 
-            foreach(var ticket in newTickets)
+            foreach (var ticket in newTickets)
             {
                 await ticketRenderingService.CreateTicketImageAsync(ticket.Id);
             }

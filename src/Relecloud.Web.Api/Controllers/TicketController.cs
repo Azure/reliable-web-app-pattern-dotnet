@@ -77,7 +77,7 @@ namespace Relecloud.Web.Api.Controllers
         [HttpPost("Purchase", Name = "Purchase")]
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type=typeof(PurchaseTicketsResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(PurchaseTicketsResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize]
         public async Task<IActionResult> PurchaseTicketsAsync(PurchaseTicketsRequest purchaseTicketRequest)
@@ -137,7 +137,7 @@ namespace Relecloud.Web.Api.Controllers
                     }
                 }
 
-                foreach(var concertAndTickets in purchaseTicketRequest.ConcertIdsAndTicketCounts!)
+                foreach (var concertAndTickets in purchaseTicketRequest.ConcertIdsAndTicketCounts!)
                 {
                     var reserveResult = await this.ticketService.ReserveTicketsAsync(concertAndTickets.Key, purchaseTicketRequest.UserId!, concertAndTickets.Value, customerId);
 
@@ -154,7 +154,7 @@ namespace Relecloud.Web.Api.Controllers
                     HoldCode = preAuthResponse.HoldCode,
                     TotalPrice = orderTotal
                 };
-                
+
                 await paymentGatewayService.CapturePaymentAsync(captureRequest);
 
                 return Accepted(new PurchaseTicketsResult
@@ -177,7 +177,7 @@ namespace Relecloud.Web.Api.Controllers
             }
 
             double totalAmount = 0.0;
-            foreach(var concertId in request.ConcertIdsAndTicketCounts.Keys)
+            foreach (var concertId in request.ConcertIdsAndTicketCounts.Keys)
             {
                 var concert = await this.concertRepository.GetConcertByIdAsync(concertId);
                 if (concert is null)

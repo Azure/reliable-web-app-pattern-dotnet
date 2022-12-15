@@ -117,7 +117,7 @@ namespace Relecloud.Web.Controllers
 
         [HttpPost]
         [Authorize(Roles.Administrator)]
-        public async Task<IActionResult> Edit([Bind(Prefix = "Concert")]Concert model)
+        public async Task<IActionResult> Edit([Bind(Prefix = "Concert")] Concert model)
         {
             if (ModelState.IsValid)
             {

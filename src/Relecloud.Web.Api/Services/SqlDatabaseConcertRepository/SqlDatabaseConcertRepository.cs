@@ -79,7 +79,8 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
                     .Take(count)
                     .ToListAsync();
                 concertsJson = JsonSerializer.Serialize(concerts);
-                var cacheOptions = new DistributedCacheEntryOptions {
+                var cacheOptions = new DistributedCacheEntryOptions
+                {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
                 };
                 await this.cache.SetStringAsync(CacheKeys.UpcomingConcerts, concertsJson, cacheOptions);
@@ -109,7 +110,7 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
         public async Task<PagedResult<Ticket>> GetAllTicketsAsync(string userId, int skip, int take)
         {
             var pageOfData = await this.database.Tickets.AsNoTracking().Include(t => t.Concert).Where(t => t.UserId == userId)
-                .OrderByDescending(t=> t.Id).Skip(skip).Take(take).ToListAsync();
+                .OrderByDescending(t => t.Id).Skip(skip).Take(take).ToListAsync();
             var totalCount = await this.database.Tickets.Where(t => t.UserId == userId).CountAsync();
 
             return new PagedResult<Ticket>(pageOfData, totalCount);
