@@ -92,9 +92,6 @@ if [[ $web_app ]]; then
     # get 'AzureAd:ClientSecret' from Key Vault
     frontEndAzureAdClientSecret=$(az keyvault secret show --vault-name $keyVaultName --name AzureAd--ClientSecret -o tsv --query "value" 2> /dev/null) 
     
-    # get 'App:RedisCache:ConnectionString' from Key Vault
-    frontEndRedisConnStr=$(az keyvault secret show --vault-name $keyVaultName --name App--RedisCache--ConnectionString -o tsv --query "value" 2> /dev/null) 
-
     # get 'App:RelecloudApi:AttendeeScope' from App Configuration Svc
     frontEndAttendeeScope=$(az appconfig kv show -n $appConfigSvcName --key App:RelecloudApi:AttendeeScope -o tsv --query value 2> /dev/null) 
 
@@ -111,7 +108,6 @@ if [[ $web_app ]]; then
     echo ""
     echo "{"
     echo "   \"App:AppConfig:Uri\": \"$appConfigUri\","
-    echo "   \"App:RedisCache:ConnectionString\": \"$frontEndRedisConnStr\","
     echo "   \"App:RelecloudApi:AttendeeScope\": \"$frontEndAttendeeScope\","
     echo "   \"App:RelecloudApi:BaseUri\": \"$frontEndBaseUri\","
     echo "   \"AzureAd:ClientId\": \"$frontEndAzureAdClientId\","

@@ -40,26 +40,10 @@ namespace Relecloud.Web
             AddConcertContextService(services);
             AddConcertSearchService(services);
             AddTicketPurchaseService(services);
-            AddAzureCacheForRedis(services);
 
             // Add support for session state.
             // NOTE: If there is a distibuted cache service (e.g. Redis) then this will be used to store session data.
             services.AddSession();
-        }
-
-        private void AddAzureCacheForRedis(IServiceCollection services)
-        {
-            if (!string.IsNullOrWhiteSpace(Configuration["App:RedisCache:ConnectionString"]))
-            {
-                services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = Configuration["App:RedisCache:ConnectionString"];
-                });
-            }
-            else
-            {
-                services.AddDistributedMemoryCache();
-            }
         }
 
         private void AddTicketPurchaseService(IServiceCollection services)
