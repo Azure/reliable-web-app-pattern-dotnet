@@ -18,7 +18,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Azure Dev Provision
-        run: azd provision --no-prompt
+        run: azd provision --no-prompt --debug
         env:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
