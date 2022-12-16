@@ -16,11 +16,12 @@ We built an app configuration setting that lets you simulate and test a transien
 Follow these steps to set up this test:
 
 1. Create a new key-value in App Configuration.
-    1. Go to App Configuration in the Azure Portal
-    1. Select your app configuration resource
-    1. Navigate to the "Configuration explorer" by clicking the link in the left-hand blade under "Operations"
-    1. Click the "+ Create" button and choose "Key-value"
-    1. Enter the following data:
+    - Go to App Configuration in the Azure Portal
+    - Select your app configuration resource
+    - Navigate to the "Configuration explorer" by clicking the link in the left-hand blade under "Operations"
+    - Click the "+ Create" button and choose "Key-value"
+    - Enter the following data:
+    
 
     |Name|Value|
     |-----|-----|
@@ -28,9 +29,9 @@ Follow these steps to set up this test:
     |*Value*|2|
 
 1. Restart the API web app App Service
-    1. Go to the API web app App Service
-    1. Navigate to the "Overview" blade
-    1. Click the "Restart" button at the top of the page.
+    - Go to the API web app App Service
+    - Navigate to the "Overview" blade
+    - Click the "Restart" button at the top of the page.
   
   > It will take a few minutes for the App Service to restart. When it restarts, the application will use the `Api:App:RetryDemo` configuration. You need to restart the App Service any time you update a configuration value.
 
