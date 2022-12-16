@@ -1,5 +1,4 @@
 using System.Net;
-using System.Security.Claims;
 
 /*
 NOTICE: This class is not intended for production scenarios.

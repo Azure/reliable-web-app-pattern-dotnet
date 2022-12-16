@@ -105,7 +105,7 @@ Write-Debug ""
 
 # Resolves permission constraint that prevents the deploymentScript from running this command
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
-Set-AzSqlServer -ServerName $mySqlServer -PublicNetworkAccess 'disabled' -ResourceGroupName $ResourceGroupName > $null
+az sql server update --name $mySqlServer --enable-public-network false --resource-group $ResourceGroupName > $null
 
 $frontEndWebObjectId = (az ad app list --filter "displayName eq '$frontEndWebAppName'" --query "[].id" -o tsv)
 

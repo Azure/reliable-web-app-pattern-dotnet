@@ -34,7 +34,7 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
                 .Where(ticket => ticket.Id == ticketId).FirstOrDefault();
             if (ticket == null)
             {
-                logger.LogWarning($"No Ticket found for id:{ticketId}"); 
+                logger.LogWarning($"No Ticket found for id:{ticketId}");
                 return;
             }
 

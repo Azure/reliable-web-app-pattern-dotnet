@@ -5,7 +5,7 @@ param isProd bool
 
 var storageSku = isProd ? 'Standard_ZRS' : 'Standard_LRS'
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: '${resourceToken}storage' //storage account name cannot contain character '-'
   tags: tags
   location: location
@@ -14,9 +14,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
   }
   kind: 'StorageV2'
 
-  resource blobServices 'blobServices@2022-05-01' = {
+  resource blobServices 'blobServices' = {
     name:'default'
-    resource container 'containers@2022-05-01' = {
+    resource container 'containers' = {
       name: 'tickets'
     }
   }

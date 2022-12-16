@@ -1,4 +1,4 @@
-# Reliable application implementation
+# Deploy the solution
 
 This reference implementation provides you with the instructions and templates you need to deploy this solution. This solution uses the Azure Dev CLI to set up Azure services
 and deploy the code.
@@ -20,6 +20,13 @@ and deploy the code.
     ```ps1
     az login
     ```
+1. [Upgrade the Azure CLI Bicep extension](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli).
+    Run the following command to verify that you're running version 0.12.40 or higher.
+
+    ```ps1
+    az bicep version
+    ```
+
 1. [Install the Azure Dev CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd).
     Run the following command to verify that the Azure Dev CLI is installed.
 
@@ -32,6 +39,21 @@ and deploy the code.
     ```ps1
     dotnet --version
     ```
+
+## Get the code
+
+Please clone the repo to get started.
+
+```
+git clone https://github.com/Azure/reliable-web-app-pattern-dotnet
+```
+
+And switch to the folder so that `azd` will recognize the solution.
+
+```
+cd reliable-web-app-pattern-dotnet
+```
+
 ## Deploying to Azure
 
 Relecloud's developers use the `azd` command line experience to deploy the code. This means their local workflow is the same
@@ -110,6 +132,16 @@ azd env set SECONDARY_AZURE_LOCATION westus3
 > az account list-locations --query "[].name" -o tsv
 > ```
 
+### (Optional) Custom SQL Password
+Relecloud's bicep templates support generating a 30 character hashed
+from the subscription, environment name, and the Azure location.
+
+To override this behavior the team provides their own custom password
+using the following command.
+
+```bash
+azd env set AZURE_SQL_PASSWORD superSECUREP@55W0RD
+```
 
 ### Provision the infrastructure
 
@@ -180,17 +212,25 @@ When finished the console will display the URI for the web app. You can use this
 
 ![screenshot of Relecloud app home page](./assets/Guide/WebAppHomePage.png)
 
-> If you face any issues with the deployment, see the [Known issues section](#known-issues) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
+> If you face any issues with the deployment, see the [Known issues document](known-issues.md) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
 
 ### Clean up Azure Resources
 
+1. Unprovision the Azure Resources
+2. Clean up App Registrations
+3. Delete the Deployment
+
+#### 1. Unprovision the Azure Resources
 To tear down an enviroment, and clean up the Azure resource group, use the folloing command:
 
 ```ps1
 azd down --force --purge --no-prompt
 ```
 
- If you want to recreate this deployment you will also need to delete the two Azure AD app registrations that were created. You can find them in Azure AD by searching for their environment name. 
+> You can also use the Azure Portal to delete the "relecloudresources" resource groups. This approach will not purge the Key Vault or App Configuration services and they will remain in your subscription for 7 days in a deleted state that does not charge your subscription. This feature enables you to recover the data if the configuration was accidentally deleted.
+
+#### 2. Clean up App Registrations
+You will also need to delete the two Azure AD app registrations that were created. You can find them in Azure AD by searching for their environment name. 
  
  **Delete App Registrations** 
 
@@ -201,6 +241,20 @@ azd down --force --purge --no-prompt
  **Purge App Configurations**
 
  ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
+
+#### 3. Delete the Deployment
+
+Your Azure subscription will retain your deployment request as a stateful object.
+If you would like to change the Azure region for this deployment you will need to
+delete the deployment by running the following command.
+
+```
+az deployment delete --name $myEnvironmentName
+```
+
+> You can list all deployments with the following command
+> `az deployment sub list --query "[].name" -o tsv`
+
 
 ## Local Development
 
@@ -382,68 +436,5 @@ Run the following command to give your Azure AD account permission to access the
 > You can use the same commands if you want to test with the secondary resource
 > group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
-# Known issues
-If you encounter issues with your deployment you can try running the following command
-to analyze the issue and receive a recommendation.
-
-<table>
-<tr>
-<td>PowerShell</td>
-<td>
-
-```ps1
-.\infra\validateDeployment.ps1 -g "$myEnvironmentName-rg"
-```
-
-</td>
-</tr>
-<tr>
-<td>Bash</td>
-<td>
-
-```bash
-./infra/validateDeployment.sh -g "$myEnvironmentName-rg"
-```
-
-</td>
-</tr>
-</table>
-
-
-You may also find the following topics helpful.
-
-## Cannot execute shellscript `/bin/bash^M: bad interpreter`
-This error happens when Windows users checked out code from a Windows environment
-and try to execute the code from Windows Subsystem for Linux (WSL). The issue is
-caused by Git tools that automatically convert `LF` characters based on the local
-environment.
-
-Run the following commands to change the windows line endings to linux line endings:
-
-```bash
-sed "s/$(printf '\r')\$//" -i ./infra/appConfigSvcPurge.sh
-sed "s/$(printf '\r')\$//" -i ./infra/addLocalIPToSqlFirewall.sh
-sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
-sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
-sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
-sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
-```
-
-## App doesn't start: 500.30 ASP.NET Core app failed to start
-
-This issue is due to missing configuration on your App Service you should **re-run** the `azd provision` command. The Azure Dev CLI performs incremental deployments that will overlay the correct settings on the existing App Service.
-
-> This is a known issue and we are tracking it [here](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/87).
-
-## Login failed for user '&lt;token-identified principal&gt;' SQL Server, Error 18456
-
-This error happens when attempting to connect to the Azure SQL Server with as
-an Active Directory user, or service principal, that has not been added as a SQL
-user.
-
-To fix this issue you need to connect to the SQL Database using the SQL Admin account
-and to add the Azure AD user.
-
-Documentation can help with this task: [Create contained users mapped to Azure AD identities](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure?tabs=azure-powershell&view=azuresql#create-contained-users-mapped-to-azure-ad-identities)
-
-This error can also happen if you still need to run the `makeSqlUserAccount.ps1` script.
+## Next Step
+- [Developer patterns](patterns.md)

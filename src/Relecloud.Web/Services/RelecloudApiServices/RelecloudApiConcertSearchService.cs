@@ -1,6 +1,4 @@
-﻿using Microsoft.Identity.Web;
-using Microsoft.Net.Http.Headers;
-using Relecloud.Web.Infrastructure;
+﻿using Relecloud.Web.Infrastructure;
 using Relecloud.Web.Models.Search;
 using Relecloud.Web.Models.Services;
 using System.Net;

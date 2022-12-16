@@ -110,3 +110,6 @@ In the next request we see that the API call was only 55ms because it didn't hav
 Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
 ![image of Azure Cache for Redis Console shows data for upcoming concerts](./assets/Guide/Simulating_RedisConsoleShowUpcomingConcerts.png)
+
+## Next Step
+- [Understand service level objectives and cost](slo-and-cost.md)
