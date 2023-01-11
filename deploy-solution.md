@@ -65,8 +65,6 @@ Use this command to get started with deployment by creating an
 
 <!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
 
-
-
 <table>
 <tr>
 <td>PowerShell</td>
@@ -74,7 +72,10 @@ Use this command to get started with deployment by creating an
 
 ```ps1
 $myEnvironmentName="relecloudresources"
-azd env new -e $myEnvironmentName
+```
+
+```ps1
+azd init -e $myEnvironmentName
 ```
 
 </td>
@@ -85,7 +86,10 @@ azd env new -e $myEnvironmentName
 
 ```bash
 myEnvironmentName="relecloudresources"
-azd env new -e $myEnvironmentName
+```
+
+```bash
+azd init -e $myEnvironmentName
 ```
 
 </td>
