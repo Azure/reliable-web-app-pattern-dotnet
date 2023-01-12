@@ -71,7 +71,7 @@ substring="-rg"
 secondaryResourceGroupName=(${resourceGroupName%%$substring*})
 secondaryResourceGroupName+="-secondary-rg"
 group2Exists=$(az group exists -n $secondaryResourceGroupName)
-if [[ $group2Exists -eq 'false' ]]; then
+if [[ $group2Exists == 'false' ]]; then
     secondaryResourceGroupName=''
 fi
 
