@@ -2,12 +2,18 @@
 
 POSITIONAL_ARGS=()
 
+debug=''
+
 while [[ $# -gt 0 ]]; do
   case $1 in
     --resource-group|-g)
       resourceGroupName="$2"
       shift # past argument
       shift # past value
+      ;;
+    --debug)
+      debug=1
+      shift # past argument
       ;;
     --help*)
       echo ""
@@ -102,6 +108,11 @@ userObjectId=$(az account show --query "id" -o tsv)
 echo "tenantId='$tenantId'"
 echo ""
 
+if [[ $debug ]]; then
+    read -n 1 -r -s -p "Press any key to continue..."
+    echo "..."
+fi
+
 # Resolves permission constraint that prevents the deploymentScript from running this command
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
 az sql server update -n $mySqlServer -g $resourceGroupName --set publicNetworkAccess="Disabled" > /dev/null
@@ -110,7 +121,7 @@ frontEndWebObjectId=$(az ad app list --filter "displayName eq '$frontEndWebAppNa
 
 if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
 
-    # quietly: grant the current user secrets management access to Key Vault so we can set keys
+    # grant the current user secrets management access to Key Vault so we can set keys
     az keyvault set-policy -n $keyVaultName --secret-permissions all --object-id $userObjectId &> /dev/null
 
     # this web app doesn't exist and must be creaed
