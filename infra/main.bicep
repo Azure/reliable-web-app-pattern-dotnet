@@ -75,12 +75,22 @@ module primaryResources './resources.bicep' = {
   }
 }
 
+module devOpsIdentitySetupSecondary './devOpsIdentitySetup.bicep' = {
+  name: 'devOpsIdentitySetupSecondary'
+  scope: secondaryResourceGroup
+  params: {
+    tags: tags
+    location: location
+    resourceToken: secondaryResourceToken
+  }
+}
+
 module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
   name: 'secondary-${primaryResourceToken}'
   scope: secondaryResourceGroup
   params: {
     azureSqlPassword: azureSqlPassword
-    devOpsManagedIdentityId: devOpsIdentitySetup.outputs.devOpsManagedIdentityId
+    devOpsManagedIdentityId: devOpsIdentitySetupSecondary.outputs.devOpsManagedIdentityId
     isProd: isProdBool
     location: secondaryAzureLocation
     principalId: principalId
