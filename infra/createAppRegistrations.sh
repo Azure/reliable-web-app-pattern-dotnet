@@ -201,10 +201,10 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
     
     # prod environments do not allow public network access
     if [[ $isProd ]]; then
-        # close the app config so that the local user can access
+        # close the app config so that the local user cannot access
         az appconfig update --name $appConfigSvcName --resource-group $resourceGroupName --enable-public-network false > /dev/null
         
-        # close the key vault so that the local user can access
+        # close the key vault so that the local user cannot access
         az keyvault update --name $keyVaultName --resource-group $resourceGroupName  --public-network-access Disabled > /dev/null
     fi
 else
@@ -360,7 +360,7 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
 
     # prod environments do not allow public network access
     if [[ $isProd ]]; then
-        # close the app config so that the local user can access
+        # close the app config so that the local user cannot access
         az appconfig update --name $appConfigSvcName --resource-group $resourceGroupName --enable-public-network false > /dev/null
     fi
 else
@@ -428,10 +428,10 @@ if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]
 
   # prod environments do not allow public network access
   if [[ $isProd ]]; then
-      # close the app config so that the local user can access
+      # close the app config so that the local user cannot access
       az appconfig update --name $secondaryAppConfigSvcName --resource-group $secondaryResourceGroupName --enable-public-network false > /dev/null
       
-      # close the key vault so that the local user can access
+      # close the key vault so that the local user cannot access
       az keyvault update --name $secondaryKeyVaultName --resource-group $secondaryResourceGroupName  --public-network-access Disabled > /dev/null
   fi
 
