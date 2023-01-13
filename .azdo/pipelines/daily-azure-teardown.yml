@@ -23,18 +23,3 @@ steps:
       AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
       AZURE_ENV_NAME: $(env_name)
       AZURE_LOCATION: $(AZURE_LOCATION)
-
-
-  # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
-      # Resource names are reserved for a period of time after deletion
-      # https://docs.microsoft.com/en-us/azure/azure-app-configuration/faq#why-can-t-i-create-an-app-configuration-store-with-the-same-name-as-one-that-i-just-deleted
-  - task: AzureCLI@2
-    displayName: Purge App Configuration Service
-    continueOnError: true
-    inputs:
-      azureSubscription: azconnection
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-          chmod +x ./infra/appConfigSvcPurge.sh
-          ./infra/appConfigSvcPurge.sh -g $(env_name)-rg
