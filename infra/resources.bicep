@@ -889,6 +889,10 @@ resource openConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-0
         value: kv.name
       }
       {
+        name: 'ADMIN_VAULT_NAME'
+        value: adminVault.name
+      }
+      {
         name: 'RESOURCE_GROUP'
         secureValue: resourceGroup().name
       }
@@ -896,6 +900,7 @@ resource openConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-0
     scriptContent: '''
       az appconfig update --name $APP_CONFIG_SVC_NAME --resource-group $RESOURCE_GROUP --enable-public-network true
       az keyvault update --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Enabled
+      az keyvault update --name $ADMIN_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Enabled
       '''
   }
 }
@@ -925,6 +930,10 @@ resource closeConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-
         value: kv.name
       }
       {
+        name: 'ADMIN_VAULT_NAME'
+        value: adminVault.name
+      }
+      {
         name: 'RESOURCE_GROUP'
         secureValue: resourceGroup().name
       }
@@ -932,6 +941,7 @@ resource closeConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-
     scriptContent: '''
       az appconfig update --name $APP_CONFIG_SVC_NAME --resource-group $RESOURCE_GROUP --enable-public-network false
       az keyvault update --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Disabled
+      az keyvault update --name $ADMIN_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Disabled
       '''
   }
   // app config vars cannot be set without public network access
