@@ -3,19 +3,38 @@ on:
   schedule:
     - cron: '0 0,12 * * *'
 
+# https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/azure-dev-cli-apps:latest
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      - name: Log in with Azure (Client Credentials)
+        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        run: |
+          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
+          Write-Host "::add-mask::$($info.clientSecret)"
 
-      - name: Log in with Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          azd login `
+            --client-id "$($info.clientId)" `
+            --client-secret "$($info.clientSecret)" `
+            --tenant-id "$($info.tenantId)"
+        shell: pwsh
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Azure Dev Provision
         run: azd provision --no-prompt --debug
