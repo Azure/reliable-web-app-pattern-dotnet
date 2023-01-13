@@ -77,8 +77,19 @@ fi
 
 mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
 
+azdData=$(azd env get-values)
+isProd=''
+if [[ $azdData =~ 'IS_PROD="true"' ]]; then
+  isProd=true
+fi
+
 echo "Derived inputs"
 echo "----------------------------------------------"
+if [[ $isProd ]]; then
+  echo "isProd=true"
+else
+  echo "isProd=false"
+fi
 echo "keyVaultName=$keyVaultName"
 echo "appConfigSvcName=$appConfigSvcName"
 echo "frontEndWebAppUri=$frontEndWebAppUri"
@@ -110,6 +121,7 @@ echo ""
 
 if [[ $debug ]]; then
     read -n 1 -r -s -p "Press any key to continue..."
+    echo ''
     echo "..."
 fi
 
