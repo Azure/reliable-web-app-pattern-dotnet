@@ -889,6 +889,10 @@ resource openConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-0
         value: kv.name
       }
       {
+        name: 'ADMIN_VAULT_NAME'
+        value: adminVault.name
+      }
+      {
         name: 'RESOURCE_GROUP'
         secureValue: resourceGroup().name
       }
