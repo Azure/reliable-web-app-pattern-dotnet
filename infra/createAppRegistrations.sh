@@ -370,7 +370,7 @@ fi
 
 ############## Copy the App Configuration and Key Vault settings to second azure location ##############
 
-if [[ ${#secondaryResourceGroupName} -gt 0 -and $canSetSecondAzureLocation -eq 1 ]]; then
+if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]]; then
   
   # assumes there is only one vault deployed to this resource group that will match this filter
   secondaryKeyVaultName=$(az keyvault list -g "$secondaryResourceGroupName" --query "[?name.starts_with(@,'rc-')].name" -o tsv)
