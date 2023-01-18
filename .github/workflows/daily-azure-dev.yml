@@ -3,22 +3,42 @@ on:
   schedule:
     - cron: '0 0,12 * * *'
 
+# https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/azure-dev-cli-apps:latest
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      # login to run ado commands such provision, deploy, and down
+      - name: Log in with Azure (Client Credentials)
+        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        run: |
+          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
+          Write-Host "::add-mask::$($info.clientSecret)"
 
-      - name: Log in with Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          azd login `
+            --client-id "$($info.clientId)" `
+            --client-secret "$($info.clientSecret)" `
+            --tenant-id "$($info.tenantId)"
+        shell: pwsh
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Azure Dev Provision
-        run: azd provision --no-prompt --debug
+        run: azd provision --no-prompt
         env:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
@@ -35,6 +55,12 @@ jobs:
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # login to run az cli commands such as validateDeployment.sh
+      - name: Log in with Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: QA - Validate Deployment
         run: |
           chmod +x ./infra/validateDeployment.sh
@@ -47,10 +73,3 @@ jobs:
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # temporary work around for known issue https://github.com/Azure/azure-dev/issues/248
-      # Resource names are reserved for a period of time after deletion
-      # https://docs.microsoft.com/en-us/azure/azure-app-configuration/faq#why-can-t-i-create-an-app-configuration-store-with-the-same-name-as-one-that-i-just-deleted
-      - name: Purge App Configuration Service
-        run: |
-          chmod +x ./infra/appConfigSvcPurge.sh
-          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}daily2-rg
