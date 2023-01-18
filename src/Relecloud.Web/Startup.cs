@@ -5,9 +5,11 @@ using Microsoft.Identity.Web.TokenCacheProviders.Distributed;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.Net.Http.Headers;
+
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
+
 using Relecloud.Web.Infrastructure;
 using Relecloud.Web.Models.ConcertContext;
 using Relecloud.Web.Models.Services;
@@ -15,6 +17,7 @@ using Relecloud.Web.Services;
 using Relecloud.Web.Services.ApiConcertService;
 using Relecloud.Web.Services.MockServices;
 using Relecloud.Web.Services.RelecloudApiServices;
+
 using System.Diagnostics;
 using System.Security.Claims;
 
@@ -41,6 +44,7 @@ namespace Relecloud.Web
             AddConcertContextService(services);
             AddConcertSearchService(services);
             AddTicketPurchaseService(services);
+            AddTicketImageService(services);
             AddAzureCacheForRedis(services);
 
             // Add support for session state.
@@ -96,6 +100,26 @@ namespace Relecloud.Web
                 {
                     httpClient.BaseAddress = new Uri(baseUri);
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+                    httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "Relecloud.Web");
+                })
+                .AddPolicyHandler(GetRetryPolicy())
+                .AddPolicyHandler(GetCircuitBreakerPolicy());
+            }
+        }
+
+        private void AddTicketImageService(IServiceCollection services)
+        {
+            var baseUri = Configuration["App:RelecloudApi:BaseUri"];
+            if (string.IsNullOrWhiteSpace(baseUri))
+            {
+                services.AddScoped<ITicketImageService, MockTicketImageService>();
+            }
+            else
+            {
+                services.AddHttpClient<ITicketImageService, RelecloudApiTicketImageService>(httpClient =>
+                {
+                    httpClient.BaseAddress = new Uri(baseUri);
+                    httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/octet-stream");
                     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "Relecloud.Web");
                 })
                 .AddPolicyHandler(GetRetryPolicy())
@@ -270,6 +294,7 @@ namespace Relecloud.Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }
