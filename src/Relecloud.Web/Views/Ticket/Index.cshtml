@@ -31,7 +31,7 @@ else
                         <a asp-controller="Concert" asp-action="Details" asp-route-id="@ticket.ConcertId">@ticket.Concert.Artist on @ticket.Concert.StartTime.UtcDateTime.ToString()</a>
                     }
                 </h4>
-                @if (string.IsNullOrEmpty(ticket.ImageUrl))
+                @if (string.IsNullOrEmpty(ticket.ImageName))
                 {
                     <div class="offset-top-md alert alert-warning">The customer's ticket is being generated, please check back later.</div>
                 }
@@ -39,11 +39,11 @@ else
                 {
                     if (ticket.Concert == null)
                     {
-                        <img src="@ticket.ImageUrl" alt="Unknown Ticket @ticket.ConcertId" class="img-responsive" />
+                        <img src="api/Image/@ticket.ImageName" alt="Unknown Ticket @ticket.ConcertId" class="img-responsive" />
                     }
                     else
                     {
-                        <img src="@ticket.ImageUrl" alt="@ticket.Concert.Artist" class="img-responsive" />
+                        <img src="api/Image/@ticket.ImageName" alt="@ticket.Concert.Artist" class="img-responsive" />
                     }
                 }
             </div>
