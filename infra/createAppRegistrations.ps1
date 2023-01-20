@@ -1,3 +1,5 @@
+#Requires -Version 7.0
+
 <#
 .SYNOPSIS
     Creates two Azure AD app registrations for the reliable-web-app-pattern-dotnet
