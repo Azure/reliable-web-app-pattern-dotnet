@@ -9,8 +9,9 @@ param name string
 @description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
 
+@minLength(1)
 @description('Id of the user or app to assign application roles')
-param principalId string = ''
+param principalId string
 
 @description('Will select production ready SKUs when `true`')
 param isProd string = 'false'
