@@ -125,9 +125,12 @@ if [[ $debug ]]; then
     echo "..."
 fi
 
-# Resolves permission constraint that prevents the deploymentScript from running this command
-# https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
-az sql server update -n $mySqlServer -g $resourceGroupName --set publicNetworkAccess="Disabled" > /dev/null
+# prod environments do not allow public network access, this must be changed before we can set values
+if [[ $isProd ]]; then
+  # Resolves permission constraint that prevents the deploymentScript from running this command
+  # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
+  az sql server update -n $mySqlServer -g $resourceGroupName --set publicNetworkAccess="Disabled" > /dev/null
+fi
 
 frontEndWebObjectId=$(az ad app list --filter "displayName eq '$frontEndWebAppName'" --query "[].id" -o tsv)
 
