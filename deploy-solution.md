@@ -136,17 +136,6 @@ azd env set SECONDARY_AZURE_LOCATION westus3
 > az account list-locations --query "[].name" -o tsv
 > ```
 
-### (Optional) Custom SQL Password
-Relecloud's bicep templates support generating a 30 character hashed
-from the subscription, environment name, and the Azure location.
-
-To override this behavior the team provides their own custom password
-using the following command.
-
-```bash
-azd env set AZURE_SQL_PASSWORD superSECUREP@55W0RD
-```
-
 ### Provision the infrastructure
 
 Relecloud uses the following command to deploy the Azure
