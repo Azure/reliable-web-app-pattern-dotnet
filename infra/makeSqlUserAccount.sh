@@ -41,11 +41,18 @@ if [[ ${#resourceGroupName} -eq 0 ]]; then
   exit 6
 fi
 
+# this will reset the SQL password because the password is not saved during set up
+echo "WARNING: this script will reset the SQL Admin password for your Azure SQL Server."
+echo "Use command interrupt if you would like to abort"
+read -n 1 -r -s -p "Press any key to continue..."
+echo ''
+echo "..."
+
 if ! [ -x "$(command -v ./sqlcmd)" ]; then
     echo 'installing sqlcmd'
     
-    wget https://github.com/microsoft/go-sqlcmd/releases/download/v0.9.1/sqlcmd-v0.9.1-linux-x64.tar.bz2
-    tar x -f sqlcmd-v0.9.1-linux-x64.tar.bz2
+    wget https://github.com/microsoft/go-sqlcmd/releases/download/v0.8.1/sqlcmd-v0.8.1-linux-x64.tar.bz2
+    tar x -f sqlcmd-v0.8.1-linux-x64.tar.bz2
     
 else
     echo 'found sqlcmd'
@@ -54,19 +61,24 @@ fi
 azureAdUsername=$(az ad signed-in-user show --query userPrincipalName -o tsv)
 objectIdForCurrentUser=$(az ad signed-in-user show --query id -o tsv)
 
-keyVaultName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.KeyVault/vaults' && name.starts_with(@, 'admin')].name" -o tsv)
-
-databaseServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+# using json format bypasses issue with tsv format observed in this issue
+# https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/202
+databaseServer=$(az resource list -g $resourceGroupName --query "[? type=='Microsoft.Sql/servers'].{name:name}" | grep -o '"name": "[^"]*'| grep -o '[^"]*$')
 databaseServerFqdn=$(az sql server show -n $databaseServer -g $resourceGroupName --query fullyQualifiedDomainName -o tsv)
 databaseName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName" -o tsv)
-sqlAdmin=$(az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorLogin --query value -o tsv)
-sqlPassword=$(az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorPassword --query value -o tsv)
+
+sqlAdmin=$(az sql server show --name $databaseServer -g $resourceGroupName --query "administratorLogin" -o tsv)
+
+# new random password
+sqlPassword=$(sed "s/[^a-zA-Z0-9\!@#\$%*()]//g" <<< $(cat /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%*()-+' | fold -w 32 | head -n 1))
 
 echo "connecting to: $databaseServerFqdn"
 echo "opening: $databaseName"
 
 # disable Azure AD only admin access
 az sql server ad-only-auth disable -n $databaseServer -g $resourceGroupName
+
+az sql server update -n $databaseServer -g $resourceGroupName -p $sqlPassword
 
 cat <<SCRIPT_END > createSqlUser.sql
 DECLARE @myObjectId varchar(100) = '$objectIdForCurrentUser'
