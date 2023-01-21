@@ -17,6 +17,7 @@ Param(
   [String]$ResourceGroupName
 )
 
+# this will reset the SQL password because the password is not saved during set up
 Write-Host "WARNING: this script will reset the SQL Admin password for your Azure SQL Server."
 Write-Host "Use command interrupt if you would like to abort"
 Read-Host -Prompt "Press enter if you wish to proceed" > $null
@@ -70,7 +71,6 @@ Write-Debug "`$databaseName='$databaseName'"
 # the current user does not have access to login to SQL so we need to use the SQL Admin account
 az sql server ad-only-auth disable -n $databaseServer -g $ResourceGroupName
 
-## new random password
 $TokenSet = @{
   U = [Char[]]'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   L = [Char[]]'abcdefghijklmnopqrstuvwxyz'
@@ -85,7 +85,7 @@ $Special = Get-Random -Count 5 -InputObject $TokenSet.S
 
 $StringSet = $Upper + $Lower + $Number + $Special
 
-# this will be used to reset the SQL password because the password is not saved during set up
+# new random password
 $sqlPassword = ((Get-Random -Count 15 -InputObject $StringSet) -join '')
 $sqlAdmin = (az sql server show --name $databaseServer -g $ResourceGroupName --query "administratorLogin" -o tsv)
 
