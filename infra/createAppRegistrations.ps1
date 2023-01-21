@@ -110,8 +110,7 @@ Write-Debug "tenantId='$tenantId'"
 Write-Debug ""
 
 if ($Debug) {
-    Write-Debug "press any key to continue..."
-    [void][System.Console]::ReadKey($true)
+    Read-Host -Prompt "Press enter to continue" > $null
     Write-Debug "..."
 }
 
