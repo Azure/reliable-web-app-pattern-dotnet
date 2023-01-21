@@ -1,8 +1,10 @@
+#Requires -Version 7.0
+
 <#
 .SYNOPSIS
-    Will make the SQL user account required to authenticate with Azure AD to Azure SQL Database.
+  Will make the SQL user account required to authenticate with Azure AD to Azure SQL Database.
 .DESCRIPTION
-  Placeholder
+  Will make the SQL user account required to authenticate with Azure AD to Azure SQL Database.
 
   <This command should only be run after using the azd command to deploy resources to Azure>
 .PARAMETER ResourceGroupName
@@ -14,6 +16,11 @@ Param(
   [Parameter(Mandatory = $true, HelpMessage = "Name of the resource group that was created by azd")]
   [String]$ResourceGroupName
 )
+
+Write-Host "WARNING: this script will reset the SQL Admin password for your Azure SQL Server."
+Write-Host "Use command interrupt if you would like to abort"
+Read-Host -Prompt "Press enter if you wish to proceed" > $null
+Write-Host "..."
 
 if (Get-Module -ListAvailable -Name SqlServer) {
   Write-Debug "SQL Already Installed"
@@ -49,10 +56,6 @@ Write-Debug "`$azureAdUsername='$azureAdUsername'"
 $objectIdForCurrentUser = (az ad signed-in-user show --query id -o tsv)
 Write-Debug "`$objectIdForCurrentUser='$objectIdForCurrentUser'"
 
-$keyVaultName = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.KeyVault/vaults' && name.starts_with(@, 'admin')].name" -o tsv)
-
-Write-Debug "`$keyVaultName='$keyVaultName'"
-
 $databaseServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
 Write-Debug "`$databaseServer='$databaseServer'"
 
@@ -62,11 +65,31 @@ Write-Debug "`$databaseServerFqdn='$databaseServerFqdn'"
 $databaseName = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName" -o tsv)
 Write-Debug "`$databaseName='$databaseName'"
 
-$sqlAdmin = (az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorLogin --query value -o tsv)
-$sqlPassword = (az keyvault secret show --vault-name $keyVaultName -n sqlAdministratorPassword --query value -o tsv)
 
 # disable Azure AD only admin access
+# the current user does not have access to login to SQL so we need to use the SQL Admin account
 az sql server ad-only-auth disable -n $databaseServer -g $ResourceGroupName
+
+## new random password
+$TokenSet = @{
+  U = [Char[]]'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  L = [Char[]]'abcdefghijklmnopqrstuvwxyz'
+  N = [Char[]]'0123456789'
+  S = [Char[]]'!#$%&()*+,-.;<=>?@[]^_{}~'
+}
+
+$Upper = Get-Random -Count 5 -InputObject $TokenSet.U
+$Lower = Get-Random -Count 5 -InputObject $TokenSet.L
+$Number = Get-Random -Count 5 -InputObject $TokenSet.N
+$Special = Get-Random -Count 5 -InputObject $TokenSet.S
+
+$StringSet = $Upper + $Lower + $Number + $Special
+
+# this will be used to reset the SQL password because the password is not saved during set up
+$sqlPassword = ((Get-Random -Count 15 -InputObject $StringSet) -join '')
+$sqlAdmin = (az sql server show --name $databaseServer -g $ResourceGroupName --query "administratorLogin" -o tsv)
+
+az sql server update -n $databaseServer -g $ResourceGroupName -p "$sqlPassword"
 
 # translate applicationId into SID
 [guid]$guid = [System.Guid]::Parse($objectIdForCurrentUser)
