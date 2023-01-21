@@ -1,3 +1,5 @@
+# Does not require pwsh
+
 <#
 .SYNOPSIS
     Used by developers to get access to Azure SQL database

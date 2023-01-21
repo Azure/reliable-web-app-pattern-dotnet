@@ -1,3 +1,6 @@
+# This script is run by azd during devOps deployment. This script is not intended to be run from a local environment.
+# For the local environment version of this script, please see makeSqlUserAccount.ps1
+
 Param(
   [Parameter(Mandatory = $true)][string]$ServerName,
   [Parameter(Mandatory = $true)][string]$ResourceGroupName,
