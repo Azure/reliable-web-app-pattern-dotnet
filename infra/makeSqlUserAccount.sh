@@ -51,8 +51,8 @@ echo "..."
 if ! [ -x "$(command -v ./sqlcmd)" ]; then
     echo 'installing sqlcmd'
     
-    wget https://github.com/microsoft/go-sqlcmd/releases/download/v0.8.1/sqlcmd-v0.8.1-linux-x64.tar.bz2
-    tar x -f sqlcmd-v0.8.1-linux-x64.tar.bz2
+    wget https://github.com/microsoft/go-sqlcmd/releases/download/v0.9.1/sqlcmd-v0.9.1-linux-x64.tar.bz2
+    tar x -f sqlcmd-v0.9.1-linux-x64.tar.bz2
     
 else
     echo 'found sqlcmd'
