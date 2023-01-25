@@ -1,0 +1,43 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.236.0/containers/dotnet
+{
+	"name": "reliable-web-app-pattern-dotnet",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": { 
+			"VARIANT": "6.0-bullseye"
+		}		
+	},
+	"runArgs": ["--init", "--privileged"],
+
+	"customizations": {
+		"vscode": {	
+			"extensions": [
+				"ms-dotnettools.csharp",
+				"ms-dotnettools.csharp",
+				"ms-azuretools.vscode-bicep",
+				"ms-azuretools.vscode-azureappservice",
+				"ms-azuretools.vscode-docker",
+				"ms-azuretools.azure-dev",
+				"ms-mssql.mssql",
+				"github.copilot"
+			]
+		}
+	},
+
+	"remoteUser": "vscode",
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {},
+		"ghcr.io/devcontainers/features/powershell:1": {},
+		"ghcr.io/devcontainers/features/azure-cli:1": {},
+		"ghcr.io/devcontainers/features/common-utils:1": {},
+		"ghcr.io/devcontainers/features/sshd:1": {
+			"version": "latest"
+		}
+	},
+
+	"waitFor": "postCreateCommand",
+
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	"postStartCommand": "bash .devcontainer/post-start.sh"
+}
