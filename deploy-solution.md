@@ -3,7 +3,20 @@
 This reference implementation provides you with the instructions and templates you need to deploy this solution. This solution uses the Azure Dev CLI to set up Azure services
 and deploy the code.
 
-## Pre-requisites
+## Codespaces and Dev Containers (Optional)
+
+1. If you are using [Codespaces](https://docs.microsoft.com/en-us/visualstudio/codespaces/overview) on [Dev Containers](https://code.visualstudio.com/docs/remote/containers), you can skip the pre-requisites. The Codespaces and Dev Containers are configured to have all the pre-requisites installed.
+
+### Dev Containers Deployment Steps
+```bash
+    cd ${CODESPACE_VSCODE_FOLDER=}
+    az login
+    az account set --subscription ${AZURE_SUBSCRIPTION_ID} 
+    task up
+```
+
+## Complete Deployment Steps
+### Pre-requisites
 
 1. To run the scripts, Windows users require [Powershell 7.2 (LTS)](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) or above. Alternatively, you can use a bash terminal using [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install). macOS users can use a bash terminal.
 
@@ -40,28 +53,20 @@ and deploy the code.
     dotnet --version
     ```
 
-## Get the code
-
-Please clone the repo to get started.
-
+### Get the code
+> **_NOTE:_** Switch to the folder so that `azd` will recognize the solution.
 ```
-git clone https://github.com/Azure/reliable-web-app-pattern-dotnet
-```
-
-And switch to the folder so that `azd` will recognize the solution.
-
-```
-cd reliable-web-app-pattern-dotnet
+    git clone https://github.com/Azure/reliable-web-app-pattern-dotnet
+    cd reliable-web-app-pattern-dotnet
 ```
 
-## Deploying to Azure
+### Deploying to Azure
 
 Relecloud's developers use the `azd` command line experience to deploy the code. This means their local workflow is the same
 experience that runs from the GitHub action. You can use these
 steps to follow their experience by running the commands from the folder where this guide is stored after cloning this repo.
 
-Use this command to get started with deployment by creating an
-`azd` environment on your workstation.
+Use this command to get started with deployment by creating an `azd` environment on your workstation.
 
 <!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
 
@@ -100,7 +105,7 @@ When prompted, select the preferred Azure Subscription and the Location:
 
 ![screenshot azd env new](./assets/Guide/Azd-Env-New.png)
 
-### (Optional Steps) Choose Prod or Non-prod environment
+#### (Optional Steps) Choose Prod or Non-prod environment
 
 The Relecloud team uses the same bicep templates to deploy
 their production, and non-prod, environments. To do this
@@ -136,7 +141,7 @@ azd env set SECONDARY_AZURE_LOCATION westus3
 > az account list-locations --query "[].name" -o tsv
 > ```
 
-### (Optional) Custom SQL Password
+#### (Optional) Custom SQL Password
 Relecloud's bicep templates support generating a 30 character hashed
 from the subscription, environment name, and the Azure location.
 
