@@ -38,7 +38,8 @@ if [[ ${#resourceGroupName} -eq 0 ]]; then
 fi
 
 myIpAddress=$(wget -q -O - ipinfo.io/ip)
-mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name | [0]" -o tsv)
 
 # Resolves permission constraint that prevents the deploymentScript from running this command
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134

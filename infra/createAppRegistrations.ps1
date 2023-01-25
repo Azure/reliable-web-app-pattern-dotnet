@@ -61,7 +61,9 @@ $keyVaultName = (az keyvault list -g "$ResourceGroupName" --query "[? starts_wit
 $appConfigSvcName = (az appconfig list -g "$ResourceGroupName" --query "[].name" -o tsv)
 
 $appServiceRootUri = 'azurewebsites.net' # hard coded because app svc does not return the public endpoint
-$frontEndWebAppName = (az resource list -g "$ResourceGroupName" --query "[? tags.\`"azd-service-name\`" == 'web' ].name" -o tsv)
+
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+$frontEndWebAppName = (az resource list -g "$ResourceGroupName" --query "[? tags.\`"azd-service-name\`" == 'web' ].name | [0]" -o tsv)
 $frontEndWebAppUri = "https://$frontEndWebAppName.$appServiceRootUri"
 
 $resourceToken = $frontEndWebAppName.substring(4, 13)
@@ -73,7 +75,8 @@ if ($group2Exists -eq 'false') {
     $secondaryResourceGroupName = ''
 }
 
-$mySqlServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+$mySqlServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name | [0]" -o tsv)
 $azdEnvironmentData=(azd env get-values)
 $isProd=($azdEnvironmentData | select-string 'IS_PROD="true"').Count -gt 0
 

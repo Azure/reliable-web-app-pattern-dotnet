@@ -1,5 +1,3 @@
-# Does not require pwsh
-
 <#
 .SYNOPSIS
     Used by developers to get access to Azure SQL database
@@ -42,7 +40,8 @@ $myIpAddress = (Invoke-WebRequest ipinfo.io/ip)
 
 Write-Debug "`$myIpAddress = '$myIpAddress'"
 
-$mySqlServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+$mySqlServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name | [0]" -o tsv)
 
 Write-Debug "`$mySqlServer = '$mySqlServer'"
 
