@@ -126,34 +126,9 @@ resource frontEndClientSecretAppCfg 'Microsoft.AppConfiguration/configurationSto
     })
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
-  dependsOn: [
-    checkIfClientSecretExists
-  ]
 }
 
 var frontEndClientSecretName = 'AzureAd--ClientSecret'
-
-resource checkIfClientSecretExists 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: 'checkIfClientSecretExists'
-  location: location
-  tags: tags
-  kind: 'AzureCLI'
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${managedIdentity.id}': {}
-    }
-  }
-  properties: {
-    azCliVersion: '2.37.0'
-    retentionInterval: 'P1D'
-    scriptContent: 'result=$(az keyvault secret list --vault-name ${kv.name} --query "[?name==\'${frontEndClientSecretName}\'].name" -o tsv); if [[ \${#result} -eq 0 ]]; then az keyvault secret set --name \'AzureAd--ClientSecret\' --vault-name ${kv.name} --value 1 --only-show-errors > /dev/null; fi'
-    arguments: '--resourceToken \'${resourceToken}\''
-  }
-  dependsOn: [
-    openConfigSvcsForEdits
-  ]
-}
 
 resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
   parent: appConfigSvc
