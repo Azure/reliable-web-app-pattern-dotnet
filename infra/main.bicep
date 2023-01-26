@@ -76,7 +76,7 @@ module primaryResources './resources.bicep' = {
   }
 }
 
-module devOpsIdentitySetupSecondary './devOpsIdentitySetup.bicep' = {
+module devOpsIdentitySetupSecondary './devOpsIdentitySetup.bicep' = if (isMultiLocationDeployment) {
   name: 'devOpsIdentitySetupSecondary'
   scope: secondaryResourceGroup
   params: {
