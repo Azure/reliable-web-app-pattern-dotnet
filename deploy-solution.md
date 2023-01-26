@@ -278,8 +278,8 @@ New team members should setup their environment by following these steps.
 
     Type |Command
     ----------------|----------------
-    PowerShell| <pre>{ps1: giveCurrentUserAccessToReadAppConfigSvc.ps1 }</pre> |
-    Bash| <code>giveCurrentUserAccessToReadAppConfigSvc.sh</code> |
+    PowerShell| ```ps1 giveCurrentUserAccessToReadAppConfigSvc.ps1 ```</pre> |
+    Bash| ``` giveCurrentUserAccessToReadAppConfigSvc.sh ``` |
     
 
 1. Open the Visual Studio solution `./src/Relecloud.sln`
