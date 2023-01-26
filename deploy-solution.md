@@ -282,7 +282,7 @@ New team members should setup their environment by following these steps.
     <td>
 
     ```ps1
-    .\infra\localDevScripts\giveCurrentUserAccessToReadAppConfigSvc.ps1
+    .\infra\localDevScripts\giveCurrentUserAccessToReadAppConfigSvc.ps1 -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -292,7 +292,7 @@ New team members should setup their environment by following these steps.
     <td>
             
     ```bash
-    bash ./infra/localDevScripts/giveCurrentUserAccessToReadAppConfigSvc.sh
+    bash ./infra/localDevScripts/giveCurrentUserAccessToReadAppConfigSvc.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
