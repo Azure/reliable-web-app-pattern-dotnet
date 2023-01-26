@@ -42,7 +42,8 @@ if [[ ${#resourceGroupName} -eq 0 ]]; then
 fi
 
 # this will reset the SQL password because the password is not saved during set up
-echo "WARNING: this script will reset the SQL Admin password for your Azure SQL Server."
+echo "WARNING: this script will reset the password for the SQL Admin on Azure SQL Server."
+echo "  Since this scenario uses Managed Identity, and no one accesses the database with this password, there should be no impact"
 echo "Use command interrupt if you would like to abort"
 read -n 1 -r -s -p "Press any key to continue..."
 echo ''
@@ -65,12 +66,15 @@ objectIdForCurrentUser=$(az ad signed-in-user show --query id -o tsv)
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/202
 databaseServer=$(az resource list -g $resourceGroupName --query "[? type=='Microsoft.Sql/servers'].{name:name}" | grep -o '"name": "[^"]*'| grep -o '[^"]*$')
 databaseServerFqdn=$(az sql server show -n $databaseServer -g $resourceGroupName --query fullyQualifiedDomainName -o tsv)
-databaseName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName" -o tsv)
+
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+databaseName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName | [0]" -o tsv)
 
 sqlAdmin=$(az sql server show --name $databaseServer -g $resourceGroupName --query "administratorLogin" -o tsv)
 
 # new random password
-sqlPassword=$(sed "s/[^a-zA-Z0-9\!@#\$%*()]//g" <<< $(cat /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%*()-+' | fold -w 32 | head -n 1))
+# https://learn.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=sql-server-ver16
+sqlPassword=$(sed "s/[^a-zA-Z0-9\!#\$%*()]//g" <<< $(cat /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%*()-+' | fold -w 32 | head -n 1))
 
 echo "connecting to: $databaseServerFqdn"
 echo "opening: $databaseName"

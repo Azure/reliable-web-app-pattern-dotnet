@@ -18,7 +18,8 @@ Param(
 )
 
 # this will reset the SQL password because the password is not saved during set up
-Write-Host "WARNING: this script will reset the SQL Admin password for your Azure SQL Server."
+Write-Host "WARNING: this script will reset the password for the SQL Admin on Azure SQL Server."
+Write-Host "  Since this scenario uses Managed Identity, and no one accesses the database with this password, there should be no impact"
 Write-Host "Use command interrupt if you would like to abort"
 Read-Host -Prompt "Press enter if you wish to proceed" > $null
 Write-Host "..."
@@ -57,13 +58,15 @@ Write-Debug "`$azureAdUsername='$azureAdUsername'"
 $objectIdForCurrentUser = (az ad signed-in-user show --query id -o tsv)
 Write-Debug "`$objectIdForCurrentUser='$objectIdForCurrentUser'"
 
-$databaseServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+$databaseServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name | [0]" -o tsv )
 Write-Debug "`$databaseServer='$databaseServer'"
 
 $databaseServerFqdn = (az sql server show -n $databaseServer -g $ResourceGroupName --query fullyQualifiedDomainName -o tsv)
 Write-Debug "`$databaseServerFqdn='$databaseServerFqdn'"
 
-$databaseName = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+$databaseName = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName | [0]" -o tsv)
 Write-Debug "`$databaseName='$databaseName'"
 
 
@@ -71,11 +74,12 @@ Write-Debug "`$databaseName='$databaseName'"
 # the current user does not have access to login to SQL so we need to use the SQL Admin account
 az sql server ad-only-auth disable -n $databaseServer -g $ResourceGroupName
 
+# https://learn.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=sql-server-ver16
 $TokenSet = @{
   U = [Char[]]'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   L = [Char[]]'abcdefghijklmnopqrstuvwxyz'
   N = [Char[]]'0123456789'
-  S = [Char[]]'!#$%&()*+,-.;<=>?@[]^_{}~'
+  S = [Char[]]'!#$%'
 }
 
 $Upper = Get-Random -Count 5 -InputObject $TokenSet.U
