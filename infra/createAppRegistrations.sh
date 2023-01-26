@@ -182,6 +182,7 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
     do
       # assumes that we only need to create client secret if the app registration did not exist
       frontEndWebAppClientSecret=$(az ad app credential reset --id $frontEndWebAppClientId --query "password" --only-show-errors 2> /dev/null)
+      frontEndWebAppClientSecret=${frontEndWebAppClientSecret:1:-2}
       isWebAppCreated=${#frontEndWebAppClientSecret}
   
       currentRetryCount=$((currentRetryCount + 1))
