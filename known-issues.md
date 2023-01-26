@@ -154,11 +154,12 @@ Run the following commands to change the windows line endings to linux line endi
 
 ```bash
 sed "s/$(printf '\r')\$//" -i ./infra/appConfigSvcPurge.sh
-sed "s/$(printf '\r')\$//" -i ./infra/addLocalIPToSqlFirewall.sh
 sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
-sed "s/$(printf '\r')\$//" -i ./infra/getSecretsForLocalDev.sh
-sed "s/$(printf '\r')\$//" -i ./infra/makeSqlUserAccount.sh
 sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
+sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/addLocalIPToSqlFirewall.sh
+sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/getSecretsForLocalDev.sh
+sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/makeSqlUserAccount.sh
+sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/giveCurrentUserAccessToReadAppConfigSvc.sh
 ```
 
 *There are no open items open for this issue.*

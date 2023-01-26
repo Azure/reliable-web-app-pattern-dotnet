@@ -276,34 +276,11 @@ New team members should setup their environment by following these steps.
 
 1. Grant your account access to Azure App Configuration Service
 
-    <table>
-    <tr>
-    <td>PowerShell</td>
-    <td>
-
-    ```ps1
-    $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
-    $currentUserObjectId=(az ad signed-in-user show --query "id")
-    $scopeId=(az group show -n "$myEnvironmentName-rg" --query "id")
-    az role assignment create --role $appConfigDataReaderRole --assignee ${currentUserObjectId:1:-2} --scope ${scopeId:1:-2}
-    ```
-
-    </td>
-    </tr>
-    <tr>
-    <td>Bash</td>
-    <td>
-            
-    ```bash
-    appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
-    currentUserObjectId=$(az ad signed-in-user show --query "id" -o tsv)
-    scopeId=$(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
-    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
-    ```
-
-    </td>
-    </tr>
-    </table>
+    Type |Command
+    ----------------|----------------
+    PowerShell| `giveCurrentUserAccessToReadAppConfigSvc.ps1`|
+    Bash| `giveCurrentUserAccessToReadAppConfigSvc.sh`|
+    
 
 1. Open the Visual Studio solution `./src/Relecloud.sln`
 1. Setup the **Relecloud.Web** project User Secrets
