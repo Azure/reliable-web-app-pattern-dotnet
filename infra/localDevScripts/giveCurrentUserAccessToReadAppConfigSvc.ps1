@@ -14,10 +14,6 @@
     <This command should only be run after using the azd command to deploy resources to Azure>
 .PARAMETER ResourceGroupName
     Name of resource group containing the environment that was created by the azd command.
-.PARAMETER Web
-    Print the json snippet for the api web app. Defaults to False.
-.PARAMETER Api
-    Print the json snippet for the front-end web app. Defaults to False.
 #>
 
 Param(

@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
       echo "              https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#app-configuration-data-reader"
       echo ""
       echo "Arguments"
-      echo "    --resource-group -g : Name of resource group where this Redis Cache is deployed."
+      echo "    --resource-group -g : Name of the resource group that was created by azd."
       echo ""
       exit 1
       ;;

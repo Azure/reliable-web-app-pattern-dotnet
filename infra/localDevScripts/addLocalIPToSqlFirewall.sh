@@ -17,7 +17,7 @@ while [[ $# -gt 0 ]]; do
       echo "    addLocalIPToSqlFirewall.sh : Makes a web request to a public site to retrieve the user's public IP address and then adds that IP address to the Azure SQL Database Firewall as an allowed connection."
       echo ""
       echo "Arguments"
-      echo "    --resource-group -g : Name of resource group where this Redis Cache is deployed."
+      echo "    --resource-group -g : Name of resource group containing the environment that was created by the azd command."
       echo ""
       exit 1
       ;;
