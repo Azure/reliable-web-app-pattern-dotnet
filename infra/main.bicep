@@ -91,7 +91,8 @@ module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
   scope: secondaryResourceGroup
   params: {
     azureSqlPassword: azureSqlPassword
-    devOpsManagedIdentityId: devOpsIdentitySetupSecondary.outputs.devOpsManagedIdentityId
+    // when not deployed, the evaluation of this template must still supply a valid parameter
+    devOpsManagedIdentityId: isMultiLocationDeployment ? devOpsIdentitySetupSecondary.outputs.devOpsManagedIdentityId : 'none'
     isProd: isProdBool
     location: secondaryAzureLocation
     principalId: principalId
