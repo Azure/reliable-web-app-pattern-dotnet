@@ -7,7 +7,7 @@
     This script supports the local development scenario by giving the current user RBAC access
     to the Azure App Configuration Service that was deployed by the AZD command in a previous step.
 
-    The hard-coded $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071' is a
+    The role $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071' is a
     well-known role from the list of Azure RBAC roles
     https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#app-configuration-data-reader
 
