@@ -19,6 +19,9 @@
     },
     "azureSqlPassword": {
       "value": "${AZURE_SQL_PASSWORD}"
+    },
+    "enableTelemetry": {
+      "value": "${ENABLE_TELEMETRY=true}"
     }
   }
 }
