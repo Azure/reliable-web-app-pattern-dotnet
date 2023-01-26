@@ -274,8 +274,39 @@ administration of these secrets so they can be easily changed.
 
 New team members should setup their environment by following these steps.
 
-1. Open the Visual Studio solution `./src/Relecloud.sln`
-2. Setup the **Relecloud.Web** project User Secrets
+1. Grant your account access to Azure App Configuration Service
+
+    <table>
+    <tr>
+    <td>PowerShell</td>
+    <td>
+
+    ```ps1
+    $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
+    $currentUserObjectId=(az ad signed-in-user show --query "id" -o tsv)
+    $scopeId=(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
+    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
+    ```
+
+    </td>
+    </tr>
+    <tr>
+    <td>Bash</td>
+    <td>
+            
+    ```bash
+    appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
+    currentUserObjectId=$(az ad signed-in-user show --query "id" -o tsv)
+    scopeId=$(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
+    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
+    ```
+
+    </td>
+    </tr>
+    </table>
+
+2. Open the Visual Studio solution `./src/Relecloud.sln`
+3. Setup the **Relecloud.Web** project User Secrets
     1. Right-click on the **Relecloud.Web** project
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
@@ -306,7 +337,7 @@ New team members should setup their environment by following these steps.
     4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
     project.
 
-3. Setup the **Relecloud.Web.Api** project User Secrets
+4. Setup the **Relecloud.Web.Api** project User Secrets
     1. Right-click on the **Relecloud.Web.Api** project
     2. From the context menu choose **Manage User Secrets**
     3. From a command prompt run the bash command
@@ -337,11 +368,11 @@ New team members should setup their environment by following these steps.
     4. Copy the output into the `secrets.json` file for the 
     **Relecloud.Web.Api** project.
 
-4. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
-5. Choose **Multiple startup projects**
-6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
-7. Click **Ok** to close the popup
-8. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
+5. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
+6. Choose **Multiple startup projects**
+7. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
+8. Click **Ok** to close the popup
+9. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
 
     <table>
     <tr>
@@ -366,7 +397,7 @@ New team members should setup their environment by following these steps.
     </tr>
     </table>
 
-9. When connecting to Azure SQL database you'll connect with your Azure AD account.
+10. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
 
     <table>
@@ -386,37 +417,6 @@ Run the following command to give your Azure AD account permission to access the
             
     ```bash
     bash ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
-    ```
-
-    </td>
-    </tr>
-    </table>
-
-10. Grant your account access to Azure App Configuration Service
-
-    <table>
-    <tr>
-    <td>PowerShell</td>
-    <td>
-
-    ```ps1
-    $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
-    $currentUserObjectId=(az ad signed-in-user show --query "id" -o tsv)
-    $scopeId=(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
-    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
-    ```
-
-    </td>
-    </tr>
-    <tr>
-    <td>Bash</td>
-    <td>
-            
-    ```bash
-    appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
-    currentUserObjectId=$(az ad signed-in-user show --query "id" -o tsv)
-    scopeId=$(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
-    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
     ```
 
     </td>
