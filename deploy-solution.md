@@ -305,11 +305,11 @@ New team members should setup their environment by following these steps.
     </tr>
     </table>
 
-2. Open the Visual Studio solution `./src/Relecloud.sln`
-3. Setup the **Relecloud.Web** project User Secrets
+1. Open the Visual Studio solution `./src/Relecloud.sln`
+1. Setup the **Relecloud.Web** project User Secrets
     1. Right-click on the **Relecloud.Web** project
-    2. From the context menu choose **Manage User Secrets**
-    3. From a command prompt run the bash command
+    1. From the context menu choose **Manage User Secrets**
+    1. From a command prompt run the bash command
 
         <table>
         <tr>
@@ -334,13 +334,13 @@ New team members should setup their environment by following these steps.
         </tr>
         </table>
 
-    4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
+    1. Copy the output into the `secrets.json` file for the **Relecloud.Web**
     project.
 
-4. Setup the **Relecloud.Web.Api** project User Secrets
+1. Setup the **Relecloud.Web.Api** project User Secrets
     1. Right-click on the **Relecloud.Web.Api** project
-    2. From the context menu choose **Manage User Secrets**
-    3. From a command prompt run the bash command
+    1. From the context menu choose **Manage User Secrets**
+    1. From a command prompt run the bash command
 
         <table>
         <tr>
@@ -365,14 +365,14 @@ New team members should setup their environment by following these steps.
         </tr>
         </table>
 
-    4. Copy the output into the `secrets.json` file for the 
+    1. Copy the output into the `secrets.json` file for the 
     **Relecloud.Web.Api** project.
 
-5. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
-6. Choose **Multiple startup projects**
-7. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
-8. Click **Ok** to close the popup
-9. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
+1. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
+1. Choose **Multiple startup projects**
+1. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
+1. Click **Ok** to close the popup
+1. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
 
     <table>
     <tr>
@@ -397,7 +397,7 @@ New team members should setup their environment by following these steps.
     </tr>
     </table>
 
-10. When connecting to Azure SQL database you'll connect with your Azure AD account.
+1. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
 
     <table>
@@ -423,11 +423,11 @@ Run the following command to give your Azure AD account permission to access the
     </tr>
     </table>
 
-> These steps grant access to SQL server in the primary resource group.
-> You can use the same commands if you want to test with the secondary resource
-> group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
+    > These steps grant access to SQL server in the primary resource group.
+    > You can use the same commands if you want to test with the secondary resource
+    > group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
-11. Press F5 to start debugging the website
+1. Press F5 to start debugging the website
 
 
 ## Next Step
