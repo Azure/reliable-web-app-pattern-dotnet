@@ -59,18 +59,26 @@ else
     echo 'found sqlcmd'
 fi
 
-azureAdUsername=$(az ad signed-in-user show --query userPrincipalName -o tsv)
-objectIdForCurrentUser=$(az ad signed-in-user show --query id -o tsv)
+azureAdUsername=$(az ad signed-in-user show --query userPrincipalName)
+azureAdUsername=${azureAdUsername:1:-2}
+
+objectIdForCurrentUser=$(az ad signed-in-user show --query id)
+objectIdForCurrentUser=${objectIdForCurrentUser:1:-2}
 
 # using json format bypasses issue with tsv format observed in this issue
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/202
-databaseServer=$(az resource list -g $resourceGroupName --query "[? type=='Microsoft.Sql/servers'].{name:name}" | grep -o '"name": "[^"]*'| grep -o '[^"]*$')
-databaseServerFqdn=$(az sql server show -n $databaseServer -g $resourceGroupName --query fullyQualifiedDomainName -o tsv)
+databaseServer=$(az resource list -g $resourceGroupName --query "[? type=='Microsoft.Sql/servers'].name | [0]")
+databaseServer=${databaseServer:1:-2}
+
+databaseServerFqdn=$(az sql server show -n $databaseServer -g $resourceGroupName --query fullyQualifiedDomainName)
+databaseServerFqdn=${databaseServerFqdn:1:-2}
 
 # updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
-databaseName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName | [0]" -o tsv)
+databaseName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName | [0]")
+databaseName=${databaseName:1:-2}
 
-sqlAdmin=$(az sql server show --name $databaseServer -g $resourceGroupName --query "administratorLogin" -o tsv)
+sqlAdmin=$(az sql server show --name $databaseServer -g $resourceGroupName --query "administratorLogin")
+sqlAdmin=${sqlAdmin:1:-2}
 
 # new random password
 # https://learn.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=sql-server-ver16
