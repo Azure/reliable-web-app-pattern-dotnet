@@ -18,3 +18,12 @@ This repository provides resources to help developers build a Reliable web app o
 
 [![screenshot azd env new](./assets/Guide/Intro-video.jpg)](https://aka.ms/eap-intro-video)
 
+## Data Collection
+
+The sample may collect information about you and your use of the sample and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft's privacy statement. Our privacy statement is located at https://go.microsoft.com/fwlink/?LinkId=521839. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the sample operates as your consent to these practices.
+
+### Telemetry Configuration
+
+Telemetry collection is on by default.
+
+To opt out, run the following command `azd env set ENABLE_TELEMETRY` to `false` in your environment.
