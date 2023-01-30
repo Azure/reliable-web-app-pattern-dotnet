@@ -322,6 +322,16 @@ resource webAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   ]
 }
 
+module webServicePlanAutoScale './appSvcAutoScaleSettings.bicep' = {
+  name: 'deploy-${webAppServicePlan.name}-scalesettings'
+  params: {
+    appServicePlanName: webAppServicePlan.name
+    location: location
+    isProd: isProd
+    tags: tags
+  }
+}
+
 resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${resourceToken}-api-plan'
   location: location
@@ -339,122 +349,13 @@ resource apiAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   ]
 }
 
-resource webAppScaleRule 'Microsoft.Insights/autoscalesettings@2021-05-01-preview' = if (isProd) {
-  name: '${resourceToken}-web-plan-autoscale'
-  location: location
-  tags: tags
-  properties: {
-    targetResourceUri: webAppServicePlan.id
-    enabled: true
-    profiles: [
-      {
-        name: 'Auto created scale condition'
-        capacity: {
-          maximum: '10'
-          default: '1'
-          minimum: '1'
-        }
-        rules: [
-          {
-            metricTrigger: {
-              metricResourceUri: webAppServicePlan.id
-              metricName: 'CpuPercentage'
-              timeGrain: 'PT5M'
-              statistic: 'Average'
-              timeWindow: 'PT10M'
-              timeAggregation: 'Average'
-              operator: 'GreaterThan'
-              threshold: scaleOutThreshold
-            }
-            scaleAction: {
-              direction: 'Increase'
-              type: 'ChangeCount'
-              value: string(1)
-              cooldown: 'PT10M'
-            }
-          }
-          {
-            metricTrigger: {
-              metricResourceUri: webAppServicePlan.id
-              metricName: 'CpuPercentage'
-              timeGrain: 'PT5M'
-              statistic: 'Average'
-              timeWindow: 'PT10M'
-              timeAggregation: 'Average'
-              operator: 'LessThan'
-              threshold: scaleInThreshold
-            }
-            scaleAction: {
-              direction: 'Decrease'
-              type: 'ChangeCount'
-              value: string(1)
-              cooldown: 'PT10M'
-            }
-          }
-        ]
-      }
-    ]
-  }
-}
-
-var scaleOutThreshold = 85
-var scaleInThreshold = 60
-
-resource apiAppScaleRule 'Microsoft.Insights/autoscalesettings@2014-04-01' = {
-  name: '${resourceToken}-api-plan-autoscale'
-  location: location
-  tags: tags
-  properties: {
-    targetResourceUri: apiAppServicePlan.id
-    enabled: true
-    profiles: [
-      {
-        name: 'Auto created scale condition'
-        capacity: {
-          minimum: string(1)
-          maximum: string(10)
-          default: string(1)
-        }
-        rules: [
-          {
-            metricTrigger: {
-              metricResourceUri: apiAppServicePlan.id
-              metricName: 'CpuPercentage'
-              timeGrain: 'PT5M'
-              statistic: 'Average'
-              timeWindow: 'PT10M'
-              timeAggregation: 'Average'
-              operator: 'GreaterThan'
-              threshold: scaleOutThreshold
-            }
-            scaleAction: {
-              direction: 'Increase'
-              type: 'ChangeCount'
-              value: string(1)
-              cooldown: 'PT10M'
-            }
-          }
-          {
-            metricTrigger: {
-              metricResourceUri: apiAppServicePlan.id
-              metricName: 'CpuPercentage'
-              timeGrain: 'PT5M'
-              statistic: 'Average'
-              timeWindow: 'PT10M'
-              timeAggregation: 'Average'
-              operator: 'LessThan'
-              threshold: scaleInThreshold
-            }
-            scaleAction: {
-              direction: 'Decrease'
-              type: 'ChangeCount'
-              value: string(1)
-              cooldown: 'PT10M'
-            }
-          }
-        ]
-      }
-    ]
+module apiServicePlanAutoScale './appSvcAutoScaleSettings.bicep' = {
+  name: 'deploy-${apiAppServicePlan.name}-scalesettings'
+  params: {
+    appServicePlanName: apiAppServicePlan.name
+    location: location
+    isProd: isProd
+    tags: tags
   }
 }
 
