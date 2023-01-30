@@ -198,6 +198,8 @@ bash ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
 </tr>
 </table>
 
+> Known issue: [/bin/bash^M: bad interpreter](known-issues.md#cannot-execute-shellscript-binbashm-bad-interpreter)
+
 ### Deploy the code
 
 To finish the deployment process the Relecloud devs run the
@@ -314,6 +316,7 @@ New team members should setup their environment by following these steps.
         </tr>
         </table>
 
+        > Known issue: [/bin/bash^M: bad interpreter](known-issues.md#cannot-execute-shellscript-binbashm-bad-interpreter)
     4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
     project.
 
