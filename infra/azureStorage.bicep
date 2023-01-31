@@ -6,8 +6,10 @@ param location string
 @description('A generated identifier used to create unique resources')
 param resourceToken string
 
+@description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
+@description('Enables the template to choose different SKU by environment')
 param isProd bool
 
 var storageSku = isProd ? 'Standard_ZRS' : 'Standard_LRS'
