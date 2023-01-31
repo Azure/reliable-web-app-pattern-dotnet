@@ -6,7 +6,7 @@ param resourceToken string
 @description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
 
-@description('An object collection that contains annotations that describe the deployed azure resources to improve operational visibility')
+@description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
 @minLength(1)

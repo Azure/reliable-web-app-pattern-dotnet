@@ -19,7 +19,7 @@ param uniqueScriptId string = newGuid()
 @description('The Azure location where this solution is deployed')
 param location string
 
-@description('An object collection that contains annotations that describe the deployed azure resources to improve operational visibility')
+@description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
 
