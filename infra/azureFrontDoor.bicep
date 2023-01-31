@@ -1,7 +1,11 @@
-param resourceToken string
+// this file is included for the sample to make it easy to get started
+// for customer scenarios we recommend reusing your Azure Front Door
+// as it supports multiple origins, and endpoints for different needs
 param tags object
 
-var frontDoorEndpointName = 'afd-${uniqueString(resourceGroup().id)}'
+// avoids resource token naming since front door is a global balancer
+var globalResourceToken = uniqueString(resourceGroup().id)
+var frontDoorEndpointName = 'afd-${globalResourceToken}'
 
 @description('The hostname of the backend. Must be an IP address or FQDN.')
 param primaryBackendAddress string
@@ -9,7 +13,7 @@ param primaryBackendAddress string
 @description('The hostname of the backend. Must be an IP address or FQDN.')
 param secondaryBackendAddress string
 
-var frontDoorProfileName = 'fd-${resourceToken}'
+var frontDoorProfileName = 'fd-${globalResourceToken}'
 var frontDoorOriginGroupName = 'MyOriginGroup'
 var frontDoorOriginName = 'MyAppServiceOrigin'
 var frontDoorRouteName = 'MyRoute'
@@ -101,7 +105,7 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' 
 }
 
 resource frontdoorWebApplicationFirewallPolicy 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@2020-11-01' = {
-  name: 'wafpolicy${resourceToken}'
+  name: 'wafpolicy${globalResourceToken}'
   location: 'Global'
   sku: {
     name: 'Standard_AzureFrontDoor'
@@ -116,14 +120,29 @@ resource frontdoorWebApplicationFirewallPolicy 'Microsoft.Network/frontdoorwebap
       rules: []
     }
     managedRules: {
-      managedRuleSets: []
+      managedRuleSets: [
+        {
+          ruleSetType: 'Microsoft_DefaultRuleSet'
+          ruleSetVersion: '2.0'
+          ruleSetAction: 'Block'
+          ruleGroupOverrides: []
+          exclusions: []
+        }
+        {
+          ruleSetType: 'Microsoft_BotManagerRuleSet'
+          ruleSetVersion: '1.0'
+          ruleSetAction: 'Block'
+          ruleGroupOverrides: []
+          exclusions: []
+        }
+      ]
     }
   }
 }
 
 resource profiles_manualryckozesqpn24_name_manualwafpolicy_cfc67469 'Microsoft.Cdn/profiles/securitypolicies@2021-06-01' = {
   parent: frontDoorProfile
-  name: 'wafpolicy-${resourceToken}'
+  name: 'wafpolicy-${globalResourceToken}'
   properties: {
     parameters: {
       wafPolicy: {
