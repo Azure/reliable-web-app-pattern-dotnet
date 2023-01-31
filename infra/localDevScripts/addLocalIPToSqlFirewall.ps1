@@ -9,14 +9,12 @@
     service have already been successfully deployed.
 
 .PARAMETER ResourceGroupName
-    A required parameter for the name of resource group that contains the environment that was
-    created by the azd command. The cmdlet will populate the App Config Svc and Key
-    Vault services in this resource group with Azure AD app registration config data.
+    Name of resource group containing the environment that was created by the azd command.
 #>
 
 Param(
     [Alias("g")]
-    [Parameter(Mandatory = $true)][string]
+    [Parameter(Mandatory = $true, HelpMessage = "Name of the resource group that was created by azd")]
     $ResourceGroupName
 )
 
@@ -40,7 +38,8 @@ $myIpAddress = (Invoke-WebRequest ipinfo.io/ip)
 
 Write-Debug "`$myIpAddress = '$myIpAddress'"
 
-$mySqlServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+$mySqlServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name | [0]" -o tsv)
 
 Write-Debug "`$mySqlServer = '$mySqlServer'"
 

@@ -17,7 +17,7 @@ while [[ $# -gt 0 ]]; do
       echo "    addLocalIPToSqlFirewall.sh : Makes a web request to a public site to retrieve the user's public IP address and then adds that IP address to the Azure SQL Database Firewall as an allowed connection."
       echo ""
       echo "Arguments"
-      echo "    --resource-group -g : Name of resource group where this Redis Cache is deployed."
+      echo "    --resource-group -g : Name of resource group containing the environment that was created by the azd command."
       echo ""
       exit 1
       ;;
@@ -38,7 +38,9 @@ if [[ ${#resourceGroupName} -eq 0 ]]; then
 fi
 
 myIpAddress=$(wget -q -O - ipinfo.io/ip)
-mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name | [0]")
+mySqlServer=${mySqlServer:1:-2}
 
 # Resolves permission constraint that prevents the deploymentScript from running this command
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
