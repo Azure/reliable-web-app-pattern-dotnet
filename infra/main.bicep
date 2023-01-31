@@ -99,7 +99,7 @@ module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
   }
 }
 
-module azureFrontDoor './azureFrontDoor.bicep' = if (isMultiLocationDeployment) {
+module azureFrontDoor './azureFrontDoor.bicep' = {
   name: 'frontDoor-${primaryResourceToken}'
   scope: primaryResourceGroup
   params: {

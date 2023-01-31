@@ -62,7 +62,7 @@ resource frontDoorPrimaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@202
   }
 }
 
-resource frontDoorSecondaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
+resource frontDoorSecondaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = if (secondaryBackendAddress != 'none') {
   name: '${frontDoorOriginName}2'
   parent: frontDoorOriginGroup
   properties: {
