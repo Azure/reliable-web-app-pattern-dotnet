@@ -1,8 +1,11 @@
+@minLength(1)
+@description('A generated identifier used to create unique resources')
 param resourceToken string
+
+@description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
-var frontDoorEndpointName = 'afd-${uniqueString(resourceGroup().id)}'
-
+@minLength(1)
 @description('The hostname of the backend. Must be an IP address or FQDN.')
 param primaryBackendAddress string
 
@@ -13,6 +16,8 @@ var frontDoorProfileName = 'fd-${resourceToken}'
 var frontDoorOriginGroupName = 'MyOriginGroup'
 var frontDoorOriginName = 'MyAppServiceOrigin'
 var frontDoorRouteName = 'MyRoute'
+
+var frontDoorEndpointName = 'afd-${uniqueString(resourceGroup().id)}'
 
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
   name: frontDoorProfileName

@@ -8,6 +8,7 @@ param isProd bool
 @description('The Azure location where this solution is deployed')
 param location string = resourceGroup().location
 
+@description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
 var scaleOutThreshold = 85
