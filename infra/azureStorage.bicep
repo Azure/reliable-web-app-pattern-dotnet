@@ -2,10 +2,11 @@ param location string
 param resourceToken string
 param tags object
 param isProd bool
+param roleAssignmentsList array
 
 var storageSku = isProd ? 'Standard_ZRS' : 'Standard_LRS'
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: '${resourceToken}storage' //storage account name cannot contain character '-'
   tags: tags
   location: location
@@ -13,26 +14,29 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     name: storageSku
   }
   kind: 'StorageV2'
-
-  resource blobServices 'blobServices' = {
-    name:'default'
-    resource container 'containers' = {
-      name: 'tickets'
-    }
-  }
+}
+resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
+  parent: storageAccount
+  name:'default'
 }
 
-resource existingKv 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
-  name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
-  scope: resourceGroup()
+resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
+  parent: blobServices
+  name: 'tickets'
 }
 
-resource kvSecretStorageAcct 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  parent: existingKv
-  name: 'App--StorageAccount--ConnectionString'
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for roleAssignment in roleAssignmentsList: {
+  name: guid(roleAssignment.principalId, roleAssignment.roleDefinitionId, resourceGroup().id)
+  scope: container
   properties: {
-    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
+    description: roleAssignment.description
+    principalId: roleAssignment.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleAssignment.roleDefinitionId)
+    principalType: roleAssignment.principalType
   }
-}
+}]
 
-output keyVaultStorageConnStrName string = kvSecretStorageAcct.name
+output storageAccountResourceId string = storageAccount.id
+output storageAccocuntBlobURL string = storageAccount.properties.primaryEndpoints.blob
+output containerId string = container.id
+output containerName string = container.name

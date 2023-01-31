@@ -151,19 +151,6 @@ resource checkIfClientSecretExists 'Microsoft.Resources/deploymentScripts@2020-1
   ]
 }
 
-resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigSvc
-  name: 'App:StorageAccount:ConnectionString'
-  properties: {
-    value: string({
-      uri: '${kv.properties.vaultUri}secrets/${storageSetup.outputs.keyVaultStorageConnStrName}'
-    })
-    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-  }
-  dependsOn: [
-    openConfigSvcsForEdits
-  ]
-}
 
 var aspNetCoreEnvironment = isProd ? 'Production' : 'Development'
 
@@ -494,6 +481,19 @@ module redisSetup 'azureRedisCache.bicep' = {
   }
 }
 
+
+@description('Built in \'Storage Blob Data Owner\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+// Allows read and write access to storage blob data
+var storageBlobDataOwner = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
+
+var storageAccountRoleAssignments =[
+  {
+    principalId: managedIdentity.properties.principalId
+    roleDefinitionId: storageBlobDataOwner
+    description: 'Give the application read and write permission to storage account.'
+    principalType:'ServicePrincipal'
+  }
+]
 module storageSetup 'azureStorage.bicep' = {
   name: 'storageSetup'
   scope: resourceGroup()
@@ -501,10 +501,33 @@ module storageSetup 'azureStorage.bicep' = {
     isProd: isProd
     location: location
     resourceToken: resourceToken
+    roleAssignmentsList: storageAccountRoleAssignments
     tags: tags
   }
   dependsOn: [
     vnet
+  ]
+}
+
+resource storageAccountBlobUrlAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
+  parent: appConfigSvc
+  name: 'App:StorageAccount:Url'
+  properties: {
+    value: storageSetup.outputs.storageAccocuntBlobURL
+  }
+  dependsOn: [
+    openConfigSvcsForEdits
+  ]
+}
+
+resource storageAccountBlobContainerAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
+  parent: appConfigSvc
+  name: 'App:StorageAccount:Container'
+  properties: {
+    value: storageSetup.outputs.containerName
+  }
+  dependsOn: [
+    openConfigSvcsForEdits
   ]
 }
 
@@ -853,7 +876,8 @@ resource closeConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-
     sqlConnStrAppConfigSetting
     redisConnAppConfigKvRef
     frontEndClientSecretAppCfg
-    storageAppConfigKvRef
+    storageAccountBlobUrlAppConfigSetting
+    storageAccountBlobContainerAppConfigSetting
   ]
 }
 

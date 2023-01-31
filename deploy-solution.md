@@ -406,7 +406,7 @@ Run the following command to give your Azure AD account permission to access the
     </tr>
     </table>
 
-10. Grant your account access to Azure App Configuration Service
+10. Grant your account access to Azure App Configuration Service and Storage
 
     <table>
     <tr>
@@ -415,9 +415,11 @@ Run the following command to give your Azure AD account permission to access the
 
     ```ps1
     $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
+    $storageBlobDataOwner='b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
     $currentUserObjectId=(az ad signed-in-user show --query "id" -o tsv)
     $scopeId=(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
     az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
+    az role assignment create --role $storageBlobDataOwner --assignee $currentUserObjectId --scope $scopeId
     ```
 
     </td>
@@ -428,9 +430,11 @@ Run the following command to give your Azure AD account permission to access the
             
     ```bash
     appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
+    storageBlobDataOwner='b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
     currentUserObjectId=$(az ad signed-in-user show --query "id" -o tsv)
     scopeId=$(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
     az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
+    az role assignment create --role $storageBlobDataOwner --assignee $currentUserObjectId --scope $scopeId
     ```
 
     </td>
