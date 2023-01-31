@@ -158,16 +158,6 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
       contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
     }
   }
-
-  resource storageAppConfigKvRef 'keyValues@2022-05-01' = {
-    name: 'App:StorageAccount:ConnectionString'
-    properties: {
-      value: string({
-        uri: '${keyVault.properties.vaultUri}secrets/${storageSetup.outputs.keyVaultStorageConnStrName}'
-      })
-      contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-    }
-  }
 }
 
 // provides additional diagnostic information from aspNet when deploying non-prod environments
@@ -444,6 +434,18 @@ module redisSetup 'azureRedisCache.bicep' = {
   }
 }
 
+@description('Built in \'Storage Blob Data Owner\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+// Allows read and write access to storage blob data
+var storageBlobDataOwner = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
+
+var storageAccountRoleAssignments =[
+  {
+    principalId: managedIdentity.properties.principalId
+    roleDefinitionId: storageBlobDataOwner
+    description: 'Give the application read and write permission to storage account.'
+    principalType:'ServicePrincipal'
+  }
+]
 module storageSetup 'azureStorage.bicep' = {
   name: 'storageSetup'
   scope: resourceGroup()
@@ -451,11 +453,28 @@ module storageSetup 'azureStorage.bicep' = {
     isProd: isProd
     location: location
     resourceToken: resourceToken
+    roleAssignmentsList: storageAccountRoleAssignments
     tags: tags
   }
   dependsOn: [
     vnet
   ]
+}
+
+resource storageAccountBlobUrlAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
+  parent: appConfigService
+  name: 'App:StorageAccount:Url'
+  properties: {
+    value: storageSetup.outputs.storageAccocuntBlobURL
+  }
+}
+
+resource storageAccountBlobContainerAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
+  parent: appConfigService
+  name: 'App:StorageAccount:Container'
+  properties: {
+    value: storageSetup.outputs.containerName
+  }
 }
 
 var privateEndpointSubnetName = 'subnetPrivateEndpoints'
