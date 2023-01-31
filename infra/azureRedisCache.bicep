@@ -7,10 +7,13 @@ param resourceToken string
 @description('Enables the template to choose different SKU by environment')
 param isProd bool
 
+@description('Name for private endpoint')
 param privateEndpointNameForRedis string
 
+@description('Name of vnet for private endpoint')
 param privateEndpointVnetName string
 
+@description('Name of subnet for private endpoint')
 param privateEndpointSubnetName string
 
 @description('Ensures that the idempotent scripts are executed each time the deployment is executed')
