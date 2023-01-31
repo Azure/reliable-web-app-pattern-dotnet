@@ -19,6 +19,8 @@ param principalId string
 
 @description('A generated identifier used to create unique resources')
 param resourceToken string
+
+@description('An object collection that contains annotations that describe the deployed azure resources to improve operational visibility')
 param tags object
 
 @description('A user-assigned managed identity that is used by the App Service app')
