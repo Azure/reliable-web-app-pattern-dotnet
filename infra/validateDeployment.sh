@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# As part of this sample the dev team is monitoring for scenarios such as race conditions and
+# intermittent issues which could cause the deployment to fail. As these issues are identified
+# we update the `validateDeployment.sh`, and the mirror file `validateDeployment.ps1` which are
+# also part of our engineering process. We use these files to validate characteristics of a
+# successful deployment. These files will evolve as the sample evolves to help us ensure the
+# quality of the solution.
+
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
