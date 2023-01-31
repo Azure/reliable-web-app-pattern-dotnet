@@ -1,6 +1,13 @@
+@minLength(1)
+@description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
+
+@minLength(1)
+@description('A generated identifier used to create unique resources')
 param resourceToken string
+
 param tags object
+
 param isProd bool
 
 var storageSku = isProd ? 'Standard_ZRS' : 'Standard_LRS'

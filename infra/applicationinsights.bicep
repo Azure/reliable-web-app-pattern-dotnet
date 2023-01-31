@@ -1,6 +1,16 @@
+@minLength(1)
+@description('A generated identifier used to create unique resources')
 param resourceToken string
+
+@minLength(1)
+@description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
+
+@description('An object collection that contains annotations that describe the deployed azure resources to improve operational visibility')
 param tags object
+
+@minLength(1)
+@description('An Id for a log analytics workspace that contains events to show in a dashboard')
 param workspaceId string
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {

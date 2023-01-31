@@ -8,13 +8,18 @@ param resourceToken string
 param isProd bool
 
 param privateEndpointNameForRedis string
+
 param privateEndpointVnetName string
+
 param privateEndpointSubnetName string
 
 @description('Ensures that the idempotent scripts are executed each time the deployment is executed')
 param uniqueScriptId string = newGuid()
 
+@description('The Azure location where this solution is deployed')
 param location string
+
+@description('An object collection that contains annotations that describe the deployed azure resources to improve operational visibility')
 param tags object
 
 
