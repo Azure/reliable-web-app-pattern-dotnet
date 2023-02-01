@@ -9,8 +9,9 @@ param name string
 @description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
 
+@minLength(1)
 @description('Id of the user or app to assign application roles')
-param principalId string = ''
+param principalId string
 
 @description('Will select production ready SKUs when `true`')
 param isProd string = 'false'
@@ -75,7 +76,7 @@ module primaryResources './resources.bicep' = {
   }
 }
 
-module devOpsIdentitySetupSecondary './devOpsIdentitySetup.bicep' = {
+module devOpsIdentitySetupSecondary './devOpsIdentitySetup.bicep' = if (isMultiLocationDeployment) {
   name: 'devOpsIdentitySetupSecondary'
   scope: secondaryResourceGroup
   params: {
@@ -90,7 +91,8 @@ module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
   scope: secondaryResourceGroup
   params: {
     azureSqlPassword: azureSqlPassword
-    devOpsManagedIdentityId: devOpsIdentitySetupSecondary.outputs.devOpsManagedIdentityId
+    // when not deployed, the evaluation of this template must still supply a valid parameter
+    devOpsManagedIdentityId: isMultiLocationDeployment ? devOpsIdentitySetupSecondary.outputs.devOpsManagedIdentityId : 'none'
     isProd: isProdBool
     location: secondaryAzureLocation
     principalId: principalId
@@ -103,7 +105,6 @@ module azureFrontDoor './azureFrontDoor.bicep' = {
   name: 'frontDoor-${primaryResourceToken}'
   scope: primaryResourceGroup
   params: {
-    resourceToken: primaryResourceToken
     tags: tags
     primaryBackendAddress: primaryResources.outputs.WEB_URI
     secondaryBackendAddress: isMultiLocationDeployment ? secondaryResources.outputs.WEB_URI : 'none'

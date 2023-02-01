@@ -1,12 +1,15 @@
 // this file is included for the sample to make it easy to get started
 // for customer scenarios we recommend reusing your Azure Front Door
 // as it supports multiple origins, and endpoints for different needs
-param tags object
 
 // avoids resource token naming since front door is a global balancer
 var globalResourceToken = uniqueString(resourceGroup().id)
 var frontDoorEndpointName = 'afd-${globalResourceToken}'
 
+@description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
+param tags object
+
+@minLength(1)
 @description('The hostname of the backend. Must be an IP address or FQDN.')
 param primaryBackendAddress string
 

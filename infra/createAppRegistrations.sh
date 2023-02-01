@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# This script is part of the sample's workflow for configuring App Registrations
+# in Azure AD and saving the appropriate values in Key Vault, and Azure App Config Service
+# so that the application can authenticate users. Note that an app registration is
+# something you'll want to set up once, and reuse for every version of the web app
+# that you deploy. You can learn more about app registrations at
+# https://learn.microsoft.com/en-us/azure/active-directory/develop/application-model
+#
+# If you do not have permission to create App Registrations consider
+# sharing this script, or something similar, with your administrators to help them
+# set up the variables you need to integrate with Azure AD
+#
+# This code may be repurposed for your scenario as desired
+# but is not covered by the guidance in this content.
+
 POSITIONAL_ARGS=()
 
 debug=''
@@ -51,12 +65,19 @@ echo "resourceGroupName='$resourceGroupName'"
 echo ""
 
 # assumes there is only one vault deployed to this resource group that will match this filter
-keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name" -o tsv)
+keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name | [0]")
+# format from json
+keyVaultName=${keyVaultName:1:-2}
 
-appConfigSvcName=$(az appconfig list -g "$resourceGroupName" --query "[].name" -o tsv)
+appConfigSvcName=$(az appconfig list -g "$resourceGroupName" --query "[].name | [0]")
+# format from json
+appConfigSvcName=${appConfigSvcName:1:-2}
 
 appServiceRootUri='azurewebsites.net' # hard coded because app svc does not return the public endpoint
-frontEndWebAppName=$(az resource list -g "$resourceGroupName" --query "[?tags.\"azd-service-name\"=='web'].name" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+frontEndWebAppName=$(az resource list -g "$resourceGroupName" --query "[?tags.\"azd-service-name\"=='web'].name | [0]")
+# format from json
+frontEndWebAppName=${frontEndWebAppName:1:-2}
 frontEndWebAppUri="https://$frontEndWebAppName.$appServiceRootUri"
 
 # assumes resourceToken is located in app service frontend web app name
@@ -75,7 +96,11 @@ if [[ $group2Exists == 'false' ]]; then
     secondaryResourceGroupName=''
 fi
 
-mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name | [0]")
+# format from json
+mySqlServer=${mySqlServer:1:-2}
+
 
 azdData=$(azd env get-values)
 isProd=''
@@ -113,8 +138,14 @@ echo "frontEndWebAppName='$frontEndWebAppName'"
 echo "apiWebAppName='$apiWebAppName'"
 echo "maxNumberOfRetries=$maxNumberOfRetries"
 
-tenantId=$(az account show --query "tenantId" -o tsv)
-userObjectId=$(az account show --query "id" -o tsv)
+tenantId=$(az account show --query "tenantId")
+# format from json
+tenantId=${tenantId:1:-2}
+
+userObjectId=$(az account show --query "id")
+# format from json
+userObjectId=${userObjectId:1:-2}
+
 
 echo "tenantId='$tenantId'"
 echo ""
@@ -125,11 +156,14 @@ if [[ $debug ]]; then
     echo "..."
 fi
 
-# Resolves permission constraint that prevents the deploymentScript from running this command
-# https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
-az sql server update -n $mySqlServer -g $resourceGroupName --set publicNetworkAccess="Disabled" > /dev/null
+# prod environments do not allow public network access, this must be changed before we can set values
+if [[ $isProd ]]; then
+  # Resolves permission constraint that prevents the deploymentScript from running this command
+  # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
+  az sql server update -n $mySqlServer -g $resourceGroupName --set publicNetworkAccess="Disabled" > /dev/null
+fi
 
-frontEndWebObjectId=$(az ad app list --filter "displayName eq '$frontEndWebAppName'" --query "[].id" -o tsv)
+frontEndWebObjectId=$(az ad app list --filter "displayName eq '$frontEndWebAppName'" --query "[].id | [0]")
 
 if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
 
@@ -144,7 +178,10 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
         --app-roles '[{ "allowedMemberTypes": [ "User" ], "description": "Relecloud Administrator", "displayName": "Relecloud Administrator", "isEnabled": "true", "value": "Administrator" }]' \
         --web-redirect-uris $frontEndWebAppUri/signin-oidc https://localhost:7227/signin-oidc \
         --enable-id-token-issuance \
-        --query appId --output tsv)
+        --query appId)
+
+    # format from json
+    frontEndWebAppClientId=${frontEndWebAppClientId:1:-2}
 
     echo "frontEndWebAppClientId='$frontEndWebAppClientId'"
 
@@ -158,7 +195,8 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
     while [ $isWebAppCreated -eq 0 ]
     do
       # assumes that we only need to create client secret if the app registration did not exist
-      frontEndWebAppClientSecret=$(az ad app credential reset --id $frontEndWebAppClientId --query "password" -o tsv --only-show-errors 2> /dev/null) 
+      frontEndWebAppClientSecret=$(az ad app credential reset --id $frontEndWebAppClientId --query "password" --only-show-errors 2> /dev/null)
+      frontEndWebAppClientSecret=${frontEndWebAppClientSecret:1:-2}
       isWebAppCreated=${#frontEndWebAppClientSecret}
   
       currentRetryCount=$((currentRetryCount + 1))
@@ -195,7 +233,7 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
     az appconfig kv set --name $appConfigSvcName --key 'AzureAd:TenantId' --value $tenantId --yes --only-show-errors > /dev/null
     echo "Set appconfig value for: 'AzureAd:TenantId'"
 
-    #save 'AzureAd:ClientId' to App Config Svc
+    # save 'AzureAd:ClientId' to App Config Svc
     az appconfig kv set --name $appConfigSvcName --key 'AzureAd:ClientId' --value $frontEndWebAppClientId --yes --only-show-errors > /dev/null
     echo "Set appconfig value for: 'AzureAd:ClientId'"
     
@@ -208,8 +246,12 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
         az keyvault update --name $keyVaultName --resource-group $resourceGroupName  --public-network-access Disabled > /dev/null
     fi
 else
+    frontEndWebObjectId=${frontEndWebObjectId:1:-2}
     echo "frontend app registration objectId=$frontEndWebObjectId already exists. Delete the '$frontEndWebAppName' app registration to recreate or reset the settings."
-    frontEndWebAppClientId=$(az ad app show --id $frontEndWebObjectId --query "appId" -o tsv)
+    frontEndWebAppClientId=$(az ad app show --id $frontEndWebObjectId --query "appId")
+    # format from json
+    frontEndWebAppClientId=${frontEndWebAppClientId:1:-2}
+    echo "frontEndWebAppClientId='$frontEndWebAppClientId'"
     canSetSecondAzureLocation=2
 fi
 
@@ -217,7 +259,7 @@ echo ""
 echo "Finished app registration for front-end"
 echo ""
 
-apiObjectId=$(az ad app list --filter "displayName eq '$apiWebAppName'" --query "[].id" -o tsv)
+apiObjectId=$(az ad app list --filter "displayName eq '$apiWebAppName'" --query "[].id | [0]")
 
 if [[ ${#apiObjectId} -eq 0 ]]; then 
     # the api app registration does not exist and must be created
@@ -226,7 +268,10 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
       --display-name $apiWebAppName \
       --sign-in-audience AzureADMyOrg \
       --app-roles '[{ "allowedMemberTypes": [ "User" ], "description": "Relecloud Administrator", "displayName": "Relecloud Administrator", "isEnabled": "true", "value": "Administrator" }]' \
-      --query appId --output tsv)
+      --query appId)
+
+    # format from json
+    apiWebAppClientId=${apiWebAppClientId:1:-2}
 
     echo "apiWebAppClientId='$apiWebAppClientId'"
 
@@ -236,8 +281,9 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
 
     while [ $isApiCreated -eq 0 ]
     do
-      apiObjectId=$(az ad app show --id $apiWebAppClientId --query id -o tsv 2> /dev/null)
+      apiObjectId=$(az ad app show --id $apiWebAppClientId --query id 2> /dev/null)
       isApiCreated=${#apiObjectId}
+      apiObjectId=${apiObjectId:1:-2}
       
       currentRetryCount=$((currentRetryCount + 1))
       if [[ $currentRetryCount -gt $maxNumberOfRetries ]]; then
@@ -269,7 +315,8 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
           --headers 'Content-Type=application/json' \
           --body "{ identifierUris:[ 'api://$apiWebAppClientId' ], api: { oauth2PermissionScopes: [ { value: '$scopeName', adminConsentDescription: 'Relecloud API access', adminConsentDisplayName: 'Relecloud API access', id: 'c791b666-cc87-4904-bc9f-c5945e08ba8f', isEnabled: true, type: 'Admin' } ] } }" 2> /dev/null
 
-      createdScope=$(az ad app show --id $apiWebAppClientId --query 'api.oauth2PermissionScopes[0].value' -o tsv 2> /dev/null)
+      createdScope=$(az ad app show --id $apiWebAppClientId --query 'api.oauth2PermissionScopes[0].value' 2> /dev/null)
+      createdScope=${createdScope:1:-2}
 
       if [[ $createdScope == $scopeName ]]; then
         isScopeAdded=1
@@ -292,7 +339,8 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
     currentRetryCount=0
     while [ ${#permId} -eq 0 ]
     do
-      permId=$(az ad app show --id $apiWebAppClientId --query 'api.oauth2PermissionScopes[].id' -o tsv 2> /dev/null)
+      permId=$(az ad app show --id $apiWebAppClientId --query 'api.oauth2PermissionScopes[].id | [0]' 2> /dev/null)
+      permId=${permId:1:-2}
 
       if [[ ${#permId} -eq 0 ]]; then
         currentRetryCount=$((currentRetryCount + 1))
@@ -322,7 +370,8 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
           --headers 'Content-Type=application/json' \
           --body "{api:{preAuthorizedApplications:[{appId:'$preAuthedAppApplicationId',delegatedPermissionIds:['$permId']}]}}" 2> /dev/null
 
-      authorizedApps=$(az ad app show --id $apiObjectId --query "api.preAuthorizedApplications" -o tsv 2> /dev/null)
+      authorizedApps=$(az ad app show --id $apiObjectId --query "api.preAuthorizedApplications[].appId | [0]" 2> /dev/null)
+      authorizedApps=${authorizedApps:1:-2}
 
       if [[ ${#authorizedApps} -eq 0 ]]; then
         currentRetryCount=$((currentRetryCount + 1))
@@ -364,6 +413,7 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
         az appconfig update --name $appConfigSvcName --resource-group $resourceGroupName --enable-public-network false > /dev/null
     fi
 else
+  apiObjectId=${apiObjectId:1:-2}
   echo "API app registration objectId=$apiObjectId already exists. Delete the '$apiWebAppName' app registration to recreate or reset the settings."
   canSetSecondAzureLocation=3
 fi
@@ -373,9 +423,13 @@ fi
 if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]]; then
   
   # assumes there is only one vault deployed to this resource group that will match this filter
-  secondaryKeyVaultName=$(az keyvault list -g "$secondaryResourceGroupName" --query "[?name.starts_with(@,'rc-')].name" -o tsv)
+  secondaryKeyVaultName=$(az keyvault list -g "$secondaryResourceGroupName" --query "[?name.starts_with(@,'rc-')].name | [0]")
+  # format from json
+  secondaryKeyVaultName=${secondaryKeyVaultName:1:-2}
 
-  secondaryAppConfigSvcName=$(az appconfig list -g "$secondaryResourceGroupName" --query "[].name" -o tsv)
+  secondaryAppConfigSvcName=$(az appconfig list -g "$secondaryResourceGroupName" --query "[].name | [0]")
+  # format from json
+  secondaryAppConfigSvcName=${secondaryAppConfigSvcName:1:-2}
 
   echo ""
   echo "Derived inputs for second azure location"

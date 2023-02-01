@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# This script is used by our QA process to ensure the quality of this sample it measures
+# characteristics of the deployment and will be modified as needed to explore intermittent issues
+
+# This engineering code may be repurposed for your scenario as desired
+# but is not covered by the guidance in this content.
+
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
