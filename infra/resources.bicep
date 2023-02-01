@@ -24,7 +24,7 @@ param resourceToken string
 // https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138
 @minLength(1)
 @description('When the deployment is executed by a user we give the principal RBAC access to key vault')
-param servicePrincipalType string
+param principalType string
 
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
@@ -52,7 +52,7 @@ resource appConfigRoleAssignmentForWebApps 'Microsoft.Authorization/roleAssignme
 }
 
 @description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
-resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = if (servicePrincipalType == 'user') {
+resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = if (principalType == 'user') {
   name: guid(appConfigurationRoleDefinitionId, appConfigService.id, principalId, resourceToken)
   scope: resourceGroup()
   properties: {
