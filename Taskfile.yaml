@@ -1,0 +1,32 @@
+version: '3'
+
+env:
+  APP_NAME: relecloud
+
+tasks:
+  up:
+    desc: Creates Azure infrastructure and deploys application code
+    cmds:
+    - azd init -e {{.APP_NAME}}  || true
+    - azd env set AZURE_SQL_PASSWORD {{.AZURE_SQL_PASSWORD}}
+    - azd env set AZURE_RESOURCE_GROUP "{{.APP_NAME}}-rg"
+    - azd env set IS_PROD {{.IS_PROD}}
+    - azd provision
+    - bash ./infra/createAppRegistrations.sh -g "{{.APP_NAME}}-rg"
+    - task: deploy
+    vars:
+      AZURE_SQL_PASSWORD:
+        sh: cat /dev/urandom | tr -dc '[:alnum:]' | head -c 20
+      IS_PROD: '{{default "false" .CLI_ARGS}}'
+
+  deploy:
+    desc: Deploys the Relecloud application
+    cmds:
+    - azd env set AZURE_RESOURCE_GROUP "{{.APP_NAME}}-rg"
+    - azd deploy
+
+  down:
+    desc: Destorys Azure infrastructure 
+    cmds:
+    - azd down --force --purge --no-prompt
+    - az deployment sub delete --name {{.APP_NAME}}
