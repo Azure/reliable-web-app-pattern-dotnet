@@ -38,7 +38,7 @@ var appConfigurationRoleDefinitionId = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 @description('Grant the \'Data Reader\' role to the user-assigned managed identity, at the scope of the resource group.')
 resource appConfigRoleAssignmentForWebApps 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(appConfigurationRoleDefinitionId, appConfigSvc.id, managedIdentity.name, resourceToken)
+  name: guid(appConfigurationRoleDefinitionId, appConfigService.id, managedIdentity.name, resourceToken)
   scope: resourceGroup()
   properties: {
     principalType: 'ServicePrincipal'
@@ -47,6 +47,9 @@ resource appConfigRoleAssignmentForWebApps 'Microsoft.Authorization/roleAssignme
     description: 'Grant the "Data Reader" role to the user-assigned managed identity so it can access the azure app configuration service.'
   }
 }
+
+// a key vault name that is shared between KV and Azure App Configuration Service to support Azure AD auth for the web app
+var frontEndClientSecretName = 'AzureAd--ClientSecret'
 
 resource kv 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
@@ -83,57 +86,60 @@ resource kv 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   }
 }
 
-resource baseApiUrlAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigSvc
-  name: 'App:RelecloudApi:BaseUri'
-  properties: {
-    value: 'https://${api.properties.defaultHostName}'
+resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-05-01' = {
+  name: '${resourceToken}-appconfig'
+  location: location
+  tags: tags
+  sku: {
+    name: 'Standard'
+  }
+
+  resource baseApiUrlAppConfigSetting 'keyValues@2022-05-01' = {
+    name: 'App:RelecloudApi:BaseUri'
+    properties: {
+      value: 'https://${api.properties.defaultHostName}'
+    }
+  }
+
+  resource sqlConnStrAppConfigSetting 'keyValues@2022-05-01' = {
+    name: 'App:SqlDatabase:ConnectionString'
+    properties: {
+      value: 'Server=tcp:${sqlSetup.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlSetup.outputs.sqlCatalogName};Authentication=Active Directory Default'
+    }
+  }
+
+  resource redisConnAppConfigKvRef 'keyValues@2022-05-01' = {
+    name: 'App:RedisCache:ConnectionString'
+    properties: {
+      value: string({
+        uri: '${kv.properties.vaultUri}secrets/${redisSetup.outputs.keyVaultRedisConnStrName}'
+      })
+      contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+    }
+  }
+
+  resource frontEndClientSecretAppCfg 'keyValues@2022-05-01' = {
+    name: 'AzureAd:ClientSecret'
+    properties: {
+      value: string({
+        uri: '${kv.properties.vaultUri}secrets/${frontEndClientSecretName}'
+      })
+      contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+    }
+  }
+
+  resource storageAppConfigKvRef 'keyValues@2022-05-01' = {
+    name: 'App:StorageAccount:ConnectionString'
+    properties: {
+      value: string({
+        uri: '${kv.properties.vaultUri}secrets/${storageSetup.outputs.keyVaultStorageConnStrName}'
+      })
+      contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+    }
   }
 }
 
-resource sqlConnStrAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigSvc
-  name: 'App:SqlDatabase:ConnectionString'
-  properties: {
-    value: 'Server=tcp:${sqlSetup.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlSetup.outputs.sqlCatalogName};Authentication=Active Directory Default'
-  }
-}
-
-resource redisConnAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigSvc
-  name: 'App:RedisCache:ConnectionString'
-  properties: {
-    value: string({
-      uri: '${kv.properties.vaultUri}secrets/${redisSetup.outputs.keyVaultRedisConnStrName}'
-    })
-    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-  }
-}
-
-resource frontEndClientSecretAppCfg 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigSvc
-  name: 'AzureAd:ClientSecret'
-  properties: {
-    value: string({
-      uri: '${kv.properties.vaultUri}secrets/${frontEndClientSecretName}'
-    })
-    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-  }
-}
-
-var frontEndClientSecretName = 'AzureAd--ClientSecret'
-
-resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigSvc
-  name: 'App:StorageAccount:ConnectionString'
-  properties: {
-    value: string({
-      uri: '${kv.properties.vaultUri}secrets/${storageSetup.outputs.keyVaultStorageConnStrName}'
-    })
-    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-  }
-}
-
+// provides additional diagnostic information from aspNet when deploying non-prod environments
 var aspNetCoreEnvironment = isProd ? 'Production' : 'Development'
 
 resource web 'Microsoft.Web/sites@2021-03-01' = {
@@ -170,7 +176,7 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
       ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
       APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
-      'App:AppConfig:Uri': appConfigSvc.properties.endpoint
+      'App:AppConfig:Uri': appConfigService.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
@@ -244,7 +250,7 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
       ASPNETCORE_ENVIRONMENT: aspNetCoreEnvironment
       AZURE_CLIENT_ID: managedIdentity.properties.clientId
       APPLICATIONINSIGHTS_CONNECTION_STRING: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_CONNECTION_STRING
-      'Api:AppConfig:Uri': appConfigSvc.properties.endpoint
+      'Api:AppConfig:Uri': appConfigService.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // App Insights settings
       // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
@@ -281,15 +287,6 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
     dependsOn: [
       appSettings
     ]
-  }
-}
-
-resource appConfigSvc 'Microsoft.AppConfiguration/configurationStores@2022-05-01' = {
-  name: '${resourceToken}-appconfig'
-  location: location
-  tags: tags
-  sku: {
-    name: 'Standard'
   }
 }
 
@@ -672,9 +669,9 @@ resource privateEndpointForAppConfig 'Microsoft.Network/privateEndpoints@2020-07
     }
     privateLinkServiceConnections: [
       {
-        name: appConfigSvc.name
+        name: appConfigService.name
         properties: {
-          privateLinkServiceId: appConfigSvc.id
+          privateLinkServiceId: appConfigService.id
           groupIds: [
             'configurationStores'
           ]
