@@ -136,17 +136,6 @@ azd env set SECONDARY_AZURE_LOCATION westus3
 > az account list-locations --query "[].name" -o tsv
 > ```
 
-### (Optional) Custom SQL Password
-Relecloud's bicep templates support generating a 30 character hashed
-from the subscription, environment name, and the Azure location.
-
-To override this behavior the team provides their own custom password
-using the following command.
-
-```bash
-azd env set AZURE_SQL_PASSWORD superSECUREP@55W0RD
-```
-
 ### Provision the infrastructure
 
 Relecloud uses the following command to deploy the Azure
@@ -287,75 +276,7 @@ administration of these secrets so they can be easily changed.
 
 New team members should setup their environment by following these steps.
 
-1. Open the Visual Studio solution `./src/Relecloud.sln`
-2. Setup the **Relecloud.Web** project User Secrets
-    1. Right-click on the **Relecloud.Web** project
-    2. From the context menu choose **Manage User Secrets**
-    3. From a command prompt run the bash command
-
-        <table>
-        <tr>
-        <td>PowerShell</td>
-        <td>
-
-        ```ps1
-        .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
-        ```
-
-        </td>
-        </tr>
-        <tr>
-        <td>Bash</td>
-        <td>
-                
-        ```bash
-        bash ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
-        ```
-
-        </td>
-        </tr>
-        </table>
-
-        > Known issue: [/bin/bash^M: bad interpreter](known-issues.md#cannot-execute-shellscript-binbashm-bad-interpreter)
-    4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
-    project.
-
-3. Setup the **Relecloud.Web.Api** project User Secrets
-    1. Right-click on the **Relecloud.Web.Api** project
-    2. From the context menu choose **Manage User Secrets**
-    3. From a command prompt run the bash command
-
-        <table>
-        <tr>
-        <td>PowerShell</td>
-        <td>
-
-        ```ps1
-        .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
-        ```
-
-        </td>
-        </tr>
-        <tr>
-        <td>Bash</td>
-        <td>
-                
-        ```bash
-        bash ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
-        ```
-
-        </td>
-        </tr>
-        </table>
-
-    4. Copy the output into the `secrets.json` file for the 
-    **Relecloud.Web.Api** project.
-
-4. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
-5. Choose **Multiple startup projects**
-6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
-7. Click **Ok** to close the popup
-8. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
+1. Grant your account access to Azure App Configuration Service
 
     <table>
     <tr>
@@ -363,7 +284,7 @@ New team members should setup their environment by following these steps.
     <td>
 
     ```ps1
-    .\infra\addLocalIPToSqlFirewall.ps1 -g "$myEnvironmentName-rg"
+    .\infra\localDevScripts\giveCurrentUserAccessToReadAppConfigSvc.ps1 -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -373,14 +294,106 @@ New team members should setup their environment by following these steps.
     <td>
             
     ```bash
-    bash ./infra/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
+    bash ./infra/localDevScripts/giveCurrentUserAccessToReadAppConfigSvc.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
     </tr>
     </table>
 
-9. When connecting to Azure SQL database you'll connect with your Azure AD account.
+1. Open the Visual Studio solution `./src/Relecloud.sln`
+1. Setup the **Relecloud.Web** project User Secrets
+    1. Right-click on the **Relecloud.Web** project
+    1. From the context menu choose **Manage User Secrets**
+    1. From a command prompt run the bash command
+
+        <table>
+        <tr>
+        <td>PowerShell</td>
+        <td>
+
+        ```ps1
+        .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
+        ```
+
+        </td>
+        </tr>
+        <tr>
+        <td>Bash</td>
+        <td>
+                
+        ```bash
+        bash ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
+        ```
+
+        </td>
+        </tr>
+        </table>
+
+        > Known issue: [/bin/bash^M: bad interpreter](known-issues.md#cannot-execute-shellscript-binbashm-bad-interpreter)
+    1. Copy the output into the `secrets.json` file for the **Relecloud.Web** project.
+
+1. Setup the **Relecloud.Web.Api** project User Secrets
+    1. Right-click on the **Relecloud.Web.Api** project
+    1. From the context menu choose **Manage User Secrets**
+    1. From a command prompt run the bash command
+
+        <table>
+        <tr>
+        <td>PowerShell</td>
+        <td>
+
+        ```ps1
+        .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
+        ```
+
+        </td>
+        </tr>
+        <tr>
+        <td>Bash</td>
+        <td>
+                
+        ```bash
+        bash ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
+        ```
+
+        </td>
+        </tr>
+        </table>
+
+    1. Copy the output into the `secrets.json` file for the 
+    **Relecloud.Web.Api** project.
+
+1. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
+1. Choose **Multiple startup projects**
+1. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
+1. Click **Ok** to close the popup
+1. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
+
+    <table>
+    <tr>
+    <td>PowerShell</td>
+    <td>
+
+    ```ps1
+    .\infra\localDevScripts\addLocalIPToSqlFirewall.ps1 -g "$myEnvironmentName-rg"
+    ```
+
+    </td>
+    </tr>
+    <tr>
+    <td>Bash</td>
+    <td>
+            
+    ```bash
+    bash ./infra/localDevScripts/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
+    ```
+
+    </td>
+    </tr>
+    </table>
+
+1. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
 
     <table>
@@ -389,7 +402,7 @@ Run the following command to give your Azure AD account permission to access the
     <td>
 
     ```ps1
-    .\infra\makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
+    .\infra\localDevScripts\makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -399,49 +412,19 @@ Run the following command to give your Azure AD account permission to access the
     <td>
             
     ```bash
-    bash ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+    bash ./infra/localDevScripts/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
     </tr>
     </table>
 
-10. Grant your account access to Azure App Configuration Service
+    > These steps grant access to SQL server in the primary resource group.
+    > You can use the same commands if you want to test with the secondary resource
+    > group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
-    <table>
-    <tr>
-    <td>PowerShell</td>
-    <td>
+1. Press F5 to start debugging the website
 
-    ```ps1
-    $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
-    $currentUserObjectId=(az ad signed-in-user show --query "id" -o tsv)
-    $scopeId=(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
-    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
-    ```
-
-    </td>
-    </tr>
-    <tr>
-    <td>Bash</td>
-    <td>
-            
-    ```bash
-    appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
-    currentUserObjectId=$(az ad signed-in-user show --query "id" -o tsv)
-    scopeId=$(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
-    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
-    ```
-
-    </td>
-    </tr>
-    </table>
-
-11. Press F5 to start debugging the website
-
-> These steps grant access to SQL server in the primary resource group.
-> You can use the same commands if you want to test with the secondary resource
-> group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
 ## Next Step
 - [Developer patterns](patterns.md)

@@ -1,3 +1,5 @@
+# Does not require pwsh
+
 <#
 .SYNOPSIS
     Will show a json snippet you can save in Visual Studio secrets.json file to run the code locally.

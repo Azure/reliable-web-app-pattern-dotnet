@@ -1,9 +1,8 @@
-# As part of this sample the dev team is monitoring for scenarios such as race conditions and
-# intermittent issues which could cause the deployment to fail. As these issues are identified
-# we update the `validateDeployment.sh`, and the mirror file `validateDeployment.ps1` which are
-# also part of our engineering process. We use these files to validate characteristics of a
-# successful deployment. These files will evolve as the sample evolves to help us ensure the
-# quality of the solution.
+# This script is used by our QA process to ensure the quality of this sample it measures
+# characteristics of the deployment and will be modified as needed to explore intermittent issues
+
+# This engineering code may be repurposed for your scenario as desired
+# but is not covered by the guidance in this content.
 
 <#
 .SYNOPSIS

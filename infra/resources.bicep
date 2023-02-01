@@ -5,16 +5,22 @@ param isProd bool
 param devOpsManagedIdentityId string
 
 @secure()
+@minLength(1)
 @description('Specifies a password that will be used to secure the Azure SQL Database')
-param azureSqlPassword string = ''
+param azureSqlPassword string
 
+@minLength(1)
+@description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
 
+@minLength(1)
 @description('The user running the deployment will be given access to the deployed resources such as Key Vault and App Config svc')
-param principalId string = ''
+param principalId string
 
 @description('A generated identifier used to create unique resources')
 param resourceToken string
+
+@description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
 @description('A user-assigned managed identity that is used by the App Service app')
@@ -122,34 +128,9 @@ resource frontEndClientSecretAppCfg 'Microsoft.AppConfiguration/configurationSto
     })
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
-  dependsOn: [
-    checkIfClientSecretExists
-  ]
 }
 
 var frontEndClientSecretName = 'AzureAd--ClientSecret'
-
-resource checkIfClientSecretExists 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: 'checkIfClientSecretExists'
-  location: location
-  tags: tags
-  kind: 'AzureCLI'
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${managedIdentity.id}': {}
-    }
-  }
-  properties: {
-    azCliVersion: '2.37.0'
-    retentionInterval: 'P1D'
-    scriptContent: 'result=$(az keyvault secret list --vault-name ${kv.name} --query "[?name==\'${frontEndClientSecretName}\'].name" -o tsv); if [[ \${#result} -eq 0 ]]; then az keyvault secret set --name \'AzureAd--ClientSecret\' --vault-name ${kv.name} --value 1 --only-show-errors > /dev/null; fi'
-    arguments: '--resourceToken \'${resourceToken}\''
-  }
-  dependsOn: [
-    openConfigSvcsForEdits
-  ]
-}
 
 resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
   parent: appConfigSvc
@@ -405,53 +386,6 @@ module webApplicationInsightsResources './applicationinsights.bicep' = {
   }
 }
 
-
-resource adminVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
-  name: 'admin-${resourceToken}-kv' // keyvault name cannot start with a number
-  location: location
-  tags: tags
-  properties: {
-    sku: {
-      family: 'A'
-      name: 'standard'
-    }
-    tenantId: subscription().tenantId
-    enabledForTemplateDeployment: true
-    accessPolicies: [
-      {
-        objectId: principalId
-        tenantId: subscription().tenantId
-        permissions: {
-          secrets: [
-            'all'
-          ]
-        }
-      }
-    ]
-  }
-}
-
-var defaultSqlPassword = 'a${toUpper(uniqueString(subscription().id, resourceToken))}32${toUpper(uniqueString(managedIdentity.properties.principalId, resourceToken))}Q'
-
-resource kvSqlAdministratorPassword 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  parent: adminVault
-  name: 'sqlAdministratorPassword'
-  properties: {
-    // uniqueString produces a 13 character result
-    // concatenation of 2 unique strings produces a 26 character password unique to your subscription per environment
-    value: (length(azureSqlPassword) == 0 ) ? defaultSqlPassword : azureSqlPassword
-  }
-}
-
-var sqlAdministratorLogin = 'sqladmin${resourceToken}'
-resource kvSqlAdministratorLogin 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  parent: adminVault
-  name: 'sqlAdministratorLogin'
-  properties: {
-    value: sqlAdministratorLogin
-  }
-}
-
 module sqlSetup 'azureSqlDatabase.bicep' = {
   name: 'sqlSetup'
   scope: resourceGroup()
@@ -469,8 +403,8 @@ module sqlSetup 'azureSqlDatabase.bicep' = {
       }
     }
     resourceToken: resourceToken
-    sqlAdministratorLogin: sqlAdministratorLogin
-    sqlAdministratorPassword: adminVault.getSecret(kvSqlAdministratorPassword.name)
+    sqlAdministratorLogin: 'sqladmin${resourceToken}'
+    sqlAdministratorPassword: azureSqlPassword
     tags: tags
   }
   dependsOn: [
@@ -790,10 +724,6 @@ resource openConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-0
         value: kv.name
       }
       {
-        name: 'ADMIN_VAULT_NAME'
-        value: adminVault.name
-      }
-      {
         name: 'RESOURCE_GROUP'
         secureValue: resourceGroup().name
       }
@@ -801,7 +731,6 @@ resource openConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-0
     scriptContent: '''
       az appconfig update --name $APP_CONFIG_SVC_NAME --resource-group $RESOURCE_GROUP --enable-public-network true
       az keyvault update --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Enabled
-      az keyvault update --name $ADMIN_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Enabled
       '''
   }
 }
@@ -831,10 +760,6 @@ resource closeConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-
         value: kv.name
       }
       {
-        name: 'ADMIN_VAULT_NAME'
-        value: adminVault.name
-      }
-      {
         name: 'RESOURCE_GROUP'
         secureValue: resourceGroup().name
       }
@@ -842,7 +767,6 @@ resource closeConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-
     scriptContent: '''
       az appconfig update --name $APP_CONFIG_SVC_NAME --resource-group $RESOURCE_GROUP --enable-public-network false
       az keyvault update --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Disabled
-      az keyvault update --name $ADMIN_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Disabled
       '''
   }
   // app config vars cannot be set without public network access
