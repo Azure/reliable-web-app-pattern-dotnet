@@ -89,9 +89,6 @@ resource baseApiUrlAppConfigSetting 'Microsoft.AppConfiguration/configurationSto
   properties: {
     value: 'https://${api.properties.defaultHostName}'
   }
-  dependsOn: [
-    openConfigSvcsForEdits
-  ]
 }
 
 resource sqlConnStrAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
@@ -100,9 +97,6 @@ resource sqlConnStrAppConfigSetting 'Microsoft.AppConfiguration/configurationSto
   properties: {
     value: 'Server=tcp:${sqlSetup.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlSetup.outputs.sqlCatalogName};Authentication=Active Directory Default'
   }
-  dependsOn: [
-    openConfigSvcsForEdits
-  ]
 }
 
 resource redisConnAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
@@ -114,9 +108,6 @@ resource redisConnAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores
     })
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
-  dependsOn: [
-    openConfigSvcsForEdits
-  ]
 }
 
 resource frontEndClientSecretAppCfg 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
@@ -141,9 +132,6 @@ resource storageAppConfigKvRef 'Microsoft.AppConfiguration/configurationStores/k
     })
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
-  dependsOn: [
-    openConfigSvcsForEdits
-  ]
 }
 
 var aspNetCoreEnvironment = isProd ? 'Production' : 'Development'
@@ -694,91 +682,6 @@ resource privateEndpointForAppConfig 'Microsoft.Network/privateEndpoints@2020-07
       }
     ]
   }
-}
-
-// app config vars cannot be set without public network access
-// the above config settings must depend on this block to ensure
-// access is allowed before we try saving the setting
-resource openConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: 'openConfigSvcsForEdits'
-  location: location
-  tags: tags
-  kind: 'AzureCLI'
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${devOpsManagedIdentityId}': {}
-    }
-  }
-  properties: {
-    forceUpdateTag: uniqueScriptId
-    azCliVersion: '2.37.0'
-    retentionInterval: 'P1D'
-    environmentVariables: [
-      {
-        name: 'APP_CONFIG_SVC_NAME'
-        value: appConfigSvc.name
-      }
-      {
-        name: 'KEY_VAULT_NAME'
-        value: kv.name
-      }
-      {
-        name: 'RESOURCE_GROUP'
-        secureValue: resourceGroup().name
-      }
-    ]
-    scriptContent: '''
-      az appconfig update --name $APP_CONFIG_SVC_NAME --resource-group $RESOURCE_GROUP --enable-public-network true
-      az keyvault update --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Enabled
-      '''
-  }
-}
-
-resource closeConfigSvcsForEdits 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (isProd) {
-  name: 'closeConfigSvcsForEdits'
-  location: location
-  tags: tags
-  kind: 'AzureCLI'
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${devOpsManagedIdentityId}': {}
-    }
-  }
-  properties: {
-    forceUpdateTag: uniqueScriptId
-    azCliVersion: '2.37.0'
-    retentionInterval: 'P1D'
-    environmentVariables: [
-      {
-        name: 'APP_CONFIG_SVC_NAME'
-        value: appConfigSvc.name
-      }
-      {
-        name: 'KEY_VAULT_NAME'
-        value: kv.name
-      }
-      {
-        name: 'RESOURCE_GROUP'
-        secureValue: resourceGroup().name
-      }
-    ]
-    scriptContent: '''
-      az appconfig update --name $APP_CONFIG_SVC_NAME --resource-group $RESOURCE_GROUP --enable-public-network false
-      az keyvault update --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP  --public-network-access Disabled
-      '''
-  }
-  // app config vars cannot be set without public network access
-  // now that they are set - we block public access for prod
-  // and leave public access enabled to support local dev scenarios
-  dependsOn:[
-    baseApiUrlAppConfigSetting
-    sqlConnStrAppConfigSetting
-    redisConnAppConfigKvRef
-    frontEndClientSecretAppCfg
-    storageAppConfigKvRef
-  ]
 }
 
 output WEB_URI string = web.properties.defaultHostName
