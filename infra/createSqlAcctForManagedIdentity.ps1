@@ -1,5 +1,14 @@
-# This script is run by azd during devOps deployment. This script is not intended to be run from a local environment.
+# This script is not intended to be run from a local environment.
+# This script is run by azd during devOps deployment.
 # For the local environment version of this script, please see makeSqlUserAccount.ps1
+
+# This script provides a workflow to automatically configure the deployed Azure resources and make it easier to get
+# started. It is not intended as part of a recommended best practice as we do not recommend deploying Azure SQL
+# with network configurations that would allow a deployment script such as this to connect.
+
+# We recommend handling this one-time process as part of your SQL data migration process
+# More details can be found in our docs for Azure SQL server
+# https://learn.microsoft.com/en-us/azure/app-service/tutorial-connect-msi-sql-database?tabs=windowsclient%2Cef%2Cdotnet
 
 Param(
   [Parameter(Mandatory = $true)][string]$ServerName,
@@ -12,10 +21,6 @@ Param(
   [Parameter(Mandatory = $true)][string]$SqlAdminPwd,
   [Parameter(Mandatory = $true)][bool]$IsProd
 )
-
-# Assumes the service principal that will connect to SQL has been set as the Azure AD Admin
-# This was handled by the bicep templates
-# see https://docs.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure?view=azuresql&tabs=azure-powershell#azure-portal
 
 # Make Invoke-Sqlcmd available
 Install-Module -Name SqlServer -Force

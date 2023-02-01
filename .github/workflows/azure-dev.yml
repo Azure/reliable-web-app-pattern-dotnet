@@ -1,5 +1,12 @@
+# This file is part of the sample that  you can use to build your devOps automation.
+# See the README markdown file for further details
+
 on:
   workflow_dispatch:
+
+# on:
+#   pull_request:
+#     types: [opened, reopened]
 
 jobs:
   build:
