@@ -37,6 +37,6 @@
 	},
 
 	"waitFor": "postCreateCommand",
-	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	"postCreateCommand": "curl -fsSL https://aka.ms/install-azd.sh | bash",
 	"postStartCommand": "az bicep upgrade --version; azd config set auth.useAzCliAuth true"
 }
