@@ -40,6 +40,11 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Set PRINCIPAL_TYPE
+        # Adding RBAC permissions via the script enables the sample to work around a permission propagation issue outlined in the issue
+        # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138
+        run: azd env set PRINCIPAL_TYPE servicePrincipal
+
       - name: Azure Dev Provision
         run: azd provision --no-prompt
         env:
@@ -47,8 +52,9 @@ jobs:
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Set AZD resource group
+      - name: Set AZD AZURE_RESOURCE_GROUP
         # temporary work around for known issue with multiple resource groups
+        # https://github.com/Azure/azure-dev/issues/690
         run: azd env set AZURE_RESOURCE_GROUP ${{ secrets.AZURE_ENV_NAME }}daily2-rg
 
       - name: Azure Dev Deploy

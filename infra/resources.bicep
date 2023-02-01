@@ -20,6 +20,12 @@ param principalId string
 @description('A generated identifier used to create unique resources')
 param resourceToken string
 
+// Adding RBAC permissions via the script enables the sample to work around a permission propagation issue outlined in the issue
+// https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138
+@minLength(1)
+@description('When the deployment is executed by a user we give the principal RBAC access to key vault')
+param servicePrincipalType string
+
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
@@ -42,6 +48,18 @@ resource appConfigRoleAssignmentForWebApps 'Microsoft.Authorization/roleAssignme
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
     principalId: managedIdentity.properties.principalId
     description: 'Grant the "Data Reader" role to the user-assigned managed identity so it can access the azure app configuration service.'
+  }
+}
+
+@description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
+resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = if (servicePrincipalType == 'user') {
+  name: guid(appConfigurationRoleDefinitionId, appConfigService.id, principalId, resourceToken)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'User'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
+    principalId: principalId
+    description: 'Grant the "Data Reader" role to the principal identity so it can access the azure app configuration service.'
   }
 }
 
