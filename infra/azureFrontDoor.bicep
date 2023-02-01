@@ -16,7 +16,7 @@ param primaryBackendAddress string
 @description('The hostname of the backend. Must be an IP address or FQDN.')
 param secondaryBackendAddress string
 
-var frontDoorProfileName = 'fd-${globalResourceToken}'
+var frontDoorProfileName = 'afd-${globalResourceToken}'
 var frontDoorOriginGroupName = 'MyOriginGroup'
 var frontDoorOriginName = 'MyAppServiceOrigin'
 var frontDoorRouteName = 'MyRoute'
@@ -26,7 +26,7 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
   tags: tags
   location: 'global'
   sku: {
-    name: 'Standard_AzureFrontDoor'
+    name: 'Premium_AzureFrontDoor'
   }
 }
 
@@ -111,7 +111,7 @@ resource frontdoorWebApplicationFirewallPolicy 'Microsoft.Network/frontdoorwebap
   name: 'wafpolicy${globalResourceToken}'
   location: 'Global'
   sku: {
-    name: 'Standard_AzureFrontDoor'
+    name: 'Premium_AzureFrontDoor'
   }
   properties: {
     policySettings: {
