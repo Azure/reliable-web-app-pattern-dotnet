@@ -20,7 +20,7 @@ We recommend these following considerations to expand on the `azure-dev.yml` sam
 This repository also contains workflows that are part of our engineering process to ensure the quality of this sample. The following files are used by the team:
 
 - `add-issues-to-project.yml`: Uses a GitHub Action to automate the process of adding an item that was created in this repository to our central project management board to improve visibility and work item tracking.
-- `scheduled-azure-dev.yml`: Deploys the Azure resources in this sample so that we can check for quality  characteristics and ensure that the latest tooling recommendation are compatible.
+- `scheduled-azure-dev.yml`: Deploys the Azure resources in this sample so that we can check for quality characteristics and ensure that the latest tooling recommendation are compatible.
 - `scheduled-azure-teardown.yml`: In the event of a workflow failure, we use this file to teardown any remaining Azure resources to limit the costs that accrue as part of our testing cycles.
 
 ### Validation Script
