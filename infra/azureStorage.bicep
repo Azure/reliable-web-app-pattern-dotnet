@@ -31,16 +31,15 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   }
 }
 
-resource existingKv 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
+resource existingKeyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
   scope: resourceGroup()
-}
 
-resource kvSecretStorageAcct 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  parent: existingKv
-  name: 'App--StorageAccount--ConnectionString'
-  properties: {
-    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
+  resource kvSecretStorageAcct 'secrets@2021-11-01-preview' = {
+    name: 'App--StorageAccount--ConnectionString'
+    properties: {
+      value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
+    }
   }
 }
 

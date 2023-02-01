@@ -48,7 +48,7 @@ resource appConfigRoleAssignmentForWebApps 'Microsoft.Authorization/roleAssignme
 // a key vault name that is shared between KV and Azure App Configuration Service to support Azure AD auth for the web app
 var frontEndClientSecretName = 'AzureAd--ClientSecret'
 
-resource kv 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
+resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
   location: location
   tags: tags
@@ -109,7 +109,7 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
     name: 'App:RedisCache:ConnectionString'
     properties: {
       value: string({
-        uri: '${kv.properties.vaultUri}secrets/${redisSetup.outputs.keyVaultRedisConnStrName}'
+        uri: '${keyVault.properties.vaultUri}secrets/${redisSetup.outputs.keyVaultRedisConnStrName}'
       })
       contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
     }
@@ -119,7 +119,7 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
     name: 'AzureAd:ClientSecret'
     properties: {
       value: string({
-        uri: '${kv.properties.vaultUri}secrets/${frontEndClientSecretName}'
+        uri: '${keyVault.properties.vaultUri}secrets/${frontEndClientSecretName}'
       })
       contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
     }
@@ -129,7 +129,7 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
     name: 'App:StorageAccount:ConnectionString'
     properties: {
       value: string({
-        uri: '${kv.properties.vaultUri}secrets/${storageSetup.outputs.keyVaultStorageConnStrName}'
+        uri: '${keyVault.properties.vaultUri}secrets/${storageSetup.outputs.keyVaultStorageConnStrName}'
       })
       contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
     }
@@ -606,9 +606,9 @@ resource privateEndpointForKv 'Microsoft.Network/privateEndpoints@2020-07-01' = 
     }
     privateLinkServiceConnections: [
       {
-        name: kv.name
+        name: keyVault.name
         properties: {
-          privateLinkServiceId: kv.id
+          privateLinkServiceId: keyVault.id
           groupIds: [
             'vault'
           ]
