@@ -43,4 +43,4 @@ resource existingKeyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existin
   }
 }
 
-output keyVaultStorageConnStrName string = kvSecretStorageAcct.name
+output keyVaultStorageConnStrName string = existingKeyVault::kvSecretStorageAcct.name
