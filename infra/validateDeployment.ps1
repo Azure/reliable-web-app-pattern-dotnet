@@ -1,3 +1,9 @@
+# This script is used by our QA process to ensure the quality of this sample it measures
+# characteristics of the deployment and will be modified as needed to explore intermittent issues
+
+# This engineering code may be repurposed for your scenario as desired
+# but is not covered by the guidance in this content.
+
 <#
 .SYNOPSIS
     Examines the web app that was deployed to identify any known issues and provide recommendations.

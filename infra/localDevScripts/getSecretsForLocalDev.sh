@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# This script is part of the sample's workflow for giving developers access
+# to the resources that were deployed. Note that a better solution, beyond
+# the scope of this demo, would be to associate permissions based on
+# Azure AD groups so that all team members inherit access from Azure AD.
+# https://learn.microsoft.com/en-us/azure/active-directory/roles/groups-concept
+#
+# This code may be repurposed for your scenario as desired
+# but is not covered by the guidance in this content.
+
 web_app=''
 api_app=''
 debug=''
@@ -71,18 +80,25 @@ if [[ $debug ]]; then
 fi
 
 # assumes there is only one vault deployed to this resource group that will match this filter
-keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name" -o tsv)
+keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name | [0]")
+keyVaultName=${keyVaultName:1:-2}
 
-appConfigSvcName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.AppConfiguration/configurationStores'].name" -o tsv)
+appConfigSvcName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.AppConfiguration/configurationStores'].name | [0]")
+appConfigSvcName=${appConfigSvcName:1:-2}
 
-appConfigUri=$(az appconfig show -n $appConfigSvcName -g $resourceGroupName --query "endpoint" -o tsv 2> /dev/null)
+appConfigUri=$(az appconfig show -n $appConfigSvcName -g $resourceGroupName --query "endpoint"  2> /dev/null)
+appConfigUri=${appConfigUri:1:-2}
 
 if [[ $debug ]]; then
     echo "Derived inputs"
     echo "----------------------------------------------"
     echo "keyVaultName=$keyVaultName"
     echo "appConfigSvcName=$appConfigSvcName"
-fi 
+    
+    read -n 1 -r -s -p "Press any key to continue..."
+    echo ''
+    echo "..."
+fi
 
 ###
 # Step1: Print json snippet for web app
