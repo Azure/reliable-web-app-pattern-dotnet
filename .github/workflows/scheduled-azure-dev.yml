@@ -51,7 +51,7 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Set PRINCIPAL_TYPE
+      - name: Set AZD PRINCIPAL_TYPE
         # Adding RBAC permissions via the script enables the sample to work around a permission propagation issue outlined in the issue
         # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138
         run: azd env set PRINCIPAL_TYPE servicePrincipal --no-prompt
