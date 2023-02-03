@@ -45,7 +45,7 @@ jobs:
       - name: Set PRINCIPAL_TYPE
         # Adding RBAC permissions via the script enables the sample to work around a permission propagation issue outlined in the issue
         # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138
-        run: azd env set PRINCIPAL_TYPE servicePrincipal
+        run: azd env set PRINCIPAL_TYPE servicePrincipal --no-prompt
 
       - name: Azure Dev Provision
         run: azd provision --no-prompt
