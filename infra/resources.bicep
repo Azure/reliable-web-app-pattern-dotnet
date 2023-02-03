@@ -66,11 +66,19 @@ resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssign
 // a key vault name that is shared between KV and Azure App Configuration Service to support Azure AD auth for the web app
 var frontEndClientSecretName = 'AzureAd--ClientSecret'
 
+// for non-prod scenarios we allow public network connections for the local dev experience
+var keyVaultPublicNetworkAccess = isProd ? 'disabled' : 'enabled'
+
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
   location: location
   tags: tags
   properties: {
+    publicNetworkAccess: keyVaultPublicNetworkAccess
+    networkAcls:{
+      defaultAction: 'Allow'
+      bypass: 'AzureServices'
+    }
     sku: {
       family: 'A'
       name: 'standard'
@@ -107,6 +115,14 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
   tags: tags
   sku: {
     name: 'Standard'
+  }
+  properties:{
+    // This network mode supports making the sample easier to get started
+    // It uses public network access because the values are set by the Azure Resource Provider
+    // by this declarative bicep file. To disable public network access would require
+    // access to the vnet and connecting over the private endpoint
+    // https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/230
+    publicNetworkAccess:'Enabled'
   }
 
   resource baseApiUrlAppConfigSetting 'keyValues@2022-05-01' = {
