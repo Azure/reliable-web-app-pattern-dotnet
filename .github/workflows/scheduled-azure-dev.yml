@@ -21,6 +21,9 @@ jobs:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
+      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -44,17 +47,9 @@ jobs:
         # Adding RBAC permissions via the script enables the sample to work around a permission propagation issue outlined in the issue
         # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138
         run: azd env set PRINCIPAL_TYPE servicePrincipal
-        env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
-          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Azure Dev Provision
         run: azd provision --no-prompt
-        env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
-          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Set AZD AZURE_RESOURCE_GROUP
         # temporary work around for known issue with multiple resource groups
@@ -63,10 +58,6 @@ jobs:
 
       - name: Azure Dev Deploy
         run: azd deploy --no-prompt
-        env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
-          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       # login to run az cli commands such as validateDeployment.sh
       - name: Log in with Azure
@@ -81,8 +72,4 @@ jobs:
 
       - name: Azure Dev Down
         run: azd down --force --purge --no-prompt
-        env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
-          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
