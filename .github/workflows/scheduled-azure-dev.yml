@@ -4,7 +4,7 @@
 on:
   workflow_dispatch:
     inputs:
-      runTearDown:
+      run_tear_down:
         description: 'When true, resources will be deleted after a run'
         required: false
         default: true
@@ -12,7 +12,7 @@ on:
   schedule:
     - cron: '0 0,12 * * *'
       inputs:
-        runTearDown:
+        run_tear_down:
           default: true
 
 # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
@@ -79,7 +79,7 @@ jobs:
           ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
 
   teardown:
-    if: ${{ inputs.runTearDown }}
+    if: ${{ inputs.run_tear_down }}
     needs: [build]
     runs-on: ubuntu-latest
     container:
@@ -92,6 +92,24 @@ jobs:
       AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
       AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      # login to run ado commands such provision, deploy, and down
+      - name: Log in with Azure (Client Credentials) for AZD
+        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        run: |
+          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
+          Write-Host "::add-mask::$($info.clientSecret)"
+
+          azd login `
+            --client-id "$($info.clientId)" `
+            --client-secret "$($info.clientSecret)" `
+            --tenant-id "$($info.tenantId)"
+        shell: pwsh
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Azure Dev Down
         run: azd down --force --purge --no-prompt
 
