@@ -3,8 +3,17 @@
 
 on:
   workflow_dispatch:
+    inputs:
+      runTearDown:
+        description: 'When true, resources will be deleted after a run'
+        required: false
+        default: true
+        type: boolean
   schedule:
     - cron: '0 0,12 * * *'
+      inputs:
+        runTearDown:
+          default: true
 
 # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
 permissions:
@@ -69,6 +78,20 @@ jobs:
           chmod +x ./infra/validateDeployment.sh
           ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
 
+  teardown:
+    if: ${{ runTearDown }}
+    needs: [build]
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/azure-dev-cli-apps:latest
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
+      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
+    steps:
       - name: Azure Dev Down
         run: azd down --force --purge --no-prompt
 
