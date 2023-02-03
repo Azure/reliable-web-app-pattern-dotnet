@@ -79,7 +79,7 @@ jobs:
           ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
 
   teardown:
-    if: ${{ runTearDown }}
+    if: ${{ inputs.runTearDown }}
     needs: [build]
     runs-on: ubuntu-latest
     container:
