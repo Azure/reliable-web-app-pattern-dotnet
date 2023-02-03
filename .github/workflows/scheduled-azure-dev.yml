@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v2
         
       # login to run ado commands such provision, deploy, and down
-      - name: Log in with Azure (Client Credentials)
+      - name: Log in with Azure (Client Credentials) for AZD
         if: ${{ env.AZURE_CREDENTIALS != '' }}
         run: |
           $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
@@ -68,7 +68,7 @@ jobs:
         run: azd deploy --no-prompt
 
       # login to run az cli commands such as validateDeployment.sh
-      - name: Log in with Azure
+      - name: Log in with Azure CLI
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
