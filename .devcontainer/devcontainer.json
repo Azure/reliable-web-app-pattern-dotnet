@@ -14,7 +14,6 @@
 		"vscode": {	
 			"extensions": [
 				"ms-dotnettools.csharp",
-				"ms-dotnettools.csharp",
 				"ms-azuretools.vscode-bicep",
 				"ms-azuretools.vscode-azureappservice",
 				"ms-azuretools.vscode-docker",
