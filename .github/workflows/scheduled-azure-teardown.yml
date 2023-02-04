@@ -34,6 +34,6 @@ jobs:
         continue-on-error: true
         run: azd down --force --purge --no-prompt
         env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
