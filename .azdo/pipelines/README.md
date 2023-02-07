@@ -1,6 +1,18 @@
 # Azure DevOps Pipeline Configuration
 
-This document will show you how to configure an Azure DevOps pipeline that uses the Azure Developer CLI. 
+This document is included to help you quickly set up this sample as part of an Azure DevOps pipeline that could be used as a starting point for your DevOps automations.
+
+## Other considerations
+Your devOps process should be customized to automate the build, test, and deployment steps specific to your business needs.
+We recommend these following considerations to expand on the `azure-dev.yml` sample.
+
+- You may want to review `scheduled-azure-dev.yml` to see how to add more steps such as validation testing
+- You may want multiple workflows defined in different files for different purposes
+    - Consider database lifecycle management
+    - Consider quality testing processes (e.g. integration testing)
+
+## Setting up Azure DevOps Pipelines
+The following content show you how to configure an Azure DevOps pipeline that uses the Azure Developer CLI. 
 
 You will find a default Azure DevOps pipeline file in `./.azdo/pipelines/daily-azure-dev.yml`. It will provision your Azure resources and deploy your code on a daily schedule.
 

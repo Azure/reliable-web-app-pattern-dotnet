@@ -1,3 +1,12 @@
+# This script is part of the sample's workflow for giving developers access
+# to the resources that were deployed. Note that a better solution, beyond
+# the scope of this demo, would be to associate permissions based on
+# Azure AD groups so that all team members inherit access from Azure AD.
+# https://learn.microsoft.com/en-us/azure/active-directory/roles/groups-concept
+#
+# This code may be repurposed for your scenario as desired
+# but is not covered by the guidance in this content.
+
 <#
 .SYNOPSIS
     Used by developers to get access to Azure SQL database
@@ -9,14 +18,12 @@
     service have already been successfully deployed.
 
 .PARAMETER ResourceGroupName
-    A required parameter for the name of resource group that contains the environment that was
-    created by the azd command. The cmdlet will populate the App Config Svc and Key
-    Vault services in this resource group with Azure AD app registration config data.
+    Name of resource group containing the environment that was created by the azd command.
 #>
 
 Param(
     [Alias("g")]
-    [Parameter(Mandatory = $true)][string]
+    [Parameter(Mandatory = $true, HelpMessage = "Name of the resource group that was created by azd")]
     $ResourceGroupName
 )
 
@@ -40,7 +47,8 @@ $myIpAddress = (Invoke-WebRequest ipinfo.io/ip)
 
 Write-Debug "`$myIpAddress = '$myIpAddress'"
 
-$mySqlServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name" -o tsv)
+# updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
+$mySqlServer = (az resource list -g $ResourceGroupName --query "[?type=='Microsoft.Sql/servers'].name | [0]" -o tsv)
 
 Write-Debug "`$mySqlServer = '$mySqlServer'"
 

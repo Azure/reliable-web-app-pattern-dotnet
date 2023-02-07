@@ -1,24 +1,35 @@
+@minLength(1)
 @description('The id for the user-assigned managed identity that runs deploymentScripts')
 param devOpsManagedIdentityId string
 
 @description('Expecting the user-assigned managed identity that represents the API web app. Will become the SQL db admin')
 param managedIdentity object
 
+@minLength(1)
 @description('A generated identifier used to create unique resources')
 param resourceToken string
 
 @description('Enables the template to choose different SKU by environment')
 param isProd bool
 
+@minLength(1)
+@description('The name of an admin account that can be used to add Managed Identities to Azure SQL')
 param sqlAdministratorLogin string
 
 @secure()
+@minLength(1)
+// note - this password should not be saved. the apps, and devs, connect with Managed Identity or Azure AD
+@description('The password for an admin account that can be used to add Managed Identities to Azure SQL')
 param sqlAdministratorPassword string
 
 @description('Ensures that the idempotent scripts are executed each time the deployment is executed')
 param uniqueScriptId string = newGuid()
 
+@minLength(1)
+@description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
+
+@description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
 var sqlServerName = '${resourceToken}-sql-server'

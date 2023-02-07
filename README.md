@@ -9,6 +9,7 @@ This repository provides resources to help developers build a Reliable web app o
 1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Read the reference architecture](reliable-web-app.md)
 1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Deploy solution](deploy-solution.md)
     1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Known issues](known-issues.md)
+1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Utilizing DevContainers](dev-containers.md)
 1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Developer patterns](patterns.md)
 1. <img src="assets/icons/microsoft.png" height="20px" /> [Understand service level objectives and cost](slo-and-cost.md)
 1. <img src="assets/icons/dotnetbot.png" height="20px" /> [Find additional resources](additional-resources.md)
