@@ -19,6 +19,9 @@
     },
     "azureSqlPassword": {
       "value": "$(secretOrRandomPassword ${AZURE_KEYVAULT_NAME} sqlAdminPassword)"
+    },
+    "enableTelemetry": {
+      "value": "${ENABLE_TELEMETRY=true}"
     }
   }
 }
