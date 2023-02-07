@@ -22,6 +22,9 @@
     },
     "principalType": {
       "value": "${PRINCIPAL_TYPE=user}"
+    },
+    "enableTelemetry": {
+      "value": "${ENABLE_TELEMETRY=true}"
     }
   }
 }
