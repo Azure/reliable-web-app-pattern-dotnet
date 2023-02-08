@@ -121,7 +121,11 @@ namespace Relecloud.Web.Api.Controllers
                     return BadRequest(PurchaseTicketsResult.ErrorResponse("We were unable to process this card. Please review your payment details."));
                 }
 
+                #pragma warning disable CS8602 // Dereference of a possibly null reference.
+                //null chec handled by error messages above
                 var customer = await this.concertRepository.GetCustomerByEmailAsync(purchaseTicketRequest.PaymentDetails.Email);
+                #pragma warning restore CS8602 // Dereference of a possibly null reference.
+
                 var customerId = customer?.Id ?? 0;
                 if (customerId == 0)
                 {
