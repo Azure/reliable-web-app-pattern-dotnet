@@ -14,21 +14,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      # login to run ado commands such provision, deploy, and down
+      - name: Log in with Azure (Client Credentials)
+        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        run: |
+          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
+          Write-Host "::add-mask::$($info.clientSecret)"
 
-      # login to run ado commands such provision, deploy, and down	
-      - name: Log in with Azure (Client Credentials)	
-        if: ${{ env.AZURE_CREDENTIALS != '' }}	
-        run: |	
-          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;	
-          Write-Host "::add-mask::$($info.clientSecret)"	
-
-
-          azd login `	      - name: Log in with Azure
-            --client-id "$($info.clientId)" `	        uses: azure/login@v1
-            --client-secret "$($info.clientSecret)" `	        with:
-            --tenant-id "$($info.tenantId)"	          creds: ${{ secrets.AZURE_CREDENTIALS }}
-        shell: pwsh	
-        env:	
+          azd login `
+            --client-id "$($info.clientId)" `
+            --client-secret "$($info.clientSecret)" `
+            --tenant-id "$($info.tenantId)"
+        shell: pwsh
+        env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Azure Dev Down
