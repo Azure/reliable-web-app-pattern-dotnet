@@ -23,6 +23,12 @@ param secondaryAzureLocation string
 @description('Specifies a password that will be used to secure the Azure SQL Database')
 param azureSqlPassword string = ''
 
+// Adding RBAC permissions via the script enables the sample to work around a permission propagation issue outlined in the issue
+// https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138
+@minLength(1)
+@description('When the deployment is executed by a user we give the principal RBAC access to key vault')
+param principalType string
+
 var isProdBool = isProd == 'true' ? true : false
 
 var tags = {
@@ -71,6 +77,7 @@ module primaryResources './resources.bicep' = {
     isProd: isProdBool
     location: location
     principalId: principalId
+    principalType: principalType
     resourceToken: primaryResourceToken
     tags: tags
   }
@@ -96,6 +103,7 @@ module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
     isProd: isProdBool
     location: secondaryAzureLocation
     principalId: principalId
+    principalType: principalType
     resourceToken: secondaryResourceToken
     tags: tags
   }
@@ -108,6 +116,23 @@ module azureFrontDoor './azureFrontDoor.bicep' = {
     tags: tags
     primaryBackendAddress: primaryResources.outputs.WEB_URI
     secondaryBackendAddress: isMultiLocationDeployment ? secondaryResources.outputs.WEB_URI : 'none'
+  }
+}
+
+@description('Enable usage and telemetry feedback to Microsoft.')
+param enableTelemetry bool = true
+
+var telemetryId = '063f9e42-c824-4573-8a47-5f6112612fe2-${location}'
+resource telemetrydeployment 'Microsoft.Resources/deployments@2021-04-01' = if (enableTelemetry) {
+  name: telemetryId
+  location: location
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#'
+      contentVersion: '1.0.0.0'
+      resources: {}
+    }
   }
 }
 

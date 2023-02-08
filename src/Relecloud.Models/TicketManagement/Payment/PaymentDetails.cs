@@ -16,11 +16,11 @@ namespace Relecloud.Web.Models.TicketManagement.Payment
 
         [Required]
         [MaxLength(75)]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(16)]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(16)]
