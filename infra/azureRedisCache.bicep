@@ -51,17 +51,16 @@ resource redisCache 'Microsoft.Cache/Redis@2022-05-01' = {
   }
 }
 
-resource existingKv 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
+resource existingKeyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
   scope: resourceGroup()
-}
 
-resource kvSecretRedis 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  name: 'App--RedisCache--ConnectionString'
-  tags: tags
-  parent: existingKv
-  properties: {
-    value: '${redisCache.name}.redis.cache.windows.net:6380,password=${redisCache.listKeys().primaryKey},ssl=True,abortConnect=False'
+  resource kvSecretRedis 'secrets@2021-11-01-preview' = {
+    name: 'App--RedisCache--ConnectionString'
+    tags: tags
+    properties: {
+      value: '${redisCache.name}.redis.cache.windows.net:6380,password=${redisCache.listKeys().primaryKey},ssl=True,abortConnect=False'
+    }
   }
 }
 
@@ -136,5 +135,5 @@ resource makeRedisAccessibleForDevs 'Microsoft.Resources/deploymentScripts@2020-
   }
 }
 
-output keyVaultRedisConnStrName string = kvSecretRedis.name
+output keyVaultRedisConnStrName string = existingKeyVault::kvSecretRedis.name
 output privateDnsZoneId string = privateDnsZoneNameForRedis.id

@@ -20,6 +20,9 @@
     "azureSqlPassword": {
       "value": "$(secretOrRandomPassword ${AZURE_KEYVAULT_NAME} sqlAdminPassword)"
     },
+    "principalType": {
+      "value": "${PRINCIPAL_TYPE=user}"
+    },
     "enableTelemetry": {
       "value": "${ENABLE_TELEMETRY=true}"
     }

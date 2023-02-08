@@ -3,8 +3,17 @@
 
 on:
   workflow_dispatch:
+    inputs:
+      run_tear_down:
+        description: 'When true, resources will be deleted after a run'
+        required: false
+        default: true
+        type: boolean
   schedule:
     - cron: '0 0,12 * * *'
+      inputs:
+        run_tear_down:
+          default: true
 
 # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
 permissions:
@@ -21,12 +30,14 @@ jobs:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
+      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         
       # login to run ado commands such provision, deploy, and down
-      - name: Log in with Azure (Client Credentials)
+      - name: Log in with Azure (Client Credentials) for AZD
         if: ${{ env.AZURE_CREDENTIALS != '' }}
         run: |
           $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
@@ -40,26 +51,24 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Set AZD PRINCIPAL_TYPE
+        # Adding RBAC permissions via the script enables the sample to work around a permission propagation issue outlined in the issue
+        # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138
+        run: azd env set PRINCIPAL_TYPE servicePrincipal --no-prompt
+
       - name: Azure Dev Provision
         run: azd provision --no-prompt
-        env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
-          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Set AZD resource group
+      - name: Set AZD AZURE_RESOURCE_GROUP
         # temporary work around for known issue with multiple resource groups
-        run: azd env set AZURE_RESOURCE_GROUP ${{ secrets.AZURE_ENV_NAME }}daily2-rg
+        # https://github.com/Azure/azure-dev/issues/690
+        run: azd env set AZURE_RESOURCE_GROUP ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
 
       - name: Azure Dev Deploy
         run: azd deploy --no-prompt
-        env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
-          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       # login to run az cli commands such as validateDeployment.sh
-      - name: Log in with Azure
+      - name: Log in with Azure CLI
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -67,12 +76,40 @@ jobs:
       - name: QA - Validate Deployment
         run: |
           chmod +x ./infra/validateDeployment.sh
-          ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}daily2-rg
+          ./infra/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
+
+  teardown:
+    if: ${{ inputs.run_tear_down }}
+    needs: [build]
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/azure-dev-cli-apps:latest
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
+      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      # login to run ado commands such provision, deploy, and down
+      - name: Log in with Azure (Client Credentials) for AZD
+        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        run: |
+          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
+          Write-Host "::add-mask::$($info.clientSecret)"
+
+          azd login `
+            --client-id "$($info.clientId)" `
+            --client-secret "$($info.clientSecret)" `
+            --tenant-id "$($info.tenantId)"
+        shell: pwsh
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Azure Dev Down
         run: azd down --force --purge --no-prompt
-        env:
-          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}daily2
-          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 

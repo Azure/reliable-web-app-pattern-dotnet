@@ -134,7 +134,6 @@ if ($Debug) {
 # Resolves permission constraint that prevents the deploymentScript from running this command
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
 
-# prod environments do not allow public network access, this must be changed before we can set values
 if ($isProd) {
     az sql server update -n $mySqlServer -g $ResourceGroupName --set publicNetworkAccess="Disabled" > $null
 }
