@@ -2,7 +2,7 @@
 # See the README markdown file for further details
 
 on:
-  #workflow_dispatch:
+  workflow_dispatch:
   schedule:
     - cron: '0 1,13 * * *'
 
