@@ -135,5 +135,5 @@ resource makeRedisAccessibleForDevs 'Microsoft.Resources/deploymentScripts@2020-
   }
 }
 
-output keyVaultRedisConnStrName string = existingKeyVault.name
+output keyVaultRedisConnStrName string = existingKeyVault::kvSecretRedis.name
 output privateDnsZoneId string = privateDnsZoneNameForRedis.id
