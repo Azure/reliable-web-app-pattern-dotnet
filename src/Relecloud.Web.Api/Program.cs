@@ -14,8 +14,8 @@ if (hasRequiredConfigSettings)
             .Connect(new Uri(builder.Configuration["Api:AppConfig:Uri"]), new DefaultAzureCredential())
             .ConfigureKeyVault(kv =>
             {
-                // In this setup, we must provide Key Vault access to setup
-                // App Congiruation even if we do not access Key Vault settings
+                // Some of the values coming from Azure App Configuration are stored Key Vault, use
+                // the managed identity of this host for the authentication.
                 kv.SetCredential(new DefaultAzureCredential());
             });
     });
