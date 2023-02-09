@@ -14,7 +14,7 @@ param azureSqlPassword string
 param location string
 
 @minLength(1)
-@description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
+@description('Name for a log analytics workspace that will collect diagnostic info for Key Vault and Front Door')
 param logAnalyticsWorkspaceNameForDiagnstics string
 
 @minLength(1)
