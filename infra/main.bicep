@@ -49,7 +49,7 @@ module logAnalyticsForDiagnostics 'logAnalyticsWorkspaceForDiagnostics.bicep' = 
   params: {
     tags: tags
     location: location
-    logAnalyticsWorkspaceNameForDiagnstics: 'log-${primaryResourceToken}-diagnostics'
+    logAnalyticsWorkspaceNameForDiagnstics: 'diagnostics-${primaryResourceToken}-log'
   }
 }
 
