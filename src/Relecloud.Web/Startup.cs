@@ -193,7 +193,7 @@ namespace Relecloud.Web
                     },
                     OnRedirectToIdentityProviderForSignOut = ctx => {
                         // not needed when using host name preservation
-                        ctx.ProtocolMessage.RedirectUri = Configuration["AzureAd:FrontDoorPostLogoutRedirectUri"];
+                        ctx.ProtocolMessage.PostLogoutRedirectUri = Configuration["AzureAd:FrontDoorPostLogoutRedirectUri"];
                         return Task.CompletedTask;
                     },
                     OnTokenValidated = async ctx =>
