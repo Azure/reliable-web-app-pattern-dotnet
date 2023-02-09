@@ -48,6 +48,8 @@ Please clone the repo to get started.
 git clone https://github.com/Azure/reliable-web-app-pattern-dotnet
 ```
 
+*If you try this sample with WSL you may encounter issues with line endings that differ between Windows and Linux.*
+
 And switch to the folder so that `azd` will recognize the solution.
 
 ```
