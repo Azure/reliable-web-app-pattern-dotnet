@@ -114,6 +114,7 @@ module azureFrontDoor './azureFrontDoor.bicep' = {
   scope: primaryResourceGroup
   params: {
     tags: tags
+    appConfigurationServiceName: primaryResources.outputs.APP_CONFIGURATION_SVC_NAME
     primaryBackendAddress: primaryResources.outputs.WEB_URI
     secondaryBackendAddress: isMultiLocationDeployment ? secondaryResources.outputs.WEB_URI : 'none'
   }

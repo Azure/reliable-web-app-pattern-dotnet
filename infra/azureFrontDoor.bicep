@@ -9,12 +9,33 @@ var frontDoorEndpointName = 'afd-${globalResourceToken}'
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
+@description('Name of the App Configuration Service where the App Service loads configuration')
+param appConfigurationServiceName string
+
 @minLength(1)
 @description('The hostname of the backend. Must be an IP address or FQDN.')
 param primaryBackendAddress string
 
 @description('The hostname of the backend. Must be an IP address or FQDN.')
 param secondaryBackendAddress string
+
+resource appConfigurationService 'Microsoft.AppConfiguration/configurationStores@2022-05-01' existing = {
+  name: appConfigurationServiceName
+  
+  resource frontDoorRedirectUriForAzureAd 'keyValues@2022-05-01' = {
+    name: 'AzureAd:FrontDoorRedirectUri'
+    properties: {
+      value: 'https://${frontDoorEndpoint.properties.hostName}/signin-oidc'
+    }
+  }
+  resource frontDoorPostLogoutRedirectUriForAzureAd 'keyValues@2022-05-01' = {
+    name: 'AzureAd:FrontDoorPostLogoutRedirectUri'
+    properties: {
+      value: 'https://${frontDoorEndpoint.properties.hostName}'
+    }
+  }
+}
+
 
 var frontDoorProfileName = 'afd-${globalResourceToken}'
 var frontDoorOriginGroupName = 'MyOriginGroup'
