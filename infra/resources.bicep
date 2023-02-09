@@ -14,6 +14,10 @@ param azureSqlPassword string
 param location string
 
 @minLength(1)
+@description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
+param logAnalyticsWorkspaceNameForDiagnstics string
+
+@minLength(1)
 @description('The user running the deployment will be given access to the deployed resources such as Key Vault and App Config svc')
 param principalId string
 

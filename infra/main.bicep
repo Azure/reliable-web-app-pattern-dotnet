@@ -43,6 +43,16 @@ var secondaryResourceGroupName = '${name}-secondary-rg'
 var primaryResourceToken = toLower(uniqueString(subscription().id, primaryResourceGroupName, location))
 var secondaryResourceToken = toLower(uniqueString(subscription().id, secondaryResourceGroupName, secondaryAzureLocation))
 
+module logAnalyticsForDiagnostics 'logAnalyticsWorkspaceForDiagnostics.bicep' = {
+  name: 'logAnalyticsForDiagnostics'
+  scope: primaryResourceGroup
+  params: {
+    tags: tags
+    location: location
+    logAnalyticsWorkspaceNameForDiagnstics: 'log-${primaryResourceToken}-diagnostics'
+  }
+}
+
 resource primaryResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: primaryResourceGroupName
   location: location
@@ -76,6 +86,7 @@ module primaryResources './resources.bicep' = {
     devOpsManagedIdentityId: devOpsIdentitySetup.outputs.devOpsManagedIdentityId
     isProd: isProdBool
     location: location
+    logAnalyticsWorkspaceNameForDiagnstics: logAnalyticsForDiagnostics.outputs.logAnalyticsWorkspaceNameForDiagnstics
     principalId: principalId
     principalType: principalType
     resourceToken: primaryResourceToken
@@ -102,6 +113,7 @@ module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
     devOpsManagedIdentityId: isMultiLocationDeployment ? devOpsIdentitySetupSecondary.outputs.devOpsManagedIdentityId : 'none'
     isProd: isProdBool
     location: secondaryAzureLocation
+    logAnalyticsWorkspaceNameForDiagnstics: logAnalyticsForDiagnostics.outputs.logAnalyticsWorkspaceNameForDiagnstics
     principalId: principalId
     principalType: principalType
     resourceToken: secondaryResourceToken
@@ -115,6 +127,7 @@ module azureFrontDoor './azureFrontDoor.bicep' = if (isMultiLocationDeployment) 
   params: {
     resourceToken: primaryResourceToken
     tags: tags
+    logAnalyticsWorkspaceNameForDiagnstics: logAnalyticsForDiagnostics.outputs.logAnalyticsWorkspaceNameForDiagnstics
     primaryBackendAddress: primaryResources.outputs.WEB_URI
     secondaryBackendAddress: isMultiLocationDeployment ? secondaryResources.outputs.WEB_URI : 'none'
   }

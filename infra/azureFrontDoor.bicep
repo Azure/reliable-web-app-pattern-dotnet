@@ -2,6 +2,10 @@
 @description('A generated identifier used to create unique resources')
 param resourceToken string
 
+@minLength(1)
+@description('Name for a log analytics workspace that will collect diagnostic info for Key Vault and Front Door')
+param logAnalyticsWorkspaceNameForDiagnstics string
+
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
@@ -19,12 +23,34 @@ var frontDoorRouteName = 'MyRoute'
 
 var frontDoorEndpointName = 'afd-${uniqueString(resourceGroup().id)}'
 
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
+  name: logAnalyticsWorkspaceNameForDiagnstics
+}
+
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
   name: frontDoorProfileName
   tags: tags
   location: 'global'
   sku: {
     name: 'Standard_AzureFrontDoor'
+  }
+}
+
+resource logAnalyticsWorkspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  scope: frontDoorProfile
+  name: 'diagnosticSettings'
+  properties: {
+    workspaceId: logAnalyticsWorkspace.id
+    logs: [
+      {
+        category: 'FrontDoorWebApplicationFirewallLog'
+        enabled: true
+        retentionPolicy: {
+          days: 0
+          enabled: true
+        }
+      }
+    ]
   }
 }
 
