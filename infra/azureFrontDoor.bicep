@@ -23,7 +23,7 @@ var frontDoorRouteName = 'MyRoute'
 
 var frontDoorEndpointName = 'afd-${uniqueString(resourceGroup().id)}'
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
+resource logAnalyticsWorkspaceForDiagnostics 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
   name: logAnalyticsWorkspaceNameForDiagnstics
 }
 
@@ -40,7 +40,7 @@ resource logAnalyticsWorkspaceDiagnostics 'Microsoft.Insights/diagnosticSettings
   scope: frontDoorProfile
   name: 'diagnosticSettings'
   properties: {
-    workspaceId: logAnalyticsWorkspace.id
+    workspaceId: logAnalyticsWorkspaceForDiagnostics.id
     logs: [
       {
         category: 'FrontDoorWebApplicationFirewallLog'
