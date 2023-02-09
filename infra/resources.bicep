@@ -381,15 +381,12 @@ resource webLogAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020
   name: 'web-${resourceToken}-log'
   location: location
   tags: tags
-  properties: any({
+  properties: {
     retentionInDays: 30
-    features: {
-      searchVersion: 1
-    }
     sku: {
       name: 'PerGB2018'
     }
-  })
+  }
 }
 
 module webApplicationInsightsResources './applicationinsights.bicep' = {
