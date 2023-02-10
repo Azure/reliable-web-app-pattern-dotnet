@@ -124,7 +124,7 @@ module azureFrontDoor './azureFrontDoor.bicep' = {
   scope: primaryResourceGroup
   params: {
     tags: tags
-    logAnalyticsWorkspaceNameForDiagnstics: logAnalyticsForDiagnostics.outputs.logAnalyticsWorkspaceNameForDiagnstics
+    logAnalyticsWorkspaceNameForDiagnstics: logAnalyticsForDiagnostics.outputs.LOG_WORKSPACE_ID
     primaryBackendAddress: primaryResources.outputs.WEB_URI
     secondaryBackendAddress: isMultiLocationDeployment ? secondaryResources.outputs.WEB_URI : 'none'
   }
@@ -144,7 +144,7 @@ module primaryKeyVaultDiagnostics 'azureKeyVaultDiagnostics.bicep' = {
   scope: primaryResourceGroup
   params: {
     keyVaultName: primaryResources.outputs.KEY_VAULT_NAME
-    logAnalyticsWorkspaceNameForDiagnstics: logAnalyticsForDiagnostics.outputs.logAnalyticsWorkspaceNameForDiagnstics
+    logAnalyticsWorkspaceIdForDiagnostics: logAnalyticsForDiagnostics.outputs.LOG_WORKSPACE_ID
   }
 }
 
@@ -162,7 +162,7 @@ module secondaryKeyVaultDiagnostics 'azureKeyVaultDiagnostics.bicep' = if (isMul
   scope: secondaryResourceGroup
   params: {
     keyVaultName: isMultiLocationDeployment ? secondaryResources.outputs.KEY_VAULT_NAME : 'none'
-    logAnalyticsWorkspaceNameForDiagnstics: logAnalyticsForDiagnostics.outputs.logAnalyticsWorkspaceNameForDiagnstics
+    logAnalyticsWorkspaceIdForDiagnostics: logAnalyticsForDiagnostics.outputs.LOG_WORKSPACE_ID
   }
 }
 
