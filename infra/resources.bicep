@@ -737,5 +737,6 @@ resource privateEndpointForAppConfig 'Microsoft.Network/privateEndpoints@2020-07
   }
 }
 
+output APP_CONFIGURATION_SVC_NAME string = appConfigService.name
 output WEB_URI string = web.properties.defaultHostName
 output API_URI string = api.properties.defaultHostName

@@ -74,14 +74,15 @@ else {
 $keyVaultName = (az keyvault list -g "$ResourceGroupName" --query "[? starts_with(name,'rc-')].name" -o tsv)
 $appConfigSvcName = (az appconfig list -g "$ResourceGroupName" --query "[].name" -o tsv)
 
-$appServiceRootUri = 'azurewebsites.net' # hard coded because app svc does not return the public endpoint
-
 # updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
 $frontEndWebAppName = (az resource list -g "$ResourceGroupName" --query "[? tags.\`"azd-service-name\`" == 'web' ].name | [0]" -o tsv)
-$frontEndWebAppUri = "https://$frontEndWebAppName.$appServiceRootUri"
 
 $resourceToken = $frontEndWebAppName.substring(4, 13)
 $environmentName = $ResourceGroupName.substring(0, $ResourceGroupName.Length - 3)
+
+$frontDoorProfileName = (az resource list -g $ResourceGroupName --query "[? kind=='frontdoor' ].name | [0]" -o tsv)
+$frontEndWebAppUri = (az afd endpoint list -g $ResourceGroupName --profile-name $frontDoorProfileName --query "[].hostName | [0]" -o tsv --only-show-errors)
+$frontEndWebAppUri = "https://$frontEndWebAppUri"
 
 $secondaryResourceGroupName = $ResourceGroupName.Substring(0,$ResourceGroupName.Length-2) + "secondary-rg"
 $group2Exists = (az group exists -n $secondaryResourceGroupName)
@@ -99,6 +100,7 @@ Write-Debug "----------------------------------------------"
 Write-Debug "isProd=$isProd"
 Write-Debug "keyVaultName=$keyVaultName"
 Write-Debug "appConfigSvcName=$appConfigSvcName"
+Write-Debug "frontDoorProfileName=$frontDoorProfileName"
 Write-Debug "frontEndWebAppUri=$frontEndWebAppUri"
 Write-Debug "resourceToken=$resourceToken"
 Write-Debug "environmentName=$environmentName"

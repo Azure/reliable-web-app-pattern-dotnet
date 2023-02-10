@@ -68,8 +68,8 @@ so they could choose different SKUs and optionally choose to
 deploy to multiple regions when targeting production.
 
 Pricing Calculator breakouts
-- [Non-prod](https://azure.com/e/2a048617e85b41b9bc889cacf5cc8059)
-- [Prod](https://azure.com/e/ccfe6f10bd394ad49257c99a9c07f43c)
+- [Non-prod](https://azure.com/e/26f1165c5e9344a4bf814cfe6c85ed8d)
+- [Prod](https://azure.com/e/8a574d4811a74928b55956838db71093)
 
 ### Production
 
