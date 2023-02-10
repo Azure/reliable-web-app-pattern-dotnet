@@ -22,16 +22,10 @@ param secondaryBackendAddress string
 resource appConfigurationService 'Microsoft.AppConfiguration/configurationStores@2022-05-01' existing = {
   name: appConfigurationServiceName
   
-  resource frontDoorRedirectUriForAzureAd 'keyValues@2022-05-01' = {
-    name: 'AzureAd:FrontDoorRedirectUri'
+  resource frontDoorRedirectUri 'keyValues@2022-05-01' = {
+    name: 'App:FrontDoorUri'
     properties: {
-      value: 'https://${frontDoorEndpoint.properties.hostName}/signin-oidc'
-    }
-  }
-  resource frontDoorPostLogoutRedirectUriForAzureAd 'keyValues@2022-05-01' = {
-    name: 'AzureAd:FrontDoorPostLogoutRedirectUri'
-    properties: {
-      value: 'https://${frontDoorEndpoint.properties.hostName}'
+      value: frontDoorEndpoint.properties.hostName
     }
   }
 }
