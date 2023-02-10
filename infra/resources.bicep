@@ -14,10 +14,6 @@ param azureSqlPassword string
 param location string
 
 @minLength(1)
-@description('Name for a log analytics workspace that will collect diagnostic info for Key Vault and Front Door')
-param logAnalyticsWorkspaceNameForDiagnstics string
-
-@minLength(1)
 @description('The user running the deployment will be given access to the deployed resources such as Key Vault and App Config svc')
 param principalId string
 
@@ -67,10 +63,6 @@ resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssign
   }
 }
 
-resource logAnalyticsWorkspaceForDiagnostics 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
-  name: logAnalyticsWorkspaceNameForDiagnstics
-}
-
 // a key vault name that is shared between KV and Azure App Configuration Service to support Azure AD auth for the web app
 var frontEndClientSecretName = 'AzureAd--ClientSecret'
 
@@ -112,26 +104,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
             'all'
           ]
         }
-      }
-    ]
-  }
-}
-
-resource keyVaultDiagnosticSettings  'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  scope: keyVault
-  name: 'default'
-  properties: {
-    workspaceId: logAnalyticsWorkspaceForDiagnostics.id
-    logs: [
-      {
-        category: 'AuditEvent'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
       }
     ]
   }
@@ -737,6 +709,7 @@ resource privateEndpointForAppConfig 'Microsoft.Network/privateEndpoints@2020-07
   }
 }
 
+output KEY_VAULT_NAME string = keyVault.name
 output APP_CONFIGURATION_SVC_NAME string = appConfigService.name
 output WEB_URI string = web.properties.defaultHostName
 output API_URI string = api.properties.defaultHostName
