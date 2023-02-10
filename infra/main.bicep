@@ -126,8 +126,27 @@ module azureFrontDoor './azureFrontDoor.bicep' = {
   scope: primaryResourceGroup
   params: {
     tags: tags
+    logAnalyticsWorkspaceNameForDiagnstics: logAnalyticsForDiagnostics.outputs.logAnalyticsWorkspaceNameForDiagnstics
     primaryBackendAddress: primaryResources.outputs.WEB_URI
     secondaryBackendAddress: isMultiLocationDeployment ? secondaryResources.outputs.WEB_URI : 'none'
+  }
+}
+
+module primaryAppConfigSvcFrontDoorUri 'appConfigSvcKeyValue.bicep' = {
+  name: 'primaryKeyValue'
+  scope: secondaryResourceGroup
+  params:{
+    appConfigurationServiceName: primaryResources.outputs.APP_CONFIGURATION_SVC_NAME
+    frontDoorUri: azureFrontDoor.outputs.HOST_NAME
+  }
+}
+
+module secondaryAppConfigSvcFrontDoorUri 'appConfigSvcKeyValue.bicep' = if (isMultiLocationDeployment) {
+  name: 'secondaryKeyValue'
+  scope: secondaryResourceGroup
+  params:{
+    appConfigurationServiceName: secondaryResources.outputs.APP_CONFIGURATION_SVC_NAME
+    frontDoorUri: azureFrontDoor.outputs.HOST_NAME
   }
 }
 
@@ -148,7 +167,7 @@ resource telemetrydeployment 'Microsoft.Resources/deployments@2021-04-01' = if (
   }
 }
 
-output WEB_URI string = azureFrontDoor.outputs.WEB_URI
+output WEB_URI string = 'https://${azureFrontDoor.outputs.HOST_NAME}'
 output AZURE_LOCATION string = location
 
 output DEBUG_IS_MULTI_LOCATION_DEPLOYMENT bool = isMultiLocationDeployment
