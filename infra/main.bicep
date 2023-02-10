@@ -145,7 +145,7 @@ module secondaryAppConfigSvcFrontDoorUri 'appConfigSvcKeyValue.bicep' = if (isMu
   name: 'secondaryKeyValue'
   scope: secondaryResourceGroup
   params:{
-    appConfigurationServiceName: secondaryResources.outputs.APP_CONFIGURATION_SVC_NAME
+    appConfigurationServiceName: isMultiLocationDeployment ? secondaryResources.outputs.APP_CONFIGURATION_SVC_NAME : 'none'
     frontDoorUri: azureFrontDoor.outputs.HOST_NAME
   }
 }
