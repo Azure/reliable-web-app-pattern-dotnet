@@ -7,8 +7,8 @@ var globalResourceToken = uniqueString(resourceGroup().id)
 var frontDoorEndpointName = 'afd-${globalResourceToken}'
 
 @minLength(1)
-@description('Name for a log analytics workspace that will collect diagnostic info for Key Vault and Front Door')
-param logAnalyticsWorkspaceNameForDiagnstics string
+@description('ResourceId for a log analytics workspace that will collect diagnostic info for Key Vault and Front Door')
+param logAnalyticsWorkspaceIdForDiagnostics string
 
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
@@ -25,10 +25,6 @@ var frontDoorOriginGroupName = 'MyOriginGroup'
 var frontDoorOriginName = 'MyAppServiceOrigin'
 var frontDoorRouteName = 'MyRoute'
 
-resource logAnalyticsWorkspaceForDiagnostics 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
-  name: logAnalyticsWorkspaceNameForDiagnstics
-}
-
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
   name: frontDoorProfileName
   tags: tags
@@ -42,7 +38,7 @@ resource logAnalyticsWorkspaceDiagnostics 'Microsoft.Insights/diagnosticSettings
   scope: frontDoorProfile
   name: 'diagnosticSettings'
   properties: {
-    workspaceId: logAnalyticsWorkspaceForDiagnostics.id
+    workspaceId: logAnalyticsWorkspaceIdForDiagnostics
     logs: [
       {
         category: 'FrontDoorWebApplicationFirewallLog'
