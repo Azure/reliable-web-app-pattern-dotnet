@@ -6,11 +6,12 @@
 var globalResourceToken = uniqueString(resourceGroup().id)
 var frontDoorEndpointName = 'afd-${globalResourceToken}'
 
+@minLength(1)
+@description('ResourceId for a log analytics workspace that will collect diagnostic info for Key Vault and Front Door')
+param logAnalyticsWorkspaceIdForDiagnostics string
+
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
-
-@description('Name of the App Configuration Service where the App Service loads configuration')
-param appConfigurationServiceName string
 
 @minLength(1)
 @description('The hostname of the backend. Must be an IP address or FQDN.')
@@ -18,18 +19,6 @@ param primaryBackendAddress string
 
 @description('The hostname of the backend. Must be an IP address or FQDN.')
 param secondaryBackendAddress string
-
-resource appConfigurationService 'Microsoft.AppConfiguration/configurationStores@2022-05-01' existing = {
-  name: appConfigurationServiceName
-  
-  resource frontDoorRedirectUri 'keyValues@2022-05-01' = {
-    name: 'App:FrontDoorUri'
-    properties: {
-      value: frontDoorEndpoint.properties.hostName
-    }
-  }
-}
-
 
 var frontDoorProfileName = 'afd-${globalResourceToken}'
 var frontDoorOriginGroupName = 'MyOriginGroup'
@@ -42,6 +31,24 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
   location: 'global'
   sku: {
     name: 'Premium_AzureFrontDoor'
+  }
+}
+
+resource logAnalyticsWorkspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  scope: frontDoorProfile
+  name: 'diagnosticSettings'
+  properties: {
+    workspaceId: logAnalyticsWorkspaceIdForDiagnostics
+    logs: [
+      {
+        category: 'FrontDoorWebApplicationFirewallLog'
+        enabled: true
+        retentionPolicy: {
+          days: 0
+          enabled: true
+        }
+      }
+    ]
   }
 }
 
@@ -183,4 +190,4 @@ resource profiles_manualryckozesqpn24_name_manualwafpolicy_cfc67469 'Microsoft.C
   }
 }
 
-output WEB_URI string = frontDoorEndpoint.properties.hostName
+output HOST_NAME string = frontDoorEndpoint.properties.hostName
