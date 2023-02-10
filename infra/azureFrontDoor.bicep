@@ -1,9 +1,16 @@
-@minLength(1)
-@description('A generated identifier used to create unique resources')
-param resourceToken string
+// this file is included for the sample to make it easy to get started
+// for customer scenarios we recommend reusing your Azure Front Door
+// as it supports multiple origins, and endpoints for different needs
+
+// avoids resource token naming since front door is a global balancer
+var globalResourceToken = uniqueString(resourceGroup().id)
+var frontDoorEndpointName = 'afd-${globalResourceToken}'
 
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
+
+@description('Name of the App Configuration Service where the App Service loads configuration')
+param appConfigurationServiceName string
 
 @minLength(1)
 @description('The hostname of the backend. Must be an IP address or FQDN.')
@@ -12,19 +19,29 @@ param primaryBackendAddress string
 @description('The hostname of the backend. Must be an IP address or FQDN.')
 param secondaryBackendAddress string
 
-var frontDoorProfileName = 'fd-${resourceToken}'
+resource appConfigurationService 'Microsoft.AppConfiguration/configurationStores@2022-05-01' existing = {
+  name: appConfigurationServiceName
+  
+  resource frontDoorRedirectUri 'keyValues@2022-05-01' = {
+    name: 'App:FrontDoorUri'
+    properties: {
+      value: frontDoorEndpoint.properties.hostName
+    }
+  }
+}
+
+
+var frontDoorProfileName = 'afd-${globalResourceToken}'
 var frontDoorOriginGroupName = 'MyOriginGroup'
 var frontDoorOriginName = 'MyAppServiceOrigin'
 var frontDoorRouteName = 'MyRoute'
-
-var frontDoorEndpointName = 'afd-${uniqueString(resourceGroup().id)}'
 
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
   name: frontDoorProfileName
   tags: tags
   location: 'global'
   sku: {
-    name: 'Standard_AzureFrontDoor'
+    name: 'Premium_AzureFrontDoor'
   }
 }
 
@@ -67,7 +84,7 @@ resource frontDoorPrimaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@202
   }
 }
 
-resource frontDoorSecondaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
+resource frontDoorSecondaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = if (secondaryBackendAddress != 'none') {
   name: '${frontDoorOriginName}2'
   parent: frontDoorOriginGroup
   properties: {
@@ -106,10 +123,10 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' 
 }
 
 resource frontdoorWebApplicationFirewallPolicy 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@2020-11-01' = {
-  name: 'wafpolicy${resourceToken}'
+  name: 'wafpolicy${globalResourceToken}'
   location: 'Global'
   sku: {
-    name: 'Standard_AzureFrontDoor'
+    name: 'Premium_AzureFrontDoor'
   }
   properties: {
     policySettings: {
@@ -121,14 +138,29 @@ resource frontdoorWebApplicationFirewallPolicy 'Microsoft.Network/frontdoorwebap
       rules: []
     }
     managedRules: {
-      managedRuleSets: []
+      managedRuleSets: [
+        {
+          ruleSetType: 'Microsoft_DefaultRuleSet'
+          ruleSetVersion: '2.0'
+          ruleSetAction: 'Block'
+          ruleGroupOverrides: []
+          exclusions: []
+        }
+        {
+          ruleSetType: 'Microsoft_BotManagerRuleSet'
+          ruleSetVersion: '1.0'
+          ruleSetAction: 'Block'
+          ruleGroupOverrides: []
+          exclusions: []
+        }
+      ]
     }
   }
 }
 
 resource profiles_manualryckozesqpn24_name_manualwafpolicy_cfc67469 'Microsoft.Cdn/profiles/securitypolicies@2021-06-01' = {
   parent: frontDoorProfile
-  name: 'wafpolicy-${resourceToken}'
+  name: 'wafpolicy-${globalResourceToken}'
   properties: {
     parameters: {
       wafPolicy: {

@@ -109,12 +109,12 @@ module secondaryResources './resources.bicep' = if (isMultiLocationDeployment) {
   }
 }
 
-module azureFrontDoor './azureFrontDoor.bicep' = if (isMultiLocationDeployment) {
+module azureFrontDoor './azureFrontDoor.bicep' = {
   name: 'frontDoor-${primaryResourceToken}'
   scope: primaryResourceGroup
   params: {
-    resourceToken: primaryResourceToken
     tags: tags
+    appConfigurationServiceName: primaryResources.outputs.APP_CONFIGURATION_SVC_NAME
     primaryBackendAddress: primaryResources.outputs.WEB_URI
     secondaryBackendAddress: isMultiLocationDeployment ? secondaryResources.outputs.WEB_URI : 'none'
   }
@@ -137,7 +137,7 @@ resource telemetrydeployment 'Microsoft.Resources/deployments@2021-04-01' = if (
   }
 }
 
-output WEB_URI string = isMultiLocationDeployment ? azureFrontDoor.outputs.WEB_URI : primaryResources.outputs.WEB_URI
+output WEB_URI string = azureFrontDoor.outputs.WEB_URI
 output AZURE_LOCATION string = location
 
 output DEBUG_IS_MULTI_LOCATION_DEPLOYMENT bool = isMultiLocationDeployment
