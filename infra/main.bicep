@@ -132,7 +132,7 @@ module azureFrontDoor './azureFrontDoor.bicep' = {
 
 module primaryAppConfigSvcFrontDoorUri 'appConfigSvcKeyValue.bicep' = {
   name: 'primaryKeyValue'
-  scope: secondaryResourceGroup
+  scope: primaryResourceGroup
   params:{
     appConfigurationServiceName: primaryResources.outputs.APP_CONFIGURATION_SVC_NAME
     frontDoorUri: azureFrontDoor.outputs.HOST_NAME
@@ -161,7 +161,7 @@ module secondaryKeyVaultDiagnostics 'azureKeyVaultDiagnostics.bicep' = if (isMul
   name: 'secondaryKeyVaultDiagnostics'
   scope: secondaryResourceGroup
   params: {
-    keyVaultName: isMultiLocationDeployment ? primaryResources.outputs.KEY_VAULT_NAME : 'none'
+    keyVaultName: isMultiLocationDeployment ? secondaryResources.outputs.KEY_VAULT_NAME : 'none'
     logAnalyticsWorkspaceNameForDiagnstics: logAnalyticsForDiagnostics.outputs.logAnalyticsWorkspaceNameForDiagnstics
   }
 }
