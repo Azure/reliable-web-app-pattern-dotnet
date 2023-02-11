@@ -142,7 +142,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       defaultAction: 'Allow'
       bypass: 'AzureServices'
     }
-    accessPolicies: []
+    enableRbacAuthorization: true
     sku: {
       family: 'A'
       name: 'standard'
