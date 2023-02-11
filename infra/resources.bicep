@@ -142,6 +142,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       defaultAction: 'Allow'
       bypass: 'AzureServices'
     }
+    accessPolicies: []
     sku: {
       family: 'A'
       name: 'standard'
@@ -463,12 +464,13 @@ module redisSetup 'azureRedisCache.bicep' = {
   params: {
     devOpsManagedIdentityId: devOpsManagedIdentityId
     isProd: isProd
+    keyVaultName: keyVault.name
     location: location
     resourceToken: resourceToken
     tags: tags
     privateEndpointNameForRedis: privateEndpointNameForRedis
-    privateEndpointVnetName: vnet.name
     privateEndpointSubnetName: privateEndpointSubnetName
+    privateEndpointVnetName: vnet.name
   }
 }
 
@@ -477,6 +479,7 @@ module storageSetup 'azureStorage.bicep' = {
   scope: resourceGroup()
   params: {
     isProd: isProd
+    keyVaultName: keyVault.name
     location: location
     resourceToken: resourceToken
     tags: tags

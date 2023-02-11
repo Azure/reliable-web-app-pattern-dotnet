@@ -1,30 +1,33 @@
 @description('The id for the user-assigned managed identity that runs deploymentScripts')
 param devOpsManagedIdentityId string
 
-@description('A generated identifier used to create unique resources')
-param resourceToken string
-
 @description('Enables the template to choose different SKU by environment')
 param isProd bool
 
-@description('Name for private endpoint')
-param privateEndpointNameForRedis string
-
-@description('Name of vnet for private endpoint')
-param privateEndpointVnetName string
-
-@description('Name of subnet for private endpoint')
-param privateEndpointSubnetName string
-
-@description('Ensures that the idempotent scripts are executed each time the deployment is executed')
-param uniqueScriptId string = newGuid()
+@minLength(1)
+@description('The name of the Key Vault that will store AAD secrets for the web app')
+param keyVaultName string
 
 @description('The Azure location where this solution is deployed')
 param location string
 
+@description('A generated identifier used to create unique resources')
+param resourceToken string
+
+@description('Name for private endpoint')
+param privateEndpointNameForRedis string
+
+@description('Name of subnet for private endpoint')
+param privateEndpointSubnetName string
+
+@description('Name of vnet for private endpoint')
+param privateEndpointVnetName string
+
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
+@description('Ensures that the idempotent scripts are executed each time the deployment is executed')
+param uniqueScriptId string = newGuid()
 
 var redisCacheSkuName = isProd ? 'Standard' : 'Basic'
 var redisCacheFamilyName = isProd ? 'C' : 'C'
@@ -52,7 +55,7 @@ resource redisCache 'Microsoft.Cache/Redis@2022-05-01' = {
 }
 
 resource existingKeyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
-  name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
+  name: keyVaultName
   scope: resourceGroup()
 
   resource kvSecretRedis 'secrets@2021-11-01-preview' = {

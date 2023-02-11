@@ -1,3 +1,10 @@
+@description('Enables the template to choose different SKU by environment')
+param isProd bool
+
+@minLength(1)
+@description('The name of the Key Vault that will store AAD secrets for the web app')
+param keyVaultName string
+
 @minLength(1)
 @description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
@@ -8,9 +15,6 @@ param resourceToken string
 
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
-
-@description('Enables the template to choose different SKU by environment')
-param isProd bool
 
 var storageSku = isProd ? 'Standard_ZRS' : 'Standard_LRS'
 
@@ -32,7 +36,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
 }
 
 resource existingKeyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
-  name: 'rc-${resourceToken}-kv' // keyvault name cannot start with a number
+  name: keyVaultName
   scope: resourceGroup()
 
   resource kvSecretStorageAcct 'secrets@2021-11-01-preview' = {
