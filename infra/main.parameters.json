@@ -35,9 +35,6 @@
     "azureAdClientSecretForFrontEnd": {
       "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdClientSecretForFrontEnd)"
     },
-    "azureAdInstance": {
-      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdInstance)"
-    },
     "azureAdTenantId": {
       "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdTenantId)"
     },
