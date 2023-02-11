@@ -11,7 +11,14 @@ param tags object
 
 @description('Enables the template to choose different SKU by environment')
 param isProd bool
+
+@description('Role assignments to add when resource is created')
 param roleAssignmentsList array
+
+param privateLinkSubnetId string
+
+param privateDnsZoneId string
+
 
 var storageSku = isProd ? 'Standard_ZRS' : 'Standard_LRS'
 
@@ -23,6 +30,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     name: storageSku
   }
   kind: 'StorageV2'
+  properties: {
+    publicNetworkAccess: 'Disabled'
+  }
 }
 resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
   parent: storageAccount
@@ -44,6 +54,20 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
     principalType: roleAssignment.principalType
   }
 }]
+
+module privateLink 'connectByPrivateLink.bicep'={
+  name: '${storageAccount.name}-privateLink'
+  params: {
+    location: location
+    name: 'privateEndpointForTickeStore'
+    tags: tags
+    serviceResourceId: storageAccount.id
+    subnetResourceId: privateLinkSubnetId
+    serviceGroupIds: ['blob']
+    privateDnsZoneId: privateDnsZoneId
+  }
+}
+
 
 output storageAccountResourceId string = storageAccount.id
 output storageAccocuntBlobURL string = storageAccount.properties.primaryEndpoints.blob

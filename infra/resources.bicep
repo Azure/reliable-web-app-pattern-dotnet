@@ -455,10 +455,9 @@ module storageSetup 'azureStorage.bicep' = {
     resourceToken: resourceToken
     roleAssignmentsList: storageAccountRoleAssignments
     tags: tags
+    privateLinkSubnetId: vnet::privateEndpointSubnet.id
+    privateDnsZoneId: privateDnsZoneForStorage.id
   }
-  dependsOn: [
-    vnet
-  ]
 }
 
 resource storageAccountBlobUrlAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
@@ -536,6 +535,10 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
 
   resource webSubnet 'subnets' existing = {
     name: subnetWebAppService
+  }
+
+  resource privateEndpointSubnet 'subnets' existing = {
+    name: privateEndpointSubnetName
   }
 }
 
@@ -668,6 +671,28 @@ resource privateEndpointForKv 'Microsoft.Network/privateEndpoints@2020-07-01' = 
         }
       }
     ]
+  }
+}
+
+resource privateDnsZoneForStorage 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'privatelink.blob.core.windows.net'
+  location: 'global'
+  tags: tags
+  dependsOn: [
+    vnet
+  ]
+}
+
+resource privateDnsZoneForStorage_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDnsZoneForStorage
+  name: '${privateDnsZoneForStorage.name}-link'
+  location: 'global'
+  tags: tags
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: vnet.id
+    }
   }
 }
 
