@@ -235,10 +235,6 @@ You will also need to delete the two Azure AD app registrations that were create
  
  You will also need to purge the App Configuration Service instance that was deployed.
 
- **Purge App Configurations**
-
- ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
-
 #### 3. Delete the Deployment
 
 Your Azure subscription will retain your deployment request as a stateful object.

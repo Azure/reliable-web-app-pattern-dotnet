@@ -173,7 +173,7 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
     serverFarmId: webAppServicePlan.id
     siteConfig: {
       alwaysOn: true
-      ftpsState: 'FtpsOnly'
+      ftpsState: 'Disabled'
 
       // Set to true to route all outbound app traffic into virtual network (see https://learn.microsoft.com/azure/app-service/overview-vnet-integration#application-routing)
       vnetRouteAllEnabled: false
@@ -247,7 +247,7 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
     serverFarmId: apiAppServicePlan.id
     siteConfig: {
       alwaysOn: true
-      ftpsState: 'FtpsOnly'
+      ftpsState: 'Disabled'
 
       // Set to true to route all outbound app traffic into virtual network (see https://learn.microsoft.com/azure/app-service/overview-vnet-integration#application-routing)
       vnetRouteAllEnabled: false
@@ -371,15 +371,12 @@ resource webLogAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020
   name: 'web-${resourceToken}-log'
   location: location
   tags: tags
-  properties: any({
+  properties: {
     retentionInDays: 30
-    features: {
-      searchVersion: 1
-    }
     sku: {
       name: 'PerGB2018'
     }
-  })
+  }
 }
 
 module webApplicationInsightsResources './applicationinsights.bicep' = {
@@ -756,6 +753,7 @@ resource privateEndpointForAppConfig 'Microsoft.Network/privateEndpoints@2020-07
   }
 }
 
+output KEY_VAULT_NAME string = keyVault.name
 output APP_CONFIGURATION_SVC_NAME string = appConfigService.name
 output WEB_URI string = web.properties.defaultHostName
 output API_URI string = api.properties.defaultHostName
