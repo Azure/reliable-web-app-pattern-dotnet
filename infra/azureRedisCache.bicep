@@ -97,9 +97,6 @@ resource privateDnsZoneNameForRedis 'Microsoft.Network/privateDnsZones@2020-06-0
   name: 'privatelink.redis.cache.windows.net'
   location: 'global'
   tags: tags
-  dependsOn: [
-    vnet
-  ]
 }
 
 resource privateDnsZoneNameForRedis_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {

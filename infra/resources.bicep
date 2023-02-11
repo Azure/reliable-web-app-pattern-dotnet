@@ -551,9 +551,6 @@ resource privateDnsZoneNameForSql 'Microsoft.Network/privateDnsZones@2020-06-01'
   name: 'privatelink${environment().suffixes.sqlServerHostname}'
   location: 'global'
   tags: tags
-  dependsOn: [
-    vnet
-  ]
 }
 
 resource privateDnsZoneNameForSql_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
@@ -603,9 +600,6 @@ resource privateDnsZoneNameForKv 'Microsoft.Network/privateDnsZones@2020-06-01' 
   name: 'privatelink.vaultcore.azure.net'
   location: 'global'
   tags: tags
-  dependsOn: [
-    vnet
-  ]
 }
 
 resource privateDnsZoneNameForKv_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
@@ -663,9 +657,6 @@ resource privateDnsZoneNameForAppConfig 'Microsoft.Network/privateDnsZones@2020-
   name: 'privatelink.azconfig.io'
   location: 'global'
   tags: tags
-  dependsOn: [
-    vnet
-  ]
 }
 
 resource privateDnsZoneNameForAppConfig_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
