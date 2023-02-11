@@ -23,6 +23,24 @@
     "principalType": {
       "value": "${PRINCIPAL_TYPE=user}"
     },
+    "azureAdApiScopeFrontEnd": {
+      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdApiScopeFrontEnd)"
+    },
+    "azureAdClientIdForBackEnd": {
+      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdClientIdForBackEnd)"
+    },
+    "azureAdClientIdForFrontEnd": {
+      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdClientIdForFrontEnd)"
+    },
+    "azureAdClientSecretForFrontEnd": {
+      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdClientSecretForFrontEnd)"
+    },
+    "azureAdInstance": {
+      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdInstance)"
+    },
+    "azureAdTenantId": {
+      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdTenantId)"
+    },
     "enableTelemetry": {
       "value": "${ENABLE_TELEMETRY=true}"
     }
