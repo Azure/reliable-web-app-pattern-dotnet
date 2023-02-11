@@ -109,7 +109,7 @@ resource keyVaultRoleAssignmentForWebApp 'Microsoft.Authorization/roleAssignment
   properties: {
     principalType: 'ServicePrincipal'
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', keyVaultSecretsUserRoleDefinitionId)
-    principalId: principalId
+    principalId: managedIdentity.properties.principalId
     description: 'Grant the "Key Secrets User" role to the principal identity so it can manage the key vault service.'
   }
 }
