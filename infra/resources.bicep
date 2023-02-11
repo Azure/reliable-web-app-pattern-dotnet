@@ -63,6 +63,36 @@ resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssign
   }
 }
 
+@description('Built in \'Key Secrets User\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+var keyVaultSecretsUserRoleDefinitionId = '4633458b-17de-408a-b874-0445c86b69e6'
+
+@description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
+resource keyVaultRoleAssignmentForWebApp 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(keyVaultSecretsUserRoleDefinitionId, appConfigService.id, principalId, resourceToken)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', keyVaultSecretsUserRoleDefinitionId)
+    principalId: principalId
+    description: 'Grant the "Key Secrets User" role to the principal identity so it can manage the key vault service.'
+  }
+}
+
+@description('Built in \'Key Vault Administrator\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+var keyVaultAdminRoleDefinitionId = '00482a5a-887f-4fb3-b363-3b7fe8e74483'
+
+@description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
+resource keyVaultRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = if (principalType == 'user') {
+  name: guid(keyVaultAdminRoleDefinitionId, appConfigService.id, principalId, resourceToken)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'User'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', keyVaultAdminRoleDefinitionId)
+    principalId: principalId
+    description: 'Grant the "Key Vault Administrator" role to the principal identity so it can manage the key vault service.'
+  }
+}
+
 // a key vault name that is shared between KV and Azure App Configuration Service to support Azure AD auth for the web app
 var frontEndClientSecretName = 'AzureAd--ClientSecret'
 
@@ -84,28 +114,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       name: 'standard'
     }
     tenantId: subscription().tenantId
-    accessPolicies: [
-      {
-        objectId: managedIdentity.properties.principalId
-        tenantId: subscription().tenantId
-        permissions: {
-          secrets: [
-            'list'
-            'get'
-            'set'
-          ]
-        }
-      }
-      {
-        objectId: principalId
-        tenantId: subscription().tenantId
-        permissions: {
-          secrets: [
-            'all'
-          ]
-        }
-      }
-    ]
   }
 }
 
