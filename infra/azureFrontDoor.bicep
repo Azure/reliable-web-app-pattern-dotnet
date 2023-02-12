@@ -70,7 +70,7 @@ resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' =
       successfulSamplesRequired: 3
     }
     healthProbeSettings: {
-      probePath: '/'
+      probePath: '/healthz'
       probeRequestType: 'HEAD'
       probeProtocol: 'Https'
       probeIntervalInSeconds: 100
