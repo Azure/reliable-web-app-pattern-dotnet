@@ -473,11 +473,11 @@ module storageSetup 'azureStorage.bicep' = {
 }
 
 resource storageRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = if (principalType == 'user') {
-  name: guid(storageBlobDataOwnerRoleDefinitionId, appConfigService.id, principalId, resourceToken)
+  name: guid(storageBlobDataOwnerRoleDefinitionId, storageSetup.name, principalId, resourceToken)
   scope: resourceGroup()
   properties: {
     principalType: 'User'
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataOwnerRoleDefinitionId)
     principalId: principalId
     description: 'Grant the "Storage Blob Data Owner" role to the developer so they can write to Azure storage while doing local development.'
   }
