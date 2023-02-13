@@ -158,6 +158,20 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
       contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
     }
   }
+
+  resource storageAccountBlobUrlAppConfigSetting 'keyValues@2022-05-01' = {
+    name: 'App:StorageAccount:Url'
+    properties: {
+      value: storageSetup.outputs.storageAccocuntBlobURL
+    }
+  }
+
+  resource storageAccountBlobContainerAppConfigSetting 'keyValues@2022-05-01' = {
+    name: 'App:StorageAccount:Container'
+    properties: {
+      value: storageSetup.outputs.containerName
+    }
+  }
 }
 
 // provides additional diagnostic information from aspNet when deploying non-prod environments
@@ -466,22 +480,6 @@ resource storageRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignme
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', appConfigurationRoleDefinitionId)
     principalId: principalId
     description: 'Grant the "Storage Blob Data Owner" role to the developer so they can write to Azure storage while doing local development.'
-  }
-}
-
-resource storageAccountBlobUrlAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigService
-  name: 'App:StorageAccount:Url'
-  properties: {
-    value: storageSetup.outputs.storageAccocuntBlobURL
-  }
-}
-
-resource storageAccountBlobContainerAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigService
-  name: 'App:StorageAccount:Container'
-  properties: {
-    value: storageSetup.outputs.containerName
   }
 }
 
