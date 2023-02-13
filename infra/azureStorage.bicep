@@ -15,8 +15,10 @@ param isProd bool
 @description('Role assignments to add when resource is created')
 param roleAssignmentsList array
 
+@description('Id of subnet for private endpoint')
 param privateLinkSubnetId string
 
+@description('Id of Azure Private DNS for private endpoint')
 param privateDnsZoneId string
 
 
@@ -34,6 +36,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     publicNetworkAccess: 'Disabled'
   }
 }
+
 resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
   parent: storageAccount
   name:'default'
