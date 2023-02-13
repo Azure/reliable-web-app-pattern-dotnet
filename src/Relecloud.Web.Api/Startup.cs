@@ -39,6 +39,7 @@ namespace Relecloud.Web.Api
             AddDistributedSession(services);
             AddPaymentGatewayService(services);
             AddTicketManagementService(services);
+            AddTicketImageService(services);
 
             // The ApplicationInitializer is injected in the Configure method with all its dependencies and will ensure
             // they are all properly initialized upon construction.
@@ -64,6 +65,12 @@ namespace Relecloud.Web.Api
                 services.AddScoped<ITicketManagementService, TicketManagementService>();
                 services.AddScoped<ITicketRenderingService, TicketRenderingService>();
             }
+        }
+
+
+        private void AddTicketImageService(IServiceCollection services)
+        {
+            services.AddScoped<ITicketImageService, TicketImageService>();
         }
 
         private void AddAzureSearchService(IServiceCollection services)

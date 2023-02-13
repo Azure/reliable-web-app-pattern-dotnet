@@ -1,8 +1,11 @@
-﻿using Azure.Storage.Blobs;
-using Azure.Storage.Sas;
+﻿using Azure.Identity;
+using Azure.Storage.Blobs;
+
 using Microsoft.EntityFrameworkCore;
+
 using Relecloud.Web.Api.Services.SqlDatabaseConcertRepository;
 using Relecloud.Web.Models.ConcertContext;
+
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -11,7 +14,6 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
 {
     public class TicketRenderingService : ITicketRenderingService
     {
-        private const string StorageContainerName = "tickets";
         private const string BlobNameFormatString = "ticket-{EntityId}.png";
 
         private readonly IConfiguration configuration;
@@ -39,8 +41,8 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
             }
 
             var ticketImageBlob = RenderImage(ticket);
-            var sasUri = await SaveImageAsync(ticket, ticketImageBlob);
-            await UpdateTicketWithUriAsync(ticket, sasUri);
+            var ticketBlobName = await SaveImageAsync(ticket, ticketImageBlob);
+            await UpdateTicketWithBlobNameAsync(ticket, ticketBlobName);
         }
 
         private MemoryStream RenderImage(Ticket ticket)
@@ -97,39 +99,24 @@ namespace Relecloud.Web.Api.Services.TicketManagementService
             return ticketImageBlob;
         }
 
-        private async Task<Uri> SaveImageAsync(Ticket ticket, MemoryStream ticketImageBlob)
+        private async Task<string> SaveImageAsync(Ticket ticket, MemoryStream ticketImageBlob)
         {
-            var storageAccountConnStr = this.configuration["App:StorageAccount:ConnectionString"];
-            var blobServiceClient = new BlobServiceClient(storageAccountConnStr);
+            var storageUrl = configuration["App:StorageAccount:Url"];
+            var storageContainer = configuration["App:StorageAccount:Container"];
+            var blobName = BlobNameFormatString.Replace("{EntityId}", ticket.Id.ToString());
+            Uri blobUri = new($"{storageUrl}/{storageContainer}/{blobName}");
 
-            //  Gets a reference to the container.
-            var blobContainerClient = blobServiceClient.GetBlobContainerClient(StorageContainerName);
+            BlobClient blobClient = new(blobUri, new DefaultAzureCredential());
 
-            //  Gets a reference to the blob in the container
-            var blobClient = blobContainerClient.GetBlobClient(BlobNameFormatString.Replace("{EntityId}", ticket.Id.ToString()));
             await blobClient.UploadAsync(ticketImageBlob, overwrite: true);
 
             logger.LogInformation("Successfully wrote blob to storage.");
-
-            //  Defines the resource being accessed and for how long the access is allowed.
-            var blobSasBuilder = new BlobSasBuilder
-            {
-                StartsOn = DateTime.UtcNow.AddMinutes(-5),
-                ExpiresOn = DateTime.UtcNow.Add(TimeSpan.FromDays(30)),
-            };
-
-            //  Defines the type of permission.
-            blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
-
-            //  Builds the Sas URI.
-            var queryUri = blobClient.GenerateSasUri(blobSasBuilder);
-
-            return queryUri;
+            return blobName;
         }
 
-        private async Task UpdateTicketWithUriAsync(Ticket ticket, Uri sasUri)
+        private async Task UpdateTicketWithBlobNameAsync(Ticket ticket, string blobName)
         {
-            ticket.ImageUrl = sasUri.ToString();
+            ticket.ImageName = blobName;
             database.Update(ticket);
             await database.SaveChangesAsync();
         }

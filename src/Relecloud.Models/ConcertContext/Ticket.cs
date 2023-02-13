@@ -3,7 +3,7 @@
     public class Ticket
     {
         public int Id { get; set; }
-        public string ImageUrl { get; set; } = string.Empty;
+        public string ImageName { get; set; } = string.Empty;
 
         public int ConcertId { get; set; }
         public Concert? Concert { get; set; }
