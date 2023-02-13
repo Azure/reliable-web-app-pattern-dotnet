@@ -1,11 +1,24 @@
-
+@minLength(1)
+@description('Name of the private endpoint that will be created for this connection')
 param name string
+
+@minLength(1)
+@description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
+
+@description('The resourceId of an existing Azure subnet that will be used to create a private endpoint connection')
 param subnetResourceId string
+
+@description('The resourceId of an existing Azure private DNS that will provide the routing for this private endpoint')
 param privateDnsZoneId string
+
+@description('The resourceId of an existing Azure resource that will be accessed by the private endpoint connection')
 param serviceResourceId string
+
+@description('The type of Azure resource that will be networked as a private endpoint such as `configurationStores` or `vault`')
 param serviceGroupIds array 
 
+@description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
