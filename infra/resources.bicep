@@ -158,6 +158,20 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
       contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
     }
   }
+
+  resource storageAccountBlobUrlAppConfigSetting 'keyValues@2022-05-01' = {
+    name: 'App:StorageAccount:Url'
+    properties: {
+      value: storageSetup.outputs.storageAccocuntBlobURL
+    }
+  }
+
+  resource storageAccountBlobContainerAppConfigSetting 'keyValues@2022-05-01' = {
+    name: 'App:StorageAccount:Container'
+    properties: {
+      value: storageSetup.outputs.containerName
+    }
+  }
 }
 
 // provides additional diagnostic information from aspNet when deploying non-prod environments
@@ -433,16 +447,17 @@ module redisSetup 'azureRedisCache.bicep' = {
 
 @description('Built in \'Storage Blob Data Owner\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
 // Allows read and write access to storage blob data
-var storageBlobDataOwner = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
+var storageBlobDataOwnerRoleDefinitionId = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
 
 var storageAccountRoleAssignments =[
   {
     principalId: managedIdentity.properties.principalId
-    roleDefinitionId: storageBlobDataOwner
+    roleDefinitionId: storageBlobDataOwnerRoleDefinitionId
     description: 'Give the application read and write permission to storage account.'
     principalType:'ServicePrincipal'
   }
 ]
+
 module storageSetup 'azureStorage.bicep' = {
   name: 'storageSetup'
   scope: resourceGroup()
@@ -457,19 +472,14 @@ module storageSetup 'azureStorage.bicep' = {
   }
 }
 
-resource storageAccountBlobUrlAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigService
-  name: 'App:StorageAccount:Url'
+resource storageRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = if (principalType == 'user') {
+  name: guid(storageBlobDataOwnerRoleDefinitionId, storageSetup.name, principalId, resourceToken)
+  scope: resourceGroup()
   properties: {
-    value: storageSetup.outputs.storageAccocuntBlobURL
-  }
-}
-
-resource storageAccountBlobContainerAppConfigSetting 'Microsoft.AppConfiguration/configurationStores/keyValues@2022-05-01' = {
-  parent: appConfigService
-  name: 'App:StorageAccount:Container'
-  properties: {
-    value: storageSetup.outputs.containerName
+    principalType: 'User'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataOwnerRoleDefinitionId)
+    principalId: principalId
+    description: 'Grant the "Storage Blob Data Owner" role to the developer so they can write to Azure storage while doing local development.'
   }
 }
 
