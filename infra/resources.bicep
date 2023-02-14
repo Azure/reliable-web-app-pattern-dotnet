@@ -191,17 +191,7 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
     }
   }
 
-  resource frontEndClientSecretAppCfg 'keyValues@2022-05-01' = {
-    name: 'AzureAd:ClientSecret'
-    properties: {
-      value: string({
-        uri: '${keyVault.properties.vaultUri}secrets/${frontEndClientSecretName}'
-      })
-      contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-    }
-  }
-
-  resource storageAppConfigKvRef 'keyValues@2022-05-01' = {
+  resource storageConnectionAppConfig 'keyValues@2022-05-01' = {
     name: 'App:StorageAccount:ConnectionString'
     properties: {
       value: storageSetup.outputs.containerName
