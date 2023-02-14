@@ -191,8 +191,15 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
     }
   }
 
-  resource storageConnectionAppConfig 'keyValues@2022-05-01' = {
-    name: 'App:StorageAccount:ConnectionString'
+  resource storageAccountBlobUrlAppConfigSetting 'keyValues@2022-05-01' = {
+    name: 'App:StorageAccount:Url'
+    properties: {
+      value: storageSetup.outputs.storageAccocuntBlobURL
+    }
+  }
+
+  resource storageAccountBlobContainerAppConfigSetting 'keyValues@2022-05-01' = {
+    name: 'App:StorageAccount:Container'
     properties: {
       value: storageSetup.outputs.containerName
     }
