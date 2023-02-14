@@ -444,37 +444,6 @@ Run the following command to give your Azure AD account permission to access the
     </tr>
     </table>
 
-1. Grant your account access to Azure App Configuration Service
-
-    <table>
-    <tr>
-    <td>PowerShell</td>
-    <td>
-
-    ```ps1
-    $appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
-    $currentUserObjectId=(az ad signed-in-user show --query "id" -o tsv)
-    $scopeId=(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
-    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
-    ```
-
-    </td>
-    </tr>
-    <tr>
-    <td>Bash</td>
-    <td>
-            
-    ```bash
-    appConfigDataReaderRole='516239f1-63e1-4d78-a4de-a74fb236a071'
-    currentUserObjectId=$(az ad signed-in-user show --query "id" -o tsv)
-    scopeId=$(az group show -n "$myEnvironmentName-rg" --query "id" -o tsv)
-    az role assignment create --role $appConfigDataReaderRole --assignee $currentUserObjectId --scope $scopeId
-    ```
-
-    </td>
-    </tr>
-    </table>
-
 1. Press F5 to start debugging the website
 
 > These steps grant access to SQL server in the primary resource group.
