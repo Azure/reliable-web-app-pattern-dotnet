@@ -453,7 +453,7 @@ Run the following command to give your Azure AD account permission to access the
 ## Additional links
 
 - [Known issues](known-issues.md)
-- [Developer patterns](patterns.md)
+- [Developer patterns](simulate-patterns.md)
 - [Find additional resources](additional-resources.md)
 - [Report security concerns](SECURITY.md)
 - [Find Support](SUPPORT.md)
