@@ -41,6 +41,3 @@ practices at a predictable cost. This phase also provides a foundation
 upon which they will achieve their longer-term objectives in later
 phases. Continue to the next section to learn more about the solution
 architecture, and the recommendations they applied to achieve their goals.
-
-## Next Step
-- [Read the reference architecture](reliable-web-app.md)
