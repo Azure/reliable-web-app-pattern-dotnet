@@ -489,7 +489,6 @@ module storageSetup 'azureStorage.bicep' = {
   scope: resourceGroup()
   params: {
     isProd: isProd
-    keyVaultName: keyVault.name
     location: location
     resourceToken: resourceToken
     roleAssignmentsList: storageAccountRoleAssignments
