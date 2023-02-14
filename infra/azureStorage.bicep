@@ -2,10 +2,6 @@
 param isProd bool
 
 @minLength(1)
-@description('The name of the Key Vault that will store AAD secrets for the web app')
-param keyVaultName string
-
-@minLength(1)
 @description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
 
