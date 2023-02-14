@@ -107,8 +107,6 @@ steps to follow their experience by running the commands from the folder where t
 Use this command to get started with deployment by creating an
 `azd` environment on your workstation.
 
-<!-- TODO - Expecting this to change for new version https://github.com/Azure/azure-dev/issues/502 -->
-
 <table>
 <tr>
 <td>PowerShell</td>
@@ -303,7 +301,6 @@ az deployment delete --name $myEnvironmentName
 > You can list all deployments with the following command
 > `az deployment sub list --query "[].name" -o tsv`
 
-
 ### Local Development
 
 Relecloud developers use Visual Studio to develop locally and they co-share
@@ -330,10 +327,10 @@ administration of these secrets so they can be easily changed.
 New team members should setup their environment by following these steps.
 
 1. Open the Visual Studio solution `./src/Relecloud.sln`
-2. Setup the **Relecloud.Web** project User Secrets
+1. Setup the **Relecloud.Web** project User Secrets
     1. Right-click on the **Relecloud.Web** project
-    2. From the context menu choose **Manage User Secrets**
-    3. From a command prompt run the bash command
+    1. From the context menu choose **Manage User Secrets**
+    1. From a command prompt run the bash command
 
         <table>
         <tr>
@@ -358,13 +355,13 @@ New team members should setup their environment by following these steps.
         </tr>
         </table>
 
-    4. Copy the output into the `secrets.json` file for the **Relecloud.Web**
+    1. Copy the output into the `secrets.json` file for the **Relecloud.Web**
     project.
 
-3. Setup the **Relecloud.Web.Api** project User Secrets
+1. Setup the **Relecloud.Web.Api** project User Secrets
     1. Right-click on the **Relecloud.Web.Api** project
-    2. From the context menu choose **Manage User Secrets**
-    3. From a command prompt run the bash command
+    1. From the context menu choose **Manage User Secrets**
+    1. From a command prompt run the bash command
 
         <table>
         <tr>
@@ -389,14 +386,14 @@ New team members should setup their environment by following these steps.
         </tr>
         </table>
 
-    4. Copy the output into the `secrets.json` file for the 
+    1. Copy the output into the `secrets.json` file for the 
     **Relecloud.Web.Api** project.
 
-4. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
-5. Choose **Multiple startup projects**
-6. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
-7. Click **Ok** to close the popup
-8. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
+1. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
+1. Choose **Multiple startup projects**
+1. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
+1. Click **Ok** to close the popup
+1. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
 
     <table>
     <tr>
@@ -421,7 +418,7 @@ New team members should setup their environment by following these steps.
     </tr>
     </table>
 
-9. When connecting to Azure SQL database you'll connect with your Azure AD account.
+1. When connecting to Azure SQL database you'll connect with your Azure AD account.
 Run the following command to give your Azure AD account permission to access the database.
 
     <table>
@@ -447,7 +444,7 @@ Run the following command to give your Azure AD account permission to access the
     </tr>
     </table>
 
-10. Grant your account access to Azure App Configuration Service
+1. Grant your account access to Azure App Configuration Service
 
     <table>
     <tr>
@@ -478,7 +475,7 @@ Run the following command to give your Azure AD account permission to access the
     </tr>
     </table>
 
-11. Press F5 to start debugging the website
+1. Press F5 to start debugging the website
 
 > These steps grant access to SQL server in the primary resource group.
 > You can use the same commands if you want to test with the secondary resource
