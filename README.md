@@ -338,7 +338,7 @@ New team members should setup their environment by following these steps.
         <td>
 
         ```ps1
-        .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
+        .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
         ```
 
         </td>
@@ -348,7 +348,7 @@ New team members should setup their environment by following these steps.
         <td>
                 
         ```bash
-        bash ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
+        bash ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
         ```
 
         </td>
@@ -369,7 +369,7 @@ New team members should setup their environment by following these steps.
         <td>
 
         ```ps1
-        .\infra\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
+        .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
         ```
 
         </td>
@@ -379,7 +379,7 @@ New team members should setup their environment by following these steps.
         <td>
                 
         ```bash
-        bash ./infra/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
+        bash ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
         ```
 
         </td>
@@ -401,7 +401,7 @@ New team members should setup their environment by following these steps.
     <td>
 
     ```ps1
-    .\infra\addLocalIPToSqlFirewall.ps1 -g "$myEnvironmentName-rg"
+    .\infra\localDevScripts\addLocalIPToSqlFirewall.ps1 -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -411,7 +411,7 @@ New team members should setup their environment by following these steps.
     <td>
             
     ```bash
-    bash ./infra/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
+    bash ./infra/localDevScripts/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -427,7 +427,7 @@ Run the following command to give your Azure AD account permission to access the
     <td>
 
     ```ps1
-    .\infra\makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
+    .\infra\localDevScripts\makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -437,7 +437,7 @@ Run the following command to give your Azure AD account permission to access the
     <td>
             
     ```bash
-    bash ./infra/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+    bash ./infra/localDevScripts/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
