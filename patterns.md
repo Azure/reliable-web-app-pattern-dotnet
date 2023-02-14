@@ -1,15 +1,8 @@
-## Simulating the patterns
+# Simulating the design patterns
 
-The application uses design patterns to improve the reliability and performance efficiency. The implementation lets you test the design patterns included in the code.
+You can test and configure the three code-level design patterns with this implementation: retry, circuit-breaker, and cache-aside. The following paragraphs detail steps to test the three code-level design patterns.
 
-### Retry pattern
-
-Transient faults are temporary service interruptions due to network hops and multi-tenancy traffic. We call them "transient" faults because they typically resolve themselves within a few seconds. The best approach for handling transient faults is with the retry pattern, not an exception. When a 500 error occurs, the retry pattern sends follow-up requests to the API because we expect the retries will be successful.
-
-For more information, see:
-
-- [Transient fault handling](https://learn.microsoft.com/aspnet/aspnet/overview/developing-apps-with-windows-azure/building-real-world-cloud-apps-with-windows-azure/transient-fault-handling)
-- [Retry pattern](https://learn.microsoft.com/azure/architecture/patterns/retry)
+## Retry pattern
 
 We built an app configuration setting that lets you simulate and test a transient failure from the Web API. The setting is called `Api:App:RetryDemo`. We've included this configuration in the deployable code. The `Api:App:RetryDemo` setting throws a 503 error when the end user sends an HTTP request to the web app API. `Api:App:RetryDemo` has an editable setting that determines the intervals between 503 errors. A value of 2 generates a 503 error for every other request.
 
@@ -21,7 +14,6 @@ Follow these steps to set up this test:
     - Navigate to the "Configuration explorer" by clicking the link in the left-hand blade under "Operations"
     - Click the "+ Create" button and choose "Key-value"
     - Enter the following data:
-    
 
     |Name|Value|
     |-----|-----|
@@ -35,7 +27,7 @@ Follow these steps to set up this test:
   
   > It will take a few minutes for the App Service to restart. When it restarts, the application will use the `Api:App:RetryDemo` configuration. You need to restart the App Service any time you update a configuration value.
 
-We recommend collecting telemetry for this test. We've configured Application Insights to collect telemetry. When the value of `Api:App:RetryDemo` is 2, the first request to the application API generates a 503 error. But the retry pattern sends a second request that is successful and generates a 200 response. We recommend using the Application Insights Live Metrics features to view the HTTP responses in near-realtime.
+We recommend collecting telemetry for this test. We've configured Application Insights to collect telemetry. When the value of `Api:App:RetryDemo` is 2, the first request to the application API generates a 503 error. But the retry pattern sends a second request that is successful and generates a 200 response. We recommend using the Application Insights Live Metrics features to view the HTTP responses in near real-time.
 
 > App Insights can up to a minute to aggregate the data it receives, and failed requests might not appear right away in the Failures view.
 
@@ -50,10 +42,6 @@ For more information, see:
 
 ### Circuit Breaker Pattern
 
-The Retry Pattern is often used with the Circuit Breaker pattern because the Retry process only handles transient errors. As a side-effect this negatively impacts the user's perception of performance if a real error happens. The Circuit Breaker pattern addresses this by analyzing the health of your system and is used to bypass the Retry Pattern when the system is unhealthy. This improves the user's perception performance because they don't have to wait around everytime there's an error. The Circuit Breaker pattern also gives resources that are failing a chance to recover by blocking new requests that would cause an error.
-
-This is particularly useful when deploying a high-volume Web API web app. During deployment all of the front-end web app calls are expected to fail. And, when the circuit breaker pattern stops new requests, this gives the Web API web app a chance to get started and fully loaded before the full load of front-end users returns.
-
 We built an app configuration setting that lets you simulate and test a failure from the Web API. The setting is called `Api:App:RetryDemo`. We've included this configuration in the deployable code. The `Api:App:RetryDemo` setting throws a 503 error when the end user sends an HTTP request to the web app API. `Api:App:RetryDemo` has an editable setting that determines the intervals between 503 errors. A value of 1 has no intervals and generates a 503 error for every request.
 
 Following these steps to set up this test:
@@ -64,7 +52,6 @@ Following these steps to set up this test:
     - Navigate to the "Configuration explorer" by clicking the link in the left-hand blade under "Operations"
     - Click the "+ Create" button and choose "Key-value"
     - Enter the following data:
-    
 
     |Name|Value|
     |-----|-----|
@@ -110,6 +97,3 @@ In the next request we see that the API call was only 55ms because it didn't hav
 Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
 ![image of Azure Cache for Redis Console shows data for upcoming concerts](./assets/Guide/Simulating_RedisConsoleShowUpcomingConcerts.png)
-
-## Next Step
-- [Understand service level objectives and cost](slo-and-cost.md)
