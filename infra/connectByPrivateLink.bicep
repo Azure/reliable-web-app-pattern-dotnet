@@ -6,12 +6,15 @@ param name string
 @description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
 
+@minLength(1)
 @description('The resourceId of an existing Azure subnet that will be used to create a private endpoint connection')
 param subnetResourceId string
 
+@minLength(1)
 @description('The resourceId of an existing Azure private DNS that will provide the routing for this private endpoint')
 param privateDnsZoneId string
 
+@minLength(1)
 @description('The resourceId of an existing Azure resource that will be accessed by the private endpoint connection')
 param serviceResourceId string
 
