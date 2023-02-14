@@ -4,16 +4,6 @@ This document helps with troubleshooting and provides an introduction to the mos
 ## Work from our backlog
 These issues relate to content in our sample that we're working to modify. Open issues are provided for further detail and status updates.
 
-### Shared Access Signatures for Azure Storage
-
-This sample uses a connection string with a secret to connect directly to Azure storage. This serves to demonstrate
-how to apply the [Valet Key Pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/valet-key) but this pattern is not the best fit for this scenario. In Relecloud's scenario, the [shared access signature (SAS)](https://learn.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature) approach provides limited time access to the tickets that were purchased.
-
-In a production scenario we do not recommend this approach as customers would need to run a schedule job to recycle the shared access signatures in order to rotate the secret key associated with the account. Further, the SAS token approach limits the lifetime of access to 30-days and a new SAS uri would need to be generated after the current one expires.
-
-Open issue:
-* [Setup network isolation for Azure Storage](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/12)
-
 ### Data consistency for multi-regional deployments
 
 This sample includes a feature to deploy to two Azure regions. The feature is intended to support the high availability scenario by deploying resources in an active/passive configuration. The sample currently supports the ability to fail-over web-traffic so requests can be handled from a second region. However it does not support data synchronization between two regions. 
