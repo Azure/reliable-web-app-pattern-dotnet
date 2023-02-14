@@ -702,7 +702,7 @@ resource privateEndpointForKv 'Microsoft.Network/privateEndpoints@2020-07-01' = 
 }
 
 resource privateDnsZoneForStorage 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.blob.core.windows.net'
+  name: 'privatelink.blob.${environment().suffixes.storage}'
   location: 'global'
   tags: tags
   dependsOn: [
