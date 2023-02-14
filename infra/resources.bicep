@@ -191,13 +191,20 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
     }
   }
 
+  resource frontEndClientSecretAppCfg 'keyValues@2022-05-01' = {
+    name: 'AzureAd:ClientSecret'
+    properties: {
+      value: string({
+        uri: '${keyVault.properties.vaultUri}secrets/${frontEndClientSecretName}'
+      })
+      contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+    }
+  }
+
   resource storageAppConfigKvRef 'keyValues@2022-05-01' = {
     name: 'App:StorageAccount:ConnectionString'
     properties: {
-      value: string({
-        uri: '${keyVault.properties.vaultUri}secrets/${storageSetup.outputs.keyVaultStorageConnStrName}'
-      })
-      contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+      value: storageSetup.outputs.containerName
     }
   }
 }
@@ -474,6 +481,19 @@ module redisSetup 'azureRedisCache.bicep' = {
   }
 }
 
+@description('Built in \'Storage Blob Data Owner\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+// Allows read and write access to storage blob data
+var storageBlobDataOwnerRoleDefinitionId = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
+
+var storageAccountRoleAssignments =[
+  {
+    principalId: managedIdentity.properties.principalId
+    roleDefinitionId: storageBlobDataOwnerRoleDefinitionId
+    description: 'Give the application read and write permission to storage account.'
+    principalType:'ServicePrincipal'
+  }
+]
+
 module storageSetup 'azureStorage.bicep' = {
   name: 'storageSetup'
   scope: resourceGroup()
@@ -482,11 +502,22 @@ module storageSetup 'azureStorage.bicep' = {
     keyVaultName: keyVault.name
     location: location
     resourceToken: resourceToken
+    roleAssignmentsList: storageAccountRoleAssignments
     tags: tags
+    privateLinkSubnetId: vnet::privateEndpointSubnet.id
+    privateDnsZoneId: privateDnsZoneForStorage.id
   }
-  dependsOn: [
-    vnet
-  ]
+}
+
+resource storageRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = if (principalType == 'user') {
+  name: guid(storageBlobDataOwnerRoleDefinitionId, storageSetup.name, principalId, resourceToken)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'User'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataOwnerRoleDefinitionId)
+    principalId: principalId
+    description: 'Grant the "Storage Blob Data Owner" role to the developer so they can write to Azure storage while doing local development.'
+  }
 }
 
 var privateEndpointSubnetName = 'subnetPrivateEndpoints'
@@ -548,6 +579,10 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-07-01' = {
 
   resource webSubnet 'subnets' existing = {
     name: subnetWebAppService
+  }
+
+  resource privateEndpointSubnet 'subnets' existing = {
+    name: privateEndpointSubnetName
   }
 }
 
@@ -674,6 +709,28 @@ resource privateEndpointForKv 'Microsoft.Network/privateEndpoints@2020-07-01' = 
         }
       }
     ]
+  }
+}
+
+resource privateDnsZoneForStorage 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'privatelink.blob.core.windows.net'
+  location: 'global'
+  tags: tags
+  dependsOn: [
+    vnet
+  ]
+}
+
+resource privateDnsZoneForStorage_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDnsZoneForStorage
+  name: '${privateDnsZoneForStorage.name}-link'
+  location: 'global'
+  tags: tags
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: vnet.id
+    }
   }
 }
 
