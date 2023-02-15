@@ -44,9 +44,4 @@ The following topics are intended to help readers with our most commonly reporte
 
     When the `azd provision` command runs it creates a deployment resource in your subscription. You must delete this deployment before you can change the Azure region.
 
-    > Please see the [teardown instructions](deploy-solution.md#clean-up-azure-resources) to address this issue.
-
-
-
-## Next Step
-- [Deploy solution](deploy-solution.md)
+    > Please see the [teardown instructions](README.md#clean-up-azure-resources) to address this issue.
