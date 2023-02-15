@@ -32,7 +32,7 @@ namespace Relecloud.Web.Infrastructure
                 var hostUri = context.Request.GetTypedHeaders().Host.ToString();
                 var frontDoorUri = config["App:FrontDoorUri"];
                 
-                if (hostUri != frontDoorUri)
+                if (context.Request.Path.Value != "/healthz" && hostUri != frontDoorUri)
                 {
                     // the forwarded host header should be populated by Front Door
                     // block this attempt to access the web app directly by redirecting to Front Door

@@ -1,3 +1,6 @@
+@description('Enables the template to choose different SKU by environment')
+param isProd bool
+
 @minLength(1)
 @description('Primary location for all resources. Should specify an Azure region. e.g. `eastus2` ')
 param location string
@@ -8,9 +11,6 @@ param resourceToken string
 
 @description('An object collection that contains annotations to describe the deployed azure resources to improve operational visibility')
 param tags object
-
-@description('Enables the template to choose different SKU by environment')
-param isProd bool
 
 @description('Role assignments to add when resource is created')
 param roleAssignmentsList array

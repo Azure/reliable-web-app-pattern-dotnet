@@ -40,6 +40,7 @@ namespace Relecloud.Web.Api
             AddPaymentGatewayService(services);
             AddTicketManagementService(services);
             AddTicketImageService(services);
+            services.AddHealthChecks();
 
             // The ApplicationInitializer is injected in the Configure method with all its dependencies and will ensure
             // they are all properly initialized upon construction.
@@ -172,6 +173,7 @@ namespace Relecloud.Web.Api
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHealthChecks("/healthz");
         }
     }
 }
