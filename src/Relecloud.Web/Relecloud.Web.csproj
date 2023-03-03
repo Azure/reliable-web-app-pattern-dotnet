@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>ff868c0e-c82e-4217-930f-cd0391eecc21</UserSecretsId>
-    <ApplicationInsightsResourceId>/subscriptions/02d31b67-afd1-4bac-81bc-5ca6a7cd37af/resourceGroups/rgReleCloudConcerts/providers/microsoft.insights/components/relecloudconcertsb2cdev</ApplicationInsightsResourceId>
   </PropertyGroup>
 
   <ItemGroup>
