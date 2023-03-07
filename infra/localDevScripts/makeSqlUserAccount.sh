@@ -69,25 +69,25 @@ else
 fi
 
 azureAdUsername=$(az ad signed-in-user show --query userPrincipalName)
-azureAdUsername=${azureAdUsername:1:-2}
+azureAdUsername=${azureAdUsername:1:-1}
 
 objectIdForCurrentUser=$(az ad signed-in-user show --query id)
-objectIdForCurrentUser=${objectIdForCurrentUser:1:-2}
+objectIdForCurrentUser=${objectIdForCurrentUser:1:-1}
 
 # using json format bypasses issue with tsv format observed in this issue
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/202
 databaseServer=$(az resource list -g $resourceGroupName --query "[? type=='Microsoft.Sql/servers'].name | [0]")
-databaseServer=${databaseServer:1:-2}
+databaseServer=${databaseServer:1:-1}
 
 databaseServerFqdn=$(az sql server show -n $databaseServer -g $resourceGroupName --query fullyQualifiedDomainName)
-databaseServerFqdn=${databaseServerFqdn:1:-2}
+databaseServerFqdn=${databaseServerFqdn:1:-1}
 
 # updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
 databaseName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName | [0]")
-databaseName=${databaseName:1:-2}
+databaseName=${databaseName:1:-1}
 
 sqlAdmin=$(az sql server show --name $databaseServer -g $resourceGroupName --query "administratorLogin")
-sqlAdmin=${sqlAdmin:1:-2}
+sqlAdmin=${sqlAdmin:1:-1}
 
 # new random password
 # https://learn.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=sql-server-ver16
