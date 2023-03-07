@@ -88,6 +88,13 @@ resourceToken=${frontEndWebAppName:4:13}
 locationOfHyphen=$(echo $resourceGroupName | awk -F "-" '{print length($0)-length($NF)}')
 environmentName=${resourceGroupName:0:$locationOfHyphen-1}
 
+
+frontDoorProfileName=$(az resource list -g $resourceGroupName --query "[? kind=='frontdoor' ].name | [0]" )
+frontDoorProfileName=${frontDoorProfileName:1:-1}
+frontEndWebAppHostName=$(az afd endpoint list -g $resourceGroupName --profile-name $frontDoorProfileName --query "[].hostName | [0]" --only-show-errors)
+frontEndWebAppHostName=${frontEndWebAppHostName:1:-1}
+frontEndWebAppUri="https://$frontEndWebAppHostName"
+
 substring="-rg"
 secondaryResourceGroupName=(${resourceGroupName%%$substring*})
 secondaryResourceGroupName+="-secondary-rg"
