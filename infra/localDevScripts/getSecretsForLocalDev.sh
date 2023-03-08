@@ -80,14 +80,11 @@ if [[ $debug ]]; then
 fi
 
 # assumes there is only one vault deployed to this resource group that will match this filter
-keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name | [0]")
-keyVaultName=${keyVaultName:1:-1}
+keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name | [0]" | tr -d '"')
 
-appConfigSvcName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.AppConfiguration/configurationStores'].name | [0]")
-appConfigSvcName=${appConfigSvcName:1:-1}
+appConfigSvcName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.AppConfiguration/configurationStores'].name | [0]" | tr -d '"')
 
-appConfigUri=$(az appconfig show -n $appConfigSvcName -g $resourceGroupName --query "endpoint"  2> /dev/null)
-appConfigUri=${appConfigUri:1:-1}
+appConfigUri=$(az appconfig show -n $appConfigSvcName -g $resourceGroupName --query "endpoint"  2> /dev/null | tr -d '"')
 
 if [[ $debug ]]; then
     echo "Derived inputs"
