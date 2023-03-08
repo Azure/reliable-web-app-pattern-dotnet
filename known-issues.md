@@ -31,7 +31,6 @@ The following topics are intended to help readers with our most commonly reporte
     sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/addLocalIPToSqlFirewall.sh
     sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/getSecretsForLocalDev.sh
     sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/makeSqlUserAccount.sh
-    sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/giveCurrentUserAccessToReadAppConfigSvc.sh
     ```
 
 * **Error: no project exists; to create a new project, run 'azd init'**
