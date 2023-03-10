@@ -45,6 +45,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+green='\033[0;32m'
+yellow='\e[0;33m'
+red='\e[1;31m'
+clear='\033[0m'
+
 if [[ ${#resourceGroupName} -eq 0 ]]; then
   printf "${red}FATAL ERROR:${clear} Missing required parameter --resource-group"
   echo ""
@@ -53,7 +58,8 @@ if [[ ${#resourceGroupName} -eq 0 ]]; then
 fi
 
 # this will reset the SQL password because the password is not saved during set up
-echo "WARNING: this script will reset the password for the SQL Admin on Azure SQL Server."
+printf "${yellow}WARNING:${clear} this script will reset the password for the SQL Admin on Azure SQL Server."
+echo ""
 echo "  Since this scenario uses Managed Identity, and no one accesses the database with this password, there should be no impact"
 echo "Use command interrupt if you would like to abort"
 read -n 1 -r -s -p "Press any key to continue..."

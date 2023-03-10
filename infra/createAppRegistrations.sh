@@ -53,6 +53,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 green='\033[0;32m'
+yellow='\e[0;33m'
 red='\e[1;31m'
 clear='\033[0m'
 
