@@ -408,7 +408,7 @@ if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]
   echo "secondaryAppConfigSvcName=$secondaryAppConfigSvcName"
 
   if [[ ${#secondaryKeyVaultName} -eq 0 ]]; then
-    echo "No secondary vault to configure"
+    echo "Finished successfully after configuring 1 Key Vault and 1 App Configuration Service"
     exit 0
   fi
 
@@ -459,6 +459,7 @@ if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]
       az keyvault update --name $secondaryKeyVaultName --resource-group $secondaryResourceGroupName  --public-network-access Disabled > /dev/null
   fi
 
+  echo "Finished successfully after configuring 2 Key Vaults and 2 App Configuration Services"
 elif [[ $canSetSecondAzureLocation -eq 2 ]]; then
   echo ""
   echo "skipped setup for secondary azure location because frontend app registration objectId=$frontEndWebObjectId already exists."
