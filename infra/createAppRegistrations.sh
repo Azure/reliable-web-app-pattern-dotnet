@@ -57,7 +57,8 @@ red='\e[1;31m'
 clear='\033[0m'
 
 if [[ ${#resourceGroupName} -eq 0 ]]; then
-  echo "FATAL ERROR: Missing required parameter --resource-group" 1>&2
+  printf "${red}FATAL ERROR:${clear} Missing required parameter --resource-group"
+  echo ""
   exit 6
 fi
 
@@ -124,7 +125,8 @@ echo "secondaryResourceGroupName=$secondaryResourceGroupName"
 echo ""
 
 if [[ ${#keyVaultName} -eq 0 ]]; then
-  echo "FATAL ERROR: Could not find Key Vault resource. Confirm the --resourceGroupName is the one created by the `azd provision` command."  1>&2
+  printf "${red}FATAL ERROR:${clear} Could not find Key Vault resource. Confirm the --resourceGroupName is the one created by the `azd provision` command."
+  echo ""
   exit 7
 fi
 
@@ -175,7 +177,9 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
     echo "frontEndWebAppClientId='$frontEndWebAppClientId'"
 
     if [[ ${#frontEndWebAppClientId} -eq 0 ]]; then
-      echo "FATAL ERROR: Failed to create front-end app registration" 1>&2
+      printf "${red}FATAL ERROR:${clear} Unknown Azure AD error. Failed to create front-end app registration."
+      echo ""
+      
       exit 8
     fi
    
@@ -191,6 +195,10 @@ if [[ ${#frontEndWebObjectId} -eq 0 ]]; then
       currentRetryCount=$((currentRetryCount + 1))
       if [[ $currentRetryCount -gt $maxNumberOfRetries ]]; then
         echo "FATAL ERROR: Tried to create a client secret too many times" 1>&2
+
+        printf "${red}FATAL ERROR:${clear} Unknown Azure AD error. Could not create and retrieve a client secret. Tried to create a client secret too many times"
+        echo ""
+
         exit 14
       fi
 
@@ -269,7 +277,9 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
       
       currentRetryCount=$((currentRetryCount + 1))
       if [[ $currentRetryCount -gt $maxNumberOfRetries ]]; then
-          echo 'FATAL ERROR: Tried to create retrieve the apiObjectId too many times' 1>&2
+          printf "${red}FATAL ERROR:${clear} Unknown Azure AD error. Tried to create retrieve the apiObjectId too many times."
+          echo ""
+
           exit 15
       fi
 
@@ -306,7 +316,9 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
         currentRetryCount=$((currentRetryCount + 1))
         echo "... trying to add scope attempt #$currentRetryCount"
         if [[ $currentRetryCount -gt $maxNumberOfRetries ]]; then
-            echo 'FATAL ERROR: Tried to set scopes too many times' 1>&2
+            printf "${red}FATAL ERROR:${clear} Unknown Azure AD error. Tried to set scopes too many times."
+            echo ""
+
             exit 16
         fi
       fi
@@ -327,7 +339,9 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
         echo "... trying to retrieve permId attempt #$currentRetryCount"
 
         if [[ $currentRetryCount -gt $maxNumberOfRetries ]]; then
-            echo 'FATAL ERROR: Tried to retrieve permissionId too many times' 1>&2
+            printf "${red}FATAL ERROR:${clear} Unknown Azure AD error. Tried to retrieve permissionId too many times"
+            echo ""
+
             exit 17
         fi
       else
@@ -357,7 +371,9 @@ if [[ ${#apiObjectId} -eq 0 ]]; then
         echo "... trying to set front-end app as an preAuthorized client attempt #$currentRetryCount"
 
         if [[ $currentRetryCount -gt $maxNumberOfRetries ]]; then
-            echo 'FATAL ERROR: Tried to authorize the front-end app too many times' 1>&2
+            printf "${red}FATAL ERROR:${clear} Unknown Azure AD error. Tried to authorize the front-end app too many times"
+            echo ""
+
             exit 18
         fi
       else

@@ -62,12 +62,16 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${#resourceGroupName} -eq 0 ]]; then
-  echo 'FATAL ERROR: Missing required parameter --resource-group' 1>&2
+  printf "${red}FATAL ERROR:${clear} Missing required parameter --resource-group"
+  echo ""
+
   exit 6
 fi
 
 if [[ $web_app == '' && $api_app == '' ]]; then
-  echo 'FATAL ERROR: Missing required flag --web or --api' 1>&2
+  printf "${red}FATAL ERROR:${clear} Missing required flag --web or --api"
+  echo ""
+
   exit 7
 fi
 
