@@ -415,6 +415,7 @@ if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]
     echo ""
     printf "${green}Finished successfully${clear} after configuring 1 Key Vault and 1 App Configuration Service!"
     echo ""
+    echo ""
     exit 0
   fi
 
@@ -467,6 +468,7 @@ if [[ ${#secondaryResourceGroupName} -gt 0 && $canSetSecondAzureLocation -eq 1 ]
 
   echo ""
   printf "${green}Finished successfully${clear} after configuring 2 Key Vaults and 2 App Configuration Services!"
+  echo ""
   echo ""
 elif [[ $canSetSecondAzureLocation -eq 2 ]]; then
   echo ""
