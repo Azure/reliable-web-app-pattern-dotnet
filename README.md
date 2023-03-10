@@ -222,7 +222,8 @@ App Configuration so that the web app can read this data.
 <td>
 
 ```bash
-bash ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
+chmod +x createAppRegistrations.sh
+./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
 ```
 
 </td>
@@ -337,7 +338,7 @@ New team members should setup their environment by following these steps.
         <td>
                 
         ```bash
-        bash ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
+        ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
         ```
 
         </td>
@@ -368,7 +369,7 @@ New team members should setup their environment by following these steps.
         <td>
                 
         ```bash
-        bash ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
+        ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
         ```
 
         </td>
@@ -400,7 +401,7 @@ New team members should setup their environment by following these steps.
     <td>
             
     ```bash
-    bash ./infra/localDevScripts/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
+    ./infra/localDevScripts/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -426,7 +427,7 @@ Run the following command to give your Azure AD account permission to access the
     <td>
             
     ```bash
-    bash ./infra/localDevScripts/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+    ./infra/localDevScripts/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
