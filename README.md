@@ -222,7 +222,7 @@ App Configuration so that the web app can read this data.
 <td>
 
 ```bash
-chmod +x createAppRegistrations.sh
+chmod +x ./infra/createAppRegistrations.sh
 ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
 ```
 
