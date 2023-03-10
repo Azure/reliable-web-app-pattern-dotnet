@@ -61,6 +61,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+green='\033[0;32m'
+red='\e[1;31m'
+clear='\033[0m'
+
 if [[ ${#resourceGroupName} -eq 0 ]]; then
   printf "${red}FATAL ERROR:${clear} Missing required parameter --resource-group"
   echo ""
@@ -136,6 +140,11 @@ if [[ $web_app ]]; then
     echo "   \"AzureAd:TenantId\": \"$frontEndAzureAdTenantId\""
     echo "}"
     echo ""
+
+    printf "${green}Finished successfully${clear}"
+    echo ""
+
+    exit 0
 fi
 
 
@@ -166,4 +175,9 @@ if [[ $api_app ]]; then
     echo "   \"App:StorageAccount:QueueConnectionString\": \"$apiAppQueueConnStr\""
     echo "}"
     echo ""
+    
+    printf "${green}Finished successfully${clear}"
+    echo ""
+
+    exit 0
 fi

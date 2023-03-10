@@ -131,3 +131,8 @@ export SQLCMDPASSWORD=clear
 
 # enable Azure AD only admin access
 az sql server ad-only-auth enable -n $databaseServer -g $resourceGroupName
+
+printf "${green}Finished successfully${clear}"
+echo ""
+
+exit 0
