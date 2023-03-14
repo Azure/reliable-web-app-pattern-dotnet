@@ -8,6 +8,7 @@ The reference implementation provides a production-grade web application that us
 - [Workflow](#workflow)
 - [Steps to deploy the reference implementation](#steps-to-deploy-the-reference-implementation)
 - [Additional links](#additional-links)
+- [Data Collection](#data-collection)
 
 ## Azure Architecture Center guidance
 
@@ -448,3 +449,12 @@ Run the following command to give your Azure AD account permission to access the
 - [Find Support](SUPPORT.md)
 - [Contributing](CONTRIBUTING.md)
 
+## Data Collection
+
+The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft's privacy statement. Our privacy statement is located at https://go.microsoft.com/fwlink/?LinkId=521839. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
+
+### Telemetry Configuration
+
+Telemetry collection is on by default.
+
+To opt out, run the following command `azd env set ENABLE_TELEMETRY` to `false` in your environment.
