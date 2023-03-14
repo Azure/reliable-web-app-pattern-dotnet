@@ -8,6 +8,7 @@ The reference implementation provides a production-grade web application that us
 - [Workflow](#workflow)
 - [Steps to deploy the reference implementation](#steps-to-deploy-the-reference-implementation)
 - [Additional links](#additional-links)
+- [Data Collection](#data-collection)
 
 ## Azure Architecture Center guidance
 
