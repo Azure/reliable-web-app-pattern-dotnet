@@ -230,6 +230,8 @@ chmod +x ./infra/createAppRegistrations.sh
 </tr>
 </table>
 
+> Known issue: [/bin/bash^M: bad interpreter](known-issues.md#troubleshooting)
+
 #### Deploy the code
 
 To finish the deployment process the Relecloud devs run the
