@@ -223,12 +223,15 @@ App Configuration so that the web app can read this data.
 <td>
 
 ```bash
-bash ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
+chmod +x ./infra/createAppRegistrations.sh
+./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
 ```
 
 </td>
 </tr>
 </table>
+
+> Known issue: [/bin/bash^M: bad interpreter](known-issues.md#troubleshooting)
 
 #### Deploy the code
 
@@ -338,7 +341,8 @@ New team members should setup their environment by following these steps.
         <td>
                 
         ```bash
-        bash ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
+        chmod +x ./infra/localDevScripts/getSecretsForLocalDev.sh
+        ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
         ```
 
         </td>
@@ -369,7 +373,7 @@ New team members should setup their environment by following these steps.
         <td>
                 
         ```bash
-        bash ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
+        ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
         ```
 
         </td>
@@ -401,7 +405,8 @@ New team members should setup their environment by following these steps.
     <td>
             
     ```bash
-    bash ./infra/localDevScripts/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
+    chmod +x ./infra/localDevScripts/addLocalIPToSqlFirewall.sh
+    ./infra/localDevScripts/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>
@@ -427,7 +432,8 @@ Run the following command to give your Azure AD account permission to access the
     <td>
             
     ```bash
-    bash ./infra/localDevScripts/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
+    chmod +x ./infra/localDevScripts/makeSqlUserAccount.sh
+    ./infra/localDevScripts/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
     ```
 
     </td>

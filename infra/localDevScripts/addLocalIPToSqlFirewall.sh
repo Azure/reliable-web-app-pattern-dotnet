@@ -41,17 +41,29 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+green='\033[0;32m'
+yellow='\e[0;33m'
+red='\e[1;31m'
+clear='\033[0m'
+
 if [[ ${#resourceGroupName} -eq 0 ]]; then
-  echo "FATAL ERROR: Missing required parameter --resource-group" 1>&2
+  printf "${red}FATAL ERROR:${clear} Missing required parameter --resource-group"
+  echo ""
+
   exit 6
 fi
 
 myIpAddress=$(wget -q -O - ipinfo.io/ip)
 # updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
-mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name | [0]" | tr -d '"')
+mySqlServer=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers'].name " -o tsv)
 
 # Resolves permission constraint that prevents the deploymentScript from running this command
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/134
 az sql server update -n $mySqlServer -g $resourceGroupName --set publicNetworkAccess="Enabled" > /dev/null
 
 az sql server firewall-rule create -g $resourceGroupName -s $mySqlServer -n "devbox_$(date +"%Y-%m-%d_%I-%M-%S")" --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+
+printf "${green}Finished successfully${clear}"
+echo ""
+
+exit 0

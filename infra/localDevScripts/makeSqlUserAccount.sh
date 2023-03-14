@@ -45,13 +45,21 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+green='\033[0;32m'
+yellow='\e[0;33m'
+red='\e[1;31m'
+clear='\033[0m'
+
 if [[ ${#resourceGroupName} -eq 0 ]]; then
-  echo 'FATAL ERROR: Missing required parameter --resource-group' 1>&2
+  printf "${red}FATAL ERROR:${clear} Missing required parameter --resource-group"
+  echo ""
+  
   exit 6
 fi
 
 # this will reset the SQL password because the password is not saved during set up
-echo "WARNING: this script will reset the password for the SQL Admin on Azure SQL Server."
+printf "${yellow}WARNING:${clear} this script will reset the password for the SQL Admin on Azure SQL Server."
+echo ""
 echo "  Since this scenario uses Managed Identity, and no one accesses the database with this password, there should be no impact"
 echo "Use command interrupt if you would like to abort"
 read -n 1 -r -s -p "Press any key to continue..."
@@ -68,20 +76,20 @@ else
     echo 'found sqlcmd'
 fi
 
-azureAdUsername=$(az ad signed-in-user show --query userPrincipalName | tr -d '"')
+azureAdUsername=$(az ad signed-in-user show --query userPrincipalName -o tsv)
 
-objectIdForCurrentUser=$(az ad signed-in-user show --query id | tr -d '"')
+objectIdForCurrentUser=$(az ad signed-in-user show --query id -o tsv)
 
 # using json format bypasses issue with tsv format observed in this issue
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/202
-databaseServer=$(az resource list -g $resourceGroupName --query "[? type=='Microsoft.Sql/servers'].name | [0]" | tr -d '"')
+databaseServer=$(az resource list -g $resourceGroupName --query "[? type=='Microsoft.Sql/servers'].name" -o tsv)
 
-databaseServerFqdn=$(az sql server show -n $databaseServer -g $resourceGroupName --query fullyQualifiedDomainName | tr -d '"')
+databaseServerFqdn=$(az sql server show -n $databaseServer -g $resourceGroupName --query fullyQualifiedDomainName  -o tsv)
 
 # updated az resource selection to filter to first based on https://github.com/Azure/azure-cli/issues/25214
-databaseName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName | [0]" | tr -d '"')
+databaseName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.Sql/servers/databases' && name.ends_with(@, 'database')].tags.displayName" -o tsv)
 
-sqlAdmin=$(az sql server show --name $databaseServer -g $resourceGroupName --query "administratorLogin" | tr -d '"')
+sqlAdmin=$(az sql server show --name $databaseServer -g $resourceGroupName --query "administratorLogin"  -o tsv)
 
 # new random password
 # https://learn.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=sql-server-ver16
@@ -129,3 +137,8 @@ export SQLCMDPASSWORD=clear
 
 # enable Azure AD only admin access
 az sql server ad-only-auth enable -n $databaseServer -g $resourceGroupName
+
+printf "${green}Finished successfully${clear}"
+echo ""
+
+exit 0

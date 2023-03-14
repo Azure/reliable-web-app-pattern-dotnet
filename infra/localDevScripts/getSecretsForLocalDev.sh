@@ -61,13 +61,22 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+green='\033[0;32m'
+yellow='\e[0;33m'
+red='\e[1;31m'
+clear='\033[0m'
+
 if [[ ${#resourceGroupName} -eq 0 ]]; then
-  echo 'FATAL ERROR: Missing required parameter --resource-group' 1>&2
+  printf "${red}FATAL ERROR:${clear} Missing required parameter --resource-group"
+  echo ""
+
   exit 6
 fi
 
 if [[ $web_app == '' && $api_app == '' ]]; then
-  echo 'FATAL ERROR: Missing required flag --web or --api' 1>&2
+  printf "${red}FATAL ERROR:${clear} Missing required flag --web or --api"
+  echo ""
+
   exit 7
 fi
 
@@ -80,11 +89,11 @@ if [[ $debug ]]; then
 fi
 
 # assumes there is only one vault deployed to this resource group that will match this filter
-keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name | [0]" | tr -d '"')
+keyVaultName=$(az keyvault list -g "$resourceGroupName" --query "[?name.starts_with(@,'rc-')].name " -o tsv)
 
-appConfigSvcName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.AppConfiguration/configurationStores'].name | [0]" | tr -d '"')
+appConfigSvcName=$(az resource list -g $resourceGroupName --query "[?type=='Microsoft.AppConfiguration/configurationStores'].name " -o tsv)
 
-appConfigUri=$(az appconfig show -n $appConfigSvcName -g $resourceGroupName --query "endpoint"  2> /dev/null | tr -d '"')
+appConfigUri=$(az appconfig show -n $appConfigSvcName -g $resourceGroupName --query "endpoint" -o tsv  2> /dev/null)
 
 if [[ $debug ]]; then
     echo "Derived inputs"
@@ -132,6 +141,11 @@ if [[ $web_app ]]; then
     echo "   \"AzureAd:TenantId\": \"$frontEndAzureAdTenantId\""
     echo "}"
     echo ""
+
+    printf "${green}Finished successfully${clear}"
+    echo ""
+
+    exit 0
 fi
 
 
@@ -162,4 +176,9 @@ if [[ $api_app ]]; then
     echo "   \"App:StorageAccount:QueueConnectionString\": \"$apiAppQueueConnStr\""
     echo "}"
     echo ""
+    
+    printf "${green}Finished successfully${clear}"
+    echo ""
+
+    exit 0
 fi
