@@ -222,6 +222,7 @@ App Configuration so that the web app can read this data.
 <td>
 
 ```ps1
+unblock-file -path .\infra\createAppRegistrations.ps1
 .\infra\createAppRegistrations.ps1 -g "$myEnvironmentName-rg"
 ```
 
@@ -340,6 +341,7 @@ New team members should setup their environment by following these steps.
         <td>
 
         ```ps1
+        unblock-file -path .\infra\localDevScripts\getSecretsForLocalDev.ps1
         .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
         ```
 
@@ -404,6 +406,7 @@ New team members should setup their environment by following these steps.
     <td>
 
     ```ps1
+    unblock-file -path .\infra\localDevScripts\addLocalIPToSqlFirewall.ps1
     .\infra\localDevScripts\addLocalIPToSqlFirewall.ps1 -g "$myEnvironmentName-rg"
     ```
 
@@ -431,6 +434,7 @@ Run the following command to give your Azure AD account permission to access the
     <td>
 
     ```ps1
+    unblock-file -path .\infra\localDevScripts\makeSqlUserAccount.ps1
     .\infra\localDevScripts\makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
     ```
 
