@@ -50,7 +50,16 @@ and deploy the code.
 
 ### Pre-requisites
 
-1. To run the scripts, Windows users require [Powershell 7.2 (LTS)](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) or above. Alternatively, you can use a bash terminal using [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install). macOS users can use a bash terminal.
+1. To run the scripts, Windows users require Powershell 7.2 (LTS) or above. Alternatively, you can use a bash terminal using [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install). macOS users can use a bash terminal.
+
+1. [Install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows)
+    Run the following to verify that you're running the latest PowerShell
+
+    ```ps1
+    $PsVersionTable
+    ```
+
+    > or install with `winget install -e --id Microsoft.PowerShell`
 
 1. [Install the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli).
     Run the following command to verify that you're running version
