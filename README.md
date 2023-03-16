@@ -227,7 +227,6 @@ App Configuration so that the web app can read this data.
 
 ```ps1
 pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\createAppRegistrations.ps1 -g '$myEnvironmentName-rg' -Debug"
-.\infra\createAppRegistrations.ps1 -g "$myEnvironmentName-rg"
 ```
 
 </td>
