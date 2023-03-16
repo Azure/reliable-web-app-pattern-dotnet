@@ -113,6 +113,7 @@ if ($web_app) {
   Write-Host "   `"AzureAd:TenantId`": `"$frontEndAzureAdTenantId`""
   Write-Host "}"
   Write-Host ""
+  Write-Host "Successful" -ForegroundColor Green -NoNewline; Write-Host " use these values to start debugging locally"
 }
 
 if ($api_app) {
@@ -141,4 +142,6 @@ if ($api_app) {
   Write-Host "   `"App:StorageAccount:QueueConnectionString`": `"$apiAppQueueConnStr`""
   Write-Host "}"
   Write-Host ""
+
+  Write-Host "Successful" -ForegroundColor Green -NoNewline; Write-Host " use these values to start debugging locally"
 }
