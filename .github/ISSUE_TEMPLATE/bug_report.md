@@ -27,18 +27,15 @@ If applicable, add screenshots to help explain your problem.
  - OS: [e.g. Windows, macOS]
  - Shell [e.g. PowerShell Core, Bash]
  - Shell Version [e.g. PowerShell 7.3.3]
- - az Version [e.g.]
-    
-    ``` az version {
+ - az version [e.g.]
+    ``` 
           "azure-cli": "2.46.0",
           "azure-cli-core": "2.46.0",
           "azure-cli-telemetry": "1.0.8",
-          "extensions": {
+          "extensions": 
                "aks-preview": "0.5.100",
                "containerapp": "0.3.10",
                "deploy-to-azure": "0.2.0"
-          }
-        } 
     ```
  - az bicep version [e.g., Bicep CLI version 0.15.31 (3ba6e06a8d)]
  - azd version [e.g., azd version 0.7.0-beta.1 (commit 9ce71659f7688d0dc3dda8b84e5accedca58cf01)]
