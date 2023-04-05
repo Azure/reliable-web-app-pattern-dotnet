@@ -89,7 +89,7 @@ and deploy the code.
     Run the following command to verify that the Azure Dev CLI is installed.
 
     ```ps1
-    azd login
+    azd auth login
     ```
 
 1. [Install .NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
@@ -152,9 +152,6 @@ azd init -e $myEnvironmentName
 </tr>
 </table>
 
-When prompted, select the preferred Azure Subscription and the Location:
-
-![screenshot azd env new](./assets/Guide/Azd-Env-New.png)
 
 #### (Optional Steps) Choose Prod or Non-prod environment
 
@@ -204,6 +201,9 @@ command.
 ```ps1
 azd provision
 ```
+When prompted, select the preferred Azure Subscription and the Location:
+
+![screenshot azd env new](./assets/Guide/Azd-Env-New.png)
 
 > When the command finishes you have deployed Azure App
 > Service, SQL Database, and supporting services to your
