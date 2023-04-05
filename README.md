@@ -52,17 +52,17 @@ and deploy the code.
 
 1. To run the scripts, Windows users require Powershell 7.2 (LTS) or above. Alternatively, you can use a bash terminal using [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install). macOS users can use a bash terminal.
 
+   1. PowerShell users - [Install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows)
+       Run the following to verify that you're running the latest PowerShell
+   
+       ```ps1
+       $PsVersionTable
+       ```
+
 1. [Install Git](https://github.com/git-guides/install-git)
     Run the following to verify that git is available
     ```ps1
     git version
-    ```
-
-1. [Install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows)
-    Run the following to verify that you're running the latest PowerShell
-
-    ```ps1
-    $PsVersionTable
     ```
 
 1. [Install the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli).
