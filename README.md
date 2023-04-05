@@ -50,7 +50,20 @@ and deploy the code.
 
 ### Pre-requisites
 
-1. To run the scripts, Windows users require [Powershell 7.2 (LTS)](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) or above. Alternatively, you can use a bash terminal using [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install). macOS users can use a bash terminal.
+1. To run the scripts, Windows users require Powershell 7.2 (LTS) or above. Alternatively, you can use a bash terminal using [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install). macOS users can use a bash terminal.
+
+   1. PowerShell users - [Install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows)
+       Run the following to verify that you're running the latest PowerShell
+   
+       ```ps1
+       $PsVersionTable
+       ```
+
+1. [Install Git](https://github.com/git-guides/install-git)
+    Run the following to verify that git is available
+    ```ps1
+    git version
+    ```
 
 1. [Install the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli).
     Run the following command to verify that you're running version
@@ -76,7 +89,7 @@ and deploy the code.
     Run the following command to verify that the Azure Dev CLI is installed.
 
     ```ps1
-    azd version
+    azd auth login
     ```
 
 1. [Install .NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
@@ -139,9 +152,6 @@ azd init -e $myEnvironmentName
 </tr>
 </table>
 
-When prompted, select the preferred Azure Subscription and the Location:
-
-![screenshot azd env new](./assets/Guide/Azd-Env-New.png)
 
 #### (Optional Steps) Choose Prod or Non-prod environment
 
@@ -191,6 +201,9 @@ command.
 ```ps1
 azd provision
 ```
+When prompted, select the preferred Azure Subscription and the Location:
+
+![screenshot azd env new](./assets/Guide/Azd-Env-New.png)
 
 > When the command finishes you have deployed Azure App
 > Service, SQL Database, and supporting services to your
@@ -213,7 +226,7 @@ App Configuration so that the web app can read this data.
 <td>
 
 ```ps1
-.\infra\createAppRegistrations.ps1 -g "$myEnvironmentName-rg"
+pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\createAppRegistrations.ps1 -g '$myEnvironmentName-rg'"
 ```
 
 </td>
@@ -331,7 +344,7 @@ New team members should setup their environment by following these steps.
         <td>
 
         ```ps1
-        .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Web
+        pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g '$myEnvironmentName-rg' -Web"
         ```
 
         </td>
@@ -363,7 +376,7 @@ New team members should setup their environment by following these steps.
         <td>
 
         ```ps1
-        .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g "$myEnvironmentName-rg" -Api
+        pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g '$myEnvironmentName-rg' -Api"
         ```
 
         </td>
@@ -395,7 +408,7 @@ New team members should setup their environment by following these steps.
     <td>
 
     ```ps1
-    .\infra\localDevScripts\addLocalIPToSqlFirewall.ps1 -g "$myEnvironmentName-rg"
+    pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\localDevScripts\addLocalIPToSqlFirewall.ps1 -g '$myEnvironmentName-rg'"
     ```
 
     </td>
@@ -422,7 +435,7 @@ Run the following command to give your Azure AD account permission to access the
     <td>
 
     ```ps1
-    .\infra\localDevScripts\makeSqlUserAccount.ps1 -g "$myEnvironmentName-rg"
+    pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\localDevScripts\makeSqlUserAccount.ps1 -g '$myEnvironmentName-rg'"
     ```
 
     </td>

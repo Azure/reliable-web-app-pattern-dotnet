@@ -132,3 +132,5 @@ Write-Debug "Granted db_owner"
 
 # enable Azure AD only admin access
 az sql server ad-only-auth enable -n $databaseServer -g $ResourceGroupName
+
+Write-Host "Successful" -ForegroundColor Green -NoNewline; Write-Host " an account for the current user was created in Azure SQL"

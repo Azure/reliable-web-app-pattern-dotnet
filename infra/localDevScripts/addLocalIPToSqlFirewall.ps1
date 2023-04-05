@@ -63,3 +63,5 @@ az sql server update -n $mySqlServer -g $ResourceGroupName --set publicNetworkAc
 Write-Debug "Change Rule"
 
 az sql server firewall-rule create -g $ResourceGroupName -s $mySqlServer -n $customRuleName --start-ip-address $myIpAddress --end-ip-address $myIpAddress
+
+Write-Host "Successful" -ForegroundColor Green -NoNewline; Write-Host " this client's IP address was added to Azure SQL Firewall"
