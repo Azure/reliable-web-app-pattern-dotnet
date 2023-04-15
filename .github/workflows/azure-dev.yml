@@ -15,7 +15,7 @@ jobs:
       image: mcr.microsoft.com/azure-dev-cli-apps:latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         
       # login to run ado commands such provision, deploy, and down
       - name: Log in with Azure (Client Credentials)
