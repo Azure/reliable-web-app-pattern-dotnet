@@ -8,8 +8,13 @@ on:
 #   pull_request:
 #     types: [opened, reopened]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
+    environment: deploy_test
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/azure-dev-cli-apps:latest
@@ -17,21 +22,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         
-      # login to run ado commands such provision, deploy, and down
-      - name: Log in with Azure (Client Credentials)
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
-        run: |
-          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
-          Write-Host "::add-mask::$($info.clientSecret)"
+      # # login to run ado commands such provision, deploy, and down
+      # - name: Log in with Azure (Client Credentials)
+      #   if: ${{ env.AZURE_CREDENTIALS != '' }}
+      #   run: |
+      #     $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
+      #     Write-Host "::add-mask::$($info.clientSecret)"
 
-          azd login `
-            --client-id "$($info.clientId)" `
-            --client-secret "$($info.clientSecret)" `
-            --tenant-id "$($info.tenantId)"
-        shell: pwsh
-        env:
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-          
+      #     azd login `
+      #       --client-id "$($info.clientId)" `
+      #       --client-secret "$($info.clientSecret)" `
+      #       --tenant-id "$($info.tenantId)"
+      #   shell: pwsh
+      #   env:
+      #     AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Login with azd (Federated Credentials)
+        run: |
+          azd auth login --client-id "f7da2879-06c4-46c0-8fe2-28741dbc3772"  --federated-credential-provider "github"  --tenant-id "72f988bf-86f1-41af-91ab-2d7cd011db47"
+
       - name: Azure Dev Provision
         run: azd provision --no-prompt
         env:
