@@ -51,7 +51,7 @@ resource allowSqlAdminScript 'Microsoft.Resources/deploymentScripts@2020-10-01' 
     retentionInterval: 'P1D'
     cleanupPreference: 'OnSuccess'
     arguments: '-SqlServerName \'${sqlServerName}\' -ResourceGroupName \'${resourceGroup().name}\''
-    scriptContent: loadTextContent('enableSqlAdminForServer.ps1')
+    scriptContent: loadTextContent('./deploymentScripts/enableSqlAdminForServer.ps1')
   }
 }
 
@@ -129,7 +129,7 @@ resource createSqlUserScript 'Microsoft.Resources/deploymentScripts@2020-10-01' 
     retentionInterval: 'P1D'
     cleanupPreference: 'OnSuccess'
     arguments: '-ServerName \'${sqlServer.name}\' -ResourceGroupName \'${resourceGroup().name}\' -ServerUri \'${sqlServer.properties.fullyQualifiedDomainName}\' -CatalogName \'${sqlCatalogName}\' -ApplicationId \'${managedIdentity.properties.principalId}\' -ManagedIdentityName \'${managedIdentity.name}\' -SqlAdminLogin \'${sqlAdministratorLogin}\' -SqlAdminPwd \'${sqlAdministratorPassword}\' -IsProd ${isProd ? '1' : '0'}'
-    scriptContent: loadTextContent('createSqlAcctForManagedIdentity.ps1')
+    scriptContent: loadTextContent('./deploymentScripts/createSqlAcctForManagedIdentity.ps1')
   }
   dependsOn:[
     sqlDatabase

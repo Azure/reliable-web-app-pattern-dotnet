@@ -1,11 +1,4 @@
-# This script is part of the sample's workflow for giving developers access
-# to the resources that were deployed. Note that a better solution, beyond
-# the scope of this demo, would be to associate permissions based on
-# Azure AD groups so that all team members inherit access from Azure AD.
-# https://learn.microsoft.com/en-us/azure/active-directory/roles/groups-concept
-#
-# This code may be repurposed for your scenario as desired
-# but is not covered by the guidance in this content.
+#Requires -Version 7.0
 
 <#
 .SYNOPSIS
@@ -18,7 +11,8 @@
     service have already been successfully deployed.
 
 .PARAMETER ResourceGroupName
-    Name of resource group containing the environment that was created by the azd command.
+    A required parameter for the name of resource group that contains the environment that was
+    created by the azd command.
 #>
 
 Param(

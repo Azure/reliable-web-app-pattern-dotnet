@@ -48,5 +48,5 @@ jobs:
       - name: Purge App Configuration Service
         continue-on-error: true
         run: |
-          chmod +x ./infra/appConfigSvcPurge.sh
-          ./infra/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}daily2-rg
+          chmod +x ./infra/deploymentScripts/appConfigSvcPurge.sh
+          ./infra/deploymentScripts/appConfigSvcPurge.sh -g ${{ secrets.AZURE_ENV_NAME }}daily2-rg

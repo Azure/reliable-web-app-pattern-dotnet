@@ -27,7 +27,7 @@ The following topics are intended to help readers with our most commonly reporte
 
     ```bash
     sed "s/$(printf '\r')\$//" -i ./infra/createAppRegistrations.sh
-    sed "s/$(printf '\r')\$//" -i ./infra/validateDeployment.sh
+    sed "s/$(printf '\r')\$//" -i ./infra/deploymentScripts/validateDeployment.sh
     sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/addLocalIPToSqlFirewall.sh
     sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/getSecretsForLocalDev.sh
     sed "s/$(printf '\r')\$//" -i ./infra/localDevScripts/makeSqlUserAccount.sh
