@@ -29,6 +29,7 @@ jobs:
       AZURE_CREDENTIALS: ${{ vars.AZURE_CREDENTIALS }}
       AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      IS_RUN_AS_SERVICEPRINCIPAL: true
       AZURE_RESOURCE_GROUP: rele-${{ vars.AZURE_ENV_NAME}}-rg
 
     steps:
