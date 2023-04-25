@@ -1,28 +1,30 @@
-# This script is used by our QA process to ensure the quality of this sample it measures
-# characteristics of the deployment and will be modified as needed to explore intermittent issues
-
-# This engineering code may be repurposed for your scenario as desired
-# but is not covered by the guidance in this content.
+#Requires -Version 7.0
 
 <#
 .SYNOPSIS
-    Examines the web app that was deployed to identify any known issues and provide recommendations.
+  Examines the web app that was deployed to identify any known issues and provide recommendations.
 
-    <This command should only be run after using the azd command to deploy resources to Azure>
+  <This command should only be run after using the azd command to deploy resources to Azure>
 .DESCRIPTION
-    Use this command to examine your deployed settings and automatically find recommendations
-    that can help you troubleshoot issues that you may encounter.
+  Use this command to examine your deployed settings and automatically find recommendations
+  that can help you troubleshoot issues that you may encounter.
 
-    This script was created after identifying intermittent Azure deployment issues. Many
-    of which can be resolved by re-running 'azd provision' command.
+  This script was created after identifying intermittent Azure deployment issues. Many
+  of which can be resolved by re-running 'azd provision' command.
 
-    NOTE: This functionality assumes that the web app, app configuration service, and app
-    service have already been successfully deployed.
+  NOTE: This script is used by our QA process to ensure the quality of this sample it measures
+  characteristics of the deployment and will be modified as needed to explore intermittent issues
+
+  This engineering code may be repurposed for your scenario as desired
+  but is not covered by the guidance in this content.
+  
+  This functionality assumes that the web app, app configuration service, and app
+  service have already been successfully deployed.
 
 .PARAMETER ResourceGroupName
-    A required parameter for the name of resource group that contains the environment that was
-    created by the azd command. The cmdlet will populate the App Config Svc and Key
-    Vault services in this resource group with Azure AD app registration config data.
+  A required parameter for the name of resource group that contains the environment that was
+  created by the azd command. The cmdlet will populate the App Config Svc and Key
+  Vault services in this resource group with Azure AD app registration config data.
 #>
 
 Param(
