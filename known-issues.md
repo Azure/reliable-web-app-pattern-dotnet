@@ -4,6 +4,7 @@ This document helps with troubleshooting and provides an introduction to the mos
 ## Work from our backlog
 These issues relate to content in our sample that we're working to modify. Open issues are provided for further detail and status updates.
 
+### Improved DevOps flows and QA
 - [GH Action to Deploy Web App with App Registration](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/298)
 
 ### Data consistency for multi-regional deployments
