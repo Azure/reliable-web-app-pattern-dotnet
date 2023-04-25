@@ -80,8 +80,8 @@ jobs:
 
       - name: QA - Validate Deployment
         run: |
-          chmod +x ./infra/deploymentScripts/validateDeployment.sh
-          ./infra/deploymentScripts/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
+          chmod +x ./infra/devOpsScripts/validateDeployment.sh
+          ./infra/devOpsScripts/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
 
   teardown:
     if: ${{ inputs.run_tear_down }}
