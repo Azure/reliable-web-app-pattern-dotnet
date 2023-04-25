@@ -3,6 +3,10 @@
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: string
 
 # on:
 #   pull_request:
@@ -14,7 +18,7 @@ permissions:
 
 jobs:
   build:
-    environment: dev
+    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/azure-dev-cli-apps:latest
@@ -30,13 +34,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         
+#azd auth login --client-id "f7da2879-06c4-46c0-8fe2-28741dbc3772"  --federated-credential-provider "github"  --tenant-id "72f988bf-86f1-41af-91ab-2d7cd011db47"  
       - name: Log in with Azure (Federated Credentials)
         if: ${{ env.AZURE_CLIENT_ID != '' }}
         run: |
           azd auth login `
             --client-id "$Env:AZURE_CLIENT_ID" `
             --federated-credential-provider "github" `
-            --tenant-id "$Env:AZURE_TENANT_ID"
+            --tenant-id "$Env:AZURE_TENANT_ID" `
+            --debug
         shell: pwsh
 
       - name: Azure Dev Provision
