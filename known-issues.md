@@ -4,6 +4,8 @@ This document helps with troubleshooting and provides an introduction to the mos
 ## Work from our backlog
 These issues relate to content in our sample that we're working to modify. Open issues are provided for further detail and status updates.
 
+- [GH Action to Deploy Web App with App Registration](https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/298)
+
 ### Data consistency for multi-regional deployments
 
 This sample includes a feature to deploy to two Azure regions. The feature is intended to support the high availability scenario by deploying resources in an active/passive configuration. The sample currently supports the ability to fail-over web-traffic so requests can be handled from a second region. However it does not support data synchronization between two regions. 
