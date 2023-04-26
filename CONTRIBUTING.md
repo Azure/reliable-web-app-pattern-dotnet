@@ -14,6 +14,6 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 ## Code changes and 3rd-party libraries
 
-This sample is provided as guidance that represents how to apply princples outlined in the Well Architected Framework.
+This sample is provided as guidance that represents how to apply principles outlined in the Well-Architected Framework.
 The provided code, and guidance, should align with existing content in published Microsoft documentation.
 Usage of 3rd-party libraries should also be limited to those we recommend in published Microsot documentation.
