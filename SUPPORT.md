@@ -4,6 +4,4 @@ This project uses GitHub Issues to track bugs and feature requests. Please searc
 
 ## Microsoft Support Policy  
 
-Support for Azure Developer CLI is limited to the resources listed above.
-
-[contribute]: https://github.com/Azure/modern-web-app-pattern-dotnet/blob/main/CONTRIBUTING.md
+Support for this content is limited to the resources listed above.
