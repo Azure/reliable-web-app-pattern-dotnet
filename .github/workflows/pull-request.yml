@@ -1,0 +1,33 @@
+name: "RWA- PR build"
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-request: read
+
+env:
+  AZURE_RESOURCE_GROUP: pr-${{github.event.pull_request.number}}-rg
+jobs:
+  clean-up-existing:
+    runs-on: ubuntu-latest
+    uses: ./.github/workflows/tear-down.yml
+    secrets: inherit
+    with:
+      environment: pr
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    uses: ./.github/workflows/tear-down.yml
+    secrets: inherit
+    with:
+      environment: pr
+
+  clean-up:
+    runs-on: ubuntu-latest
+    uses: ./.github/workflows/tear-down.yml
+    secrets: inherit
+    with:
+      environment: pr

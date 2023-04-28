@@ -8,6 +8,13 @@ on:
         required: true
         type: string
 
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+
 # on:
 #   pull_request:
 #     types: [opened, reopened]
@@ -23,14 +30,12 @@ jobs:
     container:
       image: mcr.microsoft.com/azure-dev-cli-apps:latest
     env:
+      AZURE_ENV_NAME: ${{ inputs.environment }}
       AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      AZURE_CREDENTIALS: ${{ vars.AZURE_CREDENTIALS }}
-      AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
-      IS_RUN_AS_SERVICEPRINCIPAL: true
-      AZURE_RESOURCE_GROUP: rele-${{ vars.AZURE_ENV_NAME }}-rg
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
 
     steps:
       - name: Checkout
@@ -43,7 +48,6 @@ jobs:
             --client-id "$Env:AZURE_CLIENT_ID" `
             --federated-credential-provider "github" `
             --tenant-id "$Env:AZURE_TENANT_ID" `
-            --debug
         shell: pwsh
 
       - name: Azure Dev Provision
