@@ -30,13 +30,12 @@ jobs:
       AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
       IS_RUN_AS_SERVICEPRINCIPAL: true
-      AZURE_RESOURCE_GROUP: rele-${{ vars.AZURE_ENV_NAME}}-rg
+      AZURE_RESOURCE_GROUP: rele-${{ vars.AZURE_ENV_NAME }}-rg
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         
-#azd auth login --client-id "f7da2879-06c4-46c0-8fe2-28741dbc3772"  --federated-credential-provider "github"  --tenant-id "72f988bf-86f1-41af-91ab-2d7cd011db47"  
       - name: Log in with Azure (Federated Credentials)
         if: ${{ env.AZURE_CLIENT_ID != '' }}
         run: |
