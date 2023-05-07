@@ -1,0 +1,42 @@
+# Each pr get's its own environment that gets cleaned up if the deploy is successful
+
+name: "RWA CI Build"
+
+on:
+  schedule:
+  - cron: '0 0,12 * * *'
+
+concurrency:
+  group: Scheduled-Build
+  cancel-in-progress: true
+      
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: read
+
+jobs:
+  clean-up-existing:
+    uses: ./.github/workflows/tear-down.yml
+    with:
+      github_environment: dev
+
+  build:
+    if: ${{ always() }}
+    needs: [clean-up-existing]
+
+    uses: ./.github/workflows/build.yml
+    with:
+      github_environment: dev
+
+  deploy:
+    if: ${{ always() }}
+    needs: [build]
+    concurrency:
+      group: Dev-deploy
+    uses: ./.github/workflows/deploy.yml
+    with:
+      github_environment: dev
+      run_integration_test: true
+
+      

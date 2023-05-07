@@ -1,0 +1,95 @@
+# This file is part of the sample that  you can use to build your devOps automation.
+# See the README markdown file for further details
+
+#This workflow builds the source code, runs the unit tests and if successful,
+#will publish build and infrastructure artifacts.
+
+on:
+  workflow_dispatch:
+    inputs:
+      github_environment:
+        description: 'GitHub environment where build variables and secrets are read from'
+        required: true
+        type: string
+      
+  workflow_call:
+    inputs:
+      github_environment:
+        description: 'GitHub environment where build variables and secrets are read from'
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    environment: ${{ inputs.github_environment }}
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/azure-dev-cli-apps:latest
+    env:
+        BINARY_ARTIFACTS_DIR: "./buildartifacts/packages"
+        INFRA_ARTIFACTS_DIR: "./buildartifacts/infra"
+
+    steps:
+      - name: Chekout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Install dependencies
+        run: dotnet restore ./src
+
+      - name: Build projects
+        run: dotnet build ./src --configuration Release --no-restore
+
+      - name: Run Unit tests
+        run: dotnet test ./src --no-restore --verbosity normal
+
+      - name: Package the binaries
+        shell: pwsh
+        run: |
+          azd package --no-prompt --output json > package_result.json
+
+          $packageDir="${{ env.BINARY_ARTIFACTS_DIR }}"
+          New-Item -Force -Itemtype Directory $packageDir
+          Copy-Item ./package_result.json $packageDir
+          Copy-Item ./azure.yaml $packageDir
+        
+          $packageResult= Get-Content package_result.json -Raw | ConvertFrom-Json -AsHashtable
+        
+          $services = New-Object System.Collections.ArrayList
+          $packageResult.services.keys | `
+              ForEach-Object {$services.Add(@{"service"=$_; "package"=$packageResult.services[$_].packagePath | Split-Path -Leaf}); `
+              Copy-Item $packageResult.services[$_].packagePath $packageDir}
+          $manifest=@{}
+          $manifest.Add("services",$services)
+          $manifest.Add("timestamp",$packageResult.timestamp)
+          $manifest | convertto-json -Depth 20 | Out-File $packageDir/manifest.json
+  
+      - name: Publish binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-packages
+          path: ${{ env.BINARY_ARTIFACTS_DIR }}
+
+      - name: Copy infrastructure files
+        shell: pwsh
+        run: |
+          $infraDir="${{ env.INFRA_ARTIFACTS_DIR }}"
+          New-Item -Force -Itemtype Directory $infraDir
+          Copy-Item ./azure.yaml $infraDir
+          Copy-Item -R ./infra $infraDir
+          Copy-Item -R ./src $infraDir -Filter *.csproj
+          dir ./buildartifacts -s
+
+      - name: Publish infrastructure artifacts
+        uses: actions/upload-artifact@v3
+        with:
+            name: infra
+            path: ${{ env.INFRA_ARTIFACTS_DIR }}          

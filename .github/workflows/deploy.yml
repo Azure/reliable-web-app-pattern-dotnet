@@ -1,0 +1,104 @@
+# This file is part of the sample that  you can use to build your devOps automation.
+# See the README markdown file for further details
+
+on:
+  workflow_call:
+    inputs:
+      github_environment:
+        description: 'GitHub environment where build variables and secrets are read from'
+        required: true
+        type: string
+
+      resource_group:
+        description: 'Overrides the AZURE_RESOURCE_GROUP variable if provided. (ex. deploy each pr in its own resource group)'
+        required: false
+        type: string
+        default: ''
+
+      azure_environment_name:
+        description: 'azd environment name, this also defines which resource group your app deploys to'
+        required: false
+        type: string
+        default: ''
+
+      run_integration_test:
+        description: 'Set to false to skip running integration tests'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy_to_azure:
+    environment: ${{ inputs.github_environment }}
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/azure-dev-cli-apps:latest
+    env:
+      #If an azure environment is provided use it, otherwise use the github environment.
+      #This is used by azd to tag the resource group to deploy to.
+      AZURE_ENV_NAME: ${{ inputs.azure_environment_name == '' &&  vars.AZURE_ENV_NAME || inputs.azure_environment_name }}
+
+      #If a resourcegroup is provided use it, otherwise use the default resource group for the environment
+      AZURE_RESOURCE_GROUP: ${{ inputs.resource_group == '' && vars.AZURE_RESOURCE_GROUP || inputs.resource_group }}
+
+      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      PRINCIPAL_TYPE: ${{ vars.PRINCIPAL_TYPE }}
+      BUILD_ARTIFACTS_ROOT: "./buildartifacts"
+      BINARY_ARTIFACTS_DIR: "./buildartifacts"
+      INFRA_ARTIFACTS_DIR: "./buildartifacts"
+
+    steps:
+      - name: Download infra artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: infra
+          path: ${{ env.INFRA_ARTIFACTS_DIR }}
+
+      - name: Download deployment packages
+        uses: actions/download-artifact@v3
+        with:
+          name: deployment-packages
+          path: ${{ env.BINARY_ARTIFACTS_DIR }}      
+
+      - name: Display structure of downloaded files
+        run: ls -R
+          
+      - name: Log in with Azure (Federated Credentials)
+        run: |
+          azd auth login `
+            --client-id "$Env:AZURE_CLIENT_ID" `
+            --federated-credential-provider "github" `
+            --tenant-id "$Env:AZURE_TENANT_ID" 
+        shell: pwsh
+
+      - name: Temproary fix for resource group
+        shell: pwsh
+        working-directory: ${{ env.INFRA_ARTIFACTS_DIR }}
+        run: |
+          Add-Content azure.yaml "`nresourceGroup: ${{ env.AZURE_RESOURCE_GROUP }}"
+
+      - name: Provision infrastructure
+        shell: pwsh
+        working-directory: ${{ env.INFRA_ARTIFACTS_DIR }}
+        run: |
+          azd provision --no-prompt
+
+      - name: Deploy applications
+        shell: pwsh
+        working-directory: ${{ env.BINARY_ARTIFACTS_DIR }}
+        run: |
+          $manifest= Get-Content manifest.json -Raw | ConvertFrom-Json -AsHashtable
+          $manifest.services | ForEach-Object `
+            {azd deploy $_.service --from-package $_.package --no-prompt}
+
+      - name: Run integration tests
+        if: ${{ inputs.run_integration_test }}
+        shell: pwsh
+        run: ls -R

@@ -1,0 +1,57 @@
+# Each pr get's its own environment that gets cleaned up if the deploy is successful
+
+name: "RWA PR Build"
+   
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+    branches:
+      - main
+
+concurrency:
+  group: PR-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+      
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: read
+
+jobs:
+  clean-up-existing:
+    uses: ./.github/workflows/tear-down.yml
+    with:
+      github_environment: pr
+      resource_group: rwa-pr-${{ github.event.pull_request.number }}-rg
+      #override the environment until azd picks up the RG from env.
+      azure_environment_name: rwa-pr-${{ github.event.pull_request.number }}
+
+  build:
+    if: ${{ always() }}
+    needs: [clean-up-existing]
+
+    uses: ./.github/workflows/build.yml
+    with:
+      github_environment: pr
+
+  deploy:
+    if: ${{ always() }}
+    needs: [build]
+    uses: ./.github/workflows/deploy.yml
+    with:
+      github_environment: pr
+      resource_group: rwa-pr-${{ github.event.pull_request.number }}-rg
+      run_integration_test: true
+      #override the environment until azd picks up the RG from env.
+      azure_environment_name: rwa-pr-${{ github.event.pull_request.number }}
+      
+  clean-up:
+    if: ${{ always() }}
+    needs: [deploy]
+    uses: ./.github/workflows/tear-down.yml
+    with:
+      github_environment: pr
+      resource_group: rwa-pr-${{ github.event.pull_request.number }}-rg
+      #override the environment until azd picks up the RG from env.
+      azure_environment_name: rwa-pr-${{ github.event.pull_request.number }}
+

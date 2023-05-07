@@ -1,0 +1,71 @@
+on:
+  workflow_dispatch:
+    inputs:
+      github_environment:
+        required: true
+        type: string
+
+  workflow_call:
+    inputs:
+      github_environment:
+        description: 'GitHub environment where build variables and secrets are read from'
+        required: true
+        type: string
+
+      resource_group:
+        description: 'Overrides the AZURE_RESOURCE_GROUP variable if provided. (ex. deploy each pr in its own resource group)'
+        required: false
+        type: string
+        default: ''
+
+      azure_environment_name:
+        description: 'azd environment name, this also defines which resource group your app deploys to'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  tear_down:
+    continue-on-error: true
+    environment: ${{ inputs.github_environment }}
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/azure-dev-cli-apps:latest
+
+    env:
+      #If an azure environment is provided use it, otherwise use the github environment.
+      #This is used by azd to tag the resource group to deploy to.
+      AZURE_ENV_NAME: ${{ inputs.azure_environment_name == '' &&  vars.AZURE_ENV_NAME || inputs.azure_environment_name }}
+
+      #If a resourcegroup is provided use it, otherwise use the default resource group for the environment
+      AZURE_RESOURCE_GROUP: ${{ inputs.resource_group == '' && vars.AZURE_RESOURCE_GROUP || inputs.resource_group }}
+
+      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Log in with Azure (Federated Credentials)
+        run: |
+          azd auth login `
+            --client-id "$Env:AZURE_CLIENT_ID" `
+            --federated-credential-provider "github" `
+            --tenant-id "$Env:AZURE_TENANT_ID"
+        shell: pwsh
+
+      - name: Temproary fix for resource group
+        shell: pwsh
+        working-directory: ${{ env.INFRA_ARTIFACTS_DIR }}
+        run: |
+          Add-Content azure.yaml "`nresourceGroup: ${{ env.AZURE_RESOURCE_GROUP }}"
+
+      - name: Azure Dev Down
+        run: azd down --force --purge --no-prompt
