@@ -279,7 +279,9 @@ To tear down an enviroment, and clean up the Azure resource group, use the follo
 azd down --force --purge --no-prompt
 ```
 
-> You can also use the Azure Portal to delete the "relecloudresources" resource groups. This approach will not purge the Key Vault or App Configuration services and they will remain in your subscription for 7 days in a deleted state that does not charge your subscription. This feature enables you to recover the data if the configuration was accidentally deleted.
+> You can also use the Azure Portal to delete the "relecloudresources" resource groups. This approach will not purge the Key Vault or App Configuration services and they will remain in your subscription for 7 days in a deleted state that does not charge your subscription. This feature enables you to recover the data if the configuration was accidentally deleted. You can purge these in the _Manage deleted stores_ section of each service in the portal. 
+
+ ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
 
 ##### 2. Clean up App Registrations
 You will also need to delete the two Azure AD app registrations that were created. You can find them in Azure AD by searching for their environment name. 
@@ -290,9 +292,6 @@ You will also need to delete the two Azure AD app registrations that were create
  
  You will also need to purge the App Configuration Service instance that was deployed.
 
- **Purge App Configurations**
-
- ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
 
 ##### 3. Delete the Deployment
 
