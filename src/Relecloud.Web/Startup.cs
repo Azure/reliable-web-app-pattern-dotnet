@@ -19,7 +19,6 @@ using Relecloud.Web.Services.MockServices;
 using Relecloud.Web.Services.RelecloudApiServices;
 
 using System.Diagnostics;
-using System.Security.Claims;
 
 namespace Relecloud.Web
 {
