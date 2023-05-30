@@ -49,7 +49,7 @@ namespace Relecloud.Web
             services.AddHealthChecks();
 
             // Add support for session state.
-            // NOTE: If there is a distibuted cache service (e.g. Redis) then this will be used to store session data.
+            // NOTE: If there is a distributed cache service (e.g. Redis) then this will be used to store session data.
             services.AddSession();
         }
 
