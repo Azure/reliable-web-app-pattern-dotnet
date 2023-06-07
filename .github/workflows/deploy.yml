@@ -78,7 +78,7 @@ jobs:
             --tenant-id "$Env:AZURE_TENANT_ID" 
         shell: pwsh
 
-      - name: Temproary fix for resource group
+      - name: Temporary fix for resource group
         shell: pwsh
         working-directory: ${{ env.INFRA_ARTIFACTS_DIR }}
         run: |
