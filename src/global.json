@@ -1,0 +1,9 @@
+{
+  "sdk": {
+    // updated to the latest released Major version
+    // SDK and runtime version numbers do not require sync
+    // https://learn.microsoft.com/en-us/dotnet/core/tools/global-json
+    "version": "7.0.100",
+    "rollForward": "latestFeature"
+  }
+}
