@@ -217,10 +217,10 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
     })
   properties: {
     serverFarmId: webAppServicePlan.id
+    clientAffinityEnabled: false
     siteConfig: {
       alwaysOn: true
       ftpsState: 'Disabled'
-
       // Set to true to route all outbound app traffic into virtual network (see https://learn.microsoft.com/azure/app-service/overview-vnet-integration#application-routing)
       vnetRouteAllEnabled: false
     }
@@ -291,6 +291,7 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
     })
   properties: {
     serverFarmId: apiAppServicePlan.id
+    clientAffinityEnabled: false
     siteConfig: {
       alwaysOn: true
       ftpsState: 'Disabled'
