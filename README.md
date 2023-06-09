@@ -65,7 +65,7 @@ and deploy the code.
     git version
     ```
 
-1. [Install the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli).
+1. [Install the Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli).
     Run the following command to verify that you're running version
     2.38.0 or higher.
 
@@ -316,7 +316,7 @@ database and other shared resources can impact multiple workstreams.
 To connect to the shared database the dev team uses connection strings
 from Key Vault and App Configuration Service. Devs use the following
 script to retrieve data and store it as
-[User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows)
+[User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows)
 on their workstation.
 
 Using the `secrets.json` file helps the team keep their credentials

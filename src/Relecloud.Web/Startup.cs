@@ -182,7 +182,7 @@ namespace Relecloud.Web
 
             // when using Microsoft.Identity.Web to retrieve an access token on behalf of the authenticated user
             // you should use a shared session state provider.
-            // https://docs.microsoft.com/en-us/azure/active-directory-b2c/configure-authentication-sample-web-app-with-api?tabs=visual-studio#token-cache-for-a-web-app
+            // https://learn.microsoft.com/azure/active-directory-b2c/configure-authentication-sample-web-app-with-api?tabs=visual-studio#token-cache-for-a-web-app
             if (string.IsNullOrEmpty(Configuration["App:RedisCache:ConnectionString"]))
             {
                 builder.AddInMemoryTokenCaches();

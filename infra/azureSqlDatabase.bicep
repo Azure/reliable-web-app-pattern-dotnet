@@ -102,7 +102,7 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
 // To allow applications hosted inside Azure to connect to your SQL server, Azure connections must be enabled. 
 // To enable Azure connections, there must be a firewall rule with starting and ending IP addresses set to 0.0.0.0. 
 // This recommended rule is only applicable to Azure SQL Database.
-// Ref: https://docs.microsoft.com/en-us/azure/azure-sql/database/firewall-configure?view=azuresql#connections-from-inside-azure
+// Ref: https://learn.microsoft.com/azure/azure-sql/database/firewall-configure?view=azuresql#connections-from-inside-azure
 resource allowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = {
   name: 'AllowAllWindowsAzureIps'
   parent: sqlServer

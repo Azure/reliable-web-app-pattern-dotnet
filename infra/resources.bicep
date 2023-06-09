@@ -72,7 +72,7 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-
   tags: tags
 }
 
-@description('Built in \'Data Reader\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+@description('Built in \'Data Reader\' role ID: https://learn.microsoft.com/azure/role-based-access-control/built-in-roles')
 var appConfigurationRoleDefinitionId = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 @description('Grant the \'Data Reader\' role to the user-assigned managed identity, at the scope of the resource group.')
@@ -99,7 +99,7 @@ resource appConfigRoleAssignmentForPrincipal 'Microsoft.Authorization/roleAssign
   }
 }
 
-@description('Built in \'Key Secrets User\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+@description('Built in \'Key Secrets User\' role ID: https://learn.microsoft.com/azure/role-based-access-control/built-in-roles')
 var keyVaultSecretsUserRoleDefinitionId = '4633458b-17de-408a-b874-0445c86b69e6'
 
 @description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
@@ -114,7 +114,7 @@ resource keyVaultRoleAssignmentForWebApp 'Microsoft.Authorization/roleAssignment
   }
 }
 
-@description('Built in \'Key Vault Administrator\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+@description('Built in \'Key Vault Administrator\' role ID: https://learn.microsoft.com/azure/role-based-access-control/built-in-roles')
 var keyVaultAdminRoleDefinitionId = '00482a5a-887f-4fb3-b363-3b7fe8e74483'
 
 @description('Grant the \'Data Reader\' role to the principal, at the scope of the resource group.')
@@ -246,7 +246,7 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
       'App:AppConfig:Uri': appConfigService.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // App Insights settings
-      // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
+      // https://learn.microsoft.com/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
       APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY
       ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
       XDT_MicrosoftApplicationInsights_Mode: 'recommended'
@@ -320,7 +320,7 @@ resource api 'Microsoft.Web/sites@2021-01-15' = {
       'Api:AppConfig:Uri': appConfigService.properties.endpoint
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'false'
       // App Insights settings
-      // https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
+      // https://learn.microsoft.com/azure/azure-monitor/app/azure-web-apps-net#application-settings-definitions
       APPINSIGHTS_INSTRUMENTATIONKEY: webApplicationInsightsResources.outputs.APPLICATIONINSIGHTS_INSTRUMENTATION_KEY
       ApplicationInsightsAgent_EXTENSION_VERSION: '~2'
       XDT_MicrosoftApplicationInsights_Mode: 'recommended'
@@ -478,7 +478,7 @@ module redisSetup 'azureRedisCache.bicep' = {
   }
 }
 
-@description('Built in \'Storage Blob Data Owner\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+@description('Built in \'Storage Blob Data Owner\' role ID: https://learn.microsoft.com/azure/role-based-access-control/built-in-roles')
 // Allows read and write access to storage blob data
 var storageBlobDataOwnerRoleDefinitionId = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
 
