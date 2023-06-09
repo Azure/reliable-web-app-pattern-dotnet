@@ -32,7 +32,7 @@ if (builder.Environment.IsDevelopment())
 }
 
 // Apps migrating to 6.0 don't need to use the new minimal hosting model
-// https://docs.microsoft.com/en-us/aspnet/core/migration/50-to-60?view=aspnetcore-6.0&tabs=visual-studio#apps-migrating-to-60-dont-need-to-use-the-new-minimal-hosting-model
+// https://learn.microsoft.com/aspnet/core/migration/50-to-60?view=aspnetcore-6.0&tabs=visual-studio#apps-migrating-to-60-dont-need-to-use-the-new-minimal-hosting-model
 var startup = new Startup(builder.Configuration);
 
 // Add services to the container.

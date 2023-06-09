@@ -32,7 +32,7 @@ namespace Relecloud.Web.Services.Search
             this.searchServiceUri = new Uri($"https://{searchServiceName}.search.windows.net");
             this.concertsSqlDatabaseConnectionString = concertsSqlDatabaseConnectionString;
 
-            // https://docs.microsoft.com/en-us/azure/architecture/best-practices/retry-service-specific#retry-mechanism-5
+            // https://learn.microsoft.com/azure/architecture/best-practices/retry-service-specific#retry-mechanism-5
             // The default policy retries with exponential backoff when Azure Search returns a 5xx or 408 (Request Timeout) response.
             this.concertsIndexClient = new SearchClient(this.searchServiceUri, IndexNameConcerts, new DefaultAzureCredential());
         }

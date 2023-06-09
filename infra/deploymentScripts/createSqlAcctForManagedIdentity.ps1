@@ -19,10 +19,6 @@
     We recommend handling this one-time process as part of your SQL data migration process
     More details can be found in our docs for Azure SQL server
     https://learn.microsoft.com/en-us/azure/app-service/tutorial-connect-msi-sql-database?tabs=windowsclient%2Cef%2Cdotnet
-
-    Assumes the service principal that will connect to SQL has been set as the Azure AD Admin
-    This was handled by the bicep templates
-    see https://docs.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure?view=azuresql&tabs=azure-powershell#azure-portal
 .PARAMETER ServerName
     A required parameter for the name of target Azure SQL Server.
 .PARAMETER ResourceGroupName

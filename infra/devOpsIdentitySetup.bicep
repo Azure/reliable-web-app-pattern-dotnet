@@ -17,7 +17,7 @@ resource devOpsManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities
   tags: tags
 }
 
-@description('Built in \'Contributor\' role ID: https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+@description('Built in \'Contributor\' role ID: https://learn.microsoft.com/azure/role-based-access-control/built-in-roles')
 // Allows read access to App Configuration data
 var contributorRole = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
 
