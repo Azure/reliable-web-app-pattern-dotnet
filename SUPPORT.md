@@ -10,7 +10,6 @@ The following list of issues is within the scope of Microsoft Support:
 * Underlying resource or resource provider issues when deploying the template.
 * Subscription creation via the Azure portal.
 * ARM deployment issues (e.g. template validation, CheckAccess API).
-* Customization of the template by customers and partners.
 
 Any issues that are deemed outside of the above list by Microsoft Support or requires bugfix in the reference implementation will be referred to GitHub issues.
 
