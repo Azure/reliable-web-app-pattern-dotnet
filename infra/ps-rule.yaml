@@ -1,0 +1,47 @@
+#
+# PSRule configuration
+#
+
+# Please see the documentation for all configuration options:
+# https://aka.ms/ps-rule/options
+
+configuration:
+  AZURE_BICEP_FILE_EXPANSION: true
+
+  # Configures the number of seconds to wait for build Bicep files.
+  AZURE_BICEP_FILE_EXPANSION_TIMEOUT: 10
+
+    # Enable Bicep CLI checks.
+  AZURE_BICEP_CHECK_TOOL: true
+
+  # Configure the minimum version of the Bicep CLI.
+  AZURE_BICEP_MINIMUM_VERSION: '0.18.4'
+
+requires:
+  PSRule: '@pre >=2.9.0'
+  PSRule.Rules.Azure: '@pre >=1.27.3'
+
+include:
+  module:
+    - PSRule.Rules.Azure
+
+execution:
+  unprocessedObject: Ignore
+
+output:
+  culture:
+  - en-GB
+
+input:
+  pathIgnore:
+  - '*.md'
+  - '.vscode/'
+  - 'docs/'
+  - '*.ps1'
+  - '*.sql'
+  - '*.sh'
+  - '*.yml'
+
+  # # ignore all bicep files except the ones that have been created to test modules
+  # - '*.bicep'
+  # - '!*.tests.bicep'
