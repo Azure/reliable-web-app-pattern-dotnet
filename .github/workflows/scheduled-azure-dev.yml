@@ -10,7 +10,7 @@ on:
         default: true
         type: boolean
   schedule:
-    - cron: '0 0,12 * * *'
+    - cron: '0 12 1 * *' # Run at 14:00 on the 1st day of the month
       inputs:
         run_tear_down:
           default: true
