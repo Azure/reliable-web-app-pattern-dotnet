@@ -3,17 +3,10 @@
 
 on:
   workflow_dispatch:
-    inputs:
-      run_tear_down:
-        description: 'When true, resources will be deleted after a run'
-        required: false
-        default: true
-        type: boolean
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
   schedule:
-    - cron: '0 0,12 * * *'
-      inputs:
-        run_tear_down:
-          default: true
+    - cron: '0 12 1 * *' # Run at 12:00 on the 1st day of the month
 
 # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
 permissions:
@@ -84,7 +77,6 @@ jobs:
           ./infra/devOpsScripts/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
 
   teardown:
-    if: ${{ inputs.run_tear_down }}
     needs: [build]
     runs-on: ubuntu-latest
     container:
