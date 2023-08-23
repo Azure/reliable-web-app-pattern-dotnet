@@ -43,10 +43,6 @@ resource logAnalyticsWorkspaceDiagnostics 'Microsoft.Insights/diagnosticSettings
       {
         category: 'FrontDoorWebApplicationFirewallLog'
         enabled: true
-        retentionPolicy: {
-          days: 0
-          enabled: true
-        }
       }
     ]
   }
