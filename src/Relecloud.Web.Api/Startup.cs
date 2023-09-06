@@ -149,7 +149,7 @@ namespace Relecloud.Web.Api
                 app.UseSwaggerUI();
             }
             using var serviceScope = app.Services.CreateScope();
-            serviceScope.ServiceProvider.GetService<ApplicationInitializer>()!.Initialize();
+            serviceScope.ServiceProvider.GetRequiredService<ApplicationInitializer>().Initialize();
 
             // Configure the HTTP request pipeline.
             if (!env.IsDevelopment())
