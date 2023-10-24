@@ -31,7 +31,7 @@ jobs:
         BACKEND_STORAGE_ACCOUNT_NAME: ${{ vars.BACKEND_STORAGE_ACCOUNT_NAME }}
         BACKEND_STORAGE_CONTAINER_NAME: ${{ vars.BACKEND_STORAGE_CONTAINER_NAME }}
         TF_BACKEND_KEY: ${{ vars.APPLICATION_NAME }}-${{ vars.ENVIRONMENT_NAME }}
-      working-directory: ${{ vars.WORKING_DIRECTORY }}
+      working-directory: ${{ env.WORKING_DIRECTORY }}
       run: |
         terraform init \
           -backend-config="resource_group_name=$BACKEND_RESOURCE_GROUP_NAME" \
