@@ -5,11 +5,11 @@ WORKDIR /app
 # Copy all the .csproj files and restore any dependencies (via dotnet restore)
 COPY ./Relecloud.Web.Api/Relecloud.Web.Api.csproj ./Relecloud.Web.Api/
 COPY ./Relecloud.Models/Relecloud.Web.Models.csproj ./Relecloud.Models/
-RUN dotnet restore ./Relecloud.Web/Relecloud.Web.Api.csproj
+RUN dotnet restore ./Relecloud.Web.Api/Relecloud.Web.Api.csproj
 
 # Copy the rest of the files and build the application
 COPY . ./
-RUN dotnet publish ./Relecloud.Web/Relecloud.Web.Api.csproj -c Release -o out
+RUN dotnet publish ./Relecloud.Web.Api/Relecloud.Web.Api.csproj -c Release -o out
 
 # Build the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
