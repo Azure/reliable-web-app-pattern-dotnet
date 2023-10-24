@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_FILE: "./docker/web-api/Dockerfile"
-  WORKING_DIRECTORY: "./src/"
+  DOCKER_FILE: "./src/docker/web-api/Dockerfile"
+  WORKING_DIRECTORY: "./src/dotnet"
 
 jobs:
   build:
