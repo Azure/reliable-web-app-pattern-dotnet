@@ -31,6 +31,8 @@ jobs:
         BACKEND_STORAGE_ACCOUNT_NAME: ${{ vars.BACKEND_STORAGE_ACCOUNT_NAME }}
         BACKEND_STORAGE_CONTAINER_NAME: ${{ vars.BACKEND_STORAGE_CONTAINER_NAME }}
         TF_BACKEND_KEY: ${{ vars.APPLICATION_NAME }}-${{ vars.ENVIRONMENT_NAME }}
+        TF_VAR_application_name: ${{ vars.APPLICATION_NAME }}
+        TF_VAR_environment_name: ${{ vars.ENVIRONMENT_NAME }}
       working-directory: ${{ env.WORKING_DIRECTORY }}
       run: |
         terraform init \
