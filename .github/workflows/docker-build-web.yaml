@@ -20,9 +20,10 @@ jobs:
 
     - id: setup
       name: Setup `terraform`
-      uses: hashicorp/setup-terraform@main
+      uses: hashicorp/setup-terraform@v2
       with:
-        version: ${{ env.TERRAFORM_VERSION }}
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+        terraform_wrapper: false
 
     - id: terraform
       name: Terraform Output
@@ -47,8 +48,7 @@ jobs:
 
         terraform apply -refresh-only
 
-        registry_endpoint_temp=$(terraform output registry_endpoint 2>/dev/null)
-        registry_endpoint=$(echo "$registry_endpoint_temp" | tr -d '"')
+        registry_endpoint_temp=$(terraform output -raw registry_endpoint)
         echo $registry_endpoint
         echo "registry_endpoint=$registry_endpoint" >> "$GITHUB_OUTPUT"
 
