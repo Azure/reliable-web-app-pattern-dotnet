@@ -47,7 +47,8 @@ jobs:
 
         terraform apply -refresh-only
 
-        registry_endpoint=$(terraform output --raw "registry_endpoint" 2>/dev/null)
+        registry_endpoint_temp=$(terraform output registry_endpoint 2>/dev/null)
+        registry_endpoint=$(echo "$registry_endpoint_temp" | tr -d '"')
         echo $registry_endpoint
         echo "registry_endpoint=$registry_endpoint" >> "$GITHUB_OUTPUT"
 
