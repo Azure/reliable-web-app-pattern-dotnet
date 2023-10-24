@@ -11,7 +11,7 @@ resource "azurerm_role_assignment" "acr_push" {
 
   count = length(var.container_registry_pushers)
 
-  scope                = azurerm_key_vault.main.id
+  scope                = azurerm_container_registry.main.id
   role_definition_name = "AcrPush"
   principal_id         = var.container_registry_pushers[count.index]
 
