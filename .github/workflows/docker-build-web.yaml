@@ -68,7 +68,7 @@ jobs:
       with:
         registry: ${{ steps.terraform.outputs.registry_endpoint }}
         username: ${{ vars.AZURE_REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_ADMIN_PASSWORD }}
+        password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
     - name: Build and push Docker image to ACR
       uses: docker/build-push-action@v5
