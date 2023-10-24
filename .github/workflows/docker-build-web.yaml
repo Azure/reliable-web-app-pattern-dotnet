@@ -47,7 +47,7 @@ jobs:
 
         terraform apply -refresh-only
 
-        terraform output registry_endpoint
+        terraform output -raw registry_endpoint
 
         echo "output is complete"
 
