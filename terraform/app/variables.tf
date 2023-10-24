@@ -7,3 +7,6 @@ variable "environment_name" {
 variable "primary_region" {
   type = string
 }
+variable keyvault_readers {
+  type = list(string)
+}
