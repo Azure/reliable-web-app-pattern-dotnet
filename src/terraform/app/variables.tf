@@ -13,3 +13,6 @@ variable "keyvault_readers" {
 variable "keyvault_admins" {
   type = list(string)
 }
+variable "container_registry_pushers" {
+  type = list(string)
+}
