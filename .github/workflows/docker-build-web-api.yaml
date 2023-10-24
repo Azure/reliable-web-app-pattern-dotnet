@@ -1,0 +1,41 @@
+name: Docker-WebApi
+
+on:
+  workflow_dispatch:
+
+env:
+  DOCKER_FILE: "./docker/web-api/Dockerfile"
+  WORKING_DIRECTORY: "./src/"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Copy file from DOCKER_FILE to WORKING_DIRECTORY
+      run: cp $DOCKER_FILE $WORKING_DIRECTORY
+
+    - id: image-version
+      name: Generate Version Number
+      run: |
+        echo "version=$(date +'%Y.%m').${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Azure Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ vars.AZURE_REGISTRY_NAME }}
+        username: ${{ vars.AZURE_REGISTRY_USERNAME }}
+        password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+    - name: Build and push Docker image to ACR
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ env.WORKING_DIRECTORY }}
+        push: true
+        tags: ${{ vars.AZURE_REGISTRY_NAME }}/relecloud-web-api:${{ steps.image-version.outputs.version }}
