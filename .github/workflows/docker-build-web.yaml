@@ -45,7 +45,8 @@ jobs:
           -backend-config="container_name=$BACKEND_STORAGE_CONTAINER_NAME" \
           -backend-config="key=$TF_BACKEND_KEY"
 
-        echo "registry_endpoint=$(terraform output --raw registry_endpoint)" >> "$GITHUB_OUTPUT"
+        registry_endpoint=$(terraform output -raw registry_endpoint)
+        echo "registry_endpoint=$registry_endpoint" >> "$GITHUB_OUTPUT"
 
     - name: Copy file from DOCKER_FILE to WORKING_DIRECTORY
       run: cp $DOCKER_FILE $WORKING_DIRECTORY
