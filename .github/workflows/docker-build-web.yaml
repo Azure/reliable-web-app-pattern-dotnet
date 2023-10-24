@@ -57,8 +57,13 @@ jobs:
         echo "registry_admin_username=$registry_admin_username" >> "$GITHUB_OUTPUT"
 
         registry_admin_password=$(terraform output -raw registry_admin_password)
-        echo $registry_admin_password
         echo "registry_admin_password=$registry_admin_password" >> "$GITHUB_OUTPUT"
+
+    - name: Create secret
+      uses: actions/secrets@v1
+      with:
+        name: REGISTRY_ADMIN_PASSWORD
+        value: ${{ steps.terraform.outputs.registry_admin_password }}
 
     - name: Copy file from DOCKER_FILE to WORKING_DIRECTORY
       run: cp $DOCKER_FILE $WORKING_DIRECTORY
@@ -76,7 +81,7 @@ jobs:
       with:
         registry: ${{ steps.terraform.outputs.registry_endpoint }}
         username: ${{ steps.terraform.outputs.registry_admin_username }}
-        password: ${{ steps.terraform.outputs.registry_admin_password }}
+        password: ${{ secrets.REGISTRY_ADMIN_PASSWORD }}
 
     - name: Build and push Docker image to ACR
       uses: docker/build-push-action@v5
