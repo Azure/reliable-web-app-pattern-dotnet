@@ -2,11 +2,6 @@ name: Terraform-Plan
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: 
-    - main
-    paths:
-    - 'terraform/**'
 
 env:
   TERRAFORM_VERSION: '1.5.7'

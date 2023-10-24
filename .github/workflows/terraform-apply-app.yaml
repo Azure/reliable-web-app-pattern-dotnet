@@ -2,11 +2,6 @@ name: Terraform-Apply
 
 on:
   workflow_dispatch:
-  push:
-    branches: 
-    - main
-    paths:
-    - 'terraform/**'
 
 env:
   TERRAFORM_VERSION: '1.5.7'
