@@ -5,6 +5,7 @@ on:
 
 env:
   DOCKER_FILE: "./src/docker/web-app/Dockerfile"
+  DOCKER_IMAGE_NAME: "relecloud-web-app"
   WORKING_DIRECTORY: "./src/dotnet"
   TERRAFORM_VERSION: '1.5.7'
   TERRAFORM_WORKING_DIRECTORY: "./src/terraform/app"
@@ -16,7 +17,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
 
     - id: setup
       name: Setup `terraform`
@@ -52,12 +52,6 @@ jobs:
         echo $registry_endpoint
         echo "registry_endpoint=$registry_endpoint" >> "$GITHUB_OUTPUT"
 
-    - name: Create secret
-      uses: actions/secrets@v1
-      with:
-        name: REGISTRY_ADMIN_PASSWORD
-        value: ${{ steps.terraform.outputs.registry_admin_password }}
-
     - name: Copy file from DOCKER_FILE to WORKING_DIRECTORY
       run: cp $DOCKER_FILE $WORKING_DIRECTORY
 
@@ -81,4 +75,4 @@ jobs:
       with:
         context: ${{ env.WORKING_DIRECTORY }}
         push: true
-        tags: ${{ steps.terraform.outputs.registry_endpoint }}/relecloud-web-app:${{ steps.image-version.outputs.version }}
+        tags: ${{ steps.terraform.outputs.registry_endpoint }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.image-version.outputs.version }}

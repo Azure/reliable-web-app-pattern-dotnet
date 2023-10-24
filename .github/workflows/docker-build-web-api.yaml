@@ -5,7 +5,10 @@ on:
 
 env:
   DOCKER_FILE: "./src/docker/web-api/Dockerfile"
+  DOCKER_IMAGE_NAME: "relecloud-web-api"
   WORKING_DIRECTORY: "./src/dotnet"
+  TERRAFORM_VERSION: '1.5.7'
+  TERRAFORM_WORKING_DIRECTORY: "./src/terraform/app"
 
 jobs:
   build:
@@ -14,6 +17,40 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+    - id: setup
+      name: Setup `terraform`
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+        terraform_wrapper: false
+
+    - id: terraform
+      name: Terraform Output
+      env:
+        ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+        ARM_CLIENT_ID: ${{ vars.TERRAFORM_ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.TERRAFORM_ARM_CLIENT_SECRET }}
+        BACKEND_RESOURCE_GROUP_NAME: ${{ vars.BACKEND_RESOURCE_GROUP_NAME }}
+        BACKEND_STORAGE_ACCOUNT_NAME: ${{ vars.BACKEND_STORAGE_ACCOUNT_NAME }}
+        BACKEND_STORAGE_CONTAINER_NAME: ${{ vars.BACKEND_STORAGE_CONTAINER_NAME }}
+        TF_BACKEND_KEY: ${{ vars.APPLICATION_NAME }}-${{ vars.ENVIRONMENT_NAME }}
+        TF_VAR_application_name: ${{ vars.APPLICATION_NAME }}
+        TF_VAR_environment_name: ${{ vars.ENVIRONMENT_NAME }}
+      working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
+      run: |
+        terraform init \
+          -backend-config="resource_group_name=$BACKEND_RESOURCE_GROUP_NAME" \
+          -backend-config="storage_account_name=$BACKEND_STORAGE_ACCOUNT_NAME" \
+          -backend-config="container_name=$BACKEND_STORAGE_CONTAINER_NAME" \
+          -backend-config="key=$TF_BACKEND_KEY"
+
+        terraform apply -refresh-only
+
+        registry_endpoint=$(terraform output -raw registry_endpoint)
+        echo $registry_endpoint
+        echo "registry_endpoint=$registry_endpoint" >> "$GITHUB_OUTPUT"
 
     - name: Copy file from DOCKER_FILE to WORKING_DIRECTORY
       run: cp $DOCKER_FILE $WORKING_DIRECTORY
@@ -29,13 +66,13 @@ jobs:
     - name: Login to Azure Container Registry
       uses: docker/login-action@v3
       with:
-        registry: ${{ vars.AZURE_REGISTRY_NAME }}
+        registry: ${{ steps.terraform.outputs.registry_endpoint }}
         username: ${{ vars.AZURE_REGISTRY_USERNAME }}
-        password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+        password: ${{ secrets.REGISTRY_ADMIN_PASSWORD }}
 
     - name: Build and push Docker image to ACR
       uses: docker/build-push-action@v5
       with:
         context: ${{ env.WORKING_DIRECTORY }}
         push: true
-        tags: ${{ vars.AZURE_REGISTRY_NAME }}/relecloud-web-api:${{ steps.image-version.outputs.version }}
+        tags: ${{ vars.AZURE_REGISTRY_NAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.image-version.outputs.version }}
