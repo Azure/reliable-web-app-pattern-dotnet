@@ -2,8 +2,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
 WORKDIR /app
 
-# Copy the .csproj and restore any dependencies (via dotnet restore)
+# Copy all the .csproj files and restore any dependencies (via dotnet restore)
 COPY ./Relecloud.Web/Relecloud.Web.csproj ./Relecloud.Web/
+COPY ./Relecloud.Models/Relecloud.Models.csproj ./Relecloud.Models/
 RUN dotnet restore ./Relecloud.Web/Relecloud.Web.csproj
 
 # Copy the rest of the files and build the application
