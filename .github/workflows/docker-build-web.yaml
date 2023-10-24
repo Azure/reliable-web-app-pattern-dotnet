@@ -73,7 +73,7 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ${{ steps.terraform.outputs.registry_endpoint }}
-        username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+        username: ${{ vars.AZURE_REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_ADMIN_PASSWORD }}
 
     - name: Build and push Docker image to ACR
