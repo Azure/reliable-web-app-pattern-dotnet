@@ -1,0 +1,47 @@
+name: Terraform-Apply
+
+on:
+  workflow_dispatch:
+  push:
+    branches: 
+    - main
+    paths:
+    - 'terraform/**'
+
+env:
+  TERRAFORM_VERSION: '1.5.7'
+  WORKING_DIRECTORY: "./terraform/app"
+
+jobs:
+
+  terraform-apply:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: setup
+      name: Setup `terraform`
+      uses: hashicorp/setup-terraform@main
+      with:
+        version: ${{ env.TERRAFORM_VERSION }}
+
+    - id: apply
+      name: Terraform Apply
+      env:
+        ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+        ARM_CLIENT_ID: ${{ vars.TERRAFORM_ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.TERRAFORM_ARM_CLIENT_SECRET }}
+        BACKEND_RESOURCE_GROUP_NAME: ${{ vars.BACKEND_RESOURCE_GROUP_NAME }}
+        BACKEND_STORAGE_ACCOUNT_NAME: ${{ vars.BACKEND_STORAGE_ACCOUNT_NAME }}
+        BACKEND_STORAGE_CONTAINER_NAME: ${{ vars.BACKEND_STORAGE_CONTAINER_NAME }}
+        TF_BACKEND_KEY: ${{ vars.APPLICATION_NAME }}-${{ vars.ENVIRONMENT_NAME }}
+      working-directory: ${{ env.WORKING_DIRECTORY }}
+      run: |
+        terraform init \
+          -backend-config="resource_group_name=$BACKEND_RESOURCE_GROUP_NAME" \
+          -backend-config="storage_account_name=$BACKEND_STORAGE_ACCOUNT_NAME" \
+          -backend-config="container_name=$BACKEND_STORAGE_CONTAINER_NAME" \
+          -backend-config="key=$TF_BACKEND_KEY"
+          
+        terraform apply -auto-approve
