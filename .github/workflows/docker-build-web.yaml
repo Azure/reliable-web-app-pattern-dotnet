@@ -49,7 +49,7 @@ jobs:
 
         registry_endpoint=$(terraform output registry_endpoint)
         echo $registry_endpoint
-        echo "registry_endpoint=$registry_endpoint" >> "$GITHUB_OUTPUT"
+        echo "registry_endpoint=$registry_endpoint" >> $GITHUB_OUTPUT
 
     - name: Copy file from DOCKER_FILE to WORKING_DIRECTORY
       run: cp $DOCKER_FILE $WORKING_DIRECTORY
