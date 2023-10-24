@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /app
 
 # Copy all the .csproj files and restore any dependencies (via dotnet restore)
-COPY ./Relecloud.Web/Relecloud.Web.Api.csproj ./Relecloud.Web.Api/
+COPY ./Relecloud.Web.Api/Relecloud.Web.Api.csproj ./Relecloud.Web.Api/
 COPY ./Relecloud.Models/Relecloud.Web.Models.csproj ./Relecloud.Models/
 RUN dotnet restore ./Relecloud.Web/Relecloud.Web.Api.csproj
 
