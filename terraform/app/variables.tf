@@ -7,6 +7,9 @@ variable "environment_name" {
 variable "primary_region" {
   type = string
 }
-variable keyvault_readers {
+variable "keyvault_readers" {
+  type = list(string)
+}
+variable "keyvault_admins" {
   type = list(string)
 }

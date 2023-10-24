@@ -28,3 +28,13 @@ resource "azurerm_role_assignment" "keyvault_readers" {
   principal_id         = var.keyvault_readers[count.index]
 
 }
+
+resource "azurerm_role_assignment" "keyvault_admins" {
+
+  count = length(var.keyvault_admins)
+
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = var.keyvault_admins[count.index]
+
+}
