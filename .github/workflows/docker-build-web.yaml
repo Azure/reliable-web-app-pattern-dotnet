@@ -6,6 +6,8 @@ on:
 env:
   DOCKER_FILE: "./src/docker/web-app/Dockerfile"
   WORKING_DIRECTORY: "./src/dotnet"
+  TERRAFORM_VERSION: '1.5.7'
+  TERRAFORM_WORKING_DIRECTORY: "./src/terraform/app"
 
 jobs:
   build:
@@ -14,6 +16,36 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+
+    - id: setup
+      name: Setup `terraform`
+      uses: hashicorp/setup-terraform@main
+      with:
+        version: ${{ env.TERRAFORM_VERSION }}
+
+    - id: terraform
+      name: Terraform Output
+      env:
+        ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+        ARM_CLIENT_ID: ${{ vars.TERRAFORM_ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.TERRAFORM_ARM_CLIENT_SECRET }}
+        BACKEND_RESOURCE_GROUP_NAME: ${{ vars.BACKEND_RESOURCE_GROUP_NAME }}
+        BACKEND_STORAGE_ACCOUNT_NAME: ${{ vars.BACKEND_STORAGE_ACCOUNT_NAME }}
+        BACKEND_STORAGE_CONTAINER_NAME: ${{ vars.BACKEND_STORAGE_CONTAINER_NAME }}
+        TF_BACKEND_KEY: ${{ vars.APPLICATION_NAME }}-${{ vars.ENVIRONMENT_NAME }}
+        TF_VAR_application_name: ${{ vars.APPLICATION_NAME }}
+        TF_VAR_environment_name: ${{ vars.ENVIRONMENT_NAME }}
+      working-directory: ${{ env.WORKING_DIRECTORY }}
+      run: |
+        terraform init \
+          -backend-config="resource_group_name=$BACKEND_RESOURCE_GROUP_NAME" \
+          -backend-config="storage_account_name=$BACKEND_STORAGE_ACCOUNT_NAME" \
+          -backend-config="container_name=$BACKEND_STORAGE_CONTAINER_NAME" \
+          -backend-config="key=$TF_BACKEND_KEY"
+
+        echo "registry_endpoint=$(terraform output registry_endpoint --raw)" >> "$GITHUB_OUTPUT"
 
     - name: Copy file from DOCKER_FILE to WORKING_DIRECTORY
       run: cp $DOCKER_FILE $WORKING_DIRECTORY
@@ -29,7 +61,7 @@ jobs:
     - name: Login to Azure Container Registry
       uses: docker/login-action@v3
       with:
-        registry: ${{ vars.AZURE_REGISTRY_NAME }}
+        registry: ${{ steps.terraform.outputs.registry_endpoint }}
         username: ${{ vars.AZURE_REGISTRY_USERNAME }}
         password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
@@ -38,4 +70,4 @@ jobs:
       with:
         context: ${{ env.WORKING_DIRECTORY }}
         push: true
-        tags: ${{ vars.AZURE_REGISTRY_NAME }}/relecloud-web-app:${{ steps.image-version.outputs.version }}
+        tags: ${{ steps.terraform.outputs.registry_endpoint }}/relecloud-web-app:${{ steps.image-version.outputs.version }}
