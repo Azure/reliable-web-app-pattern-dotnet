@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copy all the .csproj files and restore any dependencies (via dotnet restore)
 COPY ./Relecloud.Web/Relecloud.Web.csproj ./Relecloud.Web/
-COPY ./Relecloud.Models/Relecloud.Models.csproj ./Relecloud.Models/
+COPY ./Relecloud.Models/Relecloud.Web.Models.csproj ./Relecloud.Models/
 RUN dotnet restore ./Relecloud.Web/Relecloud.Web.csproj
 
 # Copy the rest of the files and build the application
