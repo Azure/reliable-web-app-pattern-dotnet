@@ -56,7 +56,7 @@ jobs:
         echo "registry_endpoint=$registry_endpoint" >> "$GITHUB_OUTPUT"
 
     - name: Copy file from DOCKER_FILE to WORKING_DIRECTORY
-      run: cp $DOCKER_FILE $WORKING_DIRECTORY
+      run: cp $DOCKER_FILE $DOCKER_WORKING_DIRECTORY
 
     - id: image-version
       name: Generate Version Number
