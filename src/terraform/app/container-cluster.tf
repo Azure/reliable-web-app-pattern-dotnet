@@ -70,7 +70,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 resource "azurerm_role_assignment" "cluster_kubelet" {
   principal_id                     = azurerm_user_assigned_identity.cluster_kubelet.principal_id
   role_definition_name             = "AcrPull"
-  scope                            = azurerm_container_registry.main.id
+  scope                            = data.azurerm_container_registry.main.id
   skip_service_principal_aad_check = true
 }
 
