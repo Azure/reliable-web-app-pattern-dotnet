@@ -16,6 +16,9 @@ variable "keyvault_admins" {
 variable "container_registry_pushers" {
   type = list(string)
 }
+variable "vnet_cidr_block" {
+  type = string
+}
 variable "aks_orchestration_version" {
   type = string
 }
@@ -32,7 +35,4 @@ variable "aks_workload_pool" {
     min_node_count = number
     max_node_count = number
   })
-}
-variable "vnet_cidr_block" {
-  type = string
 }
