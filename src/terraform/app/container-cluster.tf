@@ -30,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   kubelet_identity {
-    user_assigned_identity_id = azurerm_user_assigned_identity.cluster_kubelet.principal_id
+    user_assigned_identity_id = azurerm_user_assigned_identity.cluster_kubelet.id
   }
 
 }
