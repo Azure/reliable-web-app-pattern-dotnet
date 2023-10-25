@@ -29,15 +29,16 @@ resource "azurerm_kubernetes_cluster" "main" {
   workload_identity_enabled = true
 
   default_node_pool {
-    name                 = "systempool"
-    vm_size              = var.aks_system_pool.vm_size
-    enable_auto_scaling  = true
-    min_count            = var.aks_system_pool.min_node_count
-    max_count            = var.aks_system_pool.max_node_count
-    vnet_subnet_id       = azurerm_subnet.kubernetes.id
-    os_disk_type         = "Ephemeral"
-    os_disk_size_gb      = 30
-    orchestrator_version = var.aks_orchestration_version
+    name                        = "systempool"
+    vm_size                     = var.aks_system_pool.vm_size
+    enable_auto_scaling         = true
+    min_count                   = var.aks_system_pool.min_node_count
+    max_count                   = var.aks_system_pool.max_node_count
+    vnet_subnet_id              = azurerm_subnet.kubernetes.id
+    os_disk_type                = "Ephemeral"
+    os_disk_size_gb             = 30
+    orchestrator_version        = var.aks_orchestration_version
+    temporary_name_for_rotation = "workloadpool"
 
     zones = [1, 2, 3]
 
