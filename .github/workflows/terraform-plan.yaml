@@ -39,11 +39,6 @@ jobs:
         TF_VAR_environment_name: ${{ vars.ENVIRONMENT_NAME }}
       working-directory: ${{ vars.TERRAFORM_WORKING_DIRECTORY }}
       run: |
-        echo "${{ vars.TERRAFORM_WORKING_DIRECTORY }}"
-        echo "${{ vars.WORKING_DIRECTORY }}"
-        ls
-        pwd
-
         terraform init \
           -backend-config="resource_group_name=${{ vars.BACKEND_RESOURCE_GROUP_NAME }}" \
           -backend-config="storage_account_name=${{ vars.BACKEND_STORAGE_ACCOUNT_NAME }}" \
