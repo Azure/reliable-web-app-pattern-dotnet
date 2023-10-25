@@ -75,4 +75,4 @@ jobs:
       with:
         context: ${{ env.WORKING_DIRECTORY }}
         push: true
-        tags: ${{ vars.AZURE_REGISTRY_NAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.image-version.outputs.version }}
+        tags: ${{ steps.terraform.outputs.registry_endpoint }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.image-version.outputs.version }}
