@@ -5,6 +5,7 @@ resource "azurerm_container_registry" "main" {
   sku                     = "Premium"
   admin_enabled           = true
   zone_redundancy_enabled = true
+
 }
 
 resource "azurerm_role_assignment" "acr_push" {
