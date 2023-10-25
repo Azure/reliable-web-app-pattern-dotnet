@@ -18,6 +18,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    environment:
+      name: ${{ github.event.inputs.environment }}
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
