@@ -36,6 +36,7 @@ jobs:
         TF_VAR_environment_name_name: ${{ vars.ENVIRONMENT_NAME }}
       working-directory: ${{ vars.TERRAFORM_WORKING_DIRECTORY }}
       run: |
+        echo "${{ vars.TERRAFORM_WORKING_DIRECTORY }}"
         ls
         pwd
         terraform init \
