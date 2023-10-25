@@ -34,12 +34,13 @@ jobs:
         ARM_CLIENT_SECRET: ${{ secrets.TERRAFORM_ARM_CLIENT_SECRET }}
         TF_VAR_application_name: ${{ vars.APPLICATION_NAME }}
         TF_VAR_environment_name_name: ${{ vars.ENVIRONMENT_NAME }}
-      working-directory: ${{ vars.WORKING_DIRECTORY }}
+      working-directory: ${{ vars.TERRAFORM_WORKING_DIRECTORY }}
       run: |
         echo "${{ vars.TERRAFORM_WORKING_DIRECTORY }}"
         echo "${{ vars.WORKING_DIRECTORY }}"
         ls
         pwd
+        cd ${{ vars.TERRAFORM_WORKING_DIRECTORY }}
         terraform init \
           -backend-config="resource_group_name=${{ vars.BACKEND_RESOURCE_GROUP_NAME }}" \
           -backend-config="storage_account_name=${{ vars.BACKEND_STORAGE_ACCOUNT_NAME }}" \
