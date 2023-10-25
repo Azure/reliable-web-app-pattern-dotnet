@@ -4,6 +4,13 @@ resource "azurerm_user_assigned_identity" "cluster" {
   resource_group_name = azurerm_resource_group.main.name
 }
 
+resource "azurerm_role_assignment" "cluster_identity_operator" {
+
+  scope                = azurerm_kubernetes_cluster.main.id
+  role_definition_name = "Managed Identity Operator"
+  principal_id         = azurerm_user_assigned_identity.cluster.principal_id
+
+}
 
 resource "azurerm_user_assigned_identity" "cluster_kubelet" {
   location            = azurerm_resource_group.main.location
@@ -34,6 +41,8 @@ resource "azurerm_kubernetes_cluster" "main" {
     object_id                 = azurerm_user_assigned_identity.cluster_kubelet.principal_id
     user_assigned_identity_id = azurerm_user_assigned_identity.cluster_kubelet.id
   }
+
+  depends_on = [azurerm_role_assignment.cluster_identity_operator]
 
 }
 
