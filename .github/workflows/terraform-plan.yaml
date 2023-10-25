@@ -34,6 +34,8 @@ jobs:
         ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
         ARM_CLIENT_ID: ${{ vars.TERRAFORM_ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.TERRAFORM_ARM_CLIENT_SECRET }}
+        TF_VAR_application_name: ${{ env.APPLICATION_NAME }}
+        TF_VAR_environment_name_name: ${{ env.ENVIRONMENT_NAME }}
       working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
       run: |
         terraform init \
