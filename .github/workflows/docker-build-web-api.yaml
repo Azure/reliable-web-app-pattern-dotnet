@@ -2,6 +2,11 @@ name: Docker-WebApi
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
 
 env:
   DOCKER_FILE: "./src/docker/web-api/Dockerfile"
