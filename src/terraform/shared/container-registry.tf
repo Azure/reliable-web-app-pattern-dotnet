@@ -6,6 +6,10 @@ resource "azurerm_container_registry" "main" {
   admin_enabled           = true
   zone_redundancy_enabled = true
 
+  georeplications {
+    location                = "westus3"
+    zone_redundancy_enabled = true
+  }
 }
 
 resource "azurerm_role_assignment" "acr_push" {
