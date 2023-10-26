@@ -5,11 +5,18 @@ resource "azurerm_virtual_network" "main" {
   address_space       = [var.vnet_cidr_block]
 }
 
+resource "azurerm_subnet" "ingress" {
+  name                 = "snet-ingress"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = [cidrsubnet(var.vnet_cidr_block, 2, 2)]
+}
+
 resource "azurerm_subnet" "kubernetes" {
   name                 = "snet-kubernetes"
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = [cidrsubnet(var.vnet_cidr_block, 2, 1)]
+  address_prefixes     = [cidrsubnet(var.vnet_cidr_block, 2, 3)]
   service_endpoints = [
     "Microsoft.Storage",
     "Microsoft.AzureCosmosDB",
