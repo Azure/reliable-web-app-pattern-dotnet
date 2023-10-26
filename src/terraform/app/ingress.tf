@@ -21,8 +21,8 @@ locals {
   request_routing_rule_name      = "${var.application_name}-${var.environment_name}-rqrt"
   redirect_configuration_name    = "${var.application_name}-${var.environment_name}-rdrcfg"
 }
-
-resource "azurerm_application_gateway" "network" {
+/*
+resource "azurerm_application_gateway" "main" {
   name                = "agw-${var.application_name}-${var.environment_name}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
@@ -77,3 +77,4 @@ resource "azurerm_application_gateway" "network" {
     backend_http_settings_name = local.http_setting_name
   }
 }
+*/

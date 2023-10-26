@@ -45,6 +45,12 @@ resource "azurerm_kubernetes_cluster" "main" {
     upgrade_settings {
       max_surge = "33%"
     }
+    /*
+    ingress_application_gateway {
+      gateway_id = azurerm_application_gateway.main.id
+      subnet_id  = azurerm_subnet.ingress.id
+    }
+    */
   }
 
   identity {
