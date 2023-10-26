@@ -352,3 +352,6 @@ MigrationBackup/
 createSqlUser.sql
 updateSqlUserPerms.sql
 sqlcmd*
+
+# temporary IaC operator files
+**/.debug.sh
