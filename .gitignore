@@ -355,3 +355,8 @@ sqlcmd*
 
 # temporary IaC operator files
 **/.debug.sh
+
+# terraform local files
+**/.terraform/*
+**/.terraform*
+**/.k8s.sh
