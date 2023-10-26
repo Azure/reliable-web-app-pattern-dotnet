@@ -360,3 +360,6 @@ sqlcmd*
 **/.terraform/*
 **/.terraform*
 **/.k8s.sh
+src/terraform/app/files/web-app.yaml
+src/terraform/infra/relaz-kubeconfig.yaml
+src/terraform/app/relaz-kubeconfig.yaml
