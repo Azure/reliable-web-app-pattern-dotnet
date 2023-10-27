@@ -8,15 +8,17 @@ var hasRequiredConfigSettings = !string.IsNullOrEmpty(builder.Configuration["Api
 
 if (hasRequiredConfigSettings)
 {
+    var managedId = builder.Configuration["App:AppConfig:ManagedIdentity"];
+    
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
         options
-            .Connect(new Uri(builder.Configuration["Api:AppConfig:Uri"]), new DefaultAzureCredential())
+            .Connect(new Uri(builder.Configuration["Api:AppConfig:Uri"]), new ManagedIdentityCredential(managedId))
             .ConfigureKeyVault(kv =>
             {
                 // Some of the values coming from Azure App Configuration are stored Key Vault, use
                 // the managed identity of this host for the authentication.
-                kv.SetCredential(new DefaultAzureCredential());
+                kv.SetCredential(new ManagedIdentityCredential(managedId));
             });
     });
 }
