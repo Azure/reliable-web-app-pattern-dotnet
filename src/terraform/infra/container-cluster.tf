@@ -73,11 +73,18 @@ resource "azurerm_kubernetes_cluster" "main" {
 
 }
 
-resource "azurerm_role_assignment" "cluster_kubelet" {
-  principal_id                     = azurerm_user_assigned_identity.cluster_kubelet.principal_id
-  role_definition_name             = "AcrPull"
-  scope                            = data.azurerm_container_registry.main.id
-  skip_service_principal_aad_check = true
+# grant kubelet access to ACR
+resource "azurerm_role_assignment" "cluster_kubelet_acr" {
+  principal_id         = azurerm_user_assigned_identity.cluster_kubelet.principal_id
+  role_definition_name = "AcrPull"
+  scope                = data.azurerm_container_registry.main.id
+}
+
+#App Configuration Data Reader
+resource "azurerm_role_assignment" "cluster_kubelet_app_config" {
+  principal_id         = azurerm_user_assigned_identity.cluster_kubelet.principal_id
+  role_definition_name = "App Configuration Data Reader"
+  scope                = azurerm_app_configuration.main.id
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "workload" {

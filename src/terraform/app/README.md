@@ -12,4 +12,4 @@ Get the logs for a given pod
 `kubectl logs <pod-name>`
 
 Deploy the web app
-`kubectl apply -f ../app/files/web-app.yaml`
+`kubectl apply -f ./files/web-app.yaml`
