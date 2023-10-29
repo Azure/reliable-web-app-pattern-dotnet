@@ -9,3 +9,13 @@ resource "azurerm_container_registry" "main" {
   sku                 = "Premium"
   admin_enabled       = false
 }
+
+resource "azurerm_role_assignment" "acr_push" {
+
+  count = length(var.container_registry_pushers)
+
+  scope                = azurerm_container_registry.main.id
+  role_definition_name = "AcrPush"
+  principal_id         = var.container_registry_pushers[count.index]
+
+}
