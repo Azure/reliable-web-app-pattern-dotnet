@@ -20,11 +20,15 @@ resource "azurerm_user_assigned_identity" "cluster_kubelet" {
 }
 
 
-resource "azurerm_kubernetes_cluster" "example" {
-  name                = "aks-${var.application_name}-${var.environment_name}"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  dns_prefix          = "${var.application_name}-${var.environment_name}"
+resource "azurerm_kubernetes_cluster" "main" {
+  name                      = "aks-${var.application_name}-${var.environment_name}"
+  location                  = azurerm_resource_group.main.location
+  resource_group_name       = azurerm_resource_group.main.name
+  dns_prefix                = "${var.application_name}-${var.environment_name}"
+  node_resource_group       = "${azurerm_resource_group.main.name}-cluster"
+  sku_tier                  = "Standard"
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
 
   default_node_pool {
     name                        = "systempool"
