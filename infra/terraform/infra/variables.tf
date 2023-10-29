@@ -7,3 +7,6 @@ variable "environment_name" {
 variable "primary_region" {
   type = string
 }
+variable "vnet_cidr_block" {
+  type = string
+}
