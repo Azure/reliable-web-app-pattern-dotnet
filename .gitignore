@@ -352,3 +352,7 @@ MigrationBackup/
 createSqlUser.sql
 updateSqlUserPerms.sql
 sqlcmd*
+
+**/kube_config.yaml
+**/.debug.sh
+**/.terraform*

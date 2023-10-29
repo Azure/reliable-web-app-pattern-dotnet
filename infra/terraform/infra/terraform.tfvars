@@ -2,7 +2,7 @@ primary_region            = "westus3"
 vnet_cidr_block           = "10.37.0.0/22"
 aks_orchestration_version = "1.26.6"
 aks_system_pool = {
-  vm_size        = "Standard_D2_v2"
+  vm_size        = "Standard_D2s_v3"
   min_node_count = 2
   max_node_count = 3
 }
