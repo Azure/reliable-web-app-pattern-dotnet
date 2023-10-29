@@ -8,5 +8,6 @@ variable "primary_region" {
   type = string
 }
 variable "container_registry_pushers" {
-  type = list(string)
+  type        = list(string)
+  description = "Must be Object IDs you DOLT!"
 }
