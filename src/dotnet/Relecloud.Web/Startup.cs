@@ -38,7 +38,7 @@ namespace Relecloud.Web
             services.AddOptions();
             AddAzureAdServices(services);
             services.AddControllersWithViews();
-            services.AddApplicationInsightsTelemetry(Configuration["App:Api:ApplicationInsights:ConnectionString"]);
+            services.AddApplicationInsightsTelemetry();
 
             AddConcertContextService(services);
             AddConcertSearchService(services);
