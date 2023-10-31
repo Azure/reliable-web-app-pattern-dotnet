@@ -36,3 +36,6 @@ variable "aks_workload_pool" {
     max_node_count = number
   })
 }
+variable "sqldb_admin_username" {
+  type = string
+}

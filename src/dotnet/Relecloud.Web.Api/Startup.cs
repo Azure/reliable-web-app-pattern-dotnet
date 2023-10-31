@@ -167,7 +167,7 @@ namespace Relecloud.Web.Api
 
             app.UseRetryTestingMiddleware();
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();

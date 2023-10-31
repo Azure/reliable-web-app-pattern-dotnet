@@ -14,3 +14,4 @@ aks_workload_pool = {
   min_node_count = 2
   max_node_count = 3
 }
+sqldb_admin_username = "admin_user"

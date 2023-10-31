@@ -41,3 +41,4 @@ data:
   AzureAd__TenantId: "72f988bf-86f1-41af-91ab-2d7cd011db47"
   App__AppConfig__Uri: "https://appcs-relaz-app-lab1025.azconfig.io"
   App__AppConfig__ManagedIdentity: "ee5f2873-8dbf-4c18-9503-06c4c1e518ab"
+  App__RelecloudApi__BaseUri: "http://20.25.173.25"
