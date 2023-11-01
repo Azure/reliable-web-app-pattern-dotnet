@@ -32,7 +32,7 @@ namespace Relecloud.Web.Api
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            services.AddApplicationInsightsTelemetry();
+            services.AddApplicationInsightsTelemetry(Configuration["App:Api:ApplicationInsights:ConnectionString"]);
 
             AddAzureSearchService(services);
             AddConcertContextServices(services);
@@ -167,7 +167,7 @@ namespace Relecloud.Web.Api
 
             app.UseRetryTestingMiddleware();
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();
