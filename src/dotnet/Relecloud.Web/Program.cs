@@ -1,3 +1,4 @@
+using Azure.Core;
 using Azure.Identity;
 using Microsoft.IdentityModel.Logging;
 using Relecloud.Web;
@@ -10,13 +11,21 @@ if (hasRequiredConfigSettings)
 {
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
+        var managedId = builder.Configuration["Api:AppConfig:ManagedId"];
+        var hasManagedId = !string.IsNullOrEmpty(managedId);
+
+        TokenCredential tokenCredential = new DefaultAzureCredential();
+        if (hasManagedId)
+        {
+            tokenCredential = new ManagedIdentityCredential(managedId);
+        }
         options
-            .Connect(new Uri(builder.Configuration["App:AppConfig:Uri"]), new DefaultAzureCredential())
+            .Connect(new Uri(builder.Configuration["App:AppConfig:Uri"]), tokenCredential)
             .ConfigureKeyVault(kv =>
             {
                 // Some of the values coming from Azure App Configuration are stored Key Vault, use
                 // the managed identity of this host for the authentication.
-                kv.SetCredential(new DefaultAzureCredential());
+                kv.SetCredential(tokenCredential);
             });
     });
 }
