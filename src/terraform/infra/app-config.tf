@@ -1,7 +1,12 @@
 resource "azurerm_app_configuration" "main" {
-  name                = "appcs-${var.application_name}-${var.environment_name}"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
+  name                       = "appcs-${var.application_name}-${var.environment_name}"
+  resource_group_name        = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  sku                        = "standard"
+  local_auth_enabled         = true
+  public_network_access      = "Enabled"
+  purge_protection_enabled   = false
+  soft_delete_retention_days = 1
 }
 
 # grant terraform access to create app config keys
@@ -9,6 +14,13 @@ resource "azurerm_role_assignment" "terraform_app_config_data_owner" {
   scope                = azurerm_app_configuration.main.id
   role_definition_name = "App Configuration Data Owner"
   principal_id         = data.azurerm_client_config.current.object_id
+}
+
+# web api
+resource "azurerm_role_assignment" "web_api_data_reader" {
+  scope                = azurerm_app_configuration.main.id
+  role_definition_name = "App Configuration Data Reader"
+  principal_id         = var.web_api_application_id
 }
 
 locals {

@@ -9,6 +9,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   oidc_issuer_enabled       = true
   workload_identity_enabled = true
 
+
   default_node_pool {
     name                        = "systempool"
     vm_size                     = var.aks_system_pool.vm_size
@@ -52,6 +53,42 @@ resource "azurerm_kubernetes_cluster" "main" {
 
   depends_on = [azurerm_role_assignment.cluster_identity_operator]
 
+}
+
+locals {
+  aks_logs = [
+    "kube-apiserver",
+    "kube-audit",
+    "kube-audit-admin",
+    "kube-controller-manager",
+    "kube-scheduler",
+    "cluster-autoscaler",
+    "cloud-controller-manager",
+    "guard",
+    "csi-azuredisk-controller",
+    "csi-azurefile-controller",
+    "csi-snapshot-controller"
+  ]
+}
+
+resource "azurerm_monitor_diagnostic_setting" "aks_clusters" {
+
+  name                           = "aks-${var.application_name}-${var.environment_name}"
+  target_resource_id             = azurerm_kubernetes_cluster.main.id
+  log_analytics_workspace_id     = azurerm_log_analytics_workspace.main.id
+  log_analytics_destination_type = "Dedicated"
+
+  dynamic "enabled_log" {
+    for_each = local.aks_logs
+
+    content {
+      category = enabled_log.value
+    }
+  }
+
+  metric {
+    category = "AllMetrics"
+  }
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "workload" {

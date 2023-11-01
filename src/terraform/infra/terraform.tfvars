@@ -14,4 +14,6 @@ aks_workload_pool = {
   min_node_count = 2
   max_node_count = 3
 }
-sqldb_admin_username = "admin_user"
+sqldb_admin_username   = "admin_user"
+web_api_application_id = "f43f355e-6c78-4498-b441-605dd0841041"
+web_app_application_id = ""

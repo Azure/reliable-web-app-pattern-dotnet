@@ -39,3 +39,9 @@ variable "aks_workload_pool" {
 variable "sqldb_admin_username" {
   type = string
 }
+variable "web_api_application_id" {
+  type = string
+}
+variable "web_app_application_id" {
+  type = string
+}
