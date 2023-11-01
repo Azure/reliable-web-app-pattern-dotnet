@@ -8,7 +8,9 @@ using System.Net.Mime;
 
 namespace Relecloud.Web.Api.Controllers
 {
-    public class CartController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CartController : ControllerBase
     {
         private readonly ILogger<CartController> logger;
         private readonly ICartRepository cartRepository;
