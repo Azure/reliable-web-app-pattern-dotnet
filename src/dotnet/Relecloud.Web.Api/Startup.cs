@@ -66,7 +66,7 @@ namespace Relecloud.Web.Api
             else
             {
                 services.AddScoped<ITicketManagementService, TicketManagementService>();
-                services.AddScoped<ITicketRenderingService, TicketRenderingService>();
+                services.AddScoped<ITicketRenderingService, MockTicketRenderingService>();
             }
         }
 
