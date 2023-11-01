@@ -19,8 +19,15 @@ namespace Relecloud.Web.Api.Services.RedisCacheCartRepository
         {
             var cacheKey = GetCartKey(userId);
             var cartData = await cache.GetStringAsync(cacheKey);
-            var cartObject = JsonConvert.DeserializeObject<Dictionary<int, int>>(cartData);
-            return cartObject ?? new Dictionary<int, int>();
+            if(cartData == null)
+            {
+                return new Dictionary<int, int>();
+            } 
+            else
+            {
+                var cartObject = JsonConvert.DeserializeObject<Dictionary<int, int>>(cartData);
+                return cartObject ?? new Dictionary<int, int>();
+            }
         }
 
         public async Task UpdateCartAsync(string userId, int concertId, int count)
