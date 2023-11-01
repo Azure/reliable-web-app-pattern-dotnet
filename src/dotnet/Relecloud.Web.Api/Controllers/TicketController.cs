@@ -33,7 +33,7 @@ namespace Relecloud.Web.Api.Controllers
         [HttpGet("{id}", Name = "GetTicketById")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Ticket))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetAsync(int id)
         {
             try
@@ -57,7 +57,7 @@ namespace Relecloud.Web.Api.Controllers
         [HttpGet("ForUser/{userId}", Name = "GetAllTickets")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResult<Concert>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetAllTicketsAsync(string userId, int skip = 0, int take = DefaultNumberOfTickets)
         {
             try
@@ -79,7 +79,7 @@ namespace Relecloud.Web.Api.Controllers
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(PurchaseTicketsResult))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> PurchaseTicketsAsync(PurchaseTicketsRequest purchaseTicketRequest)
         {
             try
