@@ -3,8 +3,6 @@
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 13 1 * *' # Run at 13:00 on the 1st day of the month
 
 jobs:
   build:
