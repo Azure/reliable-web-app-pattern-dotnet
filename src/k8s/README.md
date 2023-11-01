@@ -18,3 +18,22 @@
 This is if you change the managed identity's role assignments or something that is not k8s related and the deployment will need to refresh
 `kubectl rollout restart deployment/relecloud-web-app`
 
+`
+{
+  "userId": "123",
+  "paymentDetails": {
+    "nameOnCard": "John Smith",
+    "name": "John Smith",
+    "email": "john@acme.com",
+    "phone": "555-123-4567",
+    "cardNumber": "4388567812345678",
+    "securityCode": "111",
+    "cardType": 1,
+    "expirationMonthYear": "1226"
+  },
+  "concertIdsAndTicketCounts": {
+    "817": 2,
+    "317": 3
+  }
+}
+`
