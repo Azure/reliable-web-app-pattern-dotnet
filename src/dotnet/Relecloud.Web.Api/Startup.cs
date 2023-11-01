@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Logging;
 using Relecloud.Web.Api.Infrastructure;
 using Relecloud.Web.Api.Services;
 using Relecloud.Web.Api.Services.MockServices;
+using Relecloud.Web.Api.Services.RedisCacheCartRepository;
 using Relecloud.Web.Api.Services.Search;
 using Relecloud.Web.Api.Services.SqlDatabaseConcertRepository;
 using Relecloud.Web.Api.Services.TicketManagementService;
@@ -36,6 +37,7 @@ namespace Relecloud.Web.Api
 
             AddAzureSearchService(services);
             AddConcertContextServices(services);
+            AddCartServices(services);
             AddDistributedSession(services);
             AddPaymentGatewayService(services);
             AddTicketManagementService(services);
@@ -114,6 +116,19 @@ namespace Relecloud.Web.Api
                         errorNumbersToAdd: null);
                     }));
                 services.AddScoped<IConcertRepository, SqlDatabaseConcertRepository>();
+            }
+        }
+        private void AddCartServices(IServiceCollection services)
+        {
+            var redisCacheConnectionString = Configuration["App:RedisCache:ConnectionString"];
+            if (string.IsNullOrWhiteSpace(redisCacheConnectionString))
+            {
+                services.AddScoped<IConcertRepository, MockConcertRepository>();
+            }
+            else
+            {
+                // Add a concert repository based on Azure SQL Database.
+                services.AddScoped<ICartRepository, RedisCacheCartRepository>();
             }
         }
 
