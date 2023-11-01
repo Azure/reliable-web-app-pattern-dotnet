@@ -5,6 +5,7 @@ metadata:
 spec:
   replicas: 3
   selector:
+
     matchLabels:
       app: relecloud-web-api
   template:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
       - name: relecloud-web-api-container
-        image: acrrelazappsharedlab1025.azurecr.io/relecloud-web-api:2023.10.14
+        image: acrrelazappsharedlab1025.azurecr.io/relecloud-web-api:2023.11.21
         envFrom:
         - configMapRef:
             name: web-api-config
@@ -37,7 +38,15 @@ kind: ConfigMap
 metadata:
   name: web-api-config
 data:
+  AZURE_CLIENT_ID: "ae6e0b29-fb8a-481f-acad-aa435ae6d25a"
+  AZURE_CLIENT_SECRET: "FOO"
+  AZURE_TENANT_ID: "72f988bf-86f1-41af-91ab-2d7cd011db47"
   Api__AzureAd__ClientId: "ae6e0b29-fb8a-481f-acad-aa435ae6d25a"
+  Api__AzureAd__ClientSecret: "FOO"
   Api__AzureAd__TenantId: "72f988bf-86f1-41af-91ab-2d7cd011db47"
   Api__AppConfig__Uri: "https://appcs-relaz-app-lab1025.azconfig.io"
-  Api__AppConfig__ManagedIdentity: "ee5f2873-8dbf-4c18-9503-06c4c1e518ab"
+  Api__AppConfig__ManagedId: "ee5f2873-8dbf-4c18-9503-06c4c1e518ab"
+  App__Api__ApplicationInsights__ConnectionString: "FOO"
+  App__RedisCache__ConnectionString: "FOO"
+  App__SqlDatabase__ConnectionString: "FOO"
+  App__StorageAccount__QueueConnectionString: ""

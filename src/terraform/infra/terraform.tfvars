@@ -16,4 +16,8 @@ aks_workload_pool = {
 }
 sqldb_admin_username   = "admin_user"
 web_api_application_id = "f43f355e-6c78-4498-b441-605dd0841041"
-web_app_application_id = ""
+web_app_application_id = "78dc7090-8db4-47c6-915a-ae01e3bde86d"
+container_registry = {
+  name                = "acrrelazappsharedlab1025"
+  resource_group_name = "rg-relaz-app-shared-lab1025"
+}

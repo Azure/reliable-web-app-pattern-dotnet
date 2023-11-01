@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: relecloud-web-app-container
-        image: acrrelazappsharedlab1025.azurecr.io/relecloud-web-app:2023.10.33
+        image: acrrelazappsharedlab1025.azurecr.io/relecloud-web-app:2023.11.38
         envFrom:
         - configMapRef:
             name: web-app-config
@@ -37,8 +37,12 @@ kind: ConfigMap
 metadata:
   name: web-app-config
 data:
+  AZURE_CLIENT_ID: "649852cf-990c-490b-aa33-1943be0168c6"
+  AZURE_CLIENT_SECRET: "FOO"
+  AZURE_TENANT_ID: "72f988bf-86f1-41af-91ab-2d7cd011db47"
   AzureAd__ClientId: "649852cf-990c-490b-aa33-1943be0168c6"
+  AzureAd__ClientSecret: "FOO"
   AzureAd__TenantId: "72f988bf-86f1-41af-91ab-2d7cd011db47"
   App__AppConfig__Uri: "https://appcs-relaz-app-lab1025.azconfig.io"
-  App__AppConfig__ManagedIdentity: "ee5f2873-8dbf-4c18-9503-06c4c1e518ab"
-  App__RelecloudApi__BaseUri: "http://20.25.173.25"
+  App__AppConfig__ManagedId: "ee5f2873-8dbf-4c18-9503-06c4c1e518ab"
+  App__RelecloudApi__BaseUri: "http://20.14.23.199"

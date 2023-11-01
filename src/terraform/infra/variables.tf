@@ -45,3 +45,9 @@ variable "web_api_application_id" {
 variable "web_app_application_id" {
   type = string
 }
+variable "container_registry" {
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
+}

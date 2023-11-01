@@ -362,3 +362,6 @@ sqlcmd*
 **/.k8s.sh
 **/relaz-kubeconfig.yaml
 **/launchSettings.local.json
+**/relaz-kubeconfig-*.yaml
+**/web-app-*.yaml
+**/web-api-*.yaml

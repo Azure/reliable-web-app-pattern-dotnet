@@ -12,7 +12,7 @@
 `kubectl logs <pod-name>`
 
 ## Deploy the web app
-`kubectl apply -f ./files/web-app.yaml`
+`kubectl apply -f web-app.yaml`
 
 ## Rollout updates to the deployment
 This is if you change the managed identity's role assignments or something that is not k8s related and the deployment will need to refresh

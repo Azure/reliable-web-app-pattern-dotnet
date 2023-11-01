@@ -16,6 +16,13 @@ resource "azurerm_role_assignment" "terraform_app_config_data_owner" {
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
+# web app
+resource "azurerm_role_assignment" "web_app_data_reader" {
+  scope                = azurerm_app_configuration.main.id
+  role_definition_name = "App Configuration Data Reader"
+  principal_id         = var.web_app_application_id
+}
+
 # web api
 resource "azurerm_role_assignment" "web_api_data_reader" {
   scope                = azurerm_app_configuration.main.id
