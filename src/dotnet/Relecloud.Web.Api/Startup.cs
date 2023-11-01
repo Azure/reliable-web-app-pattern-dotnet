@@ -143,11 +143,12 @@ namespace Relecloud.Web.Api
         public void Configure(WebApplication app, IWebHostEnvironment env)
         {
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            //if (app.Environment.IsDevelopment())
+            //{
+            //}
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
             using var serviceScope = app.Services.CreateScope();
             serviceScope.ServiceProvider.GetRequiredService<ApplicationInitializer>().Initialize();
 
