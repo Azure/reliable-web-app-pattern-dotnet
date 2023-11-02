@@ -5,6 +5,7 @@ using Relecloud.Web.Api.Services.TicketManagementService;
 using Relecloud.Web.Api.Services;
 using Relecloud.Web.Models.ConcertContext;
 using System.Net.Mime;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace Relecloud.Web.Api.Controllers
 {
@@ -47,6 +48,23 @@ namespace Relecloud.Web.Api.Controllers
             {
                 var cart = await this.cartRepository.GetCartAsync(userId);
                 return Ok(cart);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Unhandled exception from ConcertController.UpdateAsync");
+                return Problem("Unable to Update the concert");
+            }
+        }
+
+        [HttpDelete(Name = "ClearCart")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Dictionary<int, int>))]
+        public async Task<IActionResult> ClearAsync(string userId)
+        {
+            try
+            {
+                await this.cartRepository.ClearCartAsync(userId);
+                return Ok();
             }
             catch (Exception ex)
             {

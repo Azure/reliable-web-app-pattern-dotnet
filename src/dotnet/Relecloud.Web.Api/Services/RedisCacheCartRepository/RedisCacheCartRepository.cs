@@ -15,6 +15,12 @@ namespace Relecloud.Web.Api.Services.RedisCacheCartRepository
         {
         }
 
+        public async Task ClearCartAsync(string userId)
+        {
+            var currentCart = new Dictionary<int, int>();
+            await UpdateCartAsync(userId, currentCart);
+        }
+
         public async Task<Dictionary<int, int>> GetCartAsync(string userId)
         {
             var cacheKey = GetCartKey(userId);
@@ -42,14 +48,18 @@ namespace Relecloud.Web.Api.Services.RedisCacheCartRepository
             {
                 currentCart.Add(concertId, count);
             }
+            await UpdateCartAsync(userId, currentCart);
+        }
 
+        private async Task UpdateCartAsync(string userId, Dictionary<int, int> currentCart)
+        {
             var cartData = JsonConvert.SerializeObject(currentCart);
             var cacheOptions = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
             };
             var cacheKey = GetCartKey(userId);
-            await this.cache.SetStringAsync(cacheKey, cartData, cacheOptions);
+            await cache.SetStringAsync(cacheKey, cartData, cacheOptions);
         }
 
         private string GetCartKey(string userId)
