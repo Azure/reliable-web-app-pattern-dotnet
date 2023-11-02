@@ -60,15 +60,18 @@ namespace Relecloud.Web.Api.Controllers
         //[Authorize]
         public async Task<IActionResult> GetAllTicketsAsync(string userId, int skip = 0, int take = DefaultNumberOfTickets)
         {
+            var operationName = "ORDER_GET";
             try
             {
                 var tickets = await this.concertRepository.GetAllTicketsAsync(userId, skip, take);
+                this.logger.LogInformation(Request.ExtractOperationBreadcrumb("OK", operationName).Serialize());
 
                 return Ok(tickets);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unhandled exception from TicketController.GetAllTicketsAsync");
+                this.logger.LogError(Request.ExtractOperationBreadcrumb("ERROR", operationName).Serialize());
                 return Problem("Unable to GetAllTickets for this user");
             }
         }
@@ -82,6 +85,8 @@ namespace Relecloud.Web.Api.Controllers
         //[Authorize]
         public async Task<IActionResult> PurchaseTicketsAsync(PurchaseTicketsRequest purchaseTicketRequest)
         {
+            var operationName = "ORDER_CREATE";
+
             try
             {
                 if (!ModelState.IsValid)
@@ -161,6 +166,8 @@ namespace Relecloud.Web.Api.Controllers
 
                 await paymentGatewayService.CapturePaymentAsync(captureRequest);
 
+                this.logger.LogInformation(Request.ExtractOperationBreadcrumb("OK", operationName).Serialize());
+
                 return Accepted(new PurchaseTicketsResult
                 {
                     Status = PurchaseTicketsResultStatus.Success
@@ -169,6 +176,7 @@ namespace Relecloud.Web.Api.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unhandled exception from TicketController.PurchaseTicketsAsync");
+                this.logger.LogError(Request.ExtractOperationBreadcrumb("ERROR", operationName).Serialize());
                 return Problem("Unable to Create the ticket");
             }
         }

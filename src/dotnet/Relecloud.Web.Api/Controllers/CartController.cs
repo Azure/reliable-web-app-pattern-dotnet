@@ -6,6 +6,8 @@ using Relecloud.Web.Api.Services;
 using Relecloud.Web.Models.ConcertContext;
 using System.Net.Mime;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Logging;
 
 namespace Relecloud.Web.Api.Controllers
 {
@@ -27,14 +29,17 @@ namespace Relecloud.Web.Api.Controllers
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         public async Task<IActionResult> UpdateAsync(string userId, int concertId, int count)
         {
+            var operationName = "CART_ADD";
             try
             {
                 await this.cartRepository.UpdateCartAsync(userId, concertId, count);
+                this.logger.LogInformation(Request.ExtractOperationBreadcrumb("OK", operationName).Serialize());
                 return Accepted();
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Unhandled exception from ConcertController.UpdateAsync");
+                this.logger.LogError(Request.ExtractOperationBreadcrumb("ERROR", operationName).Serialize());
                 return Problem("Unable to Update the concert");
             }
         }
@@ -44,14 +49,17 @@ namespace Relecloud.Web.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Dictionary<int, int>))]
         public async Task<IActionResult> GetAsync(string userId)
         {
+            var operationName = "CART_GET";
             try
             {
                 var cart = await this.cartRepository.GetCartAsync(userId);
+                this.logger.LogInformation(Request.ExtractOperationBreadcrumb("OK", operationName).Serialize());
                 return Ok(cart);
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Unhandled exception from ConcertController.UpdateAsync");
+                this.logger.LogError(Request.ExtractOperationBreadcrumb("ERROR", operationName).Serialize());
                 return Problem("Unable to Update the concert");
             }
         }
