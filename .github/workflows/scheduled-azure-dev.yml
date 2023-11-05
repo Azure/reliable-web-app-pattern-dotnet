@@ -3,10 +3,6 @@
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
-  schedule:
-    - cron: '0 12 1 * *' # Run at 12:00 on the 1st day of the month
 
 # https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
 permissions:
