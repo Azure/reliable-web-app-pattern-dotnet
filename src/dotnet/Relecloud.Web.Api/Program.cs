@@ -8,7 +8,7 @@ var hasRequiredConfigSettings = !string.IsNullOrEmpty(builder.Configuration["Api
 
 if (hasRequiredConfigSettings)
 {
-    var managedId = builder.Configuration["App:AppConfig:ManagedIdentity"];
+    var managedId = builder.Configuration["Api:AppConfig:ManagedIdentity"];
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
         options
