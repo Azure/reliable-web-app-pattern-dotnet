@@ -40,5 +40,5 @@ data:
   AzureAd__ClientId: "ed07613e-2c08-4be4-855a-60a4c986d446"
   AzureAd__TenantId: "4d21d610-d7ef-413c-b647-f6f57aee320b"
   App__AppConfig__Uri: "https://appcs-ls-infra-dev.azconfig.io"
-  App__AppConfig__ManagedIdentity: "0b8d703c-156e-4af4-9b12-faf97e896d9f"
-  App__RelecloudApi__BaseUri: "http://20.25.173.25"
+  App__AppConfig__ManagedIdentity: "526f565d-c109-4f6d-8416-0c37f31414d7"
+  App__RelecloudApi__BaseUri: "http://20.106.109.151"
