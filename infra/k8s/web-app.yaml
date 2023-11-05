@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: relecloud-web-app-container
-        image: acrlsshareddev.azurecr.io/relecloud-web-app:2023.10.3
+        image: acrlsshareddev.azurecr.io/relecloud-web-app:2023.10.4
         envFrom:
         - configMapRef:
             name: web-app-config
