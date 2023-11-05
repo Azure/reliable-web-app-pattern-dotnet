@@ -33,3 +33,6 @@ variable "container_registry" {
     resource_group_name = string
   })
 }
+variable "mssql_admin_username" {
+  type = string
+}

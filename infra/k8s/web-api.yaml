@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: relecloud-web-api-container
-        image: acrlsshareddev.azurecr.io/relecloud-web-api:2023.11.2
+        image: acrlsshareddev.azurecr.io/relecloud-web-api:2023.11.3
         envFrom:
         - configMapRef:
             name: web-api-config
@@ -41,3 +41,9 @@ data:
   Api__AzureAd__TenantId: "4d21d610-d7ef-413c-b647-f6f57aee320b"
   Api__AppConfig__Uri: "https://appcs-ls-infra-dev.azconfig.io"
   Api__AppConfig__ManagedIdentity: "526f565d-c109-4f6d-8416-0c37f31414d7"
+  App__RedisCache__ConnectionString: "FOO"
+  App__Api__ApplicationInsights__ConnectionString: "FOO"
+  App__SqlDatabase__ConnectionString: "FOO"
+  App__AzureSearch__ServiceName: "FOO"
+  App__StorageAccount__Url: "FOO"
+  App__StorageAccount__Container: "FOO"

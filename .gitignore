@@ -356,3 +356,4 @@ sqlcmd*
 **/kube_config.yaml
 **/.debug.sh
 **/.terraform*
+infra/k8s/web-api.yaml.local

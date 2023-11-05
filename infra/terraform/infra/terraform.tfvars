@@ -15,3 +15,4 @@ container_registry = {
   name                = "acrlsshareddev"
   resource_group_name = "rg-ls-shared-dev"
 }
+mssql_admin_username = "azure-terraformer"
