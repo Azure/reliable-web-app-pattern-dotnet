@@ -365,3 +365,4 @@ sqlcmd*
 **/relaz-kubeconfig-*.yaml
 **/web-app-*.yaml
 **/web-api-*.yaml
+**/__azurite_db_table__.json
