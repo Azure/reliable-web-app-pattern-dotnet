@@ -47,255 +47,185 @@ This project has a six-part video series that details the reliable web app patte
 
 ## Steps to deploy the reference implementation
 
-This reference implementation provides you with the instructions and templates you need to deploy this solution. This solution uses the Azure Dev CLI to set up Azure services
-and deploy the code.
+The following detailed deployment steps assume you are using a Dev Container inside Visual Studio Code.
 
-### Pre-requisites
+### 1. Clone the repo
 
-1. To run the scripts, Windows users require Powershell 7.2 (LTS) or above. Alternatively, you can use a bash terminal using [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install). macOS users can use a bash terminal.
+Clone the repository from GitHub:
 
-   1. PowerShell users - [Install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows)
-       Run the following to verify that you're running the latest PowerShell
-   
-       ```ps1
-       $PsVersionTable
-       ```
-
-1. [Install Git](https://github.com/git-guides/install-git)
-    Run the following to verify that git is available
-    ```ps1
-    git version
-    ```
-
-1. [Install the Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli).
-    Run the following command to verify that you're running version
-    2.38.0 or higher.
-
-    ```ps1
-    az version
-    ```
-    
-    After the installation, run the following command to [sign in to Azure interactively](https://learn.microsoft.com/cli/azure/authenticate-azure-cli#sign-in-interactively).
-
-    ```ps1
-    az login
-    ```
-1. [Upgrade the Azure CLI Bicep extension](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli).
-    Run the following command to verify that you're running version 0.12.40 or higher.
-
-    ```ps1
-    az bicep version
-    ```
-
-1. [Install the Azure Dev CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd).
-    Run the following command to verify that the Azure Dev CLI is installed.
-
-    ```ps1
-    azd auth login
-    ```
-
-1. [Install .NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
-    Run the following command to verify that the .NET SDK 6.0 is installed.
-    ```ps1
-    dotnet --version
-    ```
-
-### Get the code
-
-Please clone the repo to get started.
-
-```
-git clone https://github.com/Azure/reliable-web-app-pattern-dotnet
+```shell
+git clone https://github.com/Azure/modern-web-app-pattern-dotnet.git
+cd modern-web-app-pattern-dotnet
 ```
 
-And switch to the folder so that `azd` will recognize the solution.
+### 2. Open Dev Container in Visual Studio Code (optional)
 
-```
-cd reliable-web-app-pattern-dotnet
-```
+If required, ensure Docker Desktop is started and enabled for your WSL terminal [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt:
 
-### Deploying to Azure
-
-Relecloud's developers use the `azd` command line experience to deploy the code. This means their local workflow is the same
-experience that runs from the GitHub action. You can use these
-steps to follow their experience by running the commands from the folder where this guide is stored after cloning this repo.
-
-Use this command to get started with deployment by creating an
-`azd` environment on your workstation.
-
-<table>
-<tr>
-<td>PowerShell</td>
-<td>
-
-```ps1
-$myEnvironmentName="relecloudresources"
+```shell
+code .
 ```
 
-```ps1
-azd init -e $myEnvironmentName
+Once Visual Studio Code is launched, you should see a popup allowing you to click on the button **Reopen in Container**.
+
+![Reopen in Container](assets/images/vscode-reopen-in-container.png)
+
+If you don't see the popup, open the Visual Studio Code Command Palette to execute the command. There are three ways to open the command palette:
+
+- For Mac users, use the keyboard shortcut ⇧⌘P
+- For Windows and Linux users, use Ctrl+Shift+P
+- From the Visual Studio Code top menu, navigate to View -> Command Palette.
+
+Once the command palette is open, search for `Dev Containers: Rebuild and Reopen in Container`.
+
+![WSL Ubuntu](assets/images/vscode-reopen-in-container-command.png)
+
+### 3. Create a new environment
+
+The environment name should be less than 18 characters and must be comprised of lower-case, numeric, and dash characters (for example, `dotnetwebapp`).  The environment name is used for resource group naming and specific resource naming. Also, select a password for the admin user of the database.
+
+If not using PowerShell 7+, run the following command:
+
+```shell
+pwsh
 ```
 
-</td>
-</tr>
-<tr>
-<td>Bash</td>
-<td>
+Run the following commands to set these values and create a new environment:
 
-```bash
-myEnvironmentName="relecloudresources"
+```pwsh
+azd env new dotnetwebapp
 ```
 
-```bash
-azd init -e $myEnvironmentName
+Substitute the environment name with your own value.
+
+By default, Azure resources are sized for a "development" mode. If doing a Production deployment, set the `AZURE_ENV_TYPE` to `prod` using the following code:
+
+```pwsh
+azd env set AZURE_ENV_TYPE prod
 ```
 
-</td>
-</tr>
-</table>
+### 4. Log in to Azure
 
+Before deploying, you must be authenticated to Azure and have the appropriate subscription selected.  To authenticate:
 
-#### (Optional Steps) Choose Prod or Non-prod environment
-
-The Relecloud team uses the same bicep templates to deploy
-their production, and non-prod, environments. To do this
-they set `azd` environment parameters that change the behavior
-of the next steps.
-
-> If you skip the next two optional steps, and change nothing,
-> then the bicep templates will default to non-prod settings.
-
-*Step: 1*
-
-Relecloud devs deploy the production environment by running the
-following command to choose the SKUs they want in production.
-
-```ps1
-azd env set IS_PROD true
+```pwsh
+azd auth login
 ```
 
-*Step: 2*
-
-Relecloud devs also use the following command to choose a second
-Azure location because the production environment is
-multiregional.
-
-```ps1
-azd env set SECONDARY_AZURE_LOCATION westus3
+```pwsh
+Connect-AzAccount
 ```
 
-> You can find a list of available Azure regions by running
-> the following Azure CLI command.
-> 
-> ```ps1
-> az account list-locations --query "[].name" -o tsv
+Each command will open a browser allowing you to authenticate.  To list the subscriptions you have access to:
+
+```pwsh
+Get-AzSubscription
+```
+
+To set the active subscription:
+
+```pwsh
+$AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
+azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
+Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
+```
+
+### 5. Select a region for deployment
+
+The application can be deployed in either a single region or multi-region manner. You can find a list of available Azure regions by running the following Azure CLI command.
+
+> ```pwsh
+> (Get-AzLocation).Location
 > ```
 
-#### Provision the infrastructure
+Set the `AZURE_LOCATION` to the primary region:
 
-Relecloud uses the following command to deploy the Azure
-services defined in the bicep files by running the provision
-command.
-
-> This step will take several minutes based on the region
-> and deployment options you selected.
-
-```ps1
-azd provision
+```shell
+azd env set AZURE_LOCATION westus3
 ```
-When prompted, select the preferred Azure Subscription and the Location:
 
-![screenshot azd env new](./assets/Guide/Azd-Env-New.png)
+If doing a multi-region deployment, set the `AZURE_LOCATION2` to the secondary region:
 
-> When the command finishes you have deployed Azure App
-> Service, SQL Database, and supporting services to your
-> subscription. If you log into the the
-> [Azure Portal](http://portal.azure.com) you can find them
-> in the resource group named `$myEnvironmentName-rg`.
+```shell
+azd env set AZURE_LOCATION2 eastus
+```
 
-#### Create App Registrations
+Make sure the secondary region is a paired region with the primary region (`AZURE_LOCATION`). Paired regions are required to support some Azure features; for example, [geo-zone-redundant storage (GZRS) failover](https://learn.microsoft.com/azure/storage/common/storage-disaster-recovery-guidance). For a full list of region pairs, see [Azure region pairs](https://learn.microsoft.com/azure/reliability/cross-region-replication-azure#azure-cross-region-replication-pairings-for-all-geographies). We have validated the following paired regions.
+
+| AZURE_LOCATION | AZURE_LOCATION2 |
+| ----- | ----- |
+| westus3 | eastus |
+| westeurope | northeurope |
+| australiaeast | australiasoutheast |
+
+### 6. Provision the application
+
+Run the following command to create the infrastructure (about 15-minutes to provision):
+
+```pwsh
+azd provision --no-prompt
+```
+
+**Create App Registrations**
 
 Relecloud devs have automated the process of creating Azure
 AD resources that support the authentication features of the
 web app. They use the following command to create two new
 App Registrations within Azure AD. The command is also
 responsible for saving configuration data to Key Vault and
-App Configuration so that the web app can read this data.
+App Configuration so that the web app can read this data
+(about 3-minutes to register).
 
-<table>
-<tr>
-<td>PowerShell</td>
-<td>
-
-```ps1
-pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\createAppRegistrations.ps1 -g '$myEnvironmentName-rg'"
+```sh
+./infra/scripts/postprovision/call-create-app-registrations.sh
 ```
 
-</td>
-</tr>
-<tr>
-<td>Bash</td>
-<td>
+**Set Configuration**
 
-```bash
-chmod +x ./infra/createAppRegistrations.sh
-./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
+Relecloud devs have automated the process of configuring the environment.
+
+```sh
+./infra/scripts/predeploy/call-set-app-configuration.sh
 ```
 
-</td>
-</tr>
-</table>
+### 7. Deploy the application
 
-> Known issue: [/bin/bash^M: bad interpreter](known-issues.md#troubleshooting)
+Run the following command to deploy the code to the created infrastructure (about 4-minutes to deploy):
 
-#### Deploy the code
-
-To finish the deployment process the Relecloud devs run the
-folowing `azd` commands to build, package, and deploy the dotnet
-code for the front-end and API web apps.
-
-```ps1
- azd env set AZURE_RESOURCE_GROUP "$myEnvironmentName-rg"
+```shell
+azd deploy
 ```
 
-```ps1
- azd deploy
+If you are doing a multi-region deployment, you must also deploy the code to the secondary region (about 4-minutes to deploy):
+
+```shell
+SECONDARY_RESOURCE_GROUP=$(azd env get-values --output json | jq -r .secondary_resource_group)
+azd env set AZURE_RESOURCE_GROUP $SECONDARY_RESOURCE_GROUP
+azd deploy
 ```
 
-When finished the console will display the URI for the web app. You can use this URI to view the deployed solution in a browser.
+The provisioning and deployment process can take anywhere from 20 minutes to over an hour, depending on system load and your bandwidth.
 
-![screenshot of Relecloud app home page](./assets/Guide/WebAppHomePage.png)
 
-> If you face any issues with the deployment, see the [Known issues document](known-issues.md) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
+### 8. Open and use the application
 
-#### Clean up Azure Resources
+Use the following to find the URL for the Proseware application that you have deployed:
 
-1. Unprovision the Azure Resources
-2. Clean up App Registrations
-3. Delete the Deployment
-
-##### 1. Unprovision the Azure Resources
-To tear down an enviroment, and clean up the Azure resource group, use the folloing command:
-
-```ps1
-azd down --force --purge --no-prompt
+```shell
+azd env get-values --output json | jq -r .WEB_URI
 ```
 
-> You can also use the Azure Portal to delete the "relecloudresources" resource groups. This approach will not purge the Key Vault or App Configuration services and they will remain in your subscription for 7 days in a deleted state that does not charge your subscription. This feature enables you to recover the data if the configuration was accidentally deleted. You can purge these in the _Manage deleted stores_ section of each service in the portal. 
+![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
 
- ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
+It takes approximately 5 minutes for the Azure App Service to respond to requests using the code deployed during step 6.
 
-##### 2. Clean up App Registrations
-You will also need to delete the two Azure AD app registrations that were created. You can find them in Azure AD by searching for their environment name. 
- 
- **Delete App Registrations** 
+### 9. Teardown
 
- ![screenshot of Azure AD App Registrations](./assets/Guide/AD-AppRegistrations.png)
- 
- You will also need to purge the App Configuration Service instance that was deployed.
+To tear down the deployment, run the following command:
 
-
-##### 3. Delete the Deployment
+```shell
+azd down
+```
 
 Your Azure subscription will retain your deployment request as a stateful object.
 If you would like to change the Azure region for this deployment you will need to
