@@ -1,24 +1,14 @@
 # Azure DevOps Pipeline Configuration
 
-This document is included to help you quickly set up this sample as part of an Azure DevOps pipeline that could be used as a starting point for your DevOps automations.
+This document will help you create an Azure DevOps pipeline that uses the Azure Developer CLI to deploy this sample.
 
-## Other considerations
-Your devOps process should be customized to automate the build, test, and deployment steps specific to your business needs.
-We recommend these following considerations to expand on the `azure-dev.yml` sample.
+> This pipeline does not include the QA processes that we recommend, it is included to help you quickstart your learning journey. This pipeline also does not include the Database lifecycle management processes that we recommend. You should review your needs with your team to identify a mature solution for deploying database changes, and versioning your database schema with source control.
 
-- You may want to review `scheduled-azure-dev.yml` to see how to add more steps such as validation testing
-- You may want multiple workflows defined in different files for different purposes
-    - Consider database lifecycle management
-    - Consider quality testing processes (e.g. integration testing)
-
-## Setting up Azure DevOps Pipelines
-The following content show you how to configure an Azure DevOps pipeline that uses the Azure Developer CLI. 
-
-You will find a default Azure DevOps pipeline file in `./.azdo/pipelines/daily-azure-dev.yml`. It will provision your Azure resources and deploy your code on a daily schedule.
+You will find a default Azure DevOps pipeline file in `./.azdo/pipelines/azure-dev.yml`. It will provision your Azure resources and deploy your code on a daily schedule.
 
 You are welcome to use the file as-is or modify it to suit your needs.
 
-> First time setup: This pipeline does not ask you to store credentials that can access Azure AD. As such, you will need to run the `createAppRegistrations.sh` script with your account for a first time setup. This process can be added to the pipeline as an idempotent script but will require an Azure AD account to create the App Registrations.
+> First time setup: This pipeline does not ask you to store credentials that can access Azure AD. As such, you will need to run the `create-app-registrations.ps1` script with your account for a first time setup. This process can be added to the pipeline as an idempotent script but will require an Azure AD account to create the App Registrations.
 
 ## Getting Started
 The following steps are required to get started.
