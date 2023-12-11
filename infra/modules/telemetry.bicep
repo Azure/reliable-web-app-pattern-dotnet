@@ -63,7 +63,7 @@ param resourceGroupName string
 // VARIABLES
 // ========================================================================
 
-var telemetryId = '2e1b35cf-c556-45fd-87d5-bfc08ac2e8ba'
+var telemetryId = '063f9e42-c824-4573-8a47-5f6112612fe2'
 
 // ========================================================================
 // AZURE RESOURCES
