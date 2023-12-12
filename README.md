@@ -33,17 +33,17 @@ This project has a six-part video series that details the reliable web app patte
 - Details about the upcoming concerts will be retrieved from the Azure SQL Database by the web api app with a SQL query. The results will be formatted as a JSON response and returned to the web front-end.
 - When the web front-end receives results from the API it will use razor template engine to render the HTML page shown to the user that asked for a list of concerts.
 - Once a user adds a concert ticket to their shopping cart the front-end web app will start interacting with Azure Cache for Redis. Asking the web app to put a concert ticket into the cart tells the web app to save information about that pending purchase as JSON data in Redis as part of a session object for the current user. Saving the session to an external datastore enables the web app to load balance traffic more evenly and to handle horizontal scaling events without losing the customer's intent to buy a ticket. No inventory management is included in this sample so there are no quantities deducted, or placed on reserve, in the backend of the system.
-- As the user checks out the front-end web app will ask the user to authenticate with Azure AD. This scenario is for a call center that places orders on-behalf of customers so the accounts in-use are managed by Relecloud and are not self-managed.
-- After authenticating to Azure AD the front-end web app will receive a token from Azure AD that represents the current user. This token is saved as a cookie in the user's browser and is not persisted by the front-end web app.
+- As the user checks out the front-end web app will ask the user to authenticate with Microsoft Entra ID. This scenario is for a call center that places orders on-behalf of customers so the accounts in-use are managed by Relecloud and are not self-managed.
+- After authenticating to Microsoft Entra ID the front-end web app will receive a token from Microsoft Entra ID that represents the current user. This token is saved as a cookie in the user's browser and is not persisted by the front-end web app.
 - As the user proceeds with checkout the web app will collect payment data. Payment data is not sent anywhere for this sample.
 - When the payment data is submitted for approval the ticket will be purchased. Logic to handle this is located in the web api project so the web app makes a call to the web api project.
 - Prior to calling the API, the front-end web app asks the MSAL library for a token it can use to call the web api app as an authenticated user.
-- When the MSAL library, in the front-end web app,  has a token it will cache it in Azure Cache for Redis. If it does not have a token it will request one from Azure AD and then save it in Azure Cache for Redis.
+- When the MSAL library, in the front-end web app,  has a token it will cache it in Azure Cache for Redis. If it does not have a token it will request one from Microsoft Entra ID and then save it in Azure Cache for Redis.
 - Once the ticket purchase request is sent to the web api app the API will render the ticket image and save it to Azure storage.
 - After the ticket purchase is completed successfully the user will be directed to their tickets page where they can see a list of the tickets they have purchased. These tickets will be immediately available because rendering the ticket was part of the purchase request.
   - As information flows between services the Azure network handles traffic routing across private endpoints by using Azure Private DNS to lookup the correct IP addresses. This enables the system to block public network traffic and use a single v-net to manage traffic between these systems. This v-net can be connected to others as-needed to allow the app to call other systems in your digital estate or to allow other systems to call the web API so they can access details about ticket purchases.
-  - As the front-end, and web api, apps process requests they are sending data to Application Insights so that you can monitor information about processing web requests
-  - When the web app is started for the first time it will load configuration data from App Config Service and Azure Key Vault. This information is saved in the web apps memory and is not accessed afterwards.
+  - As the front-end, and web api, apps process requests they are sending data to Application Insights so that you can monitor information about processing web requests.
+  - When the web app is started for the first time it will load configuration data from App Config Service and Azure Key Vault. This information is saved in the web app's memory and is not accessed afterwards.
 
 ## Steps to deploy the reference implementation
 
@@ -171,7 +171,7 @@ azd provision --no-prompt
 Relecloud devs have automated the process of creating Azure
 AD resources that support the authentication features of the
 web app. They use the following command to create two new
-App Registrations within Azure AD. The command is also
+App Registrations within Microsoft Entra ID. The command is also
 responsible for saving configuration data to Key Vault and
 App Configuration so that the web app can read this data
 (about 3-minutes to register).
