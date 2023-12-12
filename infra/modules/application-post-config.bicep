@@ -124,17 +124,21 @@ var redisCacheSecretNameSecondary = 'App--RedisCache--ConnectionString-Secondary
 
 var multiRegionalSecrets = deploymentSettings.isMultiLocationDeployment ? [redisCacheSecretNameSecondary] : []
 
-var listOfSecretNames = union([
-    azureAdApiClientId
-    azureAdApiInstance
-    azureAdApiScope
-    azureAdApiTenantId
-    azureAdCallbackPath
-    azureAdClientId
-    azureAdClientSecret
-    azureAdInstance
-    azureAdSignedOutCallbackPath
-    azureAdTenantId
+var listOfAppConfigSecrets = [
+  azureAdApiClientId
+  azureAdApiInstance
+  azureAdApiScope
+  azureAdApiTenantId
+  azureAdCallbackPath
+  azureAdClientId
+  azureAdClientSecret
+  azureAdInstance
+  azureAdSignedOutCallbackPath
+  azureAdTenantId
+]
+
+var listOfSecretNames = union(listOfAppConfigSecrets,
+  [
     redisCacheSecretNamePrimary
   ], multiRegionalSecrets)
 
@@ -215,7 +219,7 @@ module writeSecondaryRedisSecret '../core/security/key-vault-secrets.bicep' = if
 // ======================================================================== //
 // Azure AD Application Registration placeholders
 // ======================================================================== //
-module writeAppRegistrationSecrets '../core/security/key-vault-secrets.bicep' = [ for secretName in listOfSecretNames: {
+module writeAppRegistrationSecrets '../core/security/key-vault-secrets.bicep' = [ for secretName in listOfAppConfigSecrets: {
   name: 'write-temp-kv-secret-${secretName}'
   scope: existingKvResourceGroup
   params: {
