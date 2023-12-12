@@ -22,7 +22,7 @@ This project has a six-part video series that details the reliable web app patte
 
 ## Architecture
 
-![architecture diagram](./assets/icons/reliable-web-app-dotnet.png)
+![architecture diagram](./assets/images/relecloud-solution-diagram.png)
 
 ## Workflow
 
@@ -54,8 +54,8 @@ The following detailed deployment steps assume you are using a Dev Container ins
 Clone the repository from GitHub:
 
 ```shell
-git clone https://github.com/Azure/modern-web-app-pattern-dotnet.git
-cd modern-web-app-pattern-dotnet
+git clone https://github.com/Azure/reliable-web-app-pattern-dotnet.git
+cd reliable-web-app-pattern-dotnet
 ```
 
 ### 2. Open Dev Container in Visual Studio Code (optional)

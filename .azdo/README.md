@@ -33,7 +33,7 @@ The following steps walk-through creating the Azure Pipeline.
 
 1. Start by navigating to the Azure DevOps Pipeline page
 
-    ![#Azure DevOps Pipeline Page](../../assets/AzdoSetup/1CreateAPipeline.png)
+    ![#Azure DevOps Pipeline Page](../assets/images/AzdoSetup/1CreateAPipeline.png)
 
     <sup>Image of Azure DevOps Pipeline Page</sup>  
 
@@ -41,26 +41,26 @@ The following steps walk-through creating the Azure Pipeline.
 
 3. Choose **Azure Repos Git** and the appropriate git repository
 
-    ![#Azure Pipeline asks where your code is](../../assets/AzdoSetup/2CreateAPipeline.png)
+    ![#Azure Pipeline asks where your code is](../assets/images/AzdoSetup/2CreateAPipeline.png)
     
     <sup>Azure Pipeline asks where your code is</sup>  
 
 4. Choose **Existing Azure Pipelines YAML file**
 
 
-    ![#Azure Pipeline asks to pick a template](../../assets/AzdoSetup/3CreateAPipeline.png)
+    ![#Azure Pipeline asks to pick a template](../assets/images/AzdoSetup/3CreateAPipeline.png)
     
     <sup>Azure Pipeline asks to pick a template</sup> 
 
 5. Select the *daily-azure-dev.yml* file from your repo
 
-    ![#Pick the daily-azure-dev.yml file](../../assets/AzdoSetup/4CreateAPipeline.png)
+    ![#Pick the daily-azure-dev.yml file](../assets/images/AzdoSetup/4CreateAPipeline.png)
     
     <sup>Pick the daily-azure-dev.yml file</sup> 
 
 6. On the next screen you must provide 3 pipeline variables
 
-    ![#Set Pipeline variables](../../assets/AzdoSetup/5CreateAPipeline.png)
+    ![#Set Pipeline variables](../assets/images/AzdoSetup/5CreateAPipeline.png)
     
     <sup>Set Pipeline variables</sup> 
 
