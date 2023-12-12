@@ -215,7 +215,7 @@ The provisioning and deployment process can take anywhere from 20 minutes to ove
 
 ### 8. Open and use the application
 
-Use the following to find the URL for the Proseware application that you have deployed:
+Use the following to find the URL for the Relecloud application that you have deployed:
 
 ```shell
 azd env get-values --output json | jq -r .WEB_URI
