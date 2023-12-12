@@ -223,8 +223,6 @@ azd env get-values --output json | jq -r .WEB_URI
 
 ![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
 
-It takes approximately 5 minutes for the Azure App Service to respond to requests using the code deployed during step 6.
-
 ### 9. Teardown
 
 To tear down the deployment, run the following command:
