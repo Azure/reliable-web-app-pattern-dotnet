@@ -82,6 +82,8 @@ Once the command palette is open, search for `Dev Containers: Rebuild and Reopen
 
 ### 3. Create a new environment
 
+Use the VS Code terminal to run the following commands to create a new environment.
+
 The environment name should be less than 18 characters and must be comprised of lower-case, numeric, and dash characters (for example, `dotnetwebapp`).  The environment name is used for resource group naming and specific resource naming. Also, select a password for the admin user of the database.
 
 If not using PowerShell 7+, run the following command:
@@ -96,9 +98,9 @@ Run the following commands to set these values and create a new environment:
 azd env new dotnetwebapp
 ```
 
-Substitute the environment name with your own value.
+You can substitute the environment name with your own value.
 
-By default, Azure resources are sized for a "development" mode. If doing a Production deployment, set the `AZURE_ENV_TYPE` to `prod` using the following code:
+By default, Azure resources are sized for a "development" mode. If doing a Production deployment, set the `AZURE_ENV_TYPE` to `prod` using the following command:
 
 ```pwsh
 azd env set AZURE_ENV_TYPE prod
@@ -106,10 +108,14 @@ azd env set AZURE_ENV_TYPE prod
 
 ### 4. Log in to Azure
 
-Before deploying, you must be authenticated to Azure and have the appropriate subscription selected.  To authenticate:
+Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
 
 ```pwsh
 azd auth login
+```
+
+```pwsh
+Import-Module Az.Resources
 ```
 
 ```pwsh
