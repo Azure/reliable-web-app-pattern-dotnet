@@ -542,6 +542,7 @@ module applicationBudget '../core/cost-management/budget.bicep' = {
 // OUTPUTS
 // ========================================================================
 
+output app_config_uri string = appConfiguration.outputs.app_config_uri
 output key_vault_name string = deploymentSettings.isNetworkIsolated ? resourceNames.keyVault : keyVault.outputs.name
 output redis_cache_name string = redis.outputs.name
 

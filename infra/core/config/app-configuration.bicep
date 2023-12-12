@@ -194,3 +194,4 @@ resource appConfigDiagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021
 
 output id string = appConfigStore.id
 output name string = appConfigStore.name
+output app_config_uri string = appConfigStore.properties.endpoint
