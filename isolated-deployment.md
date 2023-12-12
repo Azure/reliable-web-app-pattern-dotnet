@@ -1,5 +1,5 @@
 # Steps to deploy the Network Isolated implementation
-This section describes the deployment steps for the reference implementation of a modern web application pattern with .NET on Microsoft Azure. These steps guide you through using the jump host that is deployed when performing a network isolated deployment because access to resources will be restricted from public network access and must be performed from a machine connected to the vnet.
+This section describes the deployment steps for the reference implementation of a reliable web application pattern with .NET on Microsoft Azure. These steps guide you through using the jump host that is deployed when performing a network isolated deployment because access to resources will be restricted from public network access and must be performed from a machine connected to the vnet.
 
 ## Prerequisites
 
@@ -20,8 +20,8 @@ If you do not wish to use a Dev Container, please refer to the [prerequisites](p
 For users familiar with the deployment process, you can use the following list of the deployments commands as a quick reference. The commands assume you have selected a suitable subscription and have logged into both the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/reference#azd-auth-login) and a PowerShell 7+ [AzContext](https://learn.microsoft.com/powershell/azure/authenticate-interactive):
 
 ```shell
-git clone https://github.com/Azure/modern-web-app-pattern-dotnet.git
-cd modern-web-app-pattern-dotnet
+git clone https://github.com/Azure/reliable-web-app-pattern-dotnet.git
+cd reliable-web-app-pattern-dotnet
 azd env new dotnetwebapp
 azd env set NETWORK_ISOLATION true
 azd env set DEPLOY_HUB_NETWORK true
@@ -120,8 +120,8 @@ Use the Windows Terminal to get the code:
 ```shell
 mkdir \dev
 cd \dev
-git clone https://github.com/Azure/modern-web-app-pattern-dotnet
-cd .\modern-web-app-pattern-dotnet
+git clone https://github.com/Azure/reliable-web-app-pattern-dotnet
+cd .\reliable-web-app-pattern-dotnet
 ```
 
 ### Authenticate to Azure
