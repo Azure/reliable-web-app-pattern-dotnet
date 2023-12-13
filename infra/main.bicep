@@ -551,5 +551,6 @@ output service_managed_identities object[] = application.outputs.service_managed
 output service_web_endpoints string[] = application.outputs.service_web_endpoints
 output AZURE_OPS_VAULT_NAME string = isNetworkIsolated ? hubNetwork.outputs.key_vault_name : application.outputs.key_vault_name
 
-// Local development values will be stored in user secrets file
-output App__AppConfig__Uri string = application.outputs.app_config_uri
+// Local development values
+output App_AppConfig_Uri string = application.outputs.app_config_uri
+output WEB_URI string = application.outputs.web_uri
