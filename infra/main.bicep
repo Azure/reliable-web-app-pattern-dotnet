@@ -546,6 +546,7 @@ output build_agent string = installBuildAgent ? buildAgent.outputs.build_agent_h
 
 // Application resources
 output AZURE_RESOURCE_GROUP string = resourceGroups.outputs.application_resource_group_name
+output SECONDARY_RESOURCE_GROUP string = isMultiLocationDeployment ? resourceGroups2.outputs.application_resource_group_name : 'not-deployed'
 output service_managed_identities object[] = application.outputs.service_managed_identities
 output service_web_endpoints string[] = application.outputs.service_web_endpoints
 output AZURE_OPS_VAULT_NAME string = isNetworkIsolated ? hubNetwork.outputs.key_vault_name : application.outputs.key_vault_name
