@@ -146,13 +146,13 @@ The application can be deployed in either a single region or multi-region manner
 
 Set the `AZURE_LOCATION` to the primary region:
 
-```shell
+```pwsh
 azd env set AZURE_LOCATION westus3
 ```
 
 If doing a multi-region deployment, set the `AZURE_LOCATION2` to the secondary region:
 
-```shell
+```pwsh
 azd env set AZURE_LOCATION2 eastus
 ```
 
@@ -182,29 +182,29 @@ responsible for saving configuration data to Key Vault and
 App Configuration so that the web app can read this data
 (about 3-minutes to register).
 
-```sh
-./infra/scripts/postprovision/call-create-app-registrations.sh
+```pwsh
+./infra/scripts/postprovision/call-create-app-registrations.ps1
 ```
 
 **Set Configuration**
 
 Relecloud devs have automated the process of configuring the environment.
 
-```sh
-./infra/scripts/predeploy/call-set-app-configuration.sh
+```pwsh
+./infra/scripts/predeploy/call-set-app-configuration.ps1
 ```
 
 ### 7. Deploy the application
 
 Run the following command to deploy the code to the created infrastructure (about 4-minutes to deploy):
 
-```shell
+```pwsh
 azd deploy
 ```
 
 If you are doing a multi-region deployment, you must also deploy the code to the secondary region (about 4-minutes to deploy):
 
-```shell
+```pwsh
 $SECONDARY_RESOURCE_GROUP = (azd env get-values --output json | ConvertFrom-Json).SECONDARY_RESOURCE_GROUP
 azd env set AZURE_RESOURCE_GROUP $SECONDARY_RESOURCE_GROUP
 azd deploy
@@ -227,7 +227,7 @@ Use the following to find the URL for the Relecloud application that you have de
 
 To tear down the deployment, run the following command:
 
-```shell
+```pwsh
 azd down
 ```
 
