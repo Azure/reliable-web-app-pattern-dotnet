@@ -4,7 +4,7 @@ You can test and configure the three code-level design patterns with this implem
 
 ## Retry pattern
 
-We built an app configuration setting that lets you simulate and test a transient failure from the Web API. The setting is called `Api:App:RetryDemo`. We've included this configuration in the deployable code. The `Api:App:RetryDemo` setting throws a 503 error when the end user sends an HTTP request to the web app API. `Api:App:RetryDemo` has an editable setting that determines how many back-to-back exceptions should be thrown. This is disabled by default. A value of 2 generates two 503 errors for every successful request. Removing the setting, or changing the value to 0 will disable the feature.
+We built an app configuration setting that lets you simulate and test a transient failure from the Web API. The setting is called `Api:App:RetryDemo`. We've included this configuration in the deployable code. The `Api:App:RetryDemo` setting throws a 503 error when the end user sends an HTTP request to the web app API. `Api:App:RetryDemo` has an editable setting that determines how many back-to-back exceptions should be thrown. A value of 1 generates one error after returning one successful response. This is disabled by default.  Removing the setting, or changing the value to 0 will disable the feature.
 
 Follow these steps to set up this test:
 
@@ -38,11 +38,11 @@ For more information, see:
 - [Application Insights Live Metrics](/azure/azure-monitor/app/live-stream)
 - [Visual Studio and Application Insights live telemetry](/azure/azure-monitor/app/visual-studio)
 
-> We recommend you cleanup by deleting the `Api:App:RetryDemo` setting.
+> We recommend you cleanup by deleting the `Api:App:RetryDemo` setting. And restart both web apps to resume from a known state.
 
 ### Circuit Breaker Pattern
 
-We built an app configuration setting that lets you simulate and test a failure from the Web API. The setting is called `Api:App:RetryDemo`. We've included this configuration in the deployable code. The `Api:App:RetryDemo` setting throws a 503 error when the end user sends an HTTP request to the web app API. `Api:App:RetryDemo` has an editable setting that determines the number of back-to-back errors between a successful request. A value of 5 generates five errors for every request.
+We built an app configuration setting that lets you simulate and test a failure from the Web API. The setting is called `Api:App:RetryDemo`. We've included this configuration in the deployable code. The `Api:App:RetryDemo` setting throws a 503 error when the end user sends an HTTP request to the web app API. `Api:App:RetryDemo` has an editable setting that determines the number of back-to-back errors between a successful request. A value of 5 generates five errors after returning one successful response. This is disabled by default.  Removing the setting, or changing the value to 0 will disable the feature.
 
 Following these steps to set up this test:
 
@@ -74,7 +74,7 @@ For more information, see:
 - [Application Insights Live Metrics](/azure/azure-monitor/app/live-stream)
 - [Visual Studio and Application Insights live telemetry](/azure/azure-monitor/app/visual-studio)
 
-> We recommend you cleanup by deleting the `Api:App:RetryDemo` setting.
+> We recommend you cleanup by deleting the `Api:App:RetryDemo` setting. And restart both web apps to resume from a known state.
 
 ### Cache-Aside Pattern
 
@@ -92,8 +92,22 @@ In this screenshot above we see a connection was made to SQL server and that thi
 
 In the next request we see that the API call was only 55ms because it didn't have to connect to SQL Server and instead used the data from Azure Cache for Redis.
 
+Run the command:
+
+```
+SCAN 0 COUNT 1000 MATCH *
+```
+
 ![image of Azure Cache for Redis Console lists all keys](./assets/images/Guide/Simulating_RedisConsoleListKeys.png)
 
 Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
+Run the command:
+
+```
+HGETALL UpcomingConcerts
+```
+
 ![image of Azure Cache for Redis Console shows data for upcoming concerts](./assets/images/Guide/Simulating_RedisConsoleShowUpcomingConcerts.png)
+
+> You can use the command `DEL UpcomingConcerts` to delete this data from Redis and see the cache rebuild.
