@@ -92,6 +92,13 @@ In this screenshot above we see a connection was made to SQL server and that ret
 
 In the next request we see that the total duration of the API call was only 10.4 ms because it didn't have to connect to SQL Server and instead used the data from Azure Cache for Redis.
 
+Using the (PREVIEW) Redis Console we can see this data stored in Redis.
+
+Open the Redis Console by navigating to the Azure Cache for Redis resource in the Azure Portal and clicking the "Console" link above the overview details for this resource.
+
+![image of Azure Cache for Redis Console](./assets/images/Guide/Simulating_RedisConsole.png)
+
+
 Run the command:
 
 ```
@@ -99,8 +106,6 @@ SCAN 0 COUNT 1000 MATCH *
 ```
 
 ![image of Azure Cache for Redis Console lists all keys](./assets/images/Guide/Simulating_RedisConsoleListKeys.png)
-
-Using the (PREVIEW) Redis Console we can see this data stored in Redis.
 
 Run the command:
 
