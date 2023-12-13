@@ -188,16 +188,7 @@ Run the following command to deploy the code to the created infrastructure (abou
 azd deploy
 ```
 
-If you are doing a multi-region deployment, you must also deploy the code to the secondary region (about 4-minutes to deploy):
-
-```pwsh
-$SECONDARY_RESOURCE_GROUP = (azd env get-values --output json | ConvertFrom-Json).SECONDARY_RESOURCE_GROUP
-azd env set AZURE_RESOURCE_GROUP $SECONDARY_RESOURCE_GROUP
-azd deploy
-```
-
 The provisioning and deployment process can take anywhere from 20 minutes to over an hour, depending on system load and your bandwidth.
-
 
 ### 8. Open and use the application
 
