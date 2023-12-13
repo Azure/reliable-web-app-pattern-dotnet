@@ -205,7 +205,7 @@ azd deploy
 If you are doing a multi-region deployment, you must also deploy the code to the secondary region (about 4-minutes to deploy):
 
 ```shell
-SECONDARY_RESOURCE_GROUP=$(azd env get-values --output json | jq -r .secondary_resource_group)
+$SECONDARY_RESOURCE_GROUP = (azd env get-values --output json | ConvertFrom-Json).SECONDARY_RESOURCE_GROUP
 azd env set AZURE_RESOURCE_GROUP $SECONDARY_RESOURCE_GROUP
 azd deploy
 ```
@@ -217,8 +217,8 @@ The provisioning and deployment process can take anywhere from 20 minutes to ove
 
 Use the following to find the URL for the Relecloud application that you have deployed:
 
-```shell
-azd env get-values --output json | jq -r .WEB_URI
+```pwsh
+(azd env get-values --output json | ConvertFrom-Json).WEB_URI
 ```
 
 ![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
