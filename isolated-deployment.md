@@ -31,15 +31,15 @@ azd env set OWNER_EMAIL <an email address alerted by Azure budget>
 azd env set AZURE_LOCATION westus3
 ```
 
-If doing a multi-region deployment, set the `AZURE_LOCATION2` to the secondary region:
+If doing a multi-region deployment, set the `SECONDARY_AZURE_LOCATION` to the secondary region:
 
 ```pwsh
-azd env set AZURE_LOCATION2 eastus
+azd env set SECONDARY_AZURE_LOCATION eastus
 ```
 
 Make sure the secondary region is a paired region with the primary region (`AZURE_LOCATION`). Paired regions are required to support some Azure features; for example, [geo-zone-redundant storage (GZRS) failover](https://learn.microsoft.com/azure/storage/common/storage-disaster-recovery-guidance). For a full list of region pairs, see [Azure region pairs](https://learn.microsoft.com/azure/reliability/cross-region-replication-azure#azure-cross-region-replication-pairings-for-all-geographies). We have validated the following paired regions.
 
-| AZURE_LOCATION | AZURE_LOCATION2 |
+| AZURE_LOCATION | SECONDARY_AZURE_LOCATION |
 | ----- | ----- |
 | westus3 | eastus |
 | westeurope | northeurope |
