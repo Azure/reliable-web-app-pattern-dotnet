@@ -86,11 +86,11 @@ We can observe this behavior in App Insights by testing two different pages. Fir
 
 ![image of App Insights shows connection to SQL server to retrieve data](./assets/images/Guide/Simulating_AppInsightsRequestWithSqlServer.png)
 
-In this screenshot above we see a connection was made to SQL server and that this request took 742ms.
+In this screenshot above we see a connection was made to SQL server and that retrieving the data took 131.1 ms.
 
 ![image of App Insights shows request returns data without SQL](./assets/images/Guide/Simulating_AppInsightsRequestWithoutSql.png)
 
-In the next request we see that the API call was only 55ms because it didn't have to connect to SQL Server and instead used the data from Azure Cache for Redis.
+In the next request we see that the total duration of the API call was only 10.4 ms because it didn't have to connect to SQL Server and instead used the data from Azure Cache for Redis.
 
 Run the command:
 
