@@ -19,7 +19,7 @@ If you do not wish to use a Dev Container, please refer to the [prerequisites](p
 
 For users familiar with the deployment process, you can use the following list of the deployments commands as a quick reference. The commands assume you have selected a suitable subscription and have logged into both the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/reference#azd-auth-login) and a PowerShell 7+ [AzContext](https://learn.microsoft.com/powershell/azure/authenticate-interactive):
 
-```shell
+```pwsh
 git clone https://github.com/Azure/reliable-web-app-pattern-dotnet.git
 cd reliable-web-app-pattern-dotnet
 azd env new dotnetwebapp
@@ -47,7 +47,7 @@ Make sure the secondary region is a paired region with the primary region (`AZUR
 
 Provision the Azure resources (about 55-minutes to provision):
 
-```shell
+```pwsh
 azd provision
 ```
 
@@ -202,3 +202,13 @@ azd deploy
 
 > **WARNING**
 > In some scenarios, the DNS entries for resources secured with Private Endpoint may have been cached incorrectly. It can take up to 10-minutes for the DNS cache to expire.
+
+###  Open and use the application
+
+From your Dev Container, use the following to find the URL for the Relecloud application that you have deployed:
+
+```pwsh
+(azd env get-values --output json | ConvertFrom-Json).WEB_URI
+```
+
+![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
