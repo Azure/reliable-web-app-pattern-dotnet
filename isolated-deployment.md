@@ -166,8 +166,8 @@ azd env new <Name of created environment>
 azd env set AZURE_LOCATION <Location>
 azd env set AZURE_RESOURCE_GROUP <name of application resource group from Azure Portal>
 azd env set AZURE_SUBSCRIPTION_ID "<Azure subscription ID>"
-azd env set NETWORK_ISOLATION "true"
 Set-AzContext -Subscription "<Azure Subscription ID>"
+azd env set NETWORK_ISOLATION "true"
 ```
 
 Ensure you use the same configuration you used when provisioning the services.
