@@ -128,3 +128,4 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
 // ========================================================================
 
 output endpoint string = 'https://${endpoint.properties.hostName}${routePattern}'
+output uri string = 'https://${endpoint.properties.hostName}'
