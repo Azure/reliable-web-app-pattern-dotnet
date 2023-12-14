@@ -389,21 +389,6 @@ module peerHubAndSecondarySpokeVirtualNetworks './modules/peer-networks.bicep' =
   }
 }
 
-/* peer the two spoke vnets so that replication is not forced through the hub */
-module peerSpokeVirtualNetworks './modules/peer-networks.bicep' = if (willDeployHubNetwork && isNetworkIsolated && isMultiLocationDeployment) {
-  name: '${prefix}-peer-spoke-and-spoke-networks'
-  params: {
-    hubNetwork: {
-      name: isMultiLocationDeployment ? spokeNetwork.outputs.virtual_network_name : ''
-      resourceGroupName: isMultiLocationDeployment ? naming.outputs.resourceNames.spokeResourceGroup : ''
-    }
-    spokeNetwork: {
-      name: isMultiLocationDeployment ? spokeNetwork2.outputs.virtual_network_name : ''
-      resourceGroupName: isMultiLocationDeployment ? naming2.outputs.resourceNames.spokeResourceGroup : ''
-    }
-  }
-}
-
 /*
 ** Create the application resources.
 */
