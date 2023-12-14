@@ -193,13 +193,7 @@ azd deploy
 
 It takes approximately 5 minutes to deploy the code.
 
-If you are doing a multi-region deployment, you must also deploy the code to the secondary region (about 4-minutes to deploy):
-
-```pwsh
-$SECONDARY_RESOURCE_GROUP = (azd env get-values --output json | ConvertFrom-Json).SECONDARY_RESOURCE_GROUP
-azd env set AZURE_RESOURCE_GROUP $SECONDARY_RESOURCE_GROUP
-azd deploy
-```
+If you are doing a multi-region deployment, you must also deploy the code to the secondary region following these same steps on the secondary jump host.
 
 > **WARNING**
 > In some scenarios, the DNS entries for resources secured with Private Endpoint may have been cached incorrectly. It can take up to 10-minutes for the DNS cache to expire.
