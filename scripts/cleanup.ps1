@@ -21,11 +21,6 @@
     If you provide the ResourceGroup parameter and have deployed a hub network, then you must also provide
     the HubResourceGroup if it is a different resource group.  If you don't, then the hub network will not
     be cleaned up.
-.PARAMETER AsJob
-    Use The -AsJob parameter to delete the resource groups in the background.
-.EXAMPLE
-    .\cleanup.ps1 -AsJob -Prefix rg-rele231011v1-dev-westus3-application
-    This command will clean up the Azure environment with the prefix "myenv".
 .NOTES
     This command requires that Az modules are installed and imported. It also requires that you have an
     active Azure session.  If you are not authenticated with Azure, you will be prompted to authenticate.
@@ -34,9 +29,10 @@
 Param(
     [Parameter(Mandatory = $false)][string]$Prefix,
     [Parameter(Mandatory = $false)][string]$ResourceGroup,
+    [Parameter(Mandatory = $false)][string]$SecondaryResourceGroup,
     [Parameter(Mandatory = $false)][string]$SpokeResourceGroup,
-    [Parameter(Mandatory = $false)][string]$HubResourceGroup,
-    [switch]$AsJob = $false
+    [Parameter(Mandatory = $false)][string]$SecondarySpokeResourceGroup,
+    [Parameter(Mandatory = $false)][string]$HubResourceGroup
 )
 
 
@@ -74,11 +70,16 @@ $rgPrefix = ""
 $rgApplication = ""
 $rgSpoke = ""
 $rgHub = ""
+$rgSecondaryApplication = ""
+$rgSecondarySpoke = ""
+#$CleanupAzureDirectory = $false
 
 if ($Prefix) {
     $rgPrefix = $Prefix
     $rgApplication = "$rgPrefix-application"
     $rgSpoke = "$rgPrefix-spoke"
+    $rgSecondaryApplication = "$rgPrefix-2-application"
+    $rgSecondarySpoke = "$rgPrefix-2-spoke"
     $rgHub = "$rgPrefix-hub"
 } else {
     if (!$ResourceGroup) {
@@ -93,18 +94,30 @@ if ($Prefix) {
         $rgPrefix = "rg-$environmentName-$environmentType-$location"
         $rgApplication = "$rgPrefix-application"
         $rgSpoke = "$rgPrefix-spoke"
+        $rgSecondaryApplication = "$rgPrefix-2-application"
+        $rgSecondarySpoke = "$rgPrefix-2-spoke"    
         $rgHub = "$rgPrefix-hub"
-        $CleanupAzureDirectory = $true
+        #$CleanupAzureDirectory = $true
     } else {
         $rgApplication = $ResourceGroup
         $rgPrefix = $resourceGroup.Substring(0, $resourceGroup.IndexOf('-application'))
     }
 }
 
+if ($SecondaryResourceGroup) {
+    $rgSecondaryApplication = $SecondaryResourceGroup
+} elseif ($rgSecondaryApplication -eq '') {
+    $rgSecondaryApplication = "$rgPrefix-2-application"
+}
 if ($SpokeResourceGroup) {
     $rgSpoke = $SpokeResourceGroup
 } elseif ($rgSpoke -eq '') {
     $rgSpoke = "$rgPrefix-spoke"
+}
+if ($SecondarySpokeResourceGroup) {
+    $rgSecondarySpoke = $SecondarySpokeResourceGroup
+} elseif ($rgSecondarySpoke -eq '') {
+    $rgSecondarySpoke = '$rgPrefix-2-spoke'
 }
 if ($HubResourceGroup) {
     $rgHub = $HubResourceGroup
@@ -172,14 +185,10 @@ function Remove-PrivateEndpointsForResourceGroup($resourceGroupName) {
     }
 }
 
-function Remove-ResourceGroupFromAzure($resourceGroupName, $asJob) {
+function Remove-ResourceGroupFromAzure($resourceGroupName) {
     if (Test-ResourceGroupExists -ResourceGroupName $resourceGroupName) {
         "`tRemoving $resourceGroupName" | Write-Output
-        if ($asJob) {
-            Remove-AzResourceGroup -Name $resourceGroupName -Force -AsJob
-        } else {
-            Remove-AzResourceGroup -Name $resourceGroupName -Force
-        }
+        Remove-AzResourceGroup -Name $resourceGroupName -Force
     }
 }
 
@@ -195,11 +204,19 @@ if (Test-ResourceGroupExists -ResourceGroupName $rgApplication) {
     "`tCould not find resource group: $rgApplication" | Write-Error
     exit 9
 }
+if (Test-ResourceGroupExists -ResourceGroupName $rgSecondaryApplication) {
+    "`tFound secondary application resource group: $rgSecondaryApplication" | Write-Output
+    $resourceGroups.Add($rgSecondaryApplication) | Out-Null
+}
 
 
 if (Test-ResourceGroupExists -ResourceGroupName $rgSpoke) {
     "`tFound spoke resource group: $rgSpoke" | Write-Output
     $resourceGroups.Add($rgSpoke) | Out-Null
+}
+if (Test-ResourceGroupExists -ResourceGroupName $rgSecondarySpoke) {
+    "`tFound secondary application resource group: $rgSecondarySpoke" | Write-Output
+    $resourceGroups.Add($rgSecondarySpoke) | Out-Null
 }
 if (Test-ResourceGroupExists -ResourceGroupName $rgHub) {
     "`tFound hub resource group: $rgHub" | Write-Output
@@ -223,9 +240,11 @@ foreach ($resourceGroupName in $resourceGroups) {
 }
 
 "`nRemoving resource groups in order..." | Write-Output
-Remove-ResourceGroupFromAzure -ResourceGroupName $rgApplication -AsJob:$AsJob
-Remove-ResourceGroupFromAzure -ResourceGroupName $rgSpoke -AsJob:$AsJob
-Remove-ResourceGroupFromAzure -ResourceGroupName $rgHub -AsJob:$AsJob
+Remove-ResourceGroupFromAzure -ResourceGroupName $rgApplication
+Remove-ResourceGroupFromAzure -ResourceGroupName $rgSecondaryApplication
+Remove-ResourceGroupFromAzure -ResourceGroupName $rgSpoke
+Remove-ResourceGroupFromAzure -ResourceGroupName $rgSecondarySpoke
+Remove-ResourceGroupFromAzure -ResourceGroupName $rgHub
 
 # if ($CleanupAzureDirectory -eq $true -and (Test-Path -Path ./.azure -PathType Container)) {
 #     "Cleaning up Azure Developer CLI state files." | Write-Output
