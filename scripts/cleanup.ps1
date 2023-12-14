@@ -74,11 +74,16 @@ $rgPrefix = ""
 $rgApplication = ""
 $rgSpoke = ""
 $rgHub = ""
+$rgSecondaryApplication = ""
+$rgSecondarySpoke = ""
+#$CleanupAzureDirectory = $false
 
 if ($Prefix) {
     $rgPrefix = $Prefix
     $rgApplication = "$rgPrefix-application"
     $rgSpoke = "$rgPrefix-spoke"
+    $rgSecondaryApplication = "$rgPrefix-2-application"
+    $rgSecondarySpoke = "$rgPrefix-2-spoke"
     $rgHub = "$rgPrefix-hub"
 } else {
     if (!$ResourceGroup) {
@@ -93,8 +98,10 @@ if ($Prefix) {
         $rgPrefix = "rg-$environmentName-$environmentType-$location"
         $rgApplication = "$rgPrefix-application"
         $rgSpoke = "$rgPrefix-spoke"
+        $rgSecondaryApplication = "$rgPrefix-2-application"
+        $rgSecondarySpoke = "$rgPrefix-2-spoke"    
         $rgHub = "$rgPrefix-hub"
-        $CleanupAzureDirectory = $true
+        #$CleanupAzureDirectory = $true
     } else {
         $rgApplication = $ResourceGroup
         $rgPrefix = $resourceGroup.Substring(0, $resourceGroup.IndexOf('-application'))
@@ -195,11 +202,19 @@ if (Test-ResourceGroupExists -ResourceGroupName $rgApplication) {
     "`tCould not find resource group: $rgApplication" | Write-Error
     exit 9
 }
+if (Test-ResourceGroupExists -ResourceGroupName $rgSecondaryApplication) {
+    "`tFound secondary application resource group: $rgSecondaryApplication" | Write-Output
+    $resourceGroups.Add($rgSecondaryApplication) | Out-Null
+}
 
 
 if (Test-ResourceGroupExists -ResourceGroupName $rgSpoke) {
     "`tFound spoke resource group: $rgSpoke" | Write-Output
     $resourceGroups.Add($rgSpoke) | Out-Null
+}
+if (Test-ResourceGroupExists -ResourceGroupName $rgSecondarySpoke) {
+    "`tFound secondary application resource group: $rgSecondarySpoke" | Write-Output
+    $resourceGroups.Add($rgSecondarySpoke) | Out-Null
 }
 if (Test-ResourceGroupExists -ResourceGroupName $rgHub) {
     "`tFound hub resource group: $rgHub" | Write-Output
@@ -224,7 +239,9 @@ foreach ($resourceGroupName in $resourceGroups) {
 
 "`nRemoving resource groups in order..." | Write-Output
 Remove-ResourceGroupFromAzure -ResourceGroupName $rgApplication -AsJob:$AsJob
+Remove-ResourceGroupFromAzure -ResourceGroupName $rgSecondaryApplication -AsJob:$AsJob
 Remove-ResourceGroupFromAzure -ResourceGroupName $rgSpoke -AsJob:$AsJob
+Remove-ResourceGroupFromAzure -ResourceGroupName $rgSecondarySpoke -AzJob:$AsJob
 Remove-ResourceGroupFromAzure -ResourceGroupName $rgHub -AsJob:$AsJob
 
 # if ($CleanupAzureDirectory -eq $true -and (Test-Path -Path ./.azure -PathType Container)) {
