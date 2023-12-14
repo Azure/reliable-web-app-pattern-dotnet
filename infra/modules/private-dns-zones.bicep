@@ -109,7 +109,7 @@ module createNewDnsZones '../core/network/private-dns-zone.bicep' = [ for dnsZon
 }]
 
 module updateVnetLinkForDnsZones '../core/network/private-dns-zone-link.bicep' = [ for dnsZoneName in !createDnsZone ? privateDnsZones : []: {
-  name: 'update-vnet-link-for-dns-${dnsZoneName}'
+  name: createDnsZone ? 'hub-vnet-link-for-dns-${dnsZoneName}' : 'spoke-vnet-link-for-dns-${dnsZoneName}'
   scope: resourceGroup
   params: {
     name: dnsZoneName
