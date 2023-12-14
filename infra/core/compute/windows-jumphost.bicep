@@ -101,7 +101,7 @@ var identity = !empty(managedIdentityId) ? {
 var validComputerName = replace(replace(name, '-', ''), '_', '')
 var computerName = !empty(computerWindowsName) ? computerWindowsName : length(validComputerName) > 15 ? substring(validComputerName, 0, 15) : validComputerName
 
-var installToolsOption = installTools ? '-install_clis -install_ssms' : ''
+var installToolsOption = installTools ? '-install_clis' : ''
 
 // This is the URL to the App Service Landing Zone Accelerator GitHub repository.
 // See: https://github.com/Azure/appservice-landing-zone-accelerator
