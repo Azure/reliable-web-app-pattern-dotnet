@@ -147,7 +147,7 @@ cd .\reliable-web-app-pattern-dotnet
     Connect-AzAccount
     ```
 
-    This will open a browser to complete the authentication process.  See [the documentation](https://learn.microsoft.com/cli/azure/authenticate-azure-cli) for instructions on other mechanisms to sign in to the Azure CLI.
+    This will open a browser to complete the authentication process.  See [the documentation](https://learn.microsoft.com/powershell/azure/authenticate-interactive) for instructions on other mechanisms to sign in to Azure.
 
 1. [Sign in to azd](https://learn.microsoft.com/azure/developer/azure-developer-cli/reference#azd-auth-login):
 
@@ -164,10 +164,11 @@ Set up the required Azure Developer CLI environment:
 ```shell
 azd env new <Name of created environment>
 azd env set AZURE_LOCATION <Location>
-azd env set AZURE_RESOURCE_GROUP <name of application resource group from Azure Portal>
+azd env set AZURE_RESOURCE_GROUP <name of application resource group from from azd environment>
 azd env set AZURE_SUBSCRIPTION_ID "<Azure subscription ID>"
 Set-AzContext -Subscription "<Azure Subscription ID>"
 azd env set NETWORK_ISOLATION "true"
+azd env set SECONDARY_RESOURCE_GROUP <name of secondary application resource group from azd environment>
 ```
 
 Ensure you use the same configuration you used when provisioning the services.
