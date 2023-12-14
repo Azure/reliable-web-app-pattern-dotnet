@@ -45,7 +45,7 @@ Make sure the secondary region is a paired region with the primary region (`AZUR
 | westeurope | northeurope |
 | australiaeast | australiasoutheast |
 
-Provision the Azure resources (about 55-minutes to provision):
+Provision the Azure resources (about 35-minutes to provision):
 
 ```pwsh
 azd provision
