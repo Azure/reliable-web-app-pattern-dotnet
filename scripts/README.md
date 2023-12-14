@@ -70,5 +70,5 @@ These scripts are used by the engineering team to accelerate the testing process
     > Find the full name of the application resource group to be supplied as the value for *ResourceGroup* param
 
     ```pwsh
-    ./scripts/cleanup.ps1 -AsJob -ResourceGroup rg-reledev7-dev-westus3-application
+    ./scripts/cleanup.ps1 -ResourceGroup rg-reledev7-dev-westus3-application
     ```
