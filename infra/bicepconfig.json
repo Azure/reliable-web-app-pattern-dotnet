@@ -1,0 +1,6 @@
+{
+    "experimentalFeaturesEnabled": {
+        "sourceMapping": true,
+        "userDefinedTypes": true
+    }
+}

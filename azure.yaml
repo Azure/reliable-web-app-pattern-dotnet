@@ -2,13 +2,21 @@
 
 name: reliable-csharp-web
 metadata:
-  template: reliable-csharp-web@0.0.1-beta
+  template: reliable-csharp-web@1.1.0
+hooks:
+  preprovision:
+    posix:
+      interactive: true
+      run: ./infra/scripts/preprovision/whats-my-ip.sh
+    windows:
+      interactive: true
+      run: ./infra/scripts/preprovision/whats-my-ip.ps1
 services:
-  web:
-    project: src/Relecloud.Web
+  web-callcenter-service:
+    project: src/Relecloud.Web.CallCenter.Api
     language: csharp
     host: appservice
-  api:
-    project: src/Relecloud.Web.Api
+  web-callcenter-frontend:
+    project: src/Relecloud.Web.CallCenter
     language: csharp
     host: appservice

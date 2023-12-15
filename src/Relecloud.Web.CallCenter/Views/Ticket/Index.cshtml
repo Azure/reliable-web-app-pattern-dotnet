@@ -1,0 +1,73 @@
+﻿@model Relecloud.Web.CallCenter.ViewModels.TicketViewModel
+@{
+    ViewData["Title"] = "Tickets you've booked";
+}
+<h1>@ViewData["Title"]</h1>
+@if (Model == null || Model.Tickets == null || !Model.Tickets.Any())
+{
+    <div class="alert alert-info">You haven't purchased any tickets yet, why don't you browse around the <a asp-controller="Concert" asp-action="Index">upcoming concerts</a>?</div>
+}
+else
+{
+    var ticketsText = "tickets";
+    if (Model.TotalCount == 1)
+    {
+        ticketsText = "ticket";
+    }
+
+    <h2>You've booked @Model.TotalCount @ticketsText for our customers. Nice Job!</h2>
+    <div class="list-group">
+        @foreach (var ticket in Model.Tickets)
+        {
+            <div class="list-group-item">
+                <h4 class="list-group-item-heading">
+                    @if (ticket.Concert == null)
+                    {
+                        <a asp-controller="Concert" asp-action="Details" asp-route-id="@ticket.ConcertId">Unknown Ticket @ticket.ConcertId</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Concert" asp-action="Details" asp-route-id="@ticket.ConcertId">@ticket.Concert.Artist on @ticket.Concert.StartTime.UtcDateTime.ToString()</a>
+                    }
+                </h4>
+                @if (string.IsNullOrEmpty(ticket.ImageName))
+                {
+                    <div class="offset-top-md alert alert-warning">The customer's ticket is being generated, please check back later.</div>
+                }
+                else
+                {
+                    if (ticket.Concert == null)
+                    {
+                        <img src="webapi/Image/@ticket.ImageName" alt="Unknown Ticket @ticket.ConcertId" class="img-responsive" />
+                    }
+                    else
+                    {
+                        <img src="webapi/Image/@ticket.ImageName" alt="@ticket.Concert.Artist" class="img-responsive" />
+                    }
+                }
+            </div>
+        }
+    </div>
+    <div>
+        @if (Model.TotalCount > TicketViewModel.DefaultPageSize)
+        {
+            //this search result has pages
+            for (int i=4; i > 0; i--)
+            {
+                if (Model.CurrentPage - i >= 0)
+                {
+                    <span class="mr-3">
+                        <a asp-action="Index" asp-route-currentPage="@(Model.CurrentPage - i)">@(Model.CurrentPage - i+1)</a>
+                    </span>   
+                }
+            }
+            <span class="mr-3">@(Model.CurrentPage+1)</span>
+            for (int i=1; i<5 && i+Model.CurrentPage < Model.TotalCount / TicketViewModel.DefaultPageSize + 1; i++)
+            {
+                <span class="mr-3">
+                    <a asp-action="Index" asp-route-currentPage="@(Model.CurrentPage + i)">@(Model.CurrentPage + i +1)</a>
+                </span>
+            }
+        }
+    </div>
+}
