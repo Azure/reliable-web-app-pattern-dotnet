@@ -49,7 +49,7 @@ resource spokeVirtualNetwork 'Microsoft.Network/virtualNetworks@2020-06-01' exis
 }
 
 module peerSpokeToHub '../core/network/peer-virtual-network.bicep' = {
-  name: 'peer-spoke-to-hub-network'
+  name: 'peer-${spokeNetwork.name}-to-${hubNetwork.name}-network'
   scope: resourceGroup(spokeNetwork.resourceGroupName)
   params: {
     name: 'peerTo-${hubVirtualNetwork.name}'
@@ -59,7 +59,7 @@ module peerSpokeToHub '../core/network/peer-virtual-network.bicep' = {
 }
 
 module peerHubToSpoke '../core/network/peer-virtual-network.bicep' = {
-  name: 'peer-hub-to-spoke-network'
+  name: 'peer-${hubNetwork.name}-to-${spokeNetwork.name}-network'
   scope: resourceGroup(hubNetwork.resourceGroupName)
   params: {
     name: 'peerTo-${spokeVirtualNetwork.name}'
