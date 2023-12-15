@@ -36,8 +36,8 @@ Param(
 )
 
 
-if ((Get-Module -ListAvailable -Name Az) -and (Get-Module -Name Az -ErrorAction SilentlyContinue)) {
-    Write-Debug "The 'Az' module is installed and imported."
+if ((Get-Module -ListAvailable -Name Az) -and (Get-Module -Name Az.Resources -ErrorAction SilentlyContinue)) {
+    Write-Debug "The 'Az.Resources' module is installed and imported."
     if (Get-AzContext -ErrorAction SilentlyContinue) {
         Write-Debug "The user is authenticated with Azure."
     }
@@ -48,9 +48,9 @@ if ((Get-Module -ListAvailable -Name Az) -and (Get-Module -Name Az -ErrorAction 
 }
 else {
     try {
-        Write-Host "Importing 'Az' module"
-        Import-Module -Name Az -ErrorAction Stop
-        Write-Debug "The 'Az' module is imported successfully."
+        Write-Host "Importing 'Az.Resources' module"
+        Import-Module -Name Az.Resources -ErrorAction Stop
+        Write-Debug "The 'Az.Resources' module is imported successfully."
         if (Get-AzContext -ErrorAction SilentlyContinue) {
             Write-Debug "The user is authenticated with Azure."
         }
@@ -225,7 +225,7 @@ if (Test-ResourceGroupExists -ResourceGroupName $rgHub) {
 
 # press enter to proceed
 "`nPress enter to proceed with cleanup or CTRL+C to cancel" | Write-Output
-$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+$null = Read-Host
 
 "`nRemoving resources from resource groups..." | Write-Output
 "> Private Endpoints:" | Write-Output
