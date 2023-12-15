@@ -117,7 +117,7 @@ if ($SpokeResourceGroup) {
 if ($SecondarySpokeResourceGroup) {
     $rgSecondarySpoke = $SecondarySpokeResourceGroup
 } elseif ($rgSecondarySpoke -eq '') {
-    $rgSecondarySpoke = '$rgPrefix-2-spoke'
+    $rgSecondarySpoke = "$rgPrefix-2-spoke"
 }
 if ($HubResourceGroup) {
     $rgHub = $HubResourceGroup
@@ -215,13 +215,17 @@ if (Test-ResourceGroupExists -ResourceGroupName $rgSpoke) {
     $resourceGroups.Add($rgSpoke) | Out-Null
 }
 if (Test-ResourceGroupExists -ResourceGroupName $rgSecondarySpoke) {
-    "`tFound secondary application resource group: $rgSecondarySpoke" | Write-Output
+    "`tFound secondary spoke resource group: $rgSecondarySpoke" | Write-Output
     $resourceGroups.Add($rgSecondarySpoke) | Out-Null
 }
 if (Test-ResourceGroupExists -ResourceGroupName $rgHub) {
     "`tFound hub resource group: $rgHub" | Write-Output
     $resourceGroups.Add($rgHub) | Out-Null
 }
+
+# press enter to proceed
+"`nPress enter to proceed with cleanup or CTRL+C to cancel" | Write-Output
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 
 "`nRemoving resources from resource groups..." | Write-Output
 "> Private Endpoints:" | Write-Output
