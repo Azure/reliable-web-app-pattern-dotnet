@@ -242,4 +242,7 @@ module grantSecretsUserAccessBySecretName './grant-secret-user.bicep' = [ for se
     readerIdentities: readerIdentities
     secretName: secretName
   }
+  dependsOn: [
+    writeAppRegistrationSecrets
+  ]
 }]
