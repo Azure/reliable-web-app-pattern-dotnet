@@ -5,8 +5,6 @@
 
 ## Pre-requisites
 
-> ⚠️ We are using version 1.3.0 for AZD while awaiting feedback on a known bicep issue.
-
 > ⚠️ Note that for the `Connect-AzAccount` and `azd auth login` you must use the same account. And, you may also need to specify the `--tenant` option or `--tenant-id` as required by your administrator.
 
 The following tools are pre-requisites to running the associated deployment steps on Windows without using the Dev Container.
