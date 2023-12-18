@@ -52,9 +52,9 @@ else {
 
 # Prompt formatting features
 
-$defaultColor = if ($Host.UI.SupportsVirtualTerminal) { "`e[0m" } else { "" }
-$successColor = if ($Host.UI.SupportsVirtualTerminal) { "`e[32m" } else { "" }
-$highlightColor = if ($Host.UI.SupportsVirtualTerminal) { "`e[36m" } else { "" }
+$defaultColor = if ($PSVersionTable.PSVersion.Major -ge 6) { "`e[0m" } else { "" }
+$successColor = if ($PSVersionTable.PSVersion.Major -ge 6) { "`e[32m" } else { "" }
+$highlightColor = if ($PSVersionTable.PSVersion.Major -ge 6) { "`e[36m" } else { "" }
 
 # End of Prompt formatting features
 
