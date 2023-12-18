@@ -79,6 +79,8 @@ The default username for the jump host is `azureadmin` and the password was set 
 
 1. Retrieve the username and password for your jump host:
 
+    - Locate the Hub resource group in the Azure Portal.
+    - Open the Azure Key Vault from the list of resources.
     - Select **Secrets** from the menu sidebar.
     - Select **Jumphost--AdministratorPassword**.
     - Select the currently enabled version.
