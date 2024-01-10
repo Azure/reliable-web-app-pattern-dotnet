@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 /*
-** Application Infrastructure
+** Azure Front Door resource for the front-end and API web apps
 ** Copyright (C) 2023 Microsoft, Inc.
 ** All Rights Reserved
 **
