@@ -1,14 +1,11 @@
 targetScope = 'subscription'
 
 /*
-** Hub Network Infrastructure
+** Two-way Virtual Network Peering
 ** Copyright (C) 2023 Microsoft, Inc.
 ** All Rights Reserved
 **
 ***************************************************************************
-**
-** The Hub Network consists of a virtual network that hosts resources that
-** are generally associated with a hub.
 */
 
 // ========================================================================
