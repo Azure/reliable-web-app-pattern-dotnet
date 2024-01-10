@@ -1,11 +1,12 @@
 targetScope = 'subscription'
 
 /*
-** An App Service running on a App Service Plan
+** Enterprise App Patterns Telemetry
 ** Copyright (C) 2023 Microsoft, Inc.
 ** All Rights Reserved
 **
 ***************************************************************************
+** Review the enableTelemetry parameter to understand telemetry collection
 */
 
 // ========================================================================
