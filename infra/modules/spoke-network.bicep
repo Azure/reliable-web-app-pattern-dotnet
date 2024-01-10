@@ -1,14 +1,14 @@
 targetScope = 'subscription'
 
 /*
-** Hub Network Infrastructure
+** Spoke Network Infrastructure
 ** Copyright (C) 2023 Microsoft, Inc.
 ** All Rights Reserved
 **
 ***************************************************************************
 **
-** The Hub Network consists of a virtual network that hosts resources that
-** are generally associated with a hub.
+** The Spoke Network consists of a virtual network that hosts resources that
+** are associated with the web app workload (e.g. private endpoints).
 */
 
 // ========================================================================
