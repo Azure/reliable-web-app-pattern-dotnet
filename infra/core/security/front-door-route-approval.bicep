@@ -19,10 +19,6 @@ param managedIdentityName string
 @description('Force the deployment script to run')
 param utcValue string = utcNow()
 
-// 1893972 covers moving from implicit to explicit endpoint approvals
-@description('A collection of web apps that will be approved for front door private endpoint connection')
-param webAppIds string[]
-
 // =====================================================================================================================
 //     AZURE RESOURCES
 // =====================================================================================================================
