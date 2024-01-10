@@ -1,13 +1,15 @@
 targetScope = 'resourceGroup'
 
 /*
-** Naming
+** This template creates an Azure SQL Server.
 ** Copyright (C) 2023 Microsoft, Inc.
 ** All Rights Reserved
 **
 ***************************************************************************
 **
-** Provides the names of all resources that might be created by this template.
+** Defines a SQL Server, with a user-assigned managed identity.
+** The Server is separated from the database, to allow for multiple
+** databases to be created on the same server.
 */
 
 // ========================================================================
