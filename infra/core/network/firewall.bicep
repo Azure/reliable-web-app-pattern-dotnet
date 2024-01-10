@@ -1,14 +1,14 @@
 targetScope = 'resourceGroup'
 
 /*
-** Core Resource Template
+** Azure Firewall Resource
 ** Copyright (C) 2023 Microsoft, Inc.
 ** All Rights Reserved
 **
 ***************************************************************************
 **
-** Core resource templates will create the resources requested, along with
-** appropriate diagnostics and linkage into a virtual network.
+** A fully stateful firewall as a service that provides both east-west and north-south traffic inspection.
+** https://learn.microsoft.com/en-us/azure/firewall/overview
 */
 
 // ========================================================================
