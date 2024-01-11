@@ -518,10 +518,6 @@ module approveFrontDoorPrivateLinks '../core/security/front-door-route-approval.
   params: {
     location: deploymentSettings.location
     managedIdentityName: ownerManagedIdentityRoleAssignment.outputs.identity_name
-    webAppIds: deploymentSettings.isPrimaryLocation ? [
-      webFrontendFrontDoorRoute.outputs.endpoint
-      webServiceFrontDoorRoute.outputs.endpoint
-    ] : []
   }
 }
 
