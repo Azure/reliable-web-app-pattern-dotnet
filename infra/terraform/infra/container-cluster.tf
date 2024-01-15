@@ -43,6 +43,8 @@ resource "azurerm_kubernetes_cluster" "main" {
     secret_rotation_interval = "5m"
   }
 
+  depends_on = [azurerm_role_assignment.cluster_identity_operator]
+
 }
 
 

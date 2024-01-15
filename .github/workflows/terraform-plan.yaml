@@ -24,7 +24,7 @@ jobs:
 
     - id: setup
       name: Setup `terraform`
-      uses: hashicorp/setup-terraform@main
+      uses: hashicorp/setup-terraform@v2
       with:
         version: ${{ env.TERRAFORM_VERSION }}
 
