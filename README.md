@@ -11,7 +11,7 @@ products:
 - azure
 - azure-application-insights
 - azure-app-service
-- azure-sql
+- azure-sql-database
 - azure-front-door
 - enterprise-app-patterns
 urlFragment: reliable-web-app-pattern-dotnet
