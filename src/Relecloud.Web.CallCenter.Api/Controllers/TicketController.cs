@@ -92,7 +92,7 @@ namespace Relecloud.Web.Api.Controllers
                 var errors = new List<string>();
                 if (purchaseTicketRequest == null)
                 {
-                    errors.Add("Missing required payment details");
+                    errors.Add("Purchase ticket request must not be null");
                 }
                 else
                 {
