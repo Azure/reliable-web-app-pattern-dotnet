@@ -1,29 +1,29 @@
 <#
 .SYNOPSIS
-    Creates Azure AD app registrations for the call center web and api applications
+    Creates Microsoft Entra ID App Registrations for the call center web and api applications
     and saves the configuration data in App Configuration Svc and Key Vault.
         Depends on Az module.
 
     <This command should only be run after using the azd command to deploy resources to Azure>
     
 .DESCRIPTION
-    The web app uses Azure AD to authenticate and authorize the users that can
+    The web app uses Microsoft Entra ID to authenticate and authorize the users that can
     make concert ticket purchases. This script configures the required settings and saves them in Key Vault.
     The following settings are configured:
 
-        Api--AzureAd--ClientId              Identifies the web app to Azure AD
-        Api--AzureAd--TenantId              Identifies which Azure AD instance holds the users that should be authorized
-        AzureAd--CallbackPath               The path that Azure AD should redirect to after a successful login
-        AzureAd--ClientId                   Identifies the web app to Azure AD
-        AzureAd--ClientSecret               Provides a secret known only to Azure AD, and shared with the web app, to validate that Azure AD can trust this web app
-        AzureAd--Instance                   Identifies which Azure AD instance holds the users that should be authorized
-        AzureAd--SignedOutCallbackPath      The path that Azure AD should redirect to after a successful logout
-        AzureAd--TenantId                   Identifies which Azure AD instance holds the users that should be authorized
+        Api--MicrosoftEntraId--ClientId              Identifies the web app to Microsoft Entra ID
+        Api--MicrosoftEntraId--TenantId              Identifies which Microsoft Entra ID instance holds the users that should be authorized
+        MicrosoftEntraId--CallbackPath               The path that Microsoft Entra ID should redirect to after a successful login
+        MicrosoftEntraId--ClientId                   Identifies the web app to Microsoft Entra ID
+        MicrosoftEntraId--ClientSecret               Provides a secret known by Microsoft Entra ID, and shared with the web app, to validate that Microsoft Entra ID can trust this web app
+        MicrosoftEntraId--Instance                   Identifies which Microsoft Entra ID instance holds the users that should be authorized
+        MicrosoftEntraId--SignedOutCallbackPath      The path that Microsoft Entra ID should redirect to after a successful logout
+        MicrosoftEntraId--TenantId                   Identifies which Microsoft Entra ID instance holds the users that should be authorized
 
     This script will create the App Registrations that provide these configurations. Once those
     are created the configuration data will be saved to Azure App Configuration and the secret
     will be saved in Azure Key Vault so that the web app can read these values and provide them
-    to Azure AD during the authentication process.
+    to Microsoft Entra ID during the authentication process.
 
     NOTE: This functionality assumes that the web app, app configuration service, and app
     service have already been successfully deployed.
@@ -31,7 +31,7 @@
 .PARAMETER ResourceGroupName
     A required parameter for the name of resource group that contains the environment that was
     created by the azd command. The cmdlet will populate the App Config Svc and Key
-    Vault services in this resource group with Azure AD app registration config data.
+    Vault services in this resource group with Microsoft Entra ID app registration config data.
     
 .EXAMPLE
     PS C:\> .\create-app-registrations.ps1 -ResourceGroupName rg-rele231127v4-dev-westus3-application
@@ -172,7 +172,7 @@ function New-ApiAppRegistration {
     #Write-Host "`t`tAPI Permissions:"
     #Write-Host "`t`t`t$($apiPermissions | ConvertTo-Json -Depth 100)"
 
-    # create an Azure AD App Registration for the front-end web app
+    # create a Microsoft Entra ID App Registration for the front-end web app
     $apiAppRegistration = New-AzADApplication `
         -DisplayName $AppRegistrationName `
         -SignInAudience "AzureADMyOrg" `
@@ -251,7 +251,7 @@ function New-FrontendAppRegistration {
         }
     }
 
-    # create an Azure AD App Registration for the front-end web app
+    # create a Microsoft Entra ID App Registration for the front-end web app
     $frontendAppRegistration = New-AzADApplication `
         -DisplayName $AppRegistrationName `
         -SignInAudience "AzureADMyOrg" `
@@ -406,7 +406,7 @@ if (!$keyVault) {
 # Test to see if the current user has permissions to create secrets in the Key Vault
 try {
     $secretValue = ConvertTo-SecureString -String 'https://login.microsoftonline.com/' -AsPlainText -Force
-    Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'AzureAd--Instance' -SecretValue $secretValue -ErrorAction Stop > $null
+    Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'MicrosoftEntraId--Instance' -SecretValue $secretValue -ErrorAction Stop > $null
 } catch {
     Write-Error "Unable to save data to '$keyVaultName'. Please check your permissions and the network restrictions on the Key Vault."
     exit 15
@@ -414,28 +414,28 @@ try {
 
 # Set static values
 $secretValue = ConvertTo-SecureString -String '/signin-oidc' -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'AzureAd--CallbackPath' -SecretValue $secretValue -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'AzureAd--CallbackPath'$defaultColor to Key Vault"
+Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'MicrosoftEntraId--CallbackPath' -SecretValue $secretValue -ErrorAction Stop > $null
+Write-Host "`tSaved the $highlightColor'MicrosoftEntraId--CallbackPath'$defaultColor to Key Vault"
 
 $secretValue = ConvertTo-SecureString -String '/signout-oidc' -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'AzureAd--SignedOutCallbackPath' -SecretValue $secretValue -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'AzureAd--SignedOutCallbackPath'$defaultColor to Key Vault"
+Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'MicrosoftEntraId--SignedOutCallbackPath' -SecretValue $secretValue -ErrorAction Stop > $null
+Write-Host "`tSaved the $highlightColor'MicrosoftEntraId--SignedOutCallbackPath'$defaultColor to Key Vault"
 
 $secretInstance = ConvertTo-SecureString -String 'https://login.microsoftonline.com/' -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'Api--AzureAd--Instance' -SecretValue $secretInstance -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'Api--AzureAd--Instance'$defaultColor to Key Vault"
+Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'Api--MicrosoftEntraId--Instance' -SecretValue $secretInstance -ErrorAction Stop > $null
+Write-Host "`tSaved the $highlightColor'Api--MicrosoftEntraId--Instance'$defaultColor to Key Vault"
 
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'AzureAd--Instance' -SecretValue $secretInstance -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'AzureAd--Instance'$defaultColor to Key Vault"
+Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'MicrosoftEntraId--Instance' -SecretValue $secretInstance -ErrorAction Stop > $null
+Write-Host "`tSaved the $highlightColor'MicrosoftEntraId--Instance'$defaultColor to Key Vault"
 
 # Write TenantId to Key Vault
 $secretValue = ConvertTo-SecureString -String $tenantId -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'Api--AzureAd--TenantId' -SecretValue $secretValue -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'Api--AzureAd--TenantId'$defaultColor to Key Vault"
+Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'Api--MicrosoftEntraId--TenantId' -SecretValue $secretValue -ErrorAction Stop > $null
+Write-Host "`tSaved the $highlightColor'Api--MicrosoftEntraId--TenantId'$defaultColor to Key Vault"
 
 $secretValue = ConvertTo-SecureString -String $tenantId -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'AzureAd--TenantId' -SecretValue $secretValue -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'AzureAd--TenantId'$defaultColor to Key Vault"
+Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'MicrosoftEntraId--TenantId' -SecretValue $secretValue -ErrorAction Stop > $null
+Write-Host "`tSaved the $highlightColor'MicrosoftEntraId--TenantId'$defaultColor to Key Vault"
 
 # Get or Create the front-end app registration
 $frontendAppRegistration = Get-FrontendAppRegistration `
@@ -446,8 +446,8 @@ $frontendAppRegistration = Get-FrontendAppRegistration `
 
 # Write to Key Vault
 $secretValue = ConvertTo-SecureString -String $frontendAppRegistration.AppId -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'AzureAd--ClientId' -SecretValue $secretValue -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'AzureAd--ClientId'$defaultColor to Key Vault"
+Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'MicrosoftEntraId--ClientId' -SecretValue $secretValue -ErrorAction Stop > $null
+Write-Host "`tSaved the $highlightColor'MicrosoftEntraId--ClientId'$defaultColor to Key Vault"
 
 # List client secrets
 $clientSecrets = Get-AzADAppCredential -ObjectId $frontendAppRegistration.Id -ErrorAction SilentlyContinue
@@ -465,8 +465,8 @@ $clientSecrets = New-AzADAppCredential -ObjectId $frontendAppRegistration.Id -En
 
 # Write to Key Vault
 $secretValue = ConvertTo-SecureString -String $clientSecrets.SecretText -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'AzureAd--ClientSecret' -SecretValue $secretValue -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'AzureAd--ClientSecret'$defaultColor to Key Vault"
+Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'MicrosoftEntraId--ClientSecret' -SecretValue $secretValue -ErrorAction Stop > $null
+Write-Host "`tSaved the $highlightColor'MicrosoftEntraId--ClientSecret'$defaultColor to Key Vault"
 
 # Get or Create the api app registration
 $apiAppRegistration = Get-ApiAppRegistration `
@@ -475,12 +475,12 @@ $apiAppRegistration = Get-ApiAppRegistration `
 
 # Write to Key Vault
 $secretValue = ConvertTo-SecureString -String $apiAppRegistration.AppId -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'Api--AzureAd--ClientId' -SecretValue $secretValue -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'Api--AzureAd--ClientId'$defaultColor to Key Vault"
+Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'Api--MicrosoftEntraId--ClientId' -SecretValue $secretValue -ErrorAction Stop > $null
+Write-Host "`tSaved the $highlightColor'Api--MicrosoftEntraId--ClientId'$defaultColor to Key Vault"
 
 $scopeDetails = $apiAppRegistration.Api.Oauth2PermissionScope | Where-Object { $_.Value -eq $API_SCOPE_NAME }
 if (!$scopeDetails) {
-    Write-Error "Unable to find the scope '$API_SCOPE_NAME' in the API app registration. Please check the API app registration in Azure AD."
+    Write-Error "Unable to find the scope '$API_SCOPE_NAME' in the API app registration. Please check the API app registration in Microsoft Entra ID."
     exit 16
 }
 

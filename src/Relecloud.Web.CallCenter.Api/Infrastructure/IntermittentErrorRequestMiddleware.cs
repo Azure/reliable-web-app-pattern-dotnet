@@ -1,4 +1,4 @@
-﻿namespace Relecloud.Web.CallCenter.Api.Infrastructure;
+﻿namespace Relecloud.Web.Api.Infrastructure;
 
 using System.Net;
 

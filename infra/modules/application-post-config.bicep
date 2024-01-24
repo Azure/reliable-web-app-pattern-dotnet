@@ -109,32 +109,32 @@ param readerIdentities object[]
 // VARIABLES
 // ========================================================================
 
-var azureAdApiClientId = 'Api--AzureAd--ClientId'
-var azureAdApiInstance = 'Api--AzureAd--Instance'
-var azureAdApiScope = 'App--RelecloudApi--AttendeeScope'
-var azureAdApiTenantId = 'Api--AzureAd--TenantId'
-var azureAdCallbackPath = 'AzureAd--CallbackPath'
-var azureAdClientId = 'AzureAd--ClientId'
-var azureAdClientSecret = 'AzureAd--ClientSecret'
-var azureAdInstance = 'AzureAd--Instance'
-var azureAdSignedOutCallbackPath = 'AzureAd--SignedOutCallbackPath'
-var azureAdTenantId = 'AzureAd--TenantId'
+var microsoftEntraIdApiClientId = 'Api--MicrosoftEntraId--ClientId'
+var microsoftEntraIdApiInstance = 'Api--MicrosoftEntraId--Instance'
+var microsoftEntraIdApiScope = 'App--RelecloudApi--AttendeeScope'
+var microsoftEntraIdApiTenantId = 'Api--MicrosoftEntraId--TenantId'
+var microsoftEntraIdCallbackPath = 'MicrosoftEntraId--CallbackPath'
+var microsoftEntraIdClientId = 'MicrosoftEntraId--ClientId'
+var microsoftEntraIdClientSecret = 'MicrosoftEntraId--ClientSecret'
+var microsoftEntraIdInstance = 'MicrosoftEntraId--Instance'
+var microsoftEntraIdSignedOutCallbackPath = 'MicrosoftEntraId--SignedOutCallbackPath'
+var microsoftEntraIdTenantId = 'MicrosoftEntraId--TenantId'
 var redisCacheSecretNamePrimary = 'App--RedisCache--ConnectionString-Primary'
 var redisCacheSecretNameSecondary = 'App--RedisCache--ConnectionString-Secondary'
 
 var multiRegionalSecrets = deploymentSettings.isMultiLocationDeployment ? [redisCacheSecretNameSecondary] : []
 
 var listOfAppConfigSecrets = [
-  azureAdApiClientId
-  azureAdApiInstance
-  azureAdApiScope
-  azureAdApiTenantId
-  azureAdCallbackPath
-  azureAdClientId
-  azureAdClientSecret
-  azureAdInstance
-  azureAdSignedOutCallbackPath
-  azureAdTenantId
+  microsoftEntraIdApiClientId
+  microsoftEntraIdApiInstance
+  microsoftEntraIdApiScope
+  microsoftEntraIdApiTenantId
+  microsoftEntraIdCallbackPath
+  microsoftEntraIdClientId
+  microsoftEntraIdClientSecret
+  microsoftEntraIdInstance
+  microsoftEntraIdSignedOutCallbackPath
+  microsoftEntraIdTenantId
 ]
 
 var listOfSecretNames = union(listOfAppConfigSecrets,
@@ -217,7 +217,7 @@ module writeSecondaryRedisSecret '../core/security/key-vault-secrets.bicep' = if
 }
 
 // ======================================================================== //
-// Azure AD Application Registration placeholders
+// Microsoft Entra Application Registration placeholders
 // ======================================================================== //
 module writeAppRegistrationSecrets '../core/security/key-vault-secrets.bicep' = [ for secretName in listOfAppConfigSecrets: {
   name: 'write-temp-kv-secret-${secretName}'

@@ -101,8 +101,8 @@ param githubActionsSettings GithubActionsSettings?
 @description('The name of the windows PC.  By default, this will be automatically constructed by the resource name.')
 param computerWindowsName string?
 
-@description('If true, join the computer to the Azure AD domain.')
-param joinToAzureAd bool = true
+@description('If true, join the computer to the Microsoft Entra ID domain.')
+param joinToMicrosoftEntraId bool = true
 
 @description('The SKU for the virtual machine.')
 param sku string = 'Standard_B2ms'
@@ -220,7 +220,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = if (doI
   }
 }
 
-resource aadLoginExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = if (doInstall && joinToAzureAd) {
+resource aadLoginExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = if (doInstall && joinToMicrosoftEntraId) {
   name: 'AADLoginForWindows'
   location: location
   parent: virtualMachine

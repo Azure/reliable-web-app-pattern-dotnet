@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿// Copyright (c) Microsoft Corporation. All Rights Reserved.
+// Licensed under the MIT License.
+
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Relecloud.Web.Models.ConcertContext;
@@ -12,7 +15,7 @@ namespace Relecloud.Web.CallCenter.Infrastructure
     {
         public static string GetUniqueId(this ClaimsPrincipal user)
         {
-            // Azure AD issues a globally unique user ID in the objectidentifier claim.
+            // Microsoft Entra ID issues a globally unique user ID in the objectidentifier claim.
             return user?.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier") ?? new Guid().ToString();
         }
 

@@ -8,7 +8,7 @@ You will find a default Azure DevOps pipeline file in `./.azdo/pipelines/azure-d
 
 You are welcome to use the file as-is or modify it to suit your needs.
 
-> First time setup: This pipeline does not ask you to store credentials that can access Azure AD. As such, you will need to run the `create-app-registrations.ps1` script with your account for a first time setup. This process can be added to the pipeline as an idempotent script but will require an Azure AD account to create the App Registrations.
+> First time setup: This pipeline does not ask you to store credentials that can access Microsoft Entra ID. As such, you will need to run the `create-app-registrations.ps1` script with your account for a first time setup. This process can be added to the pipeline as an idempotent script but will require an Microsoft Entra ID account to create the App Registrations.
 
 ## Getting Started
 The following steps are required to get started.
@@ -72,5 +72,5 @@ The following steps walk-through creating the Azure Pipeline.
 
 7. Click the `Run` button to start your first pipeline
 
-> Note: Because the pipeline does not configure your Azure AD resources you must configure the Azure AD App Registrations and place those values into Key Vault and App Configuration Service before the application will run successfully. We provide the `createAppRegistration.sh` script to do this one-time setup.
+> Note: Because the pipeline does not configure your Microsoft Entra ID resources you must configure the Microsoft Entra ID App Registrations and place those values into Key Vault and App Configuration Service before the application will run successfully. We provide the `createAppRegistration.sh` script to do this one-time setup.
 

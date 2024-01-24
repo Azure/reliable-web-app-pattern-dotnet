@@ -1,14 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// Copyright (c) Microsoft Corporation. All Rights Reserved.
+// Licensed under the MIT License.
+
+using Azure.Core;
+using Azure.Identity;
+using Azure.Storage.Blobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
+using Relecloud.Web.Models.Services;
 using Relecloud.Web.Api.Infrastructure;
 using Relecloud.Web.Api.Services;
 using Relecloud.Web.Api.Services.MockServices;
 using Relecloud.Web.Api.Services.Search;
 using Relecloud.Web.Api.Services.SqlDatabaseConcertRepository;
 using Relecloud.Web.Api.Services.TicketManagementService;
-using Relecloud.Web.CallCenter.Api.Infrastructure;
-using Relecloud.Web.Models.Services;
 using Relecloud.Web.Services.Search;
 using System.Diagnostics;
 
@@ -24,8 +29,10 @@ namespace Relecloud.Web.Api
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
+            var azureCredential = GetAzureCredential();
+
             // Add services to the container.
-            AddAzureAdServices(services);
+            AddMicrosoftEntraIdServices(services);
 
             services.AddControllers();
 
@@ -45,12 +52,14 @@ namespace Relecloud.Web.Api
             // The ApplicationInitializer is injected in the Configure method with all its dependencies and will ensure
             // they are all properly initialized upon construction.
             services.AddScoped<ApplicationInitializer, ApplicationInitializer>();
+            
+            services.AddHealthChecks();
         }
 
-        private void AddAzureAdServices(IServiceCollection services)
+        private void AddMicrosoftEntraIdServices(IServiceCollection services)
         {
             // Adds Microsoft Identity platform (AAD v2.0) support to protect this Api
-            services.AddMicrosoftIdentityWebApiAuthentication(Configuration, "Api:AzureAd");
+            services.AddMicrosoftIdentityWebApiAuthentication(Configuration, "Api:MicrosoftEntraId");
         }
 
         private void AddTicketManagementService(IServiceCollection services)
@@ -136,11 +145,31 @@ namespace Relecloud.Web.Api
 
         private void AddTicketImageService(IServiceCollection services)
         {
-            services.AddScoped<ITicketImageService, TicketImageService>();
+            // It is best practice to create Azure SDK clients once and reuse them.
+            // https://learn.microsoft.com/azure/storage/blobs/storage-blob-client-management#manage-client-objects
+            // https://devblogs.microsoft.com/azure-sdk/lifetime-management-and-thread-safety-guarantees-of-azure-sdk-net-clients/
+            services.AddSingleton<ITicketImageService, TicketImageService>();
+            var storageAccountUri = Configuration["App:StorageAccount:Uri"]
+                ?? throw new InvalidOperationException("Required configuration missing. Could not find App:StorageAccount:Uri setting.");
+            services.AddSingleton(sp => new BlobServiceClient(new Uri(storageAccountUri), GetAzureCredential()));
         }
+
+        private TokenCredential GetAzureCredential() =>
+            Configuration["App:AzureCredentialType"] switch
+            {
+                "AzureCLI" => new AzureCliCredential(),
+                "Environment" => new EnvironmentCredential(),
+                "ManagedIdentity" => new ManagedIdentityCredential(Configuration["AZURE_CLIENT_ID"]),
+                "VisualStudio" => new VisualStudioCredential(),
+                "VisualStudioCode" => new VisualStudioCodeCredential(),
+                _ => new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = Configuration["AZURE_CLIENT_ID"] }),
+            };
 
         public void Configure(WebApplication app, IWebHostEnvironment env)
         {
+            // Allows refreshing configuration values from Azure App Configuration
+            app.UseAzureAppConfiguration();
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -170,6 +199,8 @@ namespace Relecloud.Web.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            app.MapHealthChecks("/healthz");
 
             app.MapGet("/", () => "Default Web API endpoint");
             app.MapControllers();

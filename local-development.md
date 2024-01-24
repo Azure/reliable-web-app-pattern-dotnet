@@ -33,8 +33,8 @@ New team members should setup their environment by following these steps.
 1. Change the dropdowns for *Relecloud.Web.CallCenter* and *Relecloud.Web.CallCenter.Api* to the action of **Start**.
 1. Click **Ok** to close the popup
 
-1. When connecting to Azure SQL database you'll connect with your Azure AD account.
-Run the following command to give your Azure AD account permission to access the database.
+1. When connecting to Azure SQL database you'll connect with your Microsoft Entra ID account.
+Run the following command to give your Microsoft Entra ID account permission to access the database.
 
     <table>
     <tr>

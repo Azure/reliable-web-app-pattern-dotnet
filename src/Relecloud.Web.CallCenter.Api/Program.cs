@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All Rights Reserved.
+// Licensed under the MIT License.
+
 using Azure.Identity;
 using Microsoft.IdentityModel.Logging;
 using Relecloud.Web.Api;
@@ -12,6 +15,7 @@ if (hasRequiredConfigSettings)
     {
         options
             .Connect(new Uri(builder.Configuration["App:AppConfig:Uri"]), new DefaultAzureCredential())
+            .UseFeatureFlags() // Feature flags will be loaded and, by default, refreshed every 30 seconds
             .ConfigureKeyVault(kv =>
             {
                 // Some of the values coming from Azure App Configuration are stored Key Vault, use
@@ -41,7 +45,7 @@ if (hasRequiredConfigSettings)
     startup.ConfigureServices(builder.Services);
 }
 
-var hasAzureAdSettings = !string.IsNullOrEmpty(builder.Configuration["Api:AzureAd:ClientId"]);
+var hasMicrosoftEntraIdSettings = !string.IsNullOrEmpty(builder.Configuration["Api:MicrosoftEntraId:ClientId"]);
 
 var app = builder.Build();
 
@@ -49,9 +53,9 @@ if (hasRequiredConfigSettings)
 {
     startup.Configure(app, app.Environment);
 }
-else if (!hasAzureAdSettings)
+else if (!hasMicrosoftEntraIdSettings)
 {
-    app.MapGet("/", () => "Could not find required Azure AD settings. Check your App Config Service, you may need to run the createAppRegistrations script.");
+    app.MapGet("/", () => "Could not find required Microsoft Entra ID settings. Check your App Config Service, you may need to run the createAppRegistrations script.");
 }
 else
 {

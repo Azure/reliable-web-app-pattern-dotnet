@@ -301,7 +301,10 @@ if ($null -eq $SecondAzureLocation -or $SecondAzureLocation -eq "") {
     $secondAzureLocationCmd = $defaultSecondAzureLocation
 }
 
+$subscriptionName = (Get-AzContext).Subscription.Name
+
 Write-Host "`nProposed settings:" -ForegroundColor Yellow
+Write-Host "`tSubscription name: $subscriptionName"
 Write-Host "`tOwner name: $ownerName"
 Write-Host "`tEmail address: $emailAddr"
 Write-Host "`tEnvironment name: $environmentName"
@@ -310,6 +313,7 @@ Write-Host "`tNetwork isolation: $networkIsolation"
 Write-Host "`tDeploy hub network: $deployHubNetwork"
 Write-Host "`tAzure location: $azureLocationCmd"
 Write-Host "`tDeploy second location: $MultiLocation"
+
 if ($MultiLocation) {
     Write-Host "`tSecond Azure location: $secondAzureLocationCmd"
 }

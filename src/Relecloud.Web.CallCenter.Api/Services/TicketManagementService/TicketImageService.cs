@@ -1,32 +1,37 @@
-﻿using Azure.Identity;
+﻿// Copyright (c) Microsoft Corporation. All Rights Reserved.
+// Licensed under the MIT License.
+
 using Azure.Storage.Blobs;
 
 namespace Relecloud.Web.Api.Services.TicketManagementService
 {
     public class TicketImageService : ITicketImageService
     {
-        private readonly IConfiguration configuration;
         private readonly ILogger<TicketImageService> logger;
-        public TicketImageService(IConfiguration configuration, ILogger<TicketImageService> logger)
+        private readonly BlobContainerClient blobContainerClient;
+
+        public TicketImageService(IConfiguration configuration, BlobServiceClient blobServiceClient, ILogger<TicketImageService> logger)
         {
-            this.configuration = configuration;
             this.logger = logger;
+
+            // It is best practice to create Azure SDK clients once and reuse them.
+            // https://learn.microsoft.com/azure/storage/blobs/storage-blob-client-management#manage-client-objects
+            // https://devblogs.microsoft.com/azure-sdk/lifetime-management-and-thread-safety-guarantees-of-azure-sdk-net-clients/
+            this.blobContainerClient = blobServiceClient.GetBlobContainerClient(configuration["App:StorageAccount:Container"]);
         }
 
         public Task<Stream> GetTicketImagesAsync(string imageName)
         {
             try
             {
-                var storageUrl = configuration["App:StorageAccount:Uri"];
-                var storageContainer = configuration["App:StorageAccount:Container"];
-                Uri blobUri = new($"{storageUrl}/{storageContainer}/{imageName}");
+                this.logger.LogInformation("Retrieving image {ImageName} from blob storage container {ContainerName}.", imageName, blobContainerClient.Name);
+                var blobClient = blobContainerClient.GetBlobClient(imageName);
 
-                BlobClient blobClient = new(blobUri, new DefaultAzureCredential());
                 return blobClient.OpenReadAsync();
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, $"Unable to retrieve image {imageName}");
+                this.logger.LogError(ex, "Unable to retrieve image {ImageName} from blob storage container {ContainerName}", imageName, blobContainerClient.Name);
                 return Task.FromResult(Stream.Null);
             }
         }

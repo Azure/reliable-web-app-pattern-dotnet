@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿// Copyright (c) Microsoft Corporation. All Rights Reserved.
+// Licensed under the MIT License.
+
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.TokenCacheProviders.Distributed;
@@ -8,13 +11,13 @@ using Microsoft.Net.Http.Headers;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
+using Relecloud.Web.Models.ConcertContext;
+using Relecloud.Web.Models.Services;
 using Relecloud.Web.CallCenter.Infrastructure;
 using Relecloud.Web.CallCenter.Services;
 using Relecloud.Web.CallCenter.Services.ApiConcertService;
 using Relecloud.Web.CallCenter.Services.MockServices;
 using Relecloud.Web.CallCenter.Services.RelecloudApiServices;
-using Relecloud.Web.Models.ConcertContext;
-using Relecloud.Web.Models.Services;
 using System.Diagnostics;
 
 namespace Relecloud.Web
@@ -33,7 +36,7 @@ namespace Relecloud.Web
             services.AddHttpContextAccessor();
             services.Configure<RelecloudApiOptions>(Configuration.GetSection("App:RelecloudApi"));
             services.AddOptions();
-            AddAzureAdServices(services);
+            AddMicrosoftEntraIdServices(services);
             services.AddControllersWithViews();
             services.AddApplicationInsightsTelemetry(Configuration["App:Api:ApplicationInsights:ConnectionString"]);
 
@@ -161,7 +164,7 @@ namespace Relecloud.Web
             }
         }
 
-        private void AddAzureAdServices(IServiceCollection services)
+        private void AddMicrosoftEntraIdServices(IServiceCollection services)
         {
             services.AddRazorPages().AddMicrosoftIdentityUI();
 
@@ -173,7 +176,7 @@ namespace Relecloud.Web
                 });
             });
 
-            var builder = services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureAd")
+            var builder = services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "MicrosoftEntraId")
             .EnableTokenAcquisitionToCallDownstreamApi(new string[] { })
                .AddDownstreamWebApi("relecloud-api", Configuration.GetSection("GraphBeta"));
 
@@ -193,7 +196,7 @@ namespace Relecloud.Web
                 });
             }
 
-            // this sample uses AFD for the URL registered with Azure AD to make it easier to get started
+            // this sample uses AFD for the URL registered with Microsoft Entra ID to make it easier to get started
             // but we recommend host name preservation for production scenarios
             // https://learn.microsoft.com/en-us/azure/architecture/best-practices/host-name-preservation
             services.Configure<ForwardedHeadersOptions>(options =>
@@ -202,32 +205,29 @@ namespace Relecloud.Web
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto;
             });
 
-            services.Configure<OpenIdConnectOptions>(Configuration.GetSection("AzureAd"));
-            if (!Debugger.IsAttached)
+            services.Configure<OpenIdConnectOptions>(Configuration.GetSection("MicrosoftEntraId"));
+            services.Configure((Action<MicrosoftIdentityOptions>)(options =>
             {
-                services.Configure((Action<MicrosoftIdentityOptions>)(options =>
-                {
-                    var frontDoorHostname = Configuration["App:FrontDoorHostname"];
-                    var callbackPath = Configuration["AzureAd:CallbackPath"];
+                var frontDoorHostname = Configuration["App:FrontDoorHostname"];
+                var callbackPath = Configuration["MicrosoftEntraId:CallbackPath"];
 
-                    options.Events.OnTokenValidated += async ctx =>
-                    {
-                        await CreateOrUpdateUserInformation(ctx);
-                    };
-                    options.Events.OnRedirectToIdentityProvider += ctx =>
-                    {
-                        // not needed when using host name preservation
-                        ctx.ProtocolMessage.RedirectUri = $"https://{frontDoorHostname}{callbackPath}";
-                        return Task.CompletedTask;
-                    };
-                    options.Events.OnRedirectToIdentityProviderForSignOut += ctx =>
-                    {
-                        // not needed when using host name preservation
-                        ctx.ProtocolMessage.PostLogoutRedirectUri = $"https://{frontDoorHostname}";
-                        return Task.CompletedTask;
-                    };
-                }));
-            }
+                options.Events.OnTokenValidated += async ctx =>
+                {
+                    await CreateOrUpdateUserInformation(ctx);
+                };
+                options.Events.OnRedirectToIdentityProvider += ctx =>
+                {
+                    // not needed when using host name preservation
+                    ctx.ProtocolMessage.RedirectUri = $"https://{frontDoorHostname}{callbackPath}";
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToIdentityProviderForSignOut += ctx =>
+                {
+                    // not needed when using host name preservation
+                    ctx.ProtocolMessage.PostLogoutRedirectUri = $"https://{frontDoorHostname}";
+                    return Task.CompletedTask;
+                };
+            }));
         }
 
         private static async Task CreateOrUpdateUserInformation(TokenValidatedContext ctx)
@@ -271,7 +271,7 @@ namespace Relecloud.Web
                 IdentityModelEventSource.ShowPII = true;
             }
 
-            // this sample uses AFD for the URL registered with Azure AD to make it easier to get started
+            // this sample uses AFD for the URL registered with Microsoft Entra ID to make it easier to get started
             // but we recommend host name preservation for production scenarios
             // https://learn.microsoft.com/en-us/azure/architecture/best-practices/host-name-preservation
             app.UseForwardedHeaders();
