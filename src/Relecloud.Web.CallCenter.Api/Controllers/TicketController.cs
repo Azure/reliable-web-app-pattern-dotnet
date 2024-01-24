@@ -90,22 +90,35 @@ namespace Relecloud.Web.Api.Controllers
                 }
 
                 var errors = new List<string>();
-                if (purchaseTicketRequest.PaymentDetails == null)
+                if (purchaseTicketRequest == null)
                 {
                     errors.Add("Missing required payment details");
                 }
-                if (purchaseTicketRequest.ConcertIdsAndTicketCounts == null)
+                else
                 {
-                    errors.Add("Missing required concert ticket details");
+                    if (purchaseTicketRequest.PaymentDetails == null)
+                    {
+                        errors.Add("Missing required payment details");
+                    }
+                    if (purchaseTicketRequest.ConcertIdsAndTicketCounts == null)
+                    {
+                        errors.Add("Missing required concert ticket details");
+                    }
+                    if (string.IsNullOrEmpty(purchaseTicketRequest.UserId))
+                    {
+                        errors.Add("Missing required userId");
+                    }
                 }
-                if (string.IsNullOrEmpty(purchaseTicketRequest.UserId))
-                {
-                    errors.Add("Missing required userId");
-                }
+                
                 if (errors.Any())
                 {
                     return BadRequest(PurchaseTicketsResult.ErrorResponse(errors));
                 }
+
+                await this.concertRepository.CreateOrUpdateUserAsync(new User{
+                    Id = purchaseTicketRequest!.UserId ?? Guid.Empty.ToString(),
+                    DisplayName = purchaseTicketRequest!.PaymentDetails!.Name
+                });
 
                 var orderTotal = await TotalInvoiceAmountAsync(purchaseTicketRequest);
                 var preAuthRequest = new PreAuthPaymentRequest
