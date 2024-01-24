@@ -47,8 +47,8 @@ resource approval 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
         value: resourceGroup().name
       }
     ]
-    scriptContent: 'rg_name="$ResourceGroupName"; webapp_ids=$(az webapp list -g $rg_name --query "[].id" -o tsv); for webapp_id in $webapp_ids; do fd_conn_ids=$(az network private-endpoint-connection list --id $webapp_id --query "[?properties.provisioningState == \'Pending\'].id" -o tsv); for fd_conn_id in $fd_conn_ids; do az network private-endpoint-connection approve --id "$fd_conn_id" --description "ApprovedByCli"; done; done'         
-    cleanupPreference: 'OnSuccess'
+    scriptContent: loadTextContent('./scripts/front-door-route-approval.sh')
+    cleanupPreference: 'OnExpiration'
     retentionInterval: 'PT1H'
   }
 }

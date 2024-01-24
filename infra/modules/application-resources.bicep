@@ -519,6 +519,13 @@ module approveFrontDoorPrivateLinks '../core/security/front-door-route-approval.
     location: deploymentSettings.location
     managedIdentityName: ownerManagedIdentityRoleAssignment.outputs.identity_name
   }
+  // private endpoint approval between front door and web app depends on both resources
+  dependsOn: [
+    webService
+    webServiceFrontDoorRoute
+    webFrontend
+    webFrontendFrontDoorRoute
+  ]
 }
 
 module applicationBudget '../core/cost-management/budget.bicep' = {
