@@ -7,10 +7,12 @@ hooks:
   preprovision:
     posix:
       interactive: true
-      run: ./infra/scripts/preprovision/whats-my-ip.sh
+      shell: sh
+      run: ./infra/scripts/preprovision/validate-params.sh && ./infra/scripts/preprovision/whats-my-ip.sh
     windows:
       interactive: true
-      run: ./infra/scripts/preprovision/whats-my-ip.ps1
+      shell: pwsh
+      run: ./infra/scripts/preprovision/validate-params.ps1 && ./infra/scripts/preprovision/whats-my-ip.ps1
 services:
   web-callcenter-service:
     project: src/Relecloud.Web.CallCenter.Api

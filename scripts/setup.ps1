@@ -190,6 +190,11 @@ if ($SingleLocation -and $MultiLocation) {
     exit 1
 }
 
+if ($Production -and $NotIsolated) {
+    "The Production scenario requires network isolation to be enabled"
+    exit 1
+}
+
 if (!$SingleLocation -and !$MultiLocation -and !$NotIsolated) {
     "You must specify either -SingleLocation or -MultiLocation"
     exit 1

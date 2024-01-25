@@ -29,6 +29,12 @@ azd env set OWNER_EMAIL <an email address alerted by Azure budget>
 azd env set AZURE_LOCATION westus3
 ```
 
+If doing a production deployment, set the `AZURE_ENV_TYPE` parameter with the following command. This will choose more expensive SKUs which provide more resource capacity and higher SLAs.
+
+```pwsh
+azd env set AZURE_ENV_TYPE prod
+```
+
 If doing a multi-region deployment, set the `SECONDARY_AZURE_LOCATION` to the secondary region:
 
 ```pwsh
