@@ -155,22 +155,33 @@ var defaultDeploymentSettings = {
   }
 }
 
+var primaryNamingDeployment = defaultDeploymentSettings
+var secondaryNamingDeployment = union(defaultDeploymentSettings, {
+  isPrimaryLocation: false
+  location: secondaryAzureLocation
+})
+
 var primaryDeployment = {
   workloadTags: {
-    IsPrimaryLocation: 'true'
-    ResourceToken: naming.outputs.resourceToken
     HubGroupName: isNetworkIsolated ? naming.outputs.resourceNames.hubResourceGroup : naming.outputs.resourceNames.resourceGroup
+    IsPrimaryLocation: 'true'
+    PrimaryLocation: location
+    ResourceToken: naming.outputs.resourceToken
+    SecondaryLocation: secondaryAzureLocation
   }
 }
 
 var primaryDeploymentSettings = union(defaultDeploymentSettings, primaryDeployment)
 
 var secondDeployment = {
+  location: secondaryAzureLocation
   isPrimaryLocation: false
   workloadTags: {
-    IsPrimaryLocation: 'false'
-    ResourceToken: naming2.outputs.resourceToken
     HubGroupName: isNetworkIsolated ? naming.outputs.resourceNames.hubResourceGroup : ''
+    IsPrimaryLocation: 'false'
+    PrimaryLocation: location
+    ResourceToken: naming2.outputs.resourceToken
+    SecondaryLocation: secondaryAzureLocation
   }
 }
 
@@ -201,18 +212,20 @@ var spokeAddressPrefixSecondary = '10.0.32.0/20'
 module naming './modules/naming.bicep' = {
   name: '${prefix}-naming'
   params: {
-    deploymentSettings: defaultDeploymentSettings
+    deploymentSettings: primaryNamingDeployment
     differentiator: differentiator != 'none' ? differentiator : ''
     overrides: loadJsonContent('./naming.overrides.jsonc')
+    primaryLocation: location
   }
 }
 
 module naming2 './modules/naming.bicep' = {
   name: '${prefix}-naming2'
   params: {
-    deploymentSettings: defaultDeploymentSettings
+    deploymentSettings: secondaryNamingDeployment
     differentiator: differentiator != 'none' ? '${differentiator}2' : '2'
     overrides: loadJsonContent('./naming.overrides.jsonc')
+    primaryLocation: location
   }
 }
 
@@ -318,7 +331,7 @@ module spokeNetwork './modules/spoke-network.bicep' = if (isNetworkIsolated) {
 
     // Dependencies
     logAnalyticsWorkspaceId: azureMonitor.outputs.log_analytics_workspace_id
-    routeTableId: willDeployHubNetwork ? hubNetwork.outputs.route_table_id : ''
+    firewallInternalIpAddress: willDeployHubNetwork ? hubNetwork.outputs.firewall_ip_address : ''
 
     // Settings
     addressPrefix: spokeAddressPrefixPrimary
@@ -341,7 +354,7 @@ module spokeNetwork2 './modules/spoke-network.bicep' = if (isNetworkIsolated && 
 
     // Dependencies
     logAnalyticsWorkspaceId: azureMonitor.outputs.log_analytics_workspace_id
-    routeTableId: willDeployHubNetwork ? hubNetwork.outputs.route_table_id : ''
+    firewallInternalIpAddress: willDeployHubNetwork ? hubNetwork.outputs.firewall_ip_address : ''
 
     // Settings
     addressPrefix: spokeAddressPrefixSecondary
@@ -537,5 +550,7 @@ output service_web_endpoints string[] = application.outputs.service_web_endpoint
 output AZURE_OPS_VAULT_NAME string = isNetworkIsolated ? hubNetwork.outputs.key_vault_name : application.outputs.key_vault_name
 
 // Local development values
-output App_AppConfig_Uri string = application.outputs.app_config_uri
+output APP_CONFIG_SERVICE_URI string = application.outputs.app_config_uri
 output WEB_URI string = application.outputs.web_uri
+output SQL_DATABASE_NAME string = application.outputs.sql_database_name
+output SQL_SERVER_NAME string = application.outputs.sql_server_name

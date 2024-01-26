@@ -27,7 +27,7 @@ type DeploymentSettings = {
   @description('If \'false\', then this is a multi-location deployment for the second location.')
   isPrimaryLocation: bool
 
-  @description('The primary Azure region to host resources')
+  @description('The Azure region to host resources')
   location: string
 
   @description('The name of the workload.')
@@ -512,7 +512,7 @@ module storageAccountContainer '../core/storage/storage-account-blob.bicep' = {
   }
 }
 
-module approveFrontDoorPrivateLinks '../core/security/front-door-route-approval.bicep' = if (deploymentSettings.isNetworkIsolated) {
+module approveFrontDoorPrivateLinks '../core/security/front-door-route-approval.bicep' = if (deploymentSettings.isNetworkIsolated && deploymentSettings.isPrimaryLocation) {
   name: 'approve-front-door-routes'
   scope: resourceGroup
   params: {
@@ -559,3 +559,6 @@ output service_managed_identities object[] = [
 
 output service_web_endpoints string[] = [ deploymentSettings.isPrimaryLocation ? webFrontendFrontDoorRoute.outputs.endpoint : webFrontend.outputs.app_service_uri ]
 output web_uri string = deploymentSettings.isPrimaryLocation ? webFrontendFrontDoorRoute.outputs.uri : webFrontend.outputs.app_service_uri
+
+output sql_server_name string = sqlServer.outputs.name
+output sql_database_name string = sqlDatabase.outputs.name

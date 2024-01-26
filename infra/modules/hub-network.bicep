@@ -30,7 +30,7 @@ type DeploymentSettings = {
   @description('If \'false\', then this is a multi-location deployment for the second location.')
   isPrimaryLocation: bool
 
-  @description('The primary Azure region to host resources')
+  @description('The Azure region to host resources')
   location: string
 
   @description('The name of the workload.')
@@ -349,27 +349,6 @@ module firewall '../core/network/firewall.bicep' = if (enableFirewall) {
   }
 }
 
-module routeTable '../core/network/route-table.bicep' = if (enableFirewall) {
-  name: 'hub-route-table'
-  scope: resourceGroup
-  params: {
-    name: resourceNames.hubRouteTable
-    location: deploymentSettings.location
-    tags: moduleTags
-
-    // Settings
-    routes: [
-      {
-        name: 'defaultEgress'
-        properties: {
-          addressPrefix: '0.0.0.0/0'
-          nextHopIpAddress: firewall.outputs.internal_ip_address
-          nextHopType: 'VirtualAppliance'
-        }
-      }
-    ]
-  }
-}
 
 module bastionHost '../core/network/bastion-host.bicep' = if (enableBastionHost) {
   name: 'hub-bastion-host'
@@ -461,7 +440,6 @@ module privateDnsZones './private-dns-zones.bicep' = {
 output bastion_hostname string = enableBastionHost ? bastionHost.outputs.hostname : ''
 output firewall_hostname string = enableFirewall ? firewall.outputs.hostname : ''
 output firewall_ip_address string = enableFirewall ? firewall.outputs.internal_ip_address : ''
-output route_table_id string = enableFirewall ? routeTable.outputs.id : ''
 output virtual_network_id string = virtualNetwork.outputs.id
 output virtual_network_name string = virtualNetwork.outputs.name
 output key_vault_name string = enableJumpHost ? sharedKeyVault.outputs.name : ''

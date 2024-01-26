@@ -54,10 +54,10 @@ These scripts are used by the engineering team to accelerate the testing process
     > It is encouraged to use a distinct name for each deployment
     
     ```pwsh
-    ./scripts/setup.ps1 -NotIsolated -Development -CommonAppServicePlan -SingleLocation -Name reledev7 
+    .\scripts\setup.ps1 -NotIsolated -Development -CommonAppServicePlan -SingleLocation -Name reledev7 
     ```
 
-    <!-- ./scripts/setup.ps1 -Hub -Isolated -Development -NoCommonAppServicePlan -SingleLocation -Name rele231129v1 -->
+    <!-- .\scripts\setup.ps1 -Hub -Isolated -Development -NoCommonAppServicePlan -SingleLocation -Name rele231129v1 -->
 
 1. Run a deployment
 
@@ -70,5 +70,5 @@ These scripts are used by the engineering team to accelerate the testing process
     > Find the full name of the application resource group to be supplied as the value for *ResourceGroup* param
 
     ```pwsh
-    ./scripts/cleanup.ps1 -ResourceGroup rg-reledev7-dev-westus3-application
+    .\scripts\cleanup.ps1 -ResourceGroup rg-reledev7-dev-westus3-application
     ```

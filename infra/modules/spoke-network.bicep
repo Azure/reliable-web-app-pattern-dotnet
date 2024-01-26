@@ -30,7 +30,7 @@ type DeploymentSettings = {
   @description('If \'false\', then this is a multi-location deployment for the second location.')
   isPrimaryLocation: bool
 
-  @description('The primary Azure region to host resources')
+  @description('The Azure region to host resources')
   location: string
 
   @description('The name of the workload.')
@@ -88,7 +88,7 @@ param resourceNames object
 param logAnalyticsWorkspaceId string = ''
 
 @description('If set, the ID of the table holding the outbound route to the firewall in the hub network')
-param routeTableId string = ''
+param firewallInternalIpAddress string = ''
 
 /*
 ** Settings
@@ -115,6 +115,8 @@ param enableJumpHost bool = false
 // ========================================================================
 // VARIABLES
 // ========================================================================
+
+var enableFirewall = !empty(firewallInternalIpAddress)
 
 // The tags to apply to all resources in this workload
 var moduleTags = union(deploymentSettings.tags, deploymentSettings.workloadTags)
@@ -179,8 +181,8 @@ var denyAllInbound = {
 }
 
 // Sets up the route table when there is one specified.
-var routeTableSettings = !empty(routeTableId) ? {
-  routeTable: { id: routeTableId }
+var routeTableSettings = enableFirewall ? {
+  routeTable: { id: routeTable.outputs.id }
 } : {}
 
 var devopsSubnet = createDevopsSubnet ? [{
@@ -355,6 +357,28 @@ module virtualNetwork '../core/network/virtual-network.bicep' = {
           privateEndpointNetworkPolicies: 'Enabled'
         }, routeTableSettings)
       }], devopsSubnet)
+  }
+}
+
+module routeTable '../core/network/route-table.bicep' = if (enableFirewall) {
+  name: deploymentSettings.isPrimaryLocation ? 'spoke-route-table-0' : 'spoke-route-table-1'
+  scope: resourceGroup
+  params: {
+    name: resourceNames.spokeRouteTable
+    location: deploymentSettings.location
+    tags: moduleTags
+
+    // Settings
+    routes: [
+      {
+        name: 'defaultEgress'
+        properties: {
+          addressPrefix: '0.0.0.0/0'
+          nextHopIpAddress: firewallInternalIpAddress
+          nextHopType: 'VirtualAppliance'
+        }
+      }
+    ]
   }
 }
 

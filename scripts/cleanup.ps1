@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Cleans up the Azure resources for the Field Engineer application for a given azd environment.
+    Cleans up the Azure resources for the Reliable Web App pattern for a given azd environment.
 .DESCRIPTION
     There are times that azd down doesn't work well.  At time of writing, this includes complex
     environments with multiple resource groups and networking.  To remedy this, this script removes
@@ -65,6 +65,11 @@ else {
     }
 }
 
+function Test-ResourceGroupExists($resourceGroupName) {
+    $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
+    return $null -ne $resourceGroup
+}
+
 # Default Settings
 $rgPrefix = ""
 $rgApplication = ""
@@ -91,38 +96,47 @@ if ($Prefix) {
         $environmentName = $azdConfig['AZURE_ENV_NAME']
         $environmentType = $azdConfig['AZURE_ENV_TYPE'] ?? 'dev'
         $location = $azdConfig['AZURE_LOCATION']
-        $rgPrefix = "rg-$environmentName-$environmentType-$location"
-        $rgApplication = "$rgPrefix-application"
-        $rgSpoke = "$rgPrefix-spoke"
-        $rgSecondaryApplication = "$rgPrefix-2-application"
-        $rgSecondarySpoke = "$rgPrefix-2-spoke"    
+        $locationSecondary = $azdConfig['AZURE_LOCATION'] ?? $azdConfig['AZURE_LOCATION']
+        $rgPrefix = "rg-$environmentName-$environmentType"
+        $rgApplication = "$rgPrefix-$location-application"
+        $rgSpoke = "$rgPrefix-$location-spoke"
+        $rgSecondaryApplication = "$rgPrefix-$locationSecondary-2-application"
+        Write-Host "Secondary Application Resource Group: $rgSecondaryApplication"
+        $rgSecondarySpoke = "$rgPrefix-$locationSecondary-2-spoke"    
+        Write-Host "Secondary Spoke Resource Group: $rgSecondarySpoke"
         $rgHub = "$rgPrefix-hub"
         #$CleanupAzureDirectory = $true
     } else {
         $rgApplication = $ResourceGroup
-        $rgPrefix = $resourceGroup.Substring(0, $resourceGroup.IndexOf('-application'))
+        if (Test-ResourceGroupExists -ResourceGroupName $rgApplication) {
+            # Tags on the group describe the environment
+            $rgResource = Get-AzResourceGroup -Name $rgApplication -ErrorAction SilentlyContinue
+            $rgPrefix = $ResourceGroup.Substring(0, $ResourceGroup.IndexOf('-application') - $rgResource.Location.Length - 1)
+            $location = $rgResource.Location
+            $locationSecondary = $rgResource.Tags['SecondaryLocation'] ?? $rgResource.Location
+        }
     }
 }
 
 if ($SecondaryResourceGroup) {
     $rgSecondaryApplication = $SecondaryResourceGroup
 } elseif ($rgSecondaryApplication -eq '') {
-    $rgSecondaryApplication = "$rgPrefix-2-application"
+    $rgSecondaryApplication = "$rgPrefix-$locationSecondary-2-application"
 }
 if ($SpokeResourceGroup) {
     $rgSpoke = $SpokeResourceGroup
 } elseif ($rgSpoke -eq '') {
-    $rgSpoke = "$rgPrefix-spoke"
+    $rgSpoke = "$rgPrefix-$location-spoke"
 }
 if ($SecondarySpokeResourceGroup) {
     $rgSecondarySpoke = $SecondarySpokeResourceGroup
 } elseif ($rgSecondarySpoke -eq '') {
-    $rgSecondarySpoke = "$rgPrefix-2-spoke"
+    $rgSecondarySpoke = "$rgPrefix-$locationSecondary-2-spoke"
 }
 if ($HubResourceGroup) {
     $rgHub = $HubResourceGroup
 } elseif ($rgHub -eq '') {
-    $rgHub = "$rgPrefix-hub"
+    $rgHub = "$rgPrefix-$location-hub"
 }
 
 # Gets an access token for accessing Azure Resource Manager APIs
@@ -148,11 +162,6 @@ function Get-AzBudget($resourceGroupName) {
     $restUri = "$($baseUri)$($apiVersion)"
     $result = Invoke-RestMethod -Uri $restUri -Method GET -Header $authHeader
     return $result.value
-}
-
-function Test-ResourceGroupExists($resourceGroupName) {
-    $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
-    return $null -ne $resourceGroup
 }
 
 # Removed all budgets that are scoped to a resource group of interest.

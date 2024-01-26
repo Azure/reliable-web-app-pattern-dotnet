@@ -29,7 +29,7 @@ type DeploymentSettings = {
   @description('If \'false\', then this is a multi-location deployment for the second location.')
   isPrimaryLocation: bool
 
-  @description('The primary Azure region to host resources')
+  @description('The Azure region to host resources')
   location: string
 
   @description('The name of the workload.')
@@ -61,6 +61,9 @@ param deploymentSettings DeploymentSettings
 @description('A differentiator for the environment.  Set this to a build number or date to ensure that the resource groups and resources are unique.')
 param differentiator string = ''
 
+@description('The primary Azure location to deploy resources and the location of the hub.')
+param primaryLocation string
+
 @description('The overrides for the naming scheme.  Load this from the naming.overrides.jsonc file.')
 param overrides object = {}
 
@@ -74,8 +77,8 @@ var resourceToken = uniqueString(subscription().id, deploymentSettings.name, dep
 
 // The prefix for resource groups
 var diffPrefix = !empty(differentiator) ? '-${differentiator}' : ''
-var hubResourceGroupPrefix = 'rg-${deploymentSettings.name}-${deploymentSettings.stage}-${deploymentSettings.location}'
-var resourceGroupPrefix = '${hubResourceGroupPrefix}${diffPrefix}'
+var hubResourceGroupPrefix = 'rg-${deploymentSettings.name}-${deploymentSettings.stage}-${primaryLocation}'
+var resourceGroupPrefix = 'rg-${deploymentSettings.name}-${deploymentSettings.stage}-${deploymentSettings.location}${diffPrefix}'
 
 // The list of resource names that are used in the deployment.  The default
 // names use Cloud Adoption Framework abbreviations.
@@ -90,7 +93,6 @@ var defaultResourceNames = {
   hubFirewallPublicIpAddress: 'pip-afw-${resourceToken}'
   hubJumphost: 'vm-jump-${resourceToken}'
   hubResourceGroup: '${hubResourceGroupPrefix}-hub'
-  hubRouteTable: 'rt-${resourceToken}'
   hubSubnetBastionHost: 'AzureBastionSubnet'
   hubSubnetFirewall: 'AzureFirewallSubnet'
   hubSubnetJumphost: 'JumphostSubnet'
@@ -105,6 +107,7 @@ var defaultResourceNames = {
   spokeDevopsSubnet: 'DevopsBuildAgents'
   spokeDeploymentSubnet: 'Deployment'
   spokeResourceGroup: '${resourceGroupPrefix}-spoke'
+  spokeRouteTable: 'rt-${resourceToken}'
   spokePrivateEndpointNSG: 'nsg-pep-${resourceToken}'
   spokePrivateEndpointSubnet: 'Private-Endpoints'
   spokeVirtualNetwork: 'vnet-spoke-${resourceToken}'
@@ -166,7 +169,6 @@ output resourceNames object = {
   hubFirewallPublicIpAddress: contains(overrides, 'hubFirewallPublicIpAddress') && !empty(overrides.hubFirewallPublicIpAddress) ? overrides.hubFirewallPublicIpAddress : defaultResourceNames.hubFirewallPublicIpAddress
   hubJumphost: contains(overrides, 'hubJumphost') && !empty(overrides.hubJumphost) ? overrides.hubJumphost : defaultResourceNames.hubJumphost
   hubResourceGroup: contains(overrides, 'hubResourceGroup') && !empty(overrides.hubResourceGroup) ? overrides.hubResourceGroup : defaultResourceNames.hubResourceGroup
-  hubRouteTable: contains(overrides, 'hubRouteTable') && !empty(overrides.hubRouteTable) ? overrides.hubRouteTable : defaultResourceNames.hubRouteTable
   hubSubnetBastionHost: contains(overrides, 'hubSubnetBastionHost') && !empty(overrides.hubSubnetBastionHost) ? overrides.hubSubnetBastionHost : defaultResourceNames.hubSubnetBastionHost
   hubSubnetFirewall: contains(overrides, 'hubSubnetFirewall') && !empty(overrides.hubSubnetFirewall) ? overrides.hubSubnetFirewall : defaultResourceNames.hubSubnetFirewall
   hubSubnetJumphost: contains(overrides, 'hubSubnetJumphost') && !empty(overrides.hubSubnetJumphost) ? overrides.hubSubnetJumphost : defaultResourceNames.hubSubnetJumphost
@@ -181,6 +183,7 @@ output resourceNames object = {
   spokeDevopsSubnet: contains(overrides, 'spokeDevopsSubnet') && !empty(overrides.spokeDevopsSubnet) ? overrides.spokeDevopsSubnet : defaultResourceNames.spokeDevopsSubnet
   spokeDeploymentSubnet: contains(overrides, 'spokeDeploymentSubnet') && !empty(overrides.spokeDeploymentSubnet) ? overrides.spokeDeploymentSubnet : defaultResourceNames.spokeDeploymentSubnet
   spokeResourceGroup: contains(overrides, 'spokeResourceGroup') && !empty(overrides.spokeResourceGroup) ? overrides.spokeResourceGroup : defaultResourceNames.spokeResourceGroup
+  spokeRouteTable: contains(overrides, 'spokeRouteTable') && !empty(overrides.spokeRouteTable) ? overrides.spokeRouteTable : defaultResourceNames.spokeRouteTable
   spokePrivateEndpointNSG: contains(overrides, 'spokePrivateEndpointNSG') && !empty(overrides.spokePrivateEndpointNSG) ? overrides.spokePrivateEndpointNSG : defaultResourceNames.spokePrivateEndpointNSG
   spokePrivateEndpointSubnet: contains(overrides, 'spokePrivateEndpointSubnet') && !empty(overrides.spokePrivateEndpointSubnet) ? overrides.spokePrivateEndpointSubnet : defaultResourceNames.spokePrivateEndpointSubnet
   spokeVirtualNetwork: contains(overrides, 'spokeVirtualNetwork') && !empty(overrides.spokeVirtualNetwork) ? overrides.spokeVirtualNetwork : defaultResourceNames.spokeVirtualNetwork
