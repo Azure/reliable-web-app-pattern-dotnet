@@ -1,3 +1,31 @@
+---
+page_type: sample
+languages:
+- azdeveloper
+- csharp
+- powershell
+- shell
+- html
+- bicep
+products:
+- azure
+- azure-application-insights
+- azure-app-service
+- azure-sql-database
+- azure-front-door
+- enterprise-app-patterns
+- azure-redis-cache
+- azure-app-configuration
+- azure-key-vault
+- azure-hub-spoke
+- azure-networking
+- azure-private-link
+urlFragment: reliable-web-app-pattern-dotnet
+name: Reliable web app pattern for .NET
+description: The Reliable Web App Pattern is a set of objectives to help your web application converge on the cloud. This repo contains a reference implementation of a reliable web application hosted in a secure hub-spoke networking configuration for .NET.
+---
+<!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
+
 # Reliable web app pattern for .NET
 
 > :mega: **Got feedback?** Fill out [this survey](https://aka.ms/eap/rwa/dotnet/survey) to help us shape the future of Enterprise App Patterns and understand whether we're focusing on the business goals and features important to you. [Microsoft Privacy Statement](https://go.microsoft.com/fwlink/?LinkId=521839)
