@@ -53,6 +53,8 @@ jobs:
 
       - name: Azure Dev Provision
         run: azd provision --no-prompt
+        env:
+          AZURE_PRINCIPAL_TYPE: ServicePrincipal
 
       # re-login to run ado commands such provision, deploy, and down
       - name: Log in with Azure (Client Credentials) for AZD
