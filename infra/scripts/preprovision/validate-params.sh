@@ -14,6 +14,11 @@
 environmentType=$(azd env get-values -o json | jq -r '.AZURE_ENV_TYPE')
 networkIsolation=$(azd env get-values -o json | jq -r '.NETWORK_ISOLATION')
 
+# default environmentType to dev if not set
+if [[ $environmentType == "null" ]]; then
+    environmentType="dev"
+fi
+
 # default networkIsolation to false if not set
 if [[ $networkIsolation == "null" ]]; then
     networkIsolation="false"

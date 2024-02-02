@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This script is used by the DevOps flow to validate settings of resources
+# that were deployed by the azd command. This script is not intended to be
+# run manually by a developer.
+
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
@@ -65,7 +69,7 @@ fi
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/87
 
 
-for appTag in web-call-center call-center-api public-api web-public; do
+for appTag in web-callcenter-service web-callcenter-frontend; do
 
   appName=$(az resource list -g "$resourceGroupName" --query "[?tags.\"azd-service-name\"=='${appTag}'].name" -o tsv)
 

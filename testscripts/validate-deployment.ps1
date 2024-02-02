@@ -56,7 +56,7 @@ if ($groupExists -eq 'false') {
 # checking for known issue 87
 # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/87
 
-foreach ($appTag in @("web-call-center", "call-center-api", "public-api", "web-public")) {
+foreach ($appTag in @("web-callcenter-frontend", "web-callcenter-service")) {
 
   $appName=$(az resource list -g "$ResourceGroupName" --query "[? tags.\`"azd-service-name\`" == '$appTag' ].name" -o tsv)
 
