@@ -13,6 +13,13 @@ hooks:
       interactive: true
       shell: pwsh
       run: ./infra/scripts/preprovision/validate-params.ps1 && ./infra/scripts/preprovision/whats-my-ip.ps1
+  predown:
+    posix:
+      interactive: true
+      run: ./infra/scripts/predown/cleanup.sh
+    windows:
+      interactive: true
+      run: ./infra/scripts/predown/cleanup.ps1
 services:
   web-callcenter-service:
     project: src/Relecloud.Web.CallCenter.Api
