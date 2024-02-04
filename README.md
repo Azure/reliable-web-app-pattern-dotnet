@@ -4,21 +4,18 @@ languages:
 - azdeveloper
 - csharp
 - powershell
-- shell
 - html
 - bicep
 products:
 - azure
-- azure-application-insights
+- azure-monitor
 - azure-app-service
 - azure-sql-database
 - azure-front-door
-- enterprise-app-patterns
-- azure-redis-cache
+- azure-cache-redis
 - azure-app-configuration
 - azure-key-vault
-- azure-hub-spoke
-- azure-networking
+- azure-virtual-network
 - azure-private-link
 urlFragment: reliable-web-app-pattern-dotnet
 name: Reliable web app pattern for .NET
