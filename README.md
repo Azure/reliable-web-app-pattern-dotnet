@@ -123,7 +123,8 @@ pwsh
 Run the following commands to set these values and create a new environment:
 
 ```pwsh
-azd env new dotnetwebapp
+$AZD_ENV_NAME="dotnetwebapp"
+azd env new $AZD_ENV_NAME
 ```
 
 You can substitute the environment name with your own value.
@@ -193,15 +194,7 @@ App Configuration so that the web app can read this data
 (about 3-minutes to register).
 
 ```pwsh
-./infra/scripts/postprovision/call-create-app-registrations.ps1
-```
-
-**Set Configuration**
-
-Relecloud devs have automated the process of configuring the environment.
-
-```pwsh
-./infra/scripts/predeploy/call-set-app-configuration.ps1
+./infra/createAppRegistrations.ps1
 ```
 
 ### 7. Deploy the application
@@ -209,6 +202,7 @@ Relecloud devs have automated the process of configuring the environment.
 Run the following command to deploy the code to the created infrastructure (about 4-minutes to deploy):
 
 ```pwsh
+azd env set AZURE_RESOURCE_GROUP $AZD_ENV_NAME+"-rg"
 azd deploy
 ```
 
