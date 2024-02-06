@@ -12,6 +12,7 @@ products:
 - azure-app-service
 - azure-sql-database
 - azure-front-door
+- enterprise-apps
 - azure-cache-redis
 - azure-app-configuration
 - azure-key-vault
