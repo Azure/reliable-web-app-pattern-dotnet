@@ -235,6 +235,7 @@ azd down
 ## Additional links
 
 - [Known issues](known-issues.md)
+- [Troubleshooting](troubleshooting.md)
 - [Developer patterns](simulate-patterns.md)
 - [Local Development](local-development.md)
 - [Find additional resources](additional-resources.md)
