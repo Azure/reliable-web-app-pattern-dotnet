@@ -35,7 +35,7 @@ BadRequest: Azure subscription is not registered with CDN Provider.
     az provider list --query "[? namespace=='Microsoft.Cdn'].id"
     ```
 
-    Successful registration should return something like:
+    You should see a notice that the operation succeeded:
     ```
     [
     "/subscriptions/{subscriptionId}/providers/Microsoft.Cdn"
