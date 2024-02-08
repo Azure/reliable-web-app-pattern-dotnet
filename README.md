@@ -208,7 +208,7 @@ Use the following to find the URL for the Relecloud application that you have de
 To tear down the deployment, run the following command:
 
 ```pwsh
-azd down
+azd down --purge --force
 ```
 
 ## Additional links
