@@ -526,7 +526,6 @@ param enableTelemetry bool = true
 module telemetry './modules/telemetry.bicep' = if (enableTelemetry) {
   name: '${prefix}-telemetry'
   params: {
-    resourceGroupName: resourceGroups.outputs.application_resource_group_name
     deploymentSettings: primaryDeploymentSettings
   }
 }

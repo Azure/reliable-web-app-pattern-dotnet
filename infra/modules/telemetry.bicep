@@ -57,14 +57,11 @@ type DeploymentSettings = {
 @description('The deployment settings to use for this deployment.')
 param deploymentSettings DeploymentSettings
 
-@description('The name of the application resource group')
-param resourceGroupName string
-
 // ========================================================================
 // VARIABLES
 // ========================================================================
 
-var telemetryId = 'e7e6d339-8845-45b9-8b8e-3fe203bed296'
+var telemetryId = '063f9e42-c824-4573-8a47-5f6112612fe2'
 
 // ========================================================================
 // AZURE RESOURCES
@@ -73,27 +70,6 @@ var telemetryId = 'e7e6d339-8845-45b9-8b8e-3fe203bed296'
 resource telemetrySubscription 'Microsoft.Resources/deployments@2021-04-01' = {
   name: '${telemetryId}-${deploymentSettings.location}'
   location: deploymentSettings.location
-  properties: {
-    mode: 'Incremental'
-    template: {
-      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#'
-      contentVersion: '1.0.0.0'
-      resources: {}
-    }
-  }
-}
-
-resource telemetryResourceGroup 'Microsoft.Resources/deployments@2021-04-01' = {
-  name: '${telemetryId}-${deploymentSettings.workloadTags.WorkloadName}'
-  resourceGroup: resourceGroupName
-  tags:{
-    isNetworkIsolated: deploymentSettings.isNetworkIsolated ? 'true' : 'false'
-    isProduction: deploymentSettings.isProduction ? 'true' : 'false'
-    location: deploymentSettings.location
-    name: deploymentSettings.name
-    principalType: deploymentSettings.principalType
-    stage: deploymentSettings.stage
-  }
   properties: {
     mode: 'Incremental'
     template: {
