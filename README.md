@@ -107,7 +107,7 @@ azd env new dotnetwebapp
 
 You can substitute the environment name with your own value.
 
-By default, Azure resources are sized for a "development" mode. If doing a Production deployment, see the [prod dDeployment](./prod-deployment.md) instructions for more detail.
+By default, Azure resources are sized for a "development" mode. If doing a Production deployment, see the [prod Deployment](./prod-deployment.md) instructions for more detail.
 
 ### 4. Log in to Azure
 
