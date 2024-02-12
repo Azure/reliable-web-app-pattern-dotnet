@@ -24,7 +24,7 @@ This project has a six-part video series that details the reliable web app patte
 
 ![architecture diagram](./assets/images/reliable-web-app-dotnet.svg)
 
-This diagram describes the prod deployment which is described in the [prod-deployment.md](./prod-deployment.md) file. The following steps below are for a [dev deployment](./assets/images/) which is a simplified version.
+This diagram describes the production deployment which is described in the [prod-deployment.md](./prod-deployment.md) file. The steps below deploy the simplified [development version](./assets/images/reliable-web-app-dotnet-dev.svg) of the application infrastructure.
 
 ## Workflow
 
