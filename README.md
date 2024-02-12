@@ -65,7 +65,7 @@ cd reliable-web-app-pattern-dotnet
 
 ### 2. Open Dev Container in Visual Studio Code (optional)
 
-> For your convenience, we use DevContainers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary dependencies and following the deployment instructions below.
+> For your convenience, we use DevContainers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](./prerequisites.md) and following the deployment instructions below.
 
 If required, ensure Docker Desktop is started and enabled for your WSL terminal [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt:
 
