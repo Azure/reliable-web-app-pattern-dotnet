@@ -1,6 +1,8 @@
 # Steps to deploy the Network Isolated implementation
 This section describes the deployment steps for the reference implementation of a reliable web application pattern with .NET on Microsoft Azure. These steps guide you through using the jump host that is deployed when performing a network isolated deployment because access to resources will be restricted from public network access and must be performed from a machine connected to the vnet.
 
+![Diagram showing the network focused architecture of the reference implementation.](./assets/images/reliable-web-app-prod-network.svg)
+
 ## Prerequisites
 
 We recommend that you use a Dev Container to deploy this application.  The requirements are as follows:
