@@ -108,7 +108,7 @@ param networkIsolation string = 'auto'
 
 // Secondary Azure location - provides the name of the 2nd Azure region. Blank by default to represent a single region deployment.
 @description('Should specify an Azure region. If not set to empty string then deploy to single region, else trigger multiregional deployment. The second region should be different than the `location`. e.g. `westus3`')
-param secondaryAzureLocation string = ''
+param azureSecondaryLocation string = ''
 
 // Common App Service Plan - determines if a common app service plan should be deployed.
 //  auto = yes in dev, no in prod.
@@ -123,7 +123,7 @@ param useCommonAppServicePlan string = 'auto'
 var prefix = '${environmentName}-${environmentType}'
 
 // Boolean to indicate the various values for the deployment settings
-var isMultiLocationDeployment = secondaryAzureLocation == '' ? false : true
+var isMultiLocationDeployment = azureSecondaryLocation == '' ? false : true
 var isProduction = environmentType == 'prod'
 var isNetworkIsolated = networkIsolation == 'true' || (networkIsolation == 'auto' && isProduction)
 var willDeployHubNetwork = isNetworkIsolated && (deployHubNetwork == 'true' || (deployHubNetwork == 'auto' && !isProduction))
@@ -158,7 +158,7 @@ var defaultDeploymentSettings = {
 var primaryNamingDeployment = defaultDeploymentSettings
 var secondaryNamingDeployment = union(defaultDeploymentSettings, {
   isPrimaryLocation: false
-  location: secondaryAzureLocation
+  location: azureSecondaryLocation
 })
 
 var primaryDeployment = {
@@ -167,21 +167,21 @@ var primaryDeployment = {
     IsPrimaryLocation: 'true'
     PrimaryLocation: location
     ResourceToken: naming.outputs.resourceToken
-    SecondaryLocation: secondaryAzureLocation
+    SecondaryLocation: azureSecondaryLocation
   }
 }
 
 var primaryDeploymentSettings = union(defaultDeploymentSettings, primaryDeployment)
 
 var secondDeployment = {
-  location: secondaryAzureLocation
+  location: azureSecondaryLocation
   isPrimaryLocation: false
   workloadTags: {
     HubGroupName: isNetworkIsolated ? naming.outputs.resourceNames.hubResourceGroup : ''
     IsPrimaryLocation: 'false'
     PrimaryLocation: location
     ResourceToken: naming2.outputs.resourceToken
-    SecondaryLocation: secondaryAzureLocation
+    SecondaryLocation: azureSecondaryLocation
   }
 }
 

@@ -99,11 +99,6 @@ If not using PowerShell 7+, run the following command:
 pwsh
 ```
 
-Run the following commands to set these values and create a new environment:
-
-```pwsh
-azd env new dotnetwebapp
-```
 
 You can substitute the environment name with your own value.
 
@@ -114,10 +109,6 @@ By default, Azure resources are sized for a "development" mode. If doing a Produ
 Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
 
 ```pwsh
-azd auth login
-```
-
-```pwsh
 Import-Module Az.Resources
 ```
 
@@ -125,27 +116,39 @@ Import-Module Az.Resources
 Connect-AzAccount
 ```
 
-Each command will open a browser allowing you to authenticate.  To list the subscriptions you have access to:
+To list the subscriptions you have access to:
 
 ```pwsh
 Get-AzSubscription
 ```
 
-To set the active subscription:
-
 ```pwsh
 $AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
-azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
+```
+
+```pwsh
 Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
 ```
 
-### 5. Select a region for deployment
+```pwsh
+azd auth login
+```
 
-The application can be deployed in either a single region or multi-region manner. You can find a list of available Azure regions by running the following Azure CLI command.
+Run the following commands to set these values and create a new environment:
 
-> ```pwsh
-> (Get-AzLocation).Location
-> ```
+```pwsh
+azd env new rwa1_1
+```
+
+To deploy the dev version:
+
+```pwsh
+azd env set ENVIRONMENT dev
+```
+
+```pwsh
+azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
+```
 
 Set the `AZURE_LOCATION` to the primary region:
 
@@ -153,12 +156,12 @@ Set the `AZURE_LOCATION` to the primary region:
 azd env set AZURE_LOCATION westus3
 ```
 
-### 6. Provision the application
+### 6. Provision the app and deploy the code
 
 Run the following command to create the infrastructure (about 15-minutes to provision):
 
 ```pwsh
-azd provision --no-prompt
+azd up
 ```
 
 **Create App Registrations**
