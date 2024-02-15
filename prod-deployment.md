@@ -215,3 +215,11 @@ From your Dev Container, use the following to find the URL for the Relecloud app
 ```
 
 ![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
+
+### 9. Teardown
+
+To tear down the deployment, run the following command:
+
+```pwsh
+azd down --purge --force
+```

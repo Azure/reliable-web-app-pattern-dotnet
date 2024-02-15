@@ -16,10 +16,10 @@ hooks:
   predown:
     posix:
       interactive: true
-      run: ./infra/scripts/predown/cleanup.sh
+      run: ./infra/scripts/predown/call-cleanup.sh
     windows:
       interactive: true
-      run: ./infra/scripts/predown/cleanup.ps1
+      run: ./infra/scripts/predown/call-cleanup.ps1
 services:
   web-callcenter-service:
     project: src/Relecloud.Web.CallCenter.Api
