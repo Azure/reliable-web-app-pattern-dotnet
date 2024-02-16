@@ -20,6 +20,12 @@
 
 $resourceGroupName=(azd env get-values --output json | ConvertFrom-Json).AZURE_RESOURCE_GROUP
 
+# if the resource group is not set, then exit
+if (-not $resourceGroupName) {
+    Write-Host "AZURE_RESOURCE_GROUP not set..."
+    exit 0
+}
+
 Write-Host "Calling cleanup.ps1 for group:'$resourceGroupName'..."
 
 ./testscripts/cleanup.ps1 -ResourceGroup $resourceGroupName -NoPrompt -DeleteResourceGroups

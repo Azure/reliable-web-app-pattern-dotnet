@@ -15,6 +15,13 @@
 
 resourceGroupName=$(azd env get-values --output json | jq -r '.AZURE_RESOURCE_GROUP')
 
+# if the resource group equals the string 'null', then exit
+if [ "$resourceGroupName" == "null" ]; then
+  echo "AZURE_RESOURCE_GROUP not set..."
+  exit 0
+fi
+
+
 echo "Calling cleanup.ps1 for group:'$resourceGroupName'..."
 
 pwsh ./testscripts/cleanup.ps1 -ResourceGroup "$resourceGroupName" -NoPrompt -DeleteResourceGroups

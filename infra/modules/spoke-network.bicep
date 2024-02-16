@@ -382,7 +382,7 @@ module routeTable '../core/network/route-table.bicep' = if (enableFirewall) {
   }
 }
 
-module jumphost '../core/compute/windows-jumphost.bicep' = if (enableJumpHost) {
+module jumphost '../core/compute/ubuntu-jumphost.bicep' = if (enableJumpHost) {
   name: deploymentSettings.isPrimaryLocation ? 'hub-jumphost-0' : 'hub-jumphost-1'
   scope: resourceGroup
   params: {
@@ -395,10 +395,9 @@ module jumphost '../core/compute/windows-jumphost.bicep' = if (enableJumpHost) {
     subnetId: virtualNetwork.outputs.subnets[resourceNames.spokeDevopsSubnet].id
 
     // Settings
-    administratorPassword: administratorPassword
-    administratorUsername: administratorUsername
+    adminPasswordOrKey: administratorPassword
+    adminUsername: administratorUsername
     diagnosticSettings: diagnosticSettings
-    
   }
 }
 

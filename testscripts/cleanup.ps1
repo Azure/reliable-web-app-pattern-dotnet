@@ -85,6 +85,8 @@ $rgSecondaryApplication = ""
 $rgSecondarySpoke = ""
 #$CleanupAzureDirectory = $false
 
+$azdConfig = azd env get-values -o json | ConvertFrom-Json -Depth 9 -AsHashtable
+
 if ($Prefix) {
     $rgPrefix = $Prefix
     $rgApplication = "$rgPrefix-application"
@@ -98,7 +100,6 @@ if ($Prefix) {
             "No .azure directory found and no resource group information provided - cannot clean up"
             exit 8
         }
-        $azdConfig = azd env get-values -o json | ConvertFrom-Json -Depth 9 -AsHashtable
         $environmentName = $azdConfig['AZURE_ENV_NAME']
         $environmentType = $azdConfig['AZURE_ENV_TYPE'] ?? 'dev'
         $location = $azdConfig['AZURE_LOCATION']
@@ -249,7 +250,7 @@ if (Test-ResourceGroupExists -ResourceGroupName $rgHub) {
     $resourceGroups.Add($rgHub) | Out-Null
 }
 
-$resourceToken="vulbaocwvurym" # todo
+$resourceToken=$azdConfig['AZURE_OPS_VAULT_NAME'].Substring(3) # expecting to be something like 'kv-fjmjdbizcdxt4'
 $appRegistrations = [System.Collections.ArrayList]@()
 $calculatedAppRegistrationNameForApi = "$rgPrefix-api-webapp-$resourceToken".Substring(3)
 $calculatedAppRegistrationNameForFrontend = "$rgPrefix-front-webapp-$resourceToken".Substring(3)
@@ -269,9 +270,13 @@ if (-not $NoPrompt) {
     $null = Read-Host
 }
 
-"`nRemoving Entra ID App Registration..." | Write-Output
-foreach($appRegistration in $appRegistrations) {
-    Remove-AzADApplicationByName -Name $appRegistration
+# we don't want to delete the app registrations because we reuse them when running in pipeline
+# when running in pipeline, the AZURE_PRINCIPAL_TYPE is set to 'ServicePrincipal'
+if ($azdConfig['AZURE_PRINCIPAL_TYPE'] -eq 'User') {    
+    "`nRemoving Entra ID App Registration..." | Write-Output
+    foreach($appRegistration in $appRegistrations) {
+        Remove-AzADApplicationByName -Name $appRegistration
+    }
 }
 
 "`nRemoving resources from resource groups..." | Write-Output

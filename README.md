@@ -164,45 +164,11 @@ Run the following command to create the infrastructure (about 15-minutes to prov
 azd up
 ```
 
-**Create App Registrations**
-
-Relecloud devs have automated the process of creating Azure
-AD resources that support the authentication features of the
-web app. They use the following command to create two new
-App Registrations within Microsoft Entra ID. The command is also
-responsible for saving configuration data to Key Vault and
-App Configuration so that the web app can read this data
-(about 3-minutes to register).
-
-```pwsh
-./infra/scripts/postprovision/call-create-app-registrations.ps1
-```
-
-**Set Configuration**
-
-Relecloud devs have automated the process of configuring the environment.
-
-```pwsh
-./infra/scripts/predeploy/call-set-app-configuration.ps1
-```
-
-### 7. Deploy the application
-
-Run the following command to deploy the code to the created infrastructure (about 4-minutes to deploy):
-
-```pwsh
-azd deploy
-```
-
 The provisioning and deployment process can take anywhere from 20 minutes to over an hour, depending on system load and your bandwidth.
 
 ### 8. Open and use the application
 
-Use the following to find the URL for the Relecloud application that you have deployed:
-
-```pwsh
-(azd env get-values --output json | ConvertFrom-Json).WEB_URI
-```
+Use the URL displayed in the consol output to launch the Relecloud application that you have deployed:
 
 ![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
 

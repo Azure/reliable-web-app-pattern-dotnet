@@ -13,6 +13,27 @@ hooks:
       interactive: true
       shell: pwsh
       run: ./infra/scripts/preprovision/validate-params.ps1 && ./infra/scripts/preprovision/whats-my-ip.ps1
+  postprovision:
+    posix:
+      interactive: true
+      run: ./infra/scripts/postprovision/call-create-app-registrations.sh
+    windows:
+      interactive: true
+      run: ./infra/scripts/postprovision/call-create-app-registrations.ps1
+  predeploy:
+    posix:
+      interactive: true
+      run: ./infra/scripts/predeploy/call-set-app-configuration.sh
+    windows:
+      interactive: true
+      run: ./infra/scripts/predeploy/call-set-app-configuration.ps1
+  postdeploy:
+    posix:
+      interactive: true
+      run: ./infra/scripts/postdeploy/show-webapp-uri.sh
+    windows:
+      interactive: true
+      run: ./infra/scripts/postdeploy/show-webapp-uri.ps1
   predown:
     posix:
       interactive: true
