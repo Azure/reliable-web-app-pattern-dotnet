@@ -9,6 +9,6 @@ $highlightColor = if ($Host.UI.SupportsVirtualTerminal) { "`e[36m" } else { "" }
 
 # End of Prompt formatting features
 
-Write-Host "Use this URI to access the web app:"
+Write-Host "`nUse this URI to access the web app:"
 $azureFrontDoorUri=(azd env get-values --output json | ConvertFrom-Json).WEB_URI
 Write-Host "`t$($highlightColor)$azureFrontDoorUri$($defaultColor)"
