@@ -126,7 +126,7 @@ var prefix = '${environmentName}-${environmentType}'
 var isMultiLocationDeployment = azureSecondaryLocation == '' ? false : true
 var isProduction = environmentType == 'prod'
 var isNetworkIsolated = networkIsolation == 'true' || (networkIsolation == 'auto' && isProduction)
-var willDeployHubNetwork = isNetworkIsolated && (deployHubNetwork == 'true' || (deployHubNetwork == 'auto' && !isProduction))
+var willDeployHubNetwork = isNetworkIsolated && (deployHubNetwork == 'true' || (deployHubNetwork == 'auto' && isProduction))
 var willDeployCommonAppServicePlan = useCommonAppServicePlan == 'true' || (useCommonAppServicePlan == 'auto' && !isProduction)
 
 var defaultDeploymentSettings = {
