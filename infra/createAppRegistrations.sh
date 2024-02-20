@@ -90,7 +90,9 @@ environmentName=${resourceGroupName:0:$locationOfHyphen-1}
 
 
 frontDoorProfileName=$(az resource list -g $resourceGroupName --query "[? kind=='frontdoor' ].name" -o tsv)
+echo "frontDoorProfileName=$frontDoorProfileName"
 frontEndWebAppHostName=$(az afd endpoint list -g $resourceGroupName --profile-name $frontDoorProfileName --query "[].hostName" -o tsv --only-show-errors)
+echo "frontEndWebAppHostName=$frontEndWebAppHostName"
 frontEndWebAppUri="https://$frontEndWebAppHostName"
 
 substring="-rg"

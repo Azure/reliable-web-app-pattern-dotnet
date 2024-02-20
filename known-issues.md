@@ -47,3 +47,12 @@ The following topics are intended to help readers with our most commonly reporte
     When the `azd provision` command runs it creates a deployment resource in your subscription. You must delete this deployment before you can change the Azure region.
 
     > Please see the [teardown instructions](README.md#clean-up-azure-resources) to address this issue.
+
+* **Error: Invalid value specified for property 'web' of resource 'Application'**
+    This error most often happens when the user is running the 'createAppRegistrations.sh' file to create new app registrations and the region of user is different than the region of provisioned azure resources. For ex. the user from Canada is running this script on their local machine and the Azure region selected is East US.
+
+    > You may need to wait a bit longer (15-20 minutes) before running the below command 
+
+    ```bash
+    ./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
+    ```
