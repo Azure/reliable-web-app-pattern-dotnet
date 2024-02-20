@@ -40,6 +40,9 @@ type DeploymentSettings = {
 
   @description('The type of the \'principalId\' property.')
   principalType: 'ServicePrincipal' | 'User'
+  
+  @description('The token to use for naming resources.  This should be unique to the deployment.')
+  resourceToken: string
 
   @description('The development stage for this application')
   stage: 'dev' | 'prod'
@@ -64,16 +67,14 @@ param differentiator string = ''
 @description('The primary Azure location to deploy resources and the location of the hub.')
 param primaryLocation string
 
+var resourceToken = deploymentSettings.resourceToken
+
 @description('The overrides for the naming scheme.  Load this from the naming.overrides.jsonc file.')
 param overrides object = {}
 
 // ========================================================================
 // VARIABLES
 // ========================================================================
-
-// A unique token that is used as a differentiator for all resources.  All resources within the
-// same deployment will have the same token.
-var resourceToken = uniqueString(subscription().id, deploymentSettings.name, deploymentSettings.stage, deploymentSettings.location, differentiator)
 
 // The prefix for resource groups
 var diffPrefix = !empty(differentiator) ? '-${differentiator}' : ''

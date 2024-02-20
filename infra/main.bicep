@@ -129,6 +129,11 @@ var isNetworkIsolated = networkIsolation == 'true' || (networkIsolation == 'auto
 var willDeployHubNetwork = isNetworkIsolated && (deployHubNetwork == 'true' || (deployHubNetwork == 'auto' && isProduction))
 var willDeployCommonAppServicePlan = useCommonAppServicePlan == 'true' || (useCommonAppServicePlan == 'auto' && !isProduction)
 
+// A unique token that is used as a differentiator for all resources.  All resources within the
+// same deployment will have the same token.
+var primaryResourceToken = uniqueString(subscription().id, environmentName, environmentType, location, differentiator)
+var secondaryResourceToken = uniqueString(subscription().id, environmentName, environmentType, location, differentiator)
+
 var defaultDeploymentSettings = {
   isMultiLocationDeployment: isMultiLocationDeployment
   isProduction: isProduction
@@ -138,6 +143,7 @@ var defaultDeploymentSettings = {
   name: environmentName
   principalId: principalId
   principalType: principalType
+  resourceToken: primaryResourceToken
   stage: environmentType
   tags: {
     'azd-env-name': environmentName
@@ -159,6 +165,7 @@ var primaryNamingDeployment = defaultDeploymentSettings
 var secondaryNamingDeployment = union(defaultDeploymentSettings, {
   isPrimaryLocation: false
   location: azureSecondaryLocation
+  resourceToken: secondaryResourceToken
 })
 
 var primaryDeployment = {
@@ -176,6 +183,7 @@ var primaryDeploymentSettings = union(defaultDeploymentSettings, primaryDeployme
 var secondDeployment = {
   location: azureSecondaryLocation
   isPrimaryLocation: false
+  resourceToken: secondaryResourceToken
   workloadTags: {
     HubGroupName: isNetworkIsolated ? naming.outputs.resourceNames.hubResourceGroup : ''
     IsPrimaryLocation: 'false'
