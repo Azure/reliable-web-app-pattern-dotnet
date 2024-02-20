@@ -22,7 +22,7 @@ This project has a six-part video series that details the reliable web app patte
 
 ## Architecture
 
-![architecture diagram](./assets/icons/reliable-web-app-dotnet-1.1.png)
+![architecture diagram](./assets/icons/reliable-web-app-dotnet-1.1.svg)
 
 Relecloud aligned to a hub and spoke network topology in the prod deployment architecture to centralize common resources. This network topology provided cost savings, enhanced security, and facilitated network integration (platform and hybrid):
  
