@@ -68,13 +68,13 @@ azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
 Set the `AZURE_LOCATION` to the primary region:
 
 ```pwsh
-azd env set AZURE_LOCATION westus3
+azd env set AZURE_LOCATION australiaeast
 ```
 
 Set the `AZURE_SECONDARY_LOCATION` to the primary region:
 
 ```pwsh
-azd env set AZURE_SECONDARY_LOCATION eastus
+azd env set AZURE_SECONDARY_LOCATION australiasoutheast
 ```
 
 ### 2. Provision the app
