@@ -17,69 +17,79 @@ If you do not wish to use a Dev Container, please refer to the [prerequisites](p
 
 ## Steps to deploy the reference implementation
 
-For users familiar with the deployment process, you can use the following list of the deployments commands as a quick reference. The commands assume you have selected a suitable subscription and have logged into both the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/reference#azd-auth-login) and a PowerShell 7+ [AzContext](https://learn.microsoft.com/powershell/azure/authenticate-interactive):
+The following detailed deployment steps assume you are using a Dev Container inside Visual Studio Code.
+
+### 1. Log in to Azure
+
+Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
 
 ```pwsh
-git clone https://github.com/Azure/reliable-web-app-pattern-dotnet.git
-cd reliable-web-app-pattern-dotnet
-azd env new dotnetwebapp
-azd env set NETWORK_ISOLATION true
-azd env set DEPLOY_HUB_NETWORK true
-azd env set COMMON_APP_SERVICE_PLAN false
-azd env set OWNER_NAME <a name listed as resource owner in Azure tags>
-azd env set OWNER_EMAIL <an email address alerted by Azure budget>
+Import-Module Az.Resources
+```
+
+```pwsh
+Connect-AzAccount
+```
+
+To list the subscriptions you have access to:
+
+```pwsh
+Get-AzSubscription
+```
+
+```pwsh
+$AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
+```
+
+```pwsh
+Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
+```
+
+```pwsh
+azd auth login
+```
+
+Run the following commands to set these values and create a new environment:
+
+```pwsh
+azd env new rwa1_1
+```
+
+To deploy the dev version:
+
+```pwsh
+azd env set ENVIRONMENT prod
+```
+
+```pwsh
+azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
+```
+
+Set the `AZURE_LOCATION` to the primary region:
+
+```pwsh
 azd env set AZURE_LOCATION westus3
 ```
 
-If doing a production deployment, set the `AZURE_ENV_TYPE` parameter with the following command. This will choose more expensive SKUs which provide more resource capacity and higher SLAs.
+Set the `AZURE_SECONDARY_LOCATION` to the primary region:
 
 ```pwsh
-azd env set AZURE_ENV_TYPE prod
+azd env set AZURE_SECONDARY_LOCATION eastus
 ```
 
-If doing a multi-region deployment, set the `SECONDARY_AZURE_LOCATION` to the secondary region:
+### 2. Provision the app
 
-```pwsh
-azd env set SECONDARY_AZURE_LOCATION eastus
-```
-
-Make sure the secondary region is a paired region with the primary region (`AZURE_LOCATION`). Paired regions are required to support some Azure features; for example, [geo-zone-redundant storage (GZRS) failover](https://learn.microsoft.com/azure/storage/common/storage-disaster-recovery-guidance). For a full list of region pairs, see [Azure region pairs](https://learn.microsoft.com/azure/reliability/cross-region-replication-azure#azure-cross-region-replication-pairings-for-all-geographies). We have validated the following paired regions.
-
-| AZURE_LOCATION | SECONDARY_AZURE_LOCATION |
-| ----- | ----- |
-| westus3 | eastus |
-| westeurope | northeurope |
-| australiaeast | australiasoutheast |
-
-Provision the Azure resources (about 35-minutes to provision):
+Run the following command to create the infrastructure (about 35-minutes to provision):
 
 ```pwsh
 azd provision
 ```
 
-> **WARNING**
->
-> Your organization may not allow the creation of Entra ID application registrations unless the host is joined
-> to a domain, InTune managed, or meets other security requirements.  If your organization has such security
-> requirements, be sure to run the create-app-registrations from your dev workstation.
->
-> Microsoft employees:
->
-> - Create the Entra application registrations from the same system that you used to initially provision resources.
-> - The other actions (such as azd deploy) should be run from the jump host.
-
-Create the app registration in Microsoft Entra ID:
-
-```shell
-./infra/scripts/postprovision/call-create-app-registrations.ps1
-```
-- Wait approximately 5 minutes for the registration to propagate.
-
 ### Login
 
 > **WARNING**
 >
-> When the network isolated deployment is performed the Key Vault resource will be deployed with public network access enabled. This allows the reader to access the Key Vault to retrieve the username and password for the jump host. This also allows you to save data created by the create-app-registration script directly to the Key Vault. We recommend reviewing this approach with your security team as you may want to change this approach. One option to consider is adding the jump host to the domain, disabling public network access for Key Vault, and running the create app-registration script from the jump host.
+> When the prod deployment is performed the Key Vault resource will be deployed with public network access enabled. This allows the reader to access the Key Vault to retrieve the username and password for the jump host. This also allows you to save data created by the create-app-registration script directly to the Key Vault. We recommend reviewing this approach with your security team as you may want to change this approach. One option to consider is adding the jump host to the domain, disabling public network access for Key Vault, and running the create app-registration script from the jump host.
 
 The default username for the jump host is `azureadmin` and the password was set earlier. If you did not set an ADMIN_PASSWORD, then one is generated for you.  To retrieve the generated password:
 
