@@ -132,7 +132,7 @@ var willDeployCommonAppServicePlan = useCommonAppServicePlan == 'true' || (useCo
 // A unique token that is used as a differentiator for all resources.  All resources within the
 // same deployment will have the same token.
 var primaryResourceToken = uniqueString(subscription().id, environmentName, environmentType, location, differentiator)
-var secondaryResourceToken = uniqueString(subscription().id, environmentName, environmentType, location, differentiator)
+var secondaryResourceToken = uniqueString(subscription().id, environmentName, environmentType, azureSecondaryLocation, differentiator)
 
 var defaultDeploymentSettings = {
   isMultiLocationDeployment: isMultiLocationDeployment
