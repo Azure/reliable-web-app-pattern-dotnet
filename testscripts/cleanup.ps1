@@ -219,6 +219,17 @@ function Remove-AzADApplicationByName($name) {
     }
 }
 
+function Get-ResourceToken($resourceGroupName) {
+    $defaultRedisNamePrefix = 'redis-'
+    $redisInstances = Get-AzRedisCache -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue
+
+    if ($redisInstances.Count -eq 0) {
+        return "notfound"
+    }
+
+    return ($redisInstances | Select-Object -First 1).Name.Substring($defaultRedisNamePrefix.Length)
+}
+
 "`nCleaning up environment for application '$rgApplication'" | Write-Output
 
 # Get the list of resource groups to deal with
@@ -250,7 +261,7 @@ if (Test-ResourceGroupExists -ResourceGroupName $rgHub) {
     $resourceGroups.Add($rgHub) | Out-Null
 }
 
-$resourceToken=$azdConfig['AZURE_OPS_VAULT_NAME'].Substring(3) # expecting to be something like 'kv-fjmjdbizcdxt4'
+$resourceToken=(Get-ResourceToken -resourceGroupName $rgApplication) # expecting to be something like 'fjmjdbizcdxt4'
 $appRegistrations = [System.Collections.ArrayList]@()
 $calculatedAppRegistrationNameForApi = "$rgPrefix-api-webapp-$resourceToken".Substring(3)
 $calculatedAppRegistrationNameForFrontend = "$rgPrefix-front-webapp-$resourceToken".Substring(3)
