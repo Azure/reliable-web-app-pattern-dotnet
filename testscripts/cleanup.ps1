@@ -37,7 +37,7 @@ Param(
     [Parameter(Mandatory = $false)][string]$SpokeResourceGroup,
     [Parameter(Mandatory = $false)][string]$SecondarySpokeResourceGroup,
     [Parameter(Mandatory = $false)][string]$HubResourceGroup,
-    [Parameter(Mandatory = $false)][switch]$DeleteResourceGroups,
+    [Parameter(Mandatory = $false)][switch]$SkipResourceGroupDeletion,
     [Parameter(Mandatory = $false)][switch]$NoPrompt
 )
 
@@ -306,10 +306,10 @@ foreach ($resourceGroupName in $resourceGroups) {
     Remove-DiagnosticSettingsForResourceGroup -ResourceGroupName $resourceGroupName
 }
 
-"`nRemoving resource groups in order..." | Write-Output
-# if DeleteGroups is false, then we skip the resource group deletion
+# if $SkipResourceGroupDeletion is false, then we skip the resource group deletion
 # flag is expected to be set to false when combined with the `azd down` command
-if ($DeleteGroups) {
+if (-not $SkipResourceGroupDeletion) {
+    "`nRemoving resource groups in order..." | Write-Output
     Remove-ResourceGroupFromAzure -ResourceGroupName $rgApplication
     Remove-ResourceGroupFromAzure -ResourceGroupName $rgSecondaryApplication
     Remove-ResourceGroupFromAzure -ResourceGroupName $rgSpoke
