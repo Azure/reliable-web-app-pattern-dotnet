@@ -24,4 +24,4 @@ fi
 
 echo "Calling cleanup.ps1 for group:'$resourceGroupName'..."
 
-pwsh ./testscripts/cleanup.ps1 -ResourceGroup "$resourceGroupName" -NoPrompt -DeleteResourceGroups
+pwsh ./testscripts/cleanup.ps1 -ResourceGroup "$resourceGroupName" -NoPrompt -SkipResourceGroupDeletion
