@@ -79,7 +79,7 @@ azd env set AZURE_SECONDARY_LOCATION northeurope
 
 ### 2. Provision the app
 
-Run the following command to create the infrastructure (about 35-minutes to provision):
+Run the following command to create the infrastructure (about 45-minutes to provision):
 
 ```pwsh
 azd provision
