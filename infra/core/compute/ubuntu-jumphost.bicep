@@ -66,7 +66,7 @@ param adminPasswordOrKey string
   'Ubuntu-2004'
   'Ubuntu-2204'
 ])
-param ubuntuOSVersion string = 'Ubuntu-2004'
+param ubuntuOSVersion string = 'Ubuntu-2204'
 
 @description('Location for all resources.')
 param location string = resourceGroup().location
@@ -104,6 +104,8 @@ param subnetId string
 
 var validComputerName = replace(replace(name, '-', ''), '_', '')
 var computerName = !empty(computerLinuxName) ? computerLinuxName : length(validComputerName) > 15 ? substring(validComputerName, 0, 15) : validComputerName
+
+var configScriptRepoUrl = 'https://raw.githubusercontent.com/KSchlobohm/reliable-web-app-vm-postconfiguration/main'
 
 // ========================================================================
 // AZURE RESOURCES
@@ -229,6 +231,27 @@ resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
           maaTenantName: maaTenantName
         }
       }
+    }
+  }
+}
+
+resource postDeploymentScript 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = {
+  name: 'postDeploymentScript'
+  location: location
+  parent: virtualMachine
+  properties: {
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
+    autoUpgradeMinorVersion: true
+    settings: {
+      skipDos2Unix:false
+    }
+    protectedSettings: {
+      commandToExecute: 'chmod +x post-deployment.sh && bash post-deployment.sh'
+      fileUris: [
+        '${configScriptRepoUrl}/post-deployment.sh'
+      ]
     }
   }
 }
