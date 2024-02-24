@@ -25,75 +25,88 @@ The following detailed deployment steps assume you are using a Dev Container ins
 
 ### 1. Log in to Azure
 
-Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
+1. Start a powershell session in the dev container terminal:
 
-```pwsh
-Import-Module Az.Resources
-```
+    ```sh
+    pwsh
+    ```
 
-```pwsh
-Connect-AzAccount
-```
+1. Import the Azure cmdlets:
 
-To list the subscriptions you have access to:
+    ```pwsh
+    Import-Module Az.Resources
+    ```
 
-```pwsh
-Get-AzSubscription
-```
+1. Log in to Azure:
+    
+    ```pwsh
+    Connect-AzAccount
+    ```
 
-```pwsh
-$AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
-```
+1. Set the subscription to the one you want to use (can use [Get-AzSubscription](https://learn.microsoft.com/powershell/module/az.accounts/get-azsubscription?view=azps-11.3.0) to list available subscriptions):
 
-```pwsh
-Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
-```
+        
+    ```pwsh
+    $AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
+    ```
 
-```pwsh
-azd auth login
-```
+    ```pwsh
+    Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
+    ```
 
-Run the following commands to set these values and create a new environment:
+1. Azure Developer CLI (azd) has its own authentication context. Run the following command to authenticate to Azure:
 
-```pwsh
-azd env new rwa1_1
-```
+    ```pwsh
+    azd auth login
+    ```
 
-To deploy the dev version:
+1. Set the default subscription for the azd context:
 
-```pwsh
-azd env set ENVIRONMENT prod
-```
+    ```pwsh
+    azd config set defaults.subscription $AZURE_SUBSCRIPTION_ID
+    ```
 
-```pwsh
-azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
-```
-
-Set the `AZURE_LOCATION` to the primary region:
-
-```pwsh
-azd env set AZURE_LOCATION uksouth
-```
-
-Set the `AZURE_SECONDARY_LOCATION` to the primary region:
-
-```pwsh
-azd env set AZURE_SECONDARY_LOCATION northeurope
-```
 
 ### 2. Provision the app
 
-Run the following command to create the infrastructure (about 45-minutes to provision):
+1. Create a new AZD environment to store your deployment configuration values:
 
-```pwsh
-azd provision
-```
+    ```pwsh
+    azd env new <pick_a_name>
+    ```
+
+1. To create the prod deployment:
+
+    ```pwsh
+    azd env set ENVIRONMENT prod
+    ```
+
+1. Production is a multi-region deployment. Choose an Azure region for the primary deployment:
+
+    ```pwsh
+    azd env set AZURE_LOCATION uksouth
+    ```
+
+1. Choose an Azure region for the secondary deployment:
+
+    ```pwsh
+    azd env set AZURE_SECONDARY_LOCATION northeurope
+    ```
+
+1. Run the following command to create the Azure resources (about 45-minutes to provision):
+
+    <!-- the --no-prompt will use defaults.subscription instead of prompting to confirm -->
+    ```pwsh
+    azd provision --no-prompt
+    ```
+    <!-- todo - make folder on server -->
+    <!-- todo - installation of Az module failed -->
 
 ### 3. Upload the code to the jump host
 
 > **WARNING**
 >
-> When the prod deployment is performed the Key Vault resource will be deployed with public network access enabled. This allows the reader to access the Key Vault to retrieve the username and password for the jump host. This also allows you to save data created by the create-app-registration script directly to the Key Vault. We recommend reviewing this approach with your security team as you may want to change this approach. One option to consider is adding the jump host to the domain, disabling public network access for Key Vault, and running the create app-registration script from the jump host.
+> When the prod deployment is performed the Key Vault resource will be deployed with public network access enabled. This allows the reader to access the Key Vault to retrieve the username and password for the jump host. This also allows you to save data created by the `create-app-registration` script directly to the Key Vault. We recommend reviewing this approach with your security team as you may want to change this approach. One option to consider is adding the jump host to the domain, disabling public network access for Key Vault, and running the `create-app-registration` script from the jump host.
 
 To retrieve the generated password:
 
@@ -108,35 +121,54 @@ To retrieve the generated password:
     - Note the secret value for later use.
     - Repeat the proecess for the **Jumphost--AdministratorUsername** secret.
 
-1. Start a new terminal from your dev container and run the following commands to create a bastion tunnel to the jump host:
+1. Start a new terminal from your dev container. We use the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/) to create a bastion tunnel that allows us to connect to the jump host:
 
     <!-- requires AZ cli login -->
-    <!-- might need to remove key -->
-    <!-- todo - make folder on server -->
-    <!-- todo - installation of Az module failed -->
 
+    ```shell
+    az login
+    ```
+    
+    <!-- todo might need to get subscription from AZD env -->
+    ```shell
+    az account set --subscription $AZURE_SUBSCRIPTION_ID
+    ```
+
+    <!-- todo might need to remove previously used key -->
+    <!--
+    ```shell
+    ssh-keygen -R [127.0.0.1]:50022
+    ```
+    -->
+
+1. Run the following command to set the environment variables for the bastion tunnel:
+
+    <!-- would be simpler as a single script -->
     ```shell
     bastionName=<enter-the-data>
     resourceGroupName=<enter-the-data>
     username=azureadmin
     targetResourceId=<enter-the-data>
+    ```
 
+1. Run the following command to create a bastion tunnel to the jump host:
+    ```shell
     az network bastion tunnel --name $bastionName --resource-group $resourceGroupName --target-resource-id $targetResourceId --resource-port 22 --port 50022
     ```
 
     <!--  az network bastion ssh --name $bastionName --resource-group $resourceGroupName --target-resource-id $targetResourceId --auth-type "password" --username $username -->
+    
+    > **NOTE**
+    >
+    > Now that the tunnel is open, change back to use the original PowerShell session.
 
-1. Use the following SCP command to upload the code to the jump host:
+
+1. From PowerShell use the following SCP command to upload the code to the jump host (use the password you retrieved from Key Vault to authenticate the SCP command):
     ```shell
     scp -r -P 50022 * azureadmin@127.0.0.1:web-app-pattern/
     ```
 
-    > **NOTE**
-    >
-    > Use the password you retrieved  Key Vault to authenticate the SCP command. Replace the `azureadmin` portion of the command with the username from Key Vault as needed.
-
-
-1. Use the following SCP command to send the AZD environment to the jump host:
+1. From PowerShell use the SCP command to upload the AZD environment to the jump host:
     ```shell
     scp -r -P 50022 ./.azure azureadmin@127.0.0.1:web-app-pattern/
     ```
@@ -147,12 +179,28 @@ To retrieve the generated password:
     ssh azureadmin@127.0.0.1 -p 50022
     ```
 
-### 4. Authenticate to Azure
+### 4. Deploy code from the jump host
+
+1. Change the exeuatable permissions on the scripts:
+
+    ```shell
+    chmod +x ./infra/scripts/predeploy/call-set-app-configuration.sh
+    ```
+
+    ```shell
+    chmod +x ./infra/scripts/postdeploy/show-webapp-uri.sh
+    ```
 
 1. Start a PowerShell session:
 
     ```shell
     pwsh
+    ```
+
+1. Change to the directory where you uploaded the code:
+
+    ```pwsh
+    cd web-app-pattern
     ```
 
 1. [Sign in to Azure PowerShell interactively](https://learn.microsoft.com/powershell/azure/authenticate-interactive):
@@ -161,23 +209,17 @@ To retrieve the generated password:
     Connect-AzAccount -UseDeviceAuthentication
     ```
 
+    ```pwsh
+    Set-AzContext -SubscriptionId ((azd env get-values --output json | ConvertFrom-Json).AZURE_SUBSCRIPTION_ID)
+    ```
+
 1. [Sign in to azd](https://learn.microsoft.com/azure/developer/azure-developer-cli/reference#azd-auth-login):
 
     ```shell
     azd auth login --use-device-code
     ```
 
-<!-- todo - set default subscription for pwsh context -->
-
-### 5. Deploy the code
-
-<!-- todo - cd into web-app-pattern directory -->
-<!-- todo - chmod+x on scripts
-chmod +x ./infra/scripts/predeploy/call-set-app-configuration.sh
-chmod +x ./infra/scripts/postdeploy/show-webapp-uri.sh
- -->
-
- <!-- todo - confirm ResourceToken in script -->
+    <!-- todo - confirm ResourceToken in script -->
 
 1. Deploy the code from the jump host:
 
@@ -190,25 +232,31 @@ chmod +x ./infra/scripts/postdeploy/show-webapp-uri.sh
     For a multi-region deployment, you must also deploy the code to the secondary region following these same steps on the secondary jump host.
 
     > **WARNING**
+    >
     > In some scenarios, the DNS entries for resources secured with Private Endpoint may have been cached incorrectly. It can take up to 10-minutes for the DNS cache to expire.
 
-1. Use the URL displayed in the consol output to launch the Relecloud application that you have deployed:
+1. Use the URL displayed in the console output to launch the Relecloud application that you have deployed:
 
     ![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
 
-### 6. Teardown
+### 5. Teardown
+
+1. Close the PowerShell session on the jump host:
+
+    ```shell
+    exit
+    ```
 
 1. Close your SSH session:
 
-```shell
-exit
-```
+    ```shell
+    exit
+    ```
 
-1. Close your background shell that opened the bastion tunnel with Ctrl+C.
+1. Close your backgrond shell that opened the bastion tunnel with the interrupt command Ctrl+C.
 
-1. To tear down the deployment, run the following command from your dev container to remove all resources from Azure and the jump host:
+1. To tear down the deployment, run the following command from your dev container to remove all resources from Azure:
 
-```pwsh
-azd down --purge --force
-```
-
+    ```pwsh
+    azd down --purge --force
+    ```
