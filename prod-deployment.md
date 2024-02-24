@@ -15,6 +15,10 @@ We recommend that you use a Dev Container to deploy this application.  The requi
 
 If you do not wish to use a Dev Container, please refer to the [prerequisites](prerequisites.md) for detailed information on how to set up your development system to build, run, and deploy the application.
 
+> **Note**
+>
+> These steps are used to connect to a Linux jump host where you can deploy the code. The jump host is not designed to be a build server. You should use a devOps pipeline to manage build agents and deploy code into the environment. Also note that for this content the jump host is a Linux VM. This can be swapped with a Windows VM based on your organization's requirements.
+
 ## Steps to deploy the reference implementation
 
 The following detailed deployment steps assume you are using a Dev Container inside Visual Studio Code.
@@ -85,13 +89,13 @@ Run the following command to create the infrastructure (about 45-minutes to prov
 azd provision
 ```
 
-### Login
+### 3. Upload the code to the jump host
 
 > **WARNING**
 >
 > When the prod deployment is performed the Key Vault resource will be deployed with public network access enabled. This allows the reader to access the Key Vault to retrieve the username and password for the jump host. This also allows you to save data created by the create-app-registration script directly to the Key Vault. We recommend reviewing this approach with your security team as you may want to change this approach. One option to consider is adding the jump host to the domain, disabling public network access for Key Vault, and running the create app-registration script from the jump host.
 
-The default username for the jump host is `azureadmin` and the password was set earlier. If you did not set an ADMIN_PASSWORD, then one is generated for you.  To retrieve the generated password:
+To retrieve the generated password:
 
 1. Retrieve the username and password for your jump host:
 
@@ -104,132 +108,107 @@ The default username for the jump host is `azureadmin` and the password was set 
     - Note the secret value for later use.
     - Repeat the proecess for the **Jumphost--AdministratorUsername** secret.
 
-Now that you have the username and password:
+1. Start a new terminal from your dev container and run the following commands to create a bastion tunnel to the jump host:
 
-- Open the [Azure Portal](https://portal.azure.com)
-- Select the SPOKE resource group, then select the jump host virtual machine resource.  The resource name starts with `vm-jump`.
-- In the menu sidebar, select **Bastion**.
-- Enter the username and password in the fields provided.
-- Press **Connect** to connect to the jump host.
-
-
-### First time setup
-
-From the jump host, launch Windows Terminal to setup required tools:
-
-1. Install the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd):
+    <!-- requires AZ cli login -->
+    <!-- might need to remove key -->
+    <!-- todo - make folder on server -->
+    <!-- todo - installation of Az module failed -->
 
     ```shell
-    powershell -ex AllSigned -c "Invoke-RestMethod 'https://aka.ms/install-azd.ps1' | Invoke-Expression"
+    bastionName=<enter-the-data>
+    resourceGroupName=<enter-the-data>
+    username=azureadmin
+    targetResourceId=<enter-the-data>
+
+    az network bastion tunnel --name $bastionName --resource-group $resourceGroupName --target-resource-id $targetResourceId --resource-port 22 --port 50022
     ```
 
-1. Install the [dotnet SDK](https://learn.microsoft.com/dotnet/core/tools/dotnet-install-script):
+    <!--  az network bastion ssh --name $bastionName --resource-group $resourceGroupName --target-resource-id $targetResourceId --auth-type "password" --username $username -->
+
+1. Use the following SCP command to upload the code to the jump host:
+    ```shell
+    scp -r -P 50022 * azureadmin@127.0.0.1:web-app-pattern/
+    ```
+
+    > **NOTE**
+    >
+    > Use the password you retrieved  Key Vault to authenticate the SCP command. Replace the `azureadmin` portion of the command with the username from Key Vault as needed.
+
+
+1. Use the following SCP command to send the AZD environment to the jump host:
+    ```shell
+    scp -r -P 50022 ./.azure azureadmin@127.0.0.1:web-app-pattern/
+    ```
+
+1. Run the following command to start a shell session on the jump host:
 
     ```shell
-    powershell -ex AllSigned -c "Invoke-RestMethod 'https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.ps1' -OutFile dotnet-install.ps1"
+    ssh azureadmin@127.0.0.1 -p 50022
     ```
+
+### 4. Authenticate to Azure
+
+1. Start a PowerShell session:
 
     ```shell
-    .\dotnet-install.ps1 -Version 8.0.101
+    pwsh
     ```
-
-1. Add dotnet to the path environment variable
-
-    ![#Add dotnet to the path variable](./assets/images/jumphost-path-setup.png)
-
-    Add the path: `%USERPROFILE%\AppData\Local\Microsoft\dotnet`.
-
-1. Add Nuget source
-
-    ```shell
-    dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org
-    ```
-
-### Download the code
-
-Use the Windows Terminal to get the code:
-
-```shell
-mkdir \dev
-cd \dev
-git clone https://github.com/Azure/reliable-web-app-pattern-dotnet
-cd .\reliable-web-app-pattern-dotnet
-```
-
-### Authenticate to Azure
 
 1. [Sign in to Azure PowerShell interactively](https://learn.microsoft.com/powershell/azure/authenticate-interactive):
 
     ```pwsh
-    Install-Module Az
-    Connect-AzAccount
+    Connect-AzAccount -UseDeviceAuthentication
     ```
-
-    This will open a browser to complete the authentication process.  See [the documentation](https://learn.microsoft.com/powershell/azure/authenticate-interactive) for instructions on other mechanisms to sign in to Azure.
 
 1. [Sign in to azd](https://learn.microsoft.com/azure/developer/azure-developer-cli/reference#azd-auth-login):
 
     ```shell
-    azd auth login
+    azd auth login --use-device-code
     ```
 
-    This will also open a browser to complete the authentication process.
+<!-- todo - set default subscription for pwsh context -->
 
-### Recreate the Azure Developer CLI environment on the jump host
+### 5. Deploy the code
 
-Set up the required Azure Developer CLI environment:
+<!-- todo - cd into web-app-pattern directory -->
+<!-- todo - chmod+x on scripts
+chmod +x ./infra/scripts/predeploy/call-set-app-configuration.sh
+chmod +x ./infra/scripts/postdeploy/show-webapp-uri.sh
+ -->
+
+ <!-- todo - confirm ResourceToken in script -->
+
+1. Deploy the code from the jump host:
+
+    ```shell
+    azd deploy
+    ```
+
+    It takes approximately 5 minutes to deploy the code.
+
+    For a multi-region deployment, you must also deploy the code to the secondary region following these same steps on the secondary jump host.
+
+    > **WARNING**
+    > In some scenarios, the DNS entries for resources secured with Private Endpoint may have been cached incorrectly. It can take up to 10-minutes for the DNS cache to expire.
+
+1. Use the URL displayed in the consol output to launch the Relecloud application that you have deployed:
+
+    ![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
+
+### 6. Teardown
+
+1. Close your SSH session:
 
 ```shell
-azd env new <Name of created environment>
-azd env set AZURE_LOCATION <Location>
-azd env set AZURE_RESOURCE_GROUP <name of application resource group from from azd environment>
-azd env set AZURE_SUBSCRIPTION_ID "<Azure subscription ID>"
-Set-AzContext -Subscription "<Azure Subscription ID>"
-azd env set NETWORK_ISOLATION "true"
-azd env set SECONDARY_RESOURCE_GROUP <name of secondary application resource group from azd environment>
+exit
 ```
 
-Ensure you use the same configuration you used when provisioning the services.
+1. Close your background shell that opened the bastion tunnel with Ctrl+C.
 
-### Deploy from the jump host
-
-Deploy the configuration from the jump host:
-
-```shell
-$resourceGroupName = ((azd env get-values --output json) | ConvertFrom-Json).AZURE_RESOURCE_GROUP
-```
-
-```shell
-./infra/scripts/predeploy/set-app-configuration.ps1 -ResourceGroupName $resourceGroupName -NoPrompt
-```
-
-Deploy the code from the jump host:
-
-```shell
-azd deploy
-```
-
-It takes approximately 5 minutes to deploy the code.
-
-If you are doing a multi-region deployment, you must also deploy the code to the secondary region following these same steps on the secondary jump host.
-
-> **WARNING**
-> In some scenarios, the DNS entries for resources secured with Private Endpoint may have been cached incorrectly. It can take up to 10-minutes for the DNS cache to expire.
-
-###  Open and use the application
-
-From your Dev Container, use the following to find the URL for the Relecloud application that you have deployed:
-
-```pwsh
-(azd env get-values --output json | ConvertFrom-Json).WEB_URI
-```
-
-![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
-
-### 9. Teardown
-
-To tear down the deployment, run the following command:
+1. To tear down the deployment, run the following command from your dev container to remove all resources from Azure and the jump host:
 
 ```pwsh
 azd down --purge --force
 ```
+
