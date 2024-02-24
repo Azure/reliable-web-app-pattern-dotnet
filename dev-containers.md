@@ -25,4 +25,4 @@ The Visual Studio Code Dev Containers extension lets you use a Docker container 
     * ![screenshot dev container azd](./assets/devcontainers/devcontainers5.png)
     * ![screenshot dev container bicep](./assets/devcontainers/devcontainers6.png)
 1. Continue on deploying the environment as before.
-    * [Deploy solution](deploy-solution.md)
+    * [Steps to deploy the reference implementation](README.md#steps-to-deploy-the-reference-implementation)
