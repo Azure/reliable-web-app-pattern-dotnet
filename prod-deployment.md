@@ -99,7 +99,6 @@ The following detailed deployment steps assume you are using a Dev Container ins
     ```pwsh
     azd provision --no-prompt
     ```
-    <!-- todo - make folder on server -->
     <!-- todo - installation of Az module failed -->
 
 ### 3. Upload the code to the jump host
@@ -129,7 +128,6 @@ To retrieve the generated password:
     az login
     ```
     
-    <!-- todo might need to get subscription from AZD env -->
     ```shell
     AZURE_SUBSCRIPTION_ID=$(azd env get-values -o json | jq -r ".AZURE_SUBSCRIPTION_ID")
     az account set --subscription $AZURE_SUBSCRIPTION_ID
@@ -138,10 +136,9 @@ To retrieve the generated password:
 
 1. Run the following to set the environment variables for the bastion tunnel:
 
-    <!-- would be simpler as a single script -->
     ```shell
     bastionName=$(azd env get-values -o json | jq -r .BASTION_NAME)
-    resourceGroupName=$(azd env get-values -o json | jq -r .HUB_RESOURCE_GROUP)
+    resourceGroupName=$(azd env get-values -o json | jq -r .BASTION_RESOURCE_GROUP)
     targetResourceId=$(azd env get-values -o json | jq -r .JUMPHOST_RESOURCE_ID)
     ```
 

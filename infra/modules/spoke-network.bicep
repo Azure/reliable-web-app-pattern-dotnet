@@ -430,3 +430,4 @@ output virtual_network_id string = virtualNetwork.outputs.id
 output virtual_network_name string = virtualNetwork.outputs.name
 output subnets object = virtualNetwork.outputs.subnets
 output jumphost_computer_name string = enableJumpHost ? jumphost.outputs.computer_name : ''
+output jumphost_resource_id string = enableJumpHost ? jumphost.outputs.id : ''

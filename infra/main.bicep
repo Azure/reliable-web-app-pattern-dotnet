@@ -543,11 +543,14 @@ module telemetry './modules/telemetry.bicep' = if (enableTelemetry) {
 // ========================================================================
 
 // Hub resources
+output BASTION_NAME string = willDeployHubNetwork ? hubNetwork.outputs.bastion_name : ''
+output BASTION_RESOURCE_GROUP string = willDeployHubNetwork ? resourceGroups.outputs.hub_resource_group_name : ''
 output bastion_hostname string = willDeployHubNetwork ? hubNetwork.outputs.bastion_hostname : ''
 output firewall_hostname string = willDeployHubNetwork ? hubNetwork.outputs.firewall_hostname : ''
 
 // Spoke resources
 output build_agent string = installBuildAgent ? buildAgent.outputs.build_agent_hostname : ''
+output JUMPHOST_RESOURCE_ID string = isNetworkIsolated ? spokeNetwork.outputs.jumphost_resource_id : ''
 
 // Application resources
 output AZURE_RESOURCE_GROUP string = resourceGroups.outputs.application_resource_group_name

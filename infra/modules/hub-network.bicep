@@ -440,6 +440,7 @@ module privateDnsZones './private-dns-zones.bicep' = {
 // OUTPUTS
 // ========================================================================
 
+output bastion_name string = enableBastionHost ? bastionHost.outputs.name : ''
 output bastion_hostname string = enableBastionHost ? bastionHost.outputs.hostname : ''
 output firewall_hostname string = enableFirewall ? firewall.outputs.hostname : ''
 output firewall_ip_address string = enableFirewall ? firewall.outputs.internal_ip_address : ''
