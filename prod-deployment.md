@@ -131,8 +131,28 @@ To retrieve the generated password:
     
     <!-- todo might need to get subscription from AZD env -->
     ```shell
+    AZURE_SUBSCRIPTION_ID=$(azd env get-values -o json | jq -r ".AZURE_SUBSCRIPTION_ID")
     az account set --subscription $AZURE_SUBSCRIPTION_ID
     ```
+
+
+1. Run the following to set the environment variables for the bastion tunnel:
+
+    <!-- would be simpler as a single script -->
+    ```shell
+    bastionName=$(azd env get-values -o json | jq -r .BASTION_NAME)
+    resourceGroupName=$(azd env get-values -o json | jq -r .HUB_RESOURCE_GROUP)
+    targetResourceId=$(azd env get-values -o json | jq -r .JUMPHOST_RESOURCE_ID)
+    ```
+
+1. Run the following command to create a bastion tunnel to the jump host:
+    ```shell
+    az network bastion tunnel --name $bastionName --resource-group $resourceGroupName --target-resource-id $targetResourceId --resource-port 22 --port 50022
+    ```
+    
+    > **NOTE**
+    >
+    > Now that the tunnel is open, change back to use the original PowerShell session.
 
     <!-- todo might need to remove previously used key -->
     <!--
@@ -140,28 +160,6 @@ To retrieve the generated password:
     ssh-keygen -R [127.0.0.1]:50022
     ```
     -->
-
-1. Run the following command to set the environment variables for the bastion tunnel:
-
-    <!-- would be simpler as a single script -->
-    ```shell
-    bastionName=<enter-the-data>
-    resourceGroupName=<enter-the-data>
-    username=azureadmin
-    targetResourceId=<enter-the-data>
-    ```
-
-1. Run the following command to create a bastion tunnel to the jump host:
-    ```shell
-    az network bastion tunnel --name $bastionName --resource-group $resourceGroupName --target-resource-id $targetResourceId --resource-port 22 --port 50022
-    ```
-
-    <!--  az network bastion ssh --name $bastionName --resource-group $resourceGroupName --target-resource-id $targetResourceId --auth-type "password" --username $username -->
-    
-    > **NOTE**
-    >
-    > Now that the tunnel is open, change back to use the original PowerShell session.
-
 
 1. From PowerShell use the following SCP command to upload the code to the jump host (use the password you retrieved from Key Vault to authenticate the SCP command):
     ```shell
@@ -181,7 +179,14 @@ To retrieve the generated password:
 
 ### 4. Deploy code from the jump host
 
+1. Change to the directory where you uploaded the code:
+
+    ```shell
+    cd web-app-pattern
+    ```
+
 1. Change the exeuatable permissions on the scripts:
+    <!-- set script permissions is required when running from windows. not required from Dev Container experience -->
 
     ```shell
     chmod +x ./infra/scripts/predeploy/call-set-app-configuration.sh
@@ -195,12 +200,6 @@ To retrieve the generated password:
 
     ```shell
     pwsh
-    ```
-
-1. Change to the directory where you uploaded the code:
-
-    ```pwsh
-    cd web-app-pattern
     ```
 
 1. [Sign in to Azure PowerShell interactively](https://learn.microsoft.com/powershell/azure/authenticate-interactive):
