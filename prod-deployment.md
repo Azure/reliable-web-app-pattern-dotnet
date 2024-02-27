@@ -204,10 +204,6 @@ To retrieve the generated password:
     Install-Module -Name Az -Force
     ```
 
-    ```pwsh
-    Import-Module Az
-    ```
-
 1. [Sign in to Azure PowerShell interactively](https://learn.microsoft.com/powershell/azure/authenticate-interactive):
 
     ```pwsh
@@ -226,13 +222,16 @@ To retrieve the generated password:
 
 1. Deploy the code from the jump host:
 
+    <!--  from PowerShell use the following command to deploy the code to the secondary region:
+    azd env set AZURE_RESOURCE_GROUP ((azd env get-values --output json | ConvertFrom-Json).SECONDARY_RESOURCE_GROUP) -->
+
     ```shell
     azd deploy
     ```
 
     It takes approximately 5 minutes to deploy the code.
 
-    For a multi-region deployment, you must also deploy the code to the secondary region following these same steps on the secondary jump host.
+    For a multi-region deployment, you must also deploy the code to the secondary region following these same steps on the secondary jump host using secondary region settings.
 
     > **WARNING**
     >
