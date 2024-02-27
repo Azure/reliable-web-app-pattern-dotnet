@@ -19,7 +19,7 @@ Relecloud aligned to a hub and spoke network topology in the prod deployment arc
 ![architecture diagram](./assets/icons/reliable-web-app-dotnet-1.1.svg)
 
 -	Cost efficiency: The hub acts as a central point for shared resources, promoting cost-effective resource reuse. For instance, Azure Bastion is a shared service in the hub, providing secure and cost-effective remote access without the need for separate deployments for each application.
--	Traffic control and security: Network traffic is managed and secured using Network Security Groups and Route tables in each subnet, creating secure boundaries for Azure resources. Private endpoints add an extra layer of security, and a Jump Host within the hub allows for deployment within these boundaries, maintaining local IP access to resources.
+-	Traffic control and security: Network traffic is managed and secured using Network Security Groups and Route tables in each subnet, creating secure boundaries for Azure resources. Private endpoints add an extra layer of security, and a Jump Host allows for deployment within these boundaries, maintaining local IP access to resources.
 -	Network integration: The topology supports network integrations for data transfer across applications and hybrid scenarios. While the reference architecture doesn't include ExpressRoute or Azure VPN Gateway, these should be considered for applications requiring hybrid network connections.
 
 ## Workflow
@@ -33,7 +33,7 @@ This description details the workflow for Relecloud's concert ticketing applicat
 - User authentication: Microsoft Entra ID handles user authentication, suitable for environments where accounts are centrally managed, enhancing security and control.
 - API interaction and token management: The front-end web app uses the MSAL library to obtain tokens for authenticated API calls, caching them in Azure Cache for Redis to optimize performance and manageability.
 - Payment and checkout flow: While this example doesn't process real payments, the web app captures payment information during checkout, demonstrating how a web app can handle sensitive data.
-- Purchase and ticket generation: The backend API processes purchase requests and generates tickets, which are immediately accessible to users, showcasing the app's responsiveness.
+- Purchase and ticket generation: The backend API processes purchase requests and generates tickets that are immediately accessible to users.
 - Networking and access control: Azure Private DNS, Network Security Groups, and Azure Firewall tightly control the flow of traffic within the app's network, maintaining security and isolation.
 - Monitoring and telemetry: Application Insights provides monitoring and telemetry capabilities, enabling performance tracking and proactive issue resolution.
 - Configuration and secrets management: Initial configuration and sensitive information are loaded from Azure App Configuration and Azure Key Vault into the app's memory upon startup, minimizing access to sensitive data thereafter.
