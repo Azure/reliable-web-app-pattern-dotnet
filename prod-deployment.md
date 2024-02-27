@@ -99,7 +99,6 @@ The following detailed deployment steps assume you are using a Dev Container ins
     ```pwsh
     azd provision --no-prompt
     ```
-    <!-- todo - installation of Az module failed -->
 
 ### 3. Upload the code to the jump host
 
@@ -225,8 +224,6 @@ To retrieve the generated password:
     azd auth login --use-device-code
     ```
 
-    <!-- todo - confirm ResourceToken in script -->
-
 1. Deploy the code from the jump host:
 
     ```shell
@@ -259,7 +256,7 @@ To retrieve the generated password:
     exit
     ```
 
-1. Close your backgrond shell that opened the bastion tunnel with the interrupt command Ctrl+C.
+1. Close your background shell that opened the bastion tunnel with the interrupt command Ctrl+C.
 
 1. To tear down the deployment, run the following command from your dev container to remove all resources from Azure:
 
