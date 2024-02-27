@@ -156,6 +156,7 @@ var defaultDeploymentSettings = {
     WorkloadName: environmentName
     Environment: environmentType
     OwnerName: ownerEmail
+    ResourceToken: primaryResourceToken
     ServiceClass: isProduction ? 'Silver' : 'Dev'
     OpsCommitment: 'Workload operations'
   }
@@ -173,7 +174,7 @@ var primaryDeployment = {
     HubGroupName: isNetworkIsolated ? naming.outputs.resourceNames.hubResourceGroup : naming.outputs.resourceNames.resourceGroup
     IsPrimaryLocation: 'true'
     PrimaryLocation: location
-    ResourceToken: naming.outputs.resourceToken
+    ResourceToken: primaryResourceToken
     SecondaryLocation: azureSecondaryLocation
   }
 }
@@ -188,7 +189,7 @@ var secondDeployment = {
     HubGroupName: isNetworkIsolated ? naming.outputs.resourceNames.hubResourceGroup : ''
     IsPrimaryLocation: 'false'
     PrimaryLocation: location
-    ResourceToken: naming2.outputs.resourceToken
+    ResourceToken: secondaryResourceToken
     SecondaryLocation: azureSecondaryLocation
   }
 }
@@ -551,6 +552,7 @@ output firewall_hostname string = willDeployHubNetwork ? hubNetwork.outputs.fire
 // Spoke resources
 output build_agent string = installBuildAgent ? buildAgent.outputs.build_agent_hostname : ''
 output JUMPHOST_RESOURCE_ID string = isNetworkIsolated ? spokeNetwork.outputs.jumphost_resource_id : ''
+output SECONDARY_JUMPHOST_RESOURCE_ID string = isNetworkIsolated ? spokeNetwork2.outputs.jumphost_resource_id : ''
 
 // Application resources
 output AZURE_RESOURCE_GROUP string = resourceGroups.outputs.application_resource_group_name
