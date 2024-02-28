@@ -60,12 +60,6 @@ The following detailed deployment steps assume you are using a Dev Container ins
     azd auth login
     ```
 
-1. Set the default subscription for the azd context:
-
-    ```pwsh
-    azd config set defaults.subscription $AZURE_SUBSCRIPTION_ID
-    ```
-
 
 ### 2. Provision the app
 
@@ -73,6 +67,12 @@ The following detailed deployment steps assume you are using a Dev Container ins
 
     ```pwsh
     azd env new <pick_a_name>
+    ```
+    
+1. Set the default subscription for the azd context:
+
+    ```pwsh
+    azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
     ```
 
 1. To create the prod deployment:
@@ -84,20 +84,19 @@ The following detailed deployment steps assume you are using a Dev Container ins
 1. Production is a multi-region deployment. Choose an Azure region for the primary deployment:
 
     ```pwsh
-    azd env set AZURE_LOCATION uksouth
+    azd env set AZURE_LOCATION <pick_a_region>
     ```
 
 1. Choose an Azure region for the secondary deployment:
 
     ```pwsh
-    azd env set AZURE_SECONDARY_LOCATION northeurope
+    azd env set AZURE_SECONDARY_LOCATION <pick_a_region>
     ```
 
 1. Run the following command to create the Azure resources (about 45-minutes to provision):
 
-    <!-- the --no-prompt will use defaults.subscription instead of prompting to confirm -->
     ```pwsh
-    azd provision --no-prompt
+    azd provision
     ```
 
 ### 3. Upload the code to the jump host

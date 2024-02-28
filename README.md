@@ -137,17 +137,19 @@ azd auth login
 Run the following commands to set these values and create a new environment:
 
 ```pwsh
-azd env new rwa1_1
+azd env new <pick_a_name>
+```
+
+Select the subscription that will be used for the deployment:
+
+```pwsh
+azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
 ```
 
 To deploy the dev version:
 
 ```pwsh
 azd env set ENVIRONMENT dev
-```
-
-```pwsh
-azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
 ```
 
 Set the `AZURE_LOCATION` to the primary region:
