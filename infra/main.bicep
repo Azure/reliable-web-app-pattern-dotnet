@@ -150,6 +150,7 @@ var defaultDeploymentSettings = {
     'azd-env-type': environmentType
     'azd-owner-email': ownerEmail
     'azd-owner-name': ownerName
+    ResourceToken: primaryResourceToken
   }
   workloadTags: {
     WorkloadIdentifier: environmentName
