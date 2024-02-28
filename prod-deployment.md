@@ -118,30 +118,38 @@ To retrieve the generated password:
     - Note the secret value for later use.
     - Repeat the proecess for the **Jumphost--AdministratorUsername** secret.
 
-1. Start a new terminal from your dev container. We use the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/) to create a bastion tunnel that allows us to connect to the jump host:
+1. Start a new PowerShell session in the terminal (In VS Code use `Ctrl+Shift+~`). Run the following command from the dev container terminal to start a new PowerShell session:
+    ```
+    pwsh
+    ```
+
+1. We use the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/) to create a bastion tunnel that allows us to connect to the jump host:
 
     <!-- requires AZ cli login -->
 
-    ```shell
+    ```pwsh
     az login
     ```
     
-    ```shell
-    AZURE_SUBSCRIPTION_ID=$(azd env get-values -o json | jq -r ".AZURE_SUBSCRIPTION_ID")
+    ```pwsh
+    $AZURE_SUBSCRIPTION_ID = ((azd env get-values --output json | ConvertFrom-Json).AZURE_SUBSCRIPTION_ID)
+    ```
+
+    ```pwsh
     az account set --subscription $AZURE_SUBSCRIPTION_ID
     ```
 
 
 1. Run the following to set the environment variables for the bastion tunnel:
 
-    ```shell
-    bastionName=$(azd env get-values -o json | jq -r .BASTION_NAME)
-    resourceGroupName=$(azd env get-values -o json | jq -r .BASTION_RESOURCE_GROUP)
-    targetResourceId=$(azd env get-values -o json | jq -r .JUMPHOST_RESOURCE_ID)
+    ```pwsh
+    $bastionName = ((azd env get-values --output json | ConvertFrom-Json).BASTION_NAME)
+    $resourceGroupName = ((azd env get-values --output json | ConvertFrom-Json).BASTION_RESOURCE_GROUP)
+    $targetResourceId = ((azd env get-values --output json | ConvertFrom-Json).JUMPHOST_RESOURCE_ID)
     ```
 
 1. Run the following command to create a bastion tunnel to the jump host:
-    ```shell
+    ```pwsh
     az network bastion tunnel --name $bastionName --resource-group $resourceGroupName --target-resource-id $targetResourceId --resource-port 22 --port 50022
     ```
     
