@@ -118,7 +118,7 @@ function Get-WorkloadKeyVault {
 
     # if key vault is not found, then throw an error
     if ($keyVaultName.Length -lt 4) {
-        throw "Key vault not found in resource group $group.ResourceGroupName"
+        throw "Key vault not found in resource group $hubGroup.ResourceGroupName"
     }
 
     return Get-AzKeyVault -VaultName $keyVaultName -ResourceGroupName $hubGroup.ResourceGroupName
