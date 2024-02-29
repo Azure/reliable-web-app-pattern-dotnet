@@ -130,7 +130,7 @@ var imageReference = {
   }
 }
 var osDiskType = 'Standard_LRS'
-var linuxConfiguration = {
+var linuxConfiguration = (authenticationType == 'password') ? {} : {
   disablePasswordAuthentication: true
   ssh: {
     publicKeys: [
