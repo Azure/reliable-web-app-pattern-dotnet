@@ -74,13 +74,6 @@ param location string = resourceGroup().location
 @description('The size of the VM')
 param vmSize string = 'Standard_B2ms'
 
-@description('Security Type of the Virtual Machine.')
-@allowed([
-  'Standard'
-  'TrustedLaunch'
-])
-param securityType string = 'TrustedLaunch'
-
 @description('The tags to associate with this resource.')
 param tags object = {}
 
@@ -102,6 +95,11 @@ param subnetId string
 // VARIABLES
 // ========================================================================
 
+// based on the images allowed we enable TrustedLaunch by default to opt-in to security features by default.
+// this can be swapped to 'Standard' if the user wants to opt-out of TrustedLaunch
+// Trusted launch guards against boot kits, rootkits, and kernel-level malware. 
+// Learn more at https://learn.microsoft.com/en-us/azure/virtual-machines/trusted-launch
+var securityType = 'TrustedLaunch'
 var validComputerName = replace(replace(name, '-', ''), '_', '')
 var computerName = !empty(computerLinuxName) ? computerLinuxName : length(validComputerName) > 15 ? substring(validComputerName, 0, 15) : validComputerName
 
