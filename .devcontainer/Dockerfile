@@ -1,2 +1,5 @@
 ARG VARIANT
 FROM mcr.microsoft.com/vscode/devcontainers/dotnet:0-${VARIANT}
+
+# Install Az module
+RUN pwsh -Command "Install-Module -Name Az -Force -AllowClobber -Scope AllUsers"

@@ -1,0 +1,51 @@
+{
+    "azureMonitor": [
+        "dc.applicationinsights.azure.com",
+        "dc.applicationinsights.microsoft.com",
+        "dc.services.visualstudio.com",
+        "*.in.applicationinsights.azure.com",
+        "live.applicationinsights.azure.com",
+        "rt.applicationinsights.microsoft.com",
+        "rt.services.visualstudio.com",
+        "*.livediagnostics.monitor.azure.com",
+        "*.monitoring.azure.com",
+        "agent.azureserviceprofiler.net",
+        "*.agent.azureserviceprofiler.net",
+        "*.monitor.azure.com"
+    ],
+    "certificateServices": [
+        "*.delivery.mp.microsoft.com",
+        "ctldl.windowsupdate.com",
+        "ocsp.msocsp.com",
+        "oneocsp.microsoft.com",
+        "crl.microsoft.com",
+        "www.microsoft.com",
+        "*.digicert.com",
+        "*.symantec.com",
+        "*.symcb.com",
+        "*.d-trust.net"
+    ],
+    "coreServices": [
+        "management.azure.com",
+        "management.core.windows.net",
+        "login.microsoftonline.com",
+        "login.windows.net",
+        "login.live.com",
+        "graph.windows.net"
+    ],
+    "developerServices": [
+        "github.com",
+        "*.github.com",
+        "*.nuget.org",
+        "*.blob.core.windows.net",
+        "raw.githubusercontent.com",
+        "dev.azure.com",
+        "portal.azure.com",
+        "*.portal.azure.com",
+        "*.portal.azure.net",
+        "appservice.azureedge.net",
+        "*.azurewebsites.net",
+        "edge.management.azure.com",
+        "*.azurefd.net"
+    ]
+}

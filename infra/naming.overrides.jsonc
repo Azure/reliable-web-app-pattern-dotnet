@@ -1,0 +1,77 @@
+{
+  /*
+  ** Use this file to override any of the names that are chosen for resources.
+  */
+
+  // Hub network resources
+  // "hubBastionHost": "",
+  // "hubBastionPublicIpAddress": "",
+  // "hubBudget": "",
+  // "hubDDoSProtectionPlan": "",
+  // "hubFirewall": "",
+  // "hubFirewallPublicIpAddress": "",
+  // "hubJumphost": "",
+  // "hubResourceGroup": "",
+  // "hubSubnetBastionHost": "",
+  // "hubSubnetFirewall": "",
+  // "hubSubnetJumphost": "",
+  // "hubSubnetPrivateEndpoint": "",
+  // "hubVirtualNetwork": "",
+
+  // Spoke network resources
+  // "spokeApiInboundSubnet": "",
+  // "spokeApiInboundNSG": "",
+  // "spokeApiOutboundSubnet": "",
+  // "spokeApiOutboundNSG": "",
+  // "spokeDevopsSubnet": "",
+  // "spokeDeploymentSubnet": "",
+  // "spokeResourceGroup": "",
+  // "spokeRouteTableRouteTable": "",
+  // "spokePrivateEndpointNSG": "",
+  // "spokePrivateEndpointSubnet": "",
+  // "spokeVirtualNetwork": "",
+  // "spokeWebInboundSubnet": "",
+  // "spokeWebInboundNSG": "",
+  // "spokeWebOutboundSubnet": "",
+  // "spokeWebOutboundNSG": "",
+
+  // Common services - may be in hub or application resource group
+  // "applicationInsights": "",
+  // "buildAgent": "",
+  // "keyVault": "",
+  // "keyVaultPrivateEndpoint": "",
+  // "logAnalyticsWorkspace": "",
+
+  // Application resources
+  // "apiAppService": "",
+  // "apiAppServicePlan": "",
+  // "apiPrivateEndpoint": "",
+  // "appConfiguration": "",
+  // "appConfigurationPrivateEndpoint": "",
+  // "appManagedIdentity": "",
+  // "budget": "",
+  // "commonAppServicePlan": "",
+  // "frontDoorEndpoint": "",
+  // "frontDoorProfile": "",
+  // "ownerManagedIdentity": "",
+  // "redis": "",
+  // "redisPrivateEndpoint": "",
+  // "resourceGroup": "",
+  // "storageAccount": "",
+  // "storageAccountContainer": "",
+  // "sqlDatabase": "",
+  // "sqlDatabasePrivateEndpoint": "",
+  // "sqlServer": "",
+  // "sqlResourceGroup": "",
+  // "webAppFrontend": "",
+  // "webAppService": "",
+  // "webAppServicePlan": "",
+  // "webApplicationFirewall": "",
+  // "webAppFrontendPrivateEndpoint": "",
+  // "webwebAppServicePrivateEndpoint": "",
+
+  /*
+  ** End of file - don't remove the next line as it signifies the end.
+  */
+  "__end__": ""
+}

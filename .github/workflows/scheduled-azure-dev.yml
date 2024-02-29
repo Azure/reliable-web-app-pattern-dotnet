@@ -13,21 +13,28 @@ permissions:
   id-token: write
   contents: read
 
+concurrency: integration_testing
+
 jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/azure-dev-cli-apps:1.3.0
+      image: mcr.microsoft.com/azure-dev-cli-apps:1.5.1
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
-      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
+      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
+      IS_RUN_AS_SERVICEPRINCIPAL: true
+      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
     steps:
+      - name: Install jq tool
+        uses: dcarbone/install-jq-action@v2
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
         
       # login to run ado commands such provision, deploy, and down
       - name: Log in with Azure (Client Credentials) for AZD
@@ -44,23 +51,25 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Create AZD environment
-        # Creating an azd environment so we can set the principal type
-        # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/241
-        run: azd env new ${{ secrets.AZURE_ENV_NAME }}scheduled --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --location ${{ secrets.AZURE_LOCATION2 }}
-
-      - name: Set AZD PRINCIPAL_TYPE
-        # Adding RBAC permissions via the script enables the sample to work around a permission propagation issue outlined in the issue
-        # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/138
-        run: azd env set PRINCIPAL_TYPE servicePrincipal
-
       - name: Azure Dev Provision
         run: azd provision --no-prompt
+        env:
+          AZURE_PRINCIPAL_TYPE: ServicePrincipal
 
-      - name: Set AZD AZURE_RESOURCE_GROUP
-        # temporary work around for known issue with multiple resource groups
-        # https://github.com/Azure/azure-dev/issues/690
-        run: azd env set AZURE_RESOURCE_GROUP ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
+      # re-login to run ado commands such provision, deploy, and down
+      - name: Log in with Azure (Client Credentials) for AZD
+        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        run: |
+          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
+          Write-Host "::add-mask::$($info.clientSecret)"
+
+          azd login `
+            --client-id "$($info.clientId)" `
+            --client-secret "$($info.clientSecret)" `
+            --tenant-id "$($info.tenantId)"
+        shell: pwsh
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Azure Dev Deploy
         run: azd deploy --no-prompt
@@ -72,22 +81,20 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: QA - Validate Deployment
-        run: |
-          chmod +x ./infra/devOpsScripts/validateDeployment.sh
-          ./infra/devOpsScripts/validateDeployment.sh -g ${{ secrets.AZURE_ENV_NAME }}scheduled-rg
+        run: ./testscripts/call-validate-deployment.sh
 
   teardown:
     needs: [build]
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/azure-dev-cli-apps:1.3.0
+      image: mcr.microsoft.com/azure-dev-cli-apps:1.5.1
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}scheduled
-      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION2 }}
+      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
+      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -110,7 +117,7 @@ jobs:
       - name: Create AZD environment
         # Creating an azd environment so we can set the principal type
         # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/241
-        run: azd env new ${{ secrets.AZURE_ENV_NAME }}scheduled --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --location ${{ secrets.AZURE_LOCATION2 }}
+        run: azd env new ${{ secrets.AZURE_ENV_NAME }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --location ${{ secrets.AZURE_LOCATION }}
         
       - name: Azure Dev Down
         run: azd down --force --purge --no-prompt
