@@ -28,4 +28,4 @@ if (-not $resourceGroupName) {
 
 Write-Host "Calling cleanup.ps1 for group:'$resourceGroupName'..."
 
-./testscripts/cleanup.ps1 -ResourceGroup $resourceGroupName -NoPrompt -SkipResourceGroupDeletion
+./testscripts/cleanup.ps1 -ResourceGroup $resourceGroupName -NoPrompt
