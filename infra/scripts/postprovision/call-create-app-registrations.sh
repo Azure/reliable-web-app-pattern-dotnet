@@ -6,6 +6,8 @@ principalType=$((azd env get-values --output json) | jq -r .AZURE_PRINCIPAL_TYPE
 if [ "$principalType" == "ServicePrincipal" ]; then
     echo "Skipping create-app-registrations.ps1 because principalType is ServicePrincipal"
     exit 0
+else
+    echo "principalType is not ServicePrincipal: $principalType"
 fi
 
 # This script is run by azd pre-provision hook and is part of the deployment lifecycle run when deploying the code for the Relecloud web app.
