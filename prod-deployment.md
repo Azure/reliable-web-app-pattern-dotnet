@@ -163,7 +163,7 @@ To retrieve the generated password:
     scp -r -P 50022 * azureadmin@127.0.0.1:web-app-pattern/
     ```
 
-    > [Remote host identification has changed](troubleshooting.md#remote-host-identification-has-changed)
+    > If you were unable to connect due to [Remote host identification has changed](troubleshooting.md#remote-host-identification-has-changed)
 
 1. From PowerShell use the SCP command to upload the AZD environment to the jump host:
     ```shell
