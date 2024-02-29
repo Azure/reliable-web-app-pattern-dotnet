@@ -152,10 +152,10 @@ To deploy the dev version:
 azd env set ENVIRONMENT dev
 ```
 
-Set the `AZURE_LOCATION` to the primary region:
+Set the `AZURE_LOCATION` to the primary region (Run `(Get-AzLocation).Location` to see a list of locations):
 
 ```pwsh
-azd env set AZURE_LOCATION westus3
+azd env set AZURE_LOCATION <pick_a_region>
 ```
 
 ### 6. Provision the app and deploy the code
