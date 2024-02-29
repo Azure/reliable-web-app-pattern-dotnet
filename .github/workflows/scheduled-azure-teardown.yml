@@ -30,6 +30,13 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # login to run azd hooks
+      - name: Log in with Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
+
       - name: Create AZD environment
         # Creating an azd environment so we can set the principal type
         # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/241
