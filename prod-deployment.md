@@ -157,17 +157,13 @@ To retrieve the generated password:
     >
     > Now that the tunnel is open, change back to use the original PowerShell session.
 
-    <!-- todo might need to remove previously used key -->
-    <!--
-    ```shell
-    ssh-keygen -R [127.0.0.1]:50022
-    ```
-    -->
 
 1. From PowerShell use the following SCP command to upload the code to the jump host (use the password you retrieved from Key Vault to authenticate the SCP command):
     ```shell
     scp -r -P 50022 * azureadmin@127.0.0.1:web-app-pattern/
     ```
+
+    > [Remote host identification has changed](troubleshooting.md#remote-host-identification-has-changed)
 
 1. From PowerShell use the SCP command to upload the AZD environment to the jump host:
     ```shell

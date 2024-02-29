@@ -42,6 +42,23 @@ BadRequest: Azure subscription is not registered with CDN Provider.
     ]
     ```
 
+## Warning: Remote host identification has changed
+This warning message is displayed when the SSH key fingerprint for the remote host has changed since the last time you connected. This can happen if you have re-provisioned the environment which will recreate the VMs and thus their fingerprints.
+
+**Full warning message**
+```sh
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+```
+
+### Workaround
+
+1. Remove the previous fingerprint which is stored in a file called `known_hosts` in your user's `.ssh` directory. Run the following command to remove the old fingerprint:
+    ```sh
+    ssh-keygen -R [127.0.0.1]:50022
+    ```
 
 ## The deployment <azd-env-name> already exists in location
 This error most often happens when trying a new region with the same for a deployment with the same name used for the AZD environment name (e.g. by default it would be `dotnetwebapp`).
