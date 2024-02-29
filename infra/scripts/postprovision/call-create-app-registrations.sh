@@ -3,8 +3,8 @@
 # if this is CI/CD then we want to skip this step because the app registrations already exist
 principalType=$((azd env get-values --output json) | jq -r .AZURE_PRINCIPAL_TYPE)
 
-if [ "$principalType" == "servicePrincipal" ]; then
-    echo "Skipping create-app-registrations.ps1 because principalType is servicePrincipal"
+if [ "$principalType" == "ServicePrincipal" ]; then
+    echo "Skipping create-app-registrations.ps1 because principalType is ServicePrincipal"
     exit 0
 fi
 
