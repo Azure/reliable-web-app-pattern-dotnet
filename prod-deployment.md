@@ -81,7 +81,7 @@ The following detailed deployment steps assume you are using a Dev Container ins
     azd env set ENVIRONMENT prod
     ```
 
-1. Production is a multi-region deployment. Choose an Azure region for the primary deployment:
+1. Production is a multi-region deployment. Choose an Azure region for the primary deployment (Run `(Get-AzLocation).Location` to see a list of locations):
 
     ```pwsh
     azd env set AZURE_LOCATION <pick_a_region>
