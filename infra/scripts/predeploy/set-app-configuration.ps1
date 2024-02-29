@@ -17,7 +17,7 @@ Param(
     [Alias("g")]
     [Parameter(Mandatory = $true, HelpMessage = "Name of the application resource group that was created by azd")]
     [String]$ResourceGroupName,
-    [Parameter(Mandatory = $true, HelpMessage = "URI used for OAuth with Microsoft Entra. This is the URI of the web app.")]
+    [Parameter(Mandatory = $true, HelpMessage = "URI used for OAuth with Microsoft Entra ID. This is the URI of the web app.")]
     [String]$WebUri,
     [Parameter(Mandatory = $false, HelpMessage = "Use default values for all prompts")]
     [Switch]$NoPrompt
