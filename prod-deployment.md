@@ -197,12 +197,6 @@ To retrieve the generated password:
     pwsh
     ```
 
-1. Install the Azure PowerShell module:
-
-    ```pwsh
-    Install-Module -Name Az -Force
-    ```
-
 1. [Sign in to Azure PowerShell interactively](https://learn.microsoft.com/powershell/azure/authenticate-interactive):
 
     ```pwsh
