@@ -188,11 +188,7 @@ To retrieve the generated password:
     <!-- set script permissions is required when running from windows. not required from Dev Container experience -->
 
     ```shell
-    chmod +x ./infra/scripts/predeploy/call-set-app-configuration.sh
-    ```
-
-    ```shell
-    chmod +x ./infra/scripts/postdeploy/show-webapp-uri.sh
+    chmod +x ./infra/scripts/**/*.sh
     ```
 
 1. Start a PowerShell session:
