@@ -155,7 +155,7 @@ To retrieve the generated password:
     
     > **NOTE**
     >
-    > Now that the tunnel is open, change back to use the original PowerShell session.
+    > Now that the tunnel is open, change back to use the original PowerShell session to deploy the code.
 
 
 1. From PowerShell use the following SCP command to upload the code to the jump host (use the password you retrieved from Key Vault to authenticate the SCP command):
