@@ -157,7 +157,6 @@ var defaultDeploymentSettings = {
     WorkloadName: environmentName
     Environment: environmentType
     OwnerName: ownerEmail
-    ResourceToken: primaryResourceToken
     ServiceClass: isProduction ? 'Silver' : 'Dev'
     OpsCommitment: 'Workload operations'
   }
@@ -168,6 +167,9 @@ var secondaryNamingDeployment = union(defaultDeploymentSettings, {
   isPrimaryLocation: false
   location: azureSecondaryLocation
   resourceToken: secondaryResourceToken
+  tags: {
+    ResourceToken: secondaryResourceToken
+  }
 })
 
 var primaryDeployment = {
@@ -175,7 +177,6 @@ var primaryDeployment = {
     HubGroupName: isNetworkIsolated ? naming.outputs.resourceNames.hubResourceGroup : naming.outputs.resourceNames.resourceGroup
     IsPrimaryLocation: 'true'
     PrimaryLocation: location
-    ResourceToken: primaryResourceToken
     SecondaryLocation: azureSecondaryLocation
   }
 }
@@ -186,11 +187,13 @@ var secondDeployment = {
   location: azureSecondaryLocation
   isPrimaryLocation: false
   resourceToken: secondaryResourceToken
+  tags: {
+    ResourceToken: secondaryResourceToken
+  }
   workloadTags: {
     HubGroupName: isNetworkIsolated ? naming.outputs.resourceNames.hubResourceGroup : ''
     IsPrimaryLocation: 'false'
     PrimaryLocation: location
-    ResourceToken: secondaryResourceToken
     SecondaryLocation: azureSecondaryLocation
   }
 }
