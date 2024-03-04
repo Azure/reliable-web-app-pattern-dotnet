@@ -43,7 +43,7 @@ The following detailed deployment steps assume you are using a Dev Container ins
     Connect-AzAccount
     ```
 
-1. Set the subscription to the one you want to use (can use [Get-AzSubscription](https://learn.microsoft.com/powershell/module/az.accounts/get-azsubscription?view=azps-11.3.0) to list available subscriptions):
+1. Set the subscription to the one you want to use (you can use [Get-AzSubscription](https://learn.microsoft.com/powershell/module/az.accounts/get-azsubscription?view=azps-11.3.0) to list available subscriptions):
 
         
     ```pwsh

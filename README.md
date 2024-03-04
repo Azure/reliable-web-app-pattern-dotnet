@@ -111,11 +111,7 @@ Import-Module Az.Resources
 Connect-AzAccount
 ```
 
-To list the subscriptions you have access to:
-
-```pwsh
-Get-AzSubscription
-```
+Set the subscription to the one you want to use (you can use [Get-AzSubscription](https://learn.microsoft.com/powershell/module/az.accounts/get-azsubscription?view=azps-11.3.0) to list available subscriptions):
 
 ```pwsh
 $AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
@@ -124,6 +120,8 @@ $AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
 ```pwsh
 Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
 ```
+
+Use the next command to login with the Azure Dev CLI (AZD) tool:
 
 ```pwsh
 azd auth login
