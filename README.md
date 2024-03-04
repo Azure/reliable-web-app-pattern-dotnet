@@ -180,7 +180,7 @@ azd down --purge --force
 - [Known issues](known-issues.md)
 - [Troubleshooting](troubleshooting.md)
 - [Developer patterns](simulate-patterns.md)
-- [Local Development](local-development.md)
+- [Dev Experience](local-development.md)
 - [Find additional resources](additional-resources.md)
 - [Report security concerns](SECURITY.md)
 - [Find Support](SUPPORT.md)
