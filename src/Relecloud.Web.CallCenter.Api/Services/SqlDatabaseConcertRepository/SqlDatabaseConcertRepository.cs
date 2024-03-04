@@ -141,8 +141,9 @@ namespace Relecloud.Web.Api.Services.SqlDatabaseConcertRepository
                 return null;
             }
 
+            // assumes email address is stored as LowerCase
             return await this.database.Customers.AsNoTracking()
-                .Where(u => u.Email.ToLower() == email.ToLower()).SingleOrDefaultAsync();
+                .Where(u => u.Email == email.ToLower()).SingleOrDefaultAsync();
         }
 
         public async Task<CreateResult> CreateCustomerAsync(Customer newCustomer)
