@@ -315,7 +315,10 @@ module hubNetwork './modules/hub-network.bicep' = if (willDeployHubNetwork) {
 
     // Settings
     enableBastionHost: true
-    enableDDoSProtection: primaryDeploymentSettings.isProduction
+    // DDoS protection is recommended for Production deployments
+    // however, for this sample we disable this feature because DDoS should be configured to protect multiple subscriptions, deployments, and resources
+    // learn more at https://learn.microsoft.com/azure/ddos-protection/ddos-protection-overview
+    enableDDoSProtection: false // primaryDeploymentSettings.isProduction
     enableFirewall: true
     enableJumpHost: willDeployHubNetwork
     spokeAddressPrefixPrimary: spokeAddressPrefixPrimary
