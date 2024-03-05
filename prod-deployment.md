@@ -160,7 +160,7 @@ To retrieve the generated password:
 
 1. From PowerShell use the following SCP command to upload the code to the jump host (use the password you retrieved from Key Vault to authenticate the SCP command):
     ```shell
-    scp -r -P 50022 * azureadmin@127.0.0.1:web-app-pattern/
+    scp -r -P 50022 **/* azureadmin@127.0.0.1:web-app-pattern/
     ```
 
     > If you were unable to connect due to [Remote host identification has changed](troubleshooting.md#remote-host-identification-has-changed)
