@@ -44,7 +44,14 @@ The following detailed deployment steps assume you are using a Dev Container ins
 
 ### 1. Clone the repo
 
-Clone the repository from GitHub:
+Start a WSL session to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
+
+
+```pwsh
+wsl
+```
+
+Clone the repository from GitHub into the WSL 2 filesystem using the following command:
 
 ```shell
 git clone https://github.com/Azure/reliable-web-app-pattern-dotnet.git
@@ -53,7 +60,7 @@ cd reliable-web-app-pattern-dotnet
 
 ### 2. Open Dev Container in Visual Studio Code (optional)
 
-> For your convenience, we use DevContainers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](./prerequisites.md) and following the deployment instructions below.
+> For your convenience, we use Dev Containers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](./prerequisites.md) and following the deployment instructions below.
 
 If required, ensure Docker Desktop is started and enabled for your WSL terminal [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt:
 
@@ -87,11 +94,6 @@ If not using PowerShell 7+, run the following command:
 pwsh
 ```
 
-Run the following commands to set these values and create a new environment:
-
-```pwsh
-azd env new dotnetwebapp
-```
 
 You can substitute the environment name with your own value.
 
@@ -102,10 +104,6 @@ By default, Azure resources are sized for a "development" mode. If doing a Produ
 Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
 
 ```pwsh
-azd auth login
-```
-
-```pwsh
 Import-Module Az.Resources
 ```
 
@@ -113,81 +111,59 @@ Import-Module Az.Resources
 Connect-AzAccount
 ```
 
-Each command will open a browser allowing you to authenticate.  To list the subscriptions you have access to:
-
-```pwsh
-Get-AzSubscription
-```
-
-To set the active subscription:
+Set the subscription to the one you want to use (you can use [Get-AzSubscription](https://learn.microsoft.com/powershell/module/az.accounts/get-azsubscription?view=azps-11.3.0) to list available subscriptions):
 
 ```pwsh
 $AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
-azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
+```
+
+```pwsh
 Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
 ```
 
-### 5. Select a region for deployment
-
-The application can be deployed in either a single region or multi-region manner. You can find a list of available Azure regions by running the following Azure CLI command.
-
-> ```pwsh
-> (Get-AzLocation).Location
-> ```
-
-Set the `AZURE_LOCATION` to the primary region:
+Use the next command to login with the Azure Dev CLI (AZD) tool:
 
 ```pwsh
-azd env set AZURE_LOCATION westus3
+azd auth login
 ```
 
-### 6. Provision the application
+Run the following commands to set these values and create a new environment:
+
+```pwsh
+azd env new <pick_a_name>
+```
+
+Select the subscription that will be used for the deployment:
+
+```pwsh
+azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
+```
+
+To deploy the dev version:
+
+```pwsh
+azd env set ENVIRONMENT dev
+```
+
+Set the `AZURE_LOCATION` to the primary region (Run `(Get-AzLocation).Location` to see a list of locations):
+
+```pwsh
+azd env set AZURE_LOCATION <pick_a_region>
+```
+
+### 6. Provision the app and deploy the code
 
 Run the following command to create the infrastructure (about 15-minutes to provision):
 
 ```pwsh
-azd provision --no-prompt
-```
-
-**Create App Registrations**
-
-Relecloud devs have automated the process of creating Azure
-AD resources that support the authentication features of the
-web app. They use the following command to create two new
-App Registrations within Microsoft Entra ID. The command is also
-responsible for saving configuration data to Key Vault and
-App Configuration so that the web app can read this data
-(about 3-minutes to register).
-
-```pwsh
-./infra/scripts/postprovision/call-create-app-registrations.ps1
-```
-
-**Set Configuration**
-
-Relecloud devs have automated the process of configuring the environment.
-
-```pwsh
-./infra/scripts/predeploy/call-set-app-configuration.ps1
-```
-
-### 7. Deploy the application
-
-Run the following command to deploy the code to the created infrastructure (about 4-minutes to deploy):
-
-```pwsh
-azd deploy
+azd up
 ```
 
 The provisioning and deployment process can take anywhere from 20 minutes to over an hour, depending on system load and your bandwidth.
 
 ### 8. Open and use the application
 
-Use the following to find the URL for the Relecloud application that you have deployed:
-
-```pwsh
-(azd env get-values --output json | ConvertFrom-Json).WEB_URI
-```
+Use the URL displayed in the consol output to launch the Relecloud application that you have deployed:
 
 ![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
 
@@ -204,7 +180,7 @@ azd down --purge --force
 - [Known issues](known-issues.md)
 - [Troubleshooting](troubleshooting.md)
 - [Developer patterns](simulate-patterns.md)
-- [Local Development](local-development.md)
+- [Dev Experience](local-development.md)
 - [Find additional resources](additional-resources.md)
 - [Report security concerns](SECURITY.md)
 - [Find Support](SUPPORT.md)

@@ -21,6 +21,10 @@
     If you provide the ResourceGroup parameter and have deployed a hub network, then you must also provide
     the HubResourceGroup if it is a different resource group.  If you don't, then the hub network will not
     be cleaned up.
+.PARAMETER DeleteGroups
+    Defaults to true, but if you set this to false, then the resource groups will not be deleted.  This is
+    expected behavior when combined with the `azd down` command which will take responsibility for deleting
+    the resource groups.
 .NOTES
     This command requires that Az modules are installed and imported. It also requires that you have an
     active Azure session.  If you are not authenticated with Azure, you will be prompted to authenticate.
@@ -32,7 +36,9 @@ Param(
     [Parameter(Mandatory = $false)][string]$SecondaryResourceGroup,
     [Parameter(Mandatory = $false)][string]$SpokeResourceGroup,
     [Parameter(Mandatory = $false)][string]$SecondarySpokeResourceGroup,
-    [Parameter(Mandatory = $false)][string]$HubResourceGroup
+    [Parameter(Mandatory = $false)][string]$HubResourceGroup,
+    [Parameter(Mandatory = $false)][switch]$SkipResourceGroupDeletion,
+    [Parameter(Mandatory = $false)][switch]$NoPrompt
 )
 
 
@@ -79,6 +85,8 @@ $rgSecondaryApplication = ""
 $rgSecondarySpoke = ""
 #$CleanupAzureDirectory = $false
 
+$azdConfig = azd env get-values -o json | ConvertFrom-Json -Depth 9 -AsHashtable
+
 if ($Prefix) {
     $rgPrefix = $Prefix
     $rgApplication = "$rgPrefix-application"
@@ -92,7 +100,6 @@ if ($Prefix) {
             "No .azure directory found and no resource group information provided - cannot clean up"
             exit 8
         }
-        $azdConfig = azd env get-values -o json | ConvertFrom-Json -Depth 9 -AsHashtable
         $environmentName = $azdConfig['AZURE_ENV_NAME']
         $environmentType = $azdConfig['AZURE_ENV_TYPE'] ?? 'dev'
         $location = $azdConfig['AZURE_LOCATION']
@@ -164,9 +171,7 @@ function Get-AzBudget($resourceGroupName) {
     return $result.value
 }
 
-# Removed all budgets that are scoped to a resource group of interest.
 function Remove-ConsumptionBudgetForResourceGroup($resourceGroupName) {
-    # Get-AzConsumptionBudget -ResourceGroupName $resourceGroupName
     Get-AzBudget -ResourceGroupName $resourceGroupName
     | Foreach-Object {
         "`tRemoving $resourceGroupName::$($_.name)" | Write-Output
@@ -201,6 +206,30 @@ function Remove-ResourceGroupFromAzure($resourceGroupName) {
     }
 }
 
+function Test-EntraAppRegistrationExists($name) {
+    $appRegistration = Get-AzADApplication -DisplayName $name -ErrorAction SilentlyContinue
+    return $null -ne $appRegistration
+}
+
+function Remove-AzADApplicationByName($name) {
+    $appRegistration = Get-AzADApplication -DisplayName $name -ErrorAction SilentlyContinue
+    if ($appRegistration) {
+        "`tRemoving $name" | Write-Output
+        Remove-AzADApplication -ObjectId $appRegistration.Id
+    }
+}
+
+function Get-ResourceToken($resourceGroupName) {
+    $defaultRedisNamePrefix = 'redis-'
+    $redisInstances = Get-AzRedisCache -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue
+
+    if ($redisInstances.Count -eq 0) {
+        return "notfound"
+    }
+
+    return ($redisInstances | Select-Object -First 1).Name.Substring($defaultRedisNamePrefix.Length)
+}
+
 "`nCleaning up environment for application '$rgApplication'" | Write-Output
 
 # Get the list of resource groups to deal with
@@ -232,9 +261,34 @@ if (Test-ResourceGroupExists -ResourceGroupName $rgHub) {
     $resourceGroups.Add($rgHub) | Out-Null
 }
 
+$resourceToken=(Get-ResourceToken -resourceGroupName $rgApplication) # expecting to be something like 'fjmjdbizcdxt4'
+$appRegistrations = [System.Collections.ArrayList]@()
+$calculatedAppRegistrationNameForApi = "$rgPrefix-api-webapp-$resourceToken".Substring(3)
+$calculatedAppRegistrationNameForFrontend = "$rgPrefix-front-webapp-$resourceToken".Substring(3)
+
+if (Test-EntraAppRegistrationExists -Name $calculatedAppRegistrationNameForApi) {
+    "`tFound Entra ID App Registration: $calculatedAppRegistrationNameForApi" | Write-Output
+    $appRegistrations.Add($calculatedAppRegistrationNameForApi) | Out-Null
+}
+if (Test-EntraAppRegistrationExists -Name $calculatedAppRegistrationNameForFrontend) {
+    "`tFound Entra ID App Registration: $calculatedAppRegistrationNameForFrontend" | Write-Output
+    $appRegistrations.Add($calculatedAppRegistrationNameForFrontend) | Out-Null
+}
+
 # press enter to proceed
-"`nPress enter to proceed with cleanup or CTRL+C to cancel" | Write-Output
-$null = Read-Host
+if (-not $NoPrompt) {
+    "`nPress enter to proceed with cleanup or CTRL+C to cancel" | Write-Output
+    $null = Read-Host
+}
+
+# we don't want to delete the app registrations because we reuse them when running in pipeline
+# when running in pipeline, the AZURE_PRINCIPAL_TYPE is set to 'ServicePrincipal'
+if ($azdConfig['AZURE_PRINCIPAL_TYPE'] -eq 'User') {    
+    "`nRemoving Entra ID App Registration..." | Write-Output
+    foreach($appRegistration in $appRegistrations) {
+        Remove-AzADApplicationByName -Name $appRegistration
+    }
+}
 
 "`nRemoving resources from resource groups..." | Write-Output
 "> Private Endpoints:" | Write-Output
@@ -252,16 +306,15 @@ foreach ($resourceGroupName in $resourceGroups) {
     Remove-DiagnosticSettingsForResourceGroup -ResourceGroupName $resourceGroupName
 }
 
-"`nRemoving resource groups in order..." | Write-Output
-Remove-ResourceGroupFromAzure -ResourceGroupName $rgApplication
-Remove-ResourceGroupFromAzure -ResourceGroupName $rgSecondaryApplication
-Remove-ResourceGroupFromAzure -ResourceGroupName $rgSpoke
-Remove-ResourceGroupFromAzure -ResourceGroupName $rgSecondarySpoke
-Remove-ResourceGroupFromAzure -ResourceGroupName $rgHub
-
-# if ($CleanupAzureDirectory -eq $true -and (Test-Path -Path ./.azure -PathType Container)) {
-#     "Cleaning up Azure Developer CLI state files." | Write-Output
-#     Remove-Item -Path ./.azure -Recurse -Force
-# }
-
-"`nCleanup complete." | Write-Output
+# if $SkipResourceGroupDeletion is false, then we skip the resource group deletion
+# flag is expected to be set to false when combined with the `azd down` command
+if (-not $SkipResourceGroupDeletion) {
+    "`nRemoving resource groups in order..." | Write-Output
+    Remove-ResourceGroupFromAzure -ResourceGroupName $rgApplication
+    Remove-ResourceGroupFromAzure -ResourceGroupName $rgSecondaryApplication
+    Remove-ResourceGroupFromAzure -ResourceGroupName $rgSpoke
+    Remove-ResourceGroupFromAzure -ResourceGroupName $rgSecondarySpoke
+    Remove-ResourceGroupFromAzure -ResourceGroupName $rgHub
+    
+    "`nCleanup complete." | Write-Output
+}

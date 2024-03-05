@@ -13,6 +13,14 @@
 
 #>
 
+# if this is CI/CD then we want to skip this step because the app registrations already exist
+$principalType = (azd env get-values --output json | ConvertFrom-Json).AZURE_PRINCIPAL_TYPE
+
+if ($principalType -eq "ServicePrincipal") {
+    Write-Host "Skipping create-app-registrations.ps1 because principalType is ServicePrincipal"
+    exit 0
+}
+
 $resourceGroupName=(azd env get-values --output json | ConvertFrom-Json).AZURE_RESOURCE_GROUP
 
 Write-Host "Calling create-app-registrations.ps1 for group:'$resourceGroupName'..."

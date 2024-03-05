@@ -23,7 +23,7 @@ type DeploymentSettings = {
 
   @description('If \'true\', isolate the workload in a virtual network.')
   isNetworkIsolated: bool
-  
+
   @description('If \'false\', then this is a multi-location deployment for the second location.')
   isPrimaryLocation: bool
 
@@ -38,6 +38,9 @@ type DeploymentSettings = {
 
   @description('The type of the \'principalId\' property.')
   principalType: 'ServicePrincipal' | 'User'
+
+  @description('The token to use for naming resources.  This should be unique to the deployment.')
+  resourceToken: string
 
   @description('The development stage for this application')
   stage: 'dev' | 'prod'
@@ -151,8 +154,6 @@ var budget = {
 }
 var budgetAmount = reduce(map(items(budget), (obj) => obj.value), 0, (total, amount) => total + amount)
 
-var redisConnectionSecretName= deploymentSettings.isPrimaryLocation ? 'App--RedisCache--ConnectionString-Primary' : 'App--RedisCache--ConnectionString-Secondary'
-
 // describes the Azure Storage container where ticket images will be stored after they are rendered during purchase
 var ticketContainerName = 'tickets'
 
@@ -175,7 +176,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing 
 ** Identities used by the application.
 */
 module ownerManagedIdentity '../core/identity/managed-identity.bicep' = {
-  name: 'owner-managed-identity'
+  name: 'owner-managed-identity-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.ownerManagedIdentity
@@ -185,7 +186,7 @@ module ownerManagedIdentity '../core/identity/managed-identity.bicep' = {
 }
 
 module appManagedIdentity '../core/identity/managed-identity.bicep' = {
-  name: 'application-managed-identity'
+  name: 'application-managed-identity-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.appManagedIdentity
@@ -195,7 +196,7 @@ module appManagedIdentity '../core/identity/managed-identity.bicep' = {
 }
 
 module ownerManagedIdentityRoleAssignment '../core/identity/resource-group-role-assignment.bicep' = {
-  name: 'owner-managed-identity-role-assignment'
+  name: 'owner-managed-identity-role-assignment-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     identityName: ownerManagedIdentity.outputs.name
@@ -208,7 +209,7 @@ module ownerManagedIdentityRoleAssignment '../core/identity/resource-group-role-
 ** App Configuration - used for storing configuration data
 */
 module appConfiguration '../core/config/app-configuration.bicep' = {
-  name: 'application-app-configuration'
+  name: 'application-app-configuration-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.appConfiguration
@@ -243,7 +244,7 @@ module appConfiguration '../core/config/app-configuration.bicep' = {
 ** This vault is deployed with the application when not using Network Isolation.
 */
 module keyVault '../core/security/key-vault.bicep' = if (!deploymentSettings.isNetworkIsolated) {
-  name: 'application-key-vault'
+  name: 'application-key-vault-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.keyVault
@@ -276,7 +277,7 @@ module keyVault '../core/security/key-vault.bicep' = if (!deploymentSettings.isN
 ** SQL Database
 */
 module sqlServer '../core/database/sql-server.bicep' = if (createSqlServer) {
-  name: 'application-sql-server'
+  name: 'application-sql-server-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.sqlServer
@@ -298,7 +299,7 @@ module sqlServer '../core/database/sql-server.bicep' = if (createSqlServer) {
 }
 
 module sqlDatabase '../core/database/sql-database.bicep' = {
-  name: 'application-sql-database'
+  name: 'application-sql-database-${deploymentSettings.resourceToken}'
   scope: az.resourceGroup(resourceNames.sqlResourceGroup)
   params: {
     name: resourceNames.sqlDatabase
@@ -327,7 +328,7 @@ module sqlDatabase '../core/database/sql-database.bicep' = {
 ** App Services
 */
 module commonAppServicePlan '../core/hosting/app-service-plan.bicep' = if (useCommonAppServicePlan) {
-  name: 'application-app-service-plan'
+  name: 'application-app-service-plan-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.commonAppServicePlan
@@ -346,7 +347,7 @@ module commonAppServicePlan '../core/hosting/app-service-plan.bicep' = if (useCo
 }
 
 module webService './application-appservice.bicep' = {
-  name: 'application-webservice'
+  name: 'application-webservice-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     deploymentSettings: deploymentSettings
@@ -379,7 +380,7 @@ module webService './application-appservice.bicep' = {
 }
 
 module webServiceFrontDoorRoute '../core/security/front-door-route.bicep' = if (deploymentSettings.isPrimaryLocation) {
-  name: 'web-service-front-door-route'
+  name: 'web-service-front-door-route-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     frontDoorEndpointName: frontDoorSettings.endpointName
@@ -398,7 +399,7 @@ module webServiceFrontDoorRoute '../core/security/front-door-route.bicep' = if (
 }
 
 module webFrontend './application-appservice.bicep' = {
-  name: 'application-webfrontend'
+  name: 'application-webfrontend-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     deploymentSettings: deploymentSettings
@@ -429,7 +430,7 @@ module webFrontend './application-appservice.bicep' = {
 }
 
 module webFrontendFrontDoorRoute '../core/security/front-door-route.bicep' = if (deploymentSettings.isPrimaryLocation) {
-  name: 'web-frontend-front-door-route'
+  name: 'web-frontend-front-door-route-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     frontDoorEndpointName: frontDoorSettings.endpointName
@@ -452,7 +453,7 @@ module webFrontendFrontDoorRoute '../core/security/front-door-route.bicep' = if 
 */
 
 module redis '../core/database/azure-cache-for-redis.bicep' = {
-  name: 'application-redis'
+  name: 'application-redis-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.redis
@@ -478,7 +479,7 @@ module redis '../core/database/azure-cache-for-redis.bicep' = {
 */
 
 module storageAccount '../core/storage/storage-account.bicep' = {
-  name: 'application-storage-account'
+  name: 'application-storage-account-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     location: deploymentSettings.location
@@ -500,7 +501,7 @@ module storageAccount '../core/storage/storage-account.bicep' = {
 }
 
 module storageAccountContainer '../core/storage/storage-account-blob.bicep' = {
-  name: 'application-storage-account-container'
+  name: 'application-storage-account-container-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.storageAccountContainer
@@ -513,7 +514,7 @@ module storageAccountContainer '../core/storage/storage-account-blob.bicep' = {
 }
 
 module approveFrontDoorPrivateLinks '../core/security/front-door-route-approval.bicep' = if (deploymentSettings.isNetworkIsolated && deploymentSettings.isPrimaryLocation) {
-  name: 'approve-front-door-routes'
+  name: 'approve-front-door-routes-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     location: deploymentSettings.location
@@ -529,7 +530,7 @@ module approveFrontDoorPrivateLinks '../core/security/front-door-route-approval.
 }
 
 module applicationBudget '../core/cost-management/budget.bicep' = {
-  name: 'application-budget'
+  name: 'application-budget-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.budget

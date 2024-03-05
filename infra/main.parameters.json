@@ -12,7 +12,7 @@
         "value": "${AZD_IP_ADDRESS}"
     },
     "databasePassword": {
-        "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} Relecloud--SqlAdministratorPassword)"
+        "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} Application--SqlAdministratorPassword)"
     },
     "differentiator": {
         "value": "${AZURE_CI_DIFFERENTIATOR=none}"
@@ -24,7 +24,7 @@
         "value": "${AZURE_ENV_NAME}"
     },
     "environmentType": {
-        "value": "${AZURE_ENV_TYPE=dev}"
+        "value": "${ENVIRONMENT=dev}"
     },
     "githubRepositoryUrl": {
         "value": "${GITHUB_REPO}"
@@ -45,7 +45,7 @@
         "value": "${AZURE_PRINCIPAL_TYPE=User}"
     },
     "deployHubNetwork": {
-        "value": "${DEPLOY_HUB_NETWORK=false}"
+        "value": "${DEPLOY_HUB_NETWORK=auto}"
     },
     "networkIsolation": {
         "value": "${NETWORK_ISOLATION=auto}"
@@ -56,11 +56,8 @@
     "ownerName": {
         "value": "${OWNER_NAME=notset}"
     },
-    "secondaryAzureLocation": {
-      "value": "${SECONDARY_AZURE_LOCATION}"
-    },
-    "useCommonAppServicePlan": {
-        "value": "${COMMON_APP_SERVICE_PLAN=auto}"
+    "azureSecondaryLocation": {
+      "value": "${AZURE_SECONDARY_LOCATION}"
     }
   }
 }

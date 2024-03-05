@@ -27,14 +27,19 @@ jobs:
       AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
       IS_RUN_AS_SERVICEPRINCIPAL: true
       AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+      AZURE_PRINCIPAL_TYPE: ServicePrincipal
     steps:
       - name: Install jq tool
         uses: dcarbone/install-jq-action@v2
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v3
+        uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+
+      - name: Install Az module
+        run: Install-Module -Name Az -Force -AllowClobber -Scope CurrentUser -Repository PSGallery
+        shell: pwsh
         
       # login to run ado commands such provision, deploy, and down
       - name: Log in with Azure (Client Credentials) for AZD
@@ -51,34 +56,18 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # login to run azd hooks and the QA validation script
+      - name: Log in with Azure CLI
+        uses: Azure/login@v1.6.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
+
       - name: Azure Dev Provision
         run: azd provision --no-prompt
-        env:
-          AZURE_PRINCIPAL_TYPE: ServicePrincipal
-
-      # re-login to run ado commands such provision, deploy, and down
-      - name: Log in with Azure (Client Credentials) for AZD
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
-        run: |
-          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
-          Write-Host "::add-mask::$($info.clientSecret)"
-
-          azd login `
-            --client-id "$($info.clientId)" `
-            --client-secret "$($info.clientSecret)" `
-            --tenant-id "$($info.tenantId)"
-        shell: pwsh
-        env:
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Azure Dev Deploy
         run: azd deploy --no-prompt
-
-      # login to run az cli commands such as validateDeployment.sh
-      - name: Log in with Azure CLI
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: QA - Validate Deployment
         run: ./testscripts/call-validate-deployment.sh
@@ -95,9 +84,10 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
       AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+      AZURE_PRINCIPAL_TYPE: ServicePrincipal
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         
       # login to run ado commands such provision, deploy, and down
       - name: Log in with Azure (Client Credentials) for AZD

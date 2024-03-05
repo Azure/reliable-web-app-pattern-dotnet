@@ -26,7 +26,7 @@ type DeploymentSettings = {
 
   @description('If \'true\', isolate the workload in a virtual network.')
   isNetworkIsolated: bool
-  
+
   @description('If \'false\', then this is a multi-location deployment for the second location.')
   isPrimaryLocation: bool
 
@@ -41,6 +41,9 @@ type DeploymentSettings = {
 
   @description('The type of the \'principalId\' property.')
   principalType: 'ServicePrincipal' | 'User'
+
+  @description('The token to use for naming resources.  This should be unique to the deployment.')
+  resourceToken: string
 
   @description('The development stage for this application')
   stage: 'dev' | 'prod'
@@ -425,7 +428,7 @@ var virtualNetworkLinks = [
 ]
 
 module privateDnsZones './private-dns-zones.bicep' = {
-  name: 'hub-private-dns-zone-deploy'
+  name: 'hub-private-dns-zone-deploy-${deploymentSettings.resourceToken}'
   params:{
     deploymentSettings: deploymentSettings
     hubResourceGroupName: resourceGroup.name
@@ -437,6 +440,7 @@ module privateDnsZones './private-dns-zones.bicep' = {
 // OUTPUTS
 // ========================================================================
 
+output bastion_name string = enableBastionHost ? bastionHost.outputs.name : ''
 output bastion_hostname string = enableBastionHost ? bastionHost.outputs.hostname : ''
 output firewall_hostname string = enableFirewall ? firewall.outputs.hostname : ''
 output firewall_ip_address string = enableFirewall ? firewall.outputs.internal_ip_address : ''

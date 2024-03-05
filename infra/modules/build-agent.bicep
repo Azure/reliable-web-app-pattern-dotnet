@@ -22,7 +22,7 @@ type DeploymentSettings = {
 
   @description('If \'true\', isolate the workload in a virtual network.')
   isNetworkIsolated: bool
-  
+
   @description('If \'false\', then this is a multi-location deployment for the second location.')
   isPrimaryLocation: bool
 
@@ -37,6 +37,9 @@ type DeploymentSettings = {
 
   @description('The type of the \'principalId\' property.')
   principalType: 'ServicePrincipal' | 'User'
+
+  @description('The token to use for naming resources.  This should be unique to the deployment.')
+  resourceToken: string
 
   @description('The development stage for this application')
   stage: 'dev' | 'prod'

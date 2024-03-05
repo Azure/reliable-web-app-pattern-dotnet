@@ -1,13 +1,11 @@
-# Local Development
+# Dev Experience
 
-Relecloud developers use Visual Studio to develop and they integrate directly with Azure resources for local dev. The team chooses this workflow to so they can develop as their code would behave when deployed to Azure allowing them to catch issues like serialization exceptions.
-
+Relecloud developers use Visual Studio to develop and they integrate directly with Azure resources when building the code. The team chooses this workflow to so they can develop as their code would behave when deployed to Azure allowing them to catch issues like serialization exceptions.
 
 > **WARNING**
 >
-> Local development is only supported when the Azure resources are not network isolated.
+> This developer experience is only supported when the Azure resources are not network isolated.
 > If you are using network isolation you will only be able to access the Azure resources from the jump host.
->
 
 To connect to the Azure resources the dev team uses connection strings from Key Vault and App Configuration Service. Devs use the following script to retrieve data and store it as [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows) on their workstation.
 

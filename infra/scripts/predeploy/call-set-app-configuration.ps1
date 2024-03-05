@@ -14,7 +14,8 @@
 #>
 
 $resourceGroupName = ((azd env get-values --output json) | ConvertFrom-Json).AZURE_RESOURCE_GROUP
+$webUri = ((azd env get-values --output json) | ConvertFrom-Json).WEB_URI
 
-Write-Host "Calling set-app-configuration.ps1 for group:'$resourceGroupName'..."
+Write-Host "Calling set-app-configuration.ps1 for group:'$resourceGroupName' with webUri:'$webUri' ..."
 
-./infra/scripts/predeploy/set-app-configuration.ps1 -ResourceGroupName $resourceGroupName -NoPrompt
+./infra/scripts/predeploy/set-app-configuration.ps1 -ResourceGroupName $resourceGroupName -WebUri $webUri -NoPrompt
