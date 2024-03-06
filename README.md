@@ -158,7 +158,7 @@ Use the URL displayed in the console output to launch the web application that y
 
 You can learn more about the web app by reading the [Pattern Simulations](demo.md) documentation.
 
-### 7. Teardown
+### 7. Tear down the deployment
 
 Run the following command to tear down the deployment:
 
