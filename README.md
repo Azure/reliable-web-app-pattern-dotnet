@@ -87,7 +87,7 @@ Once the command palette is open, search for `Dev Containers: Rebuild and Reopen
 
 Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
 
-If not using PowerShell 7+, run the following command:
+If you are not using PowerShell 7+, run the following command (you can use [$PSVersionTable.PSVersion](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_powershell_editions) to check your version):
 
 ```shell
 pwsh
@@ -120,7 +120,7 @@ azd auth login
 
 ### 4. Create a new environment
 
-In this step we provide the AZD tool with variables that it uses to create the deployment. The first one we initialize is the AZD environment with a name.
+Next we provide the AZD tool with variables that it uses to create the deployment. The first thing we initialize is the AZD environment with a name.
 
 The environment name should be less than 18 characters and must be comprised of lower-case, numeric, and dash characters (for example, `dotnetwebapp`).  The environment name is used for resource group naming and specific resource naming.
 
@@ -156,9 +156,11 @@ Use the URL displayed in the console output to launch the web application that y
 
 ![screenshot of web app home page](assets/images/WebAppHomePage.png)
 
+You can learn more about the web app by reading the [Pattern Simulations](demo.md) documentation.
+
 ### 7. Teardown
 
-Run the following command to teardown the deployment:
+Run the following command to tear down the deployment:
 
 ```pwsh
 azd down --purge --force
