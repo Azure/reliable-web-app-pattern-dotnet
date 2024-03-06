@@ -14,9 +14,11 @@ This project has a [a companion article in the Azure Architecture Center](https:
 
 ## Architecture
 
-Relecloud aligned to a hub and spoke network topology in the prod deployment architecture to centralize common resources. This network topology provided cost savings, enhanced security, and facilitated network integration (platform and hybrid):
+Relecloud aligned to a hub and spoke network topology in the production deployment architecture to centralize common resources. This network topology provided cost savings, enhanced security, and facilitated network integration (platform and hybrid):
 
 ![architecture diagram](./assets/icons/reliable-web-app-dotnet-1.1.svg)
+
+This diagram describes the production deployment which is described in the [prod-deployment.md](./prod-deployment.md) file. The following steps below are for a [development deployment](./assets/images/) which is a simplified version.
 
 -	Cost efficiency: The hub acts as a central point for shared resources, promoting cost-effective resource reuse. For instance, Azure Bastion is a shared service in the hub, providing secure and cost-effective remote access without the need for separate deployments for each application.
 -	Traffic control and security: Network traffic is managed and secured using Network Security Groups and Route tables in each subnet, creating secure boundaries for Azure resources. Private endpoints add an extra layer of security, and a Jump Host allows for deployment within these boundaries, maintaining local IP access to resources.
@@ -47,7 +49,6 @@ The following detailed deployment steps assume you are using a Dev Container ins
 > For your convenience, we use Dev Containers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](./prerequisites.md) and skip to the deployment instructions starting in [Step 3](#3-log-in-to-azure).
 
 Start a WSL session to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
-
 
 ```pwsh
 wsl
@@ -116,17 +117,14 @@ Use the next command to login with the Azure Dev CLI (AZD) tool:
 azd auth login
 ```
 
-Run the following commands to set these values and create a new environment:
 
 ### 4. Create a new environment
 
-Use the VS Code terminal to run the following commands to create a new environment.
+In this step we provide the AZD tool with variables that it uses to create the deployment. The first one we initialize is the AZD environment with a name.
 
-The environment name should be less than 18 characters and must be comprised of lower-case, numeric, and dash characters (for example, `dotnetwebapp`).  The environment name is used for resource group naming and specific resource naming. Also, select a password for the admin user of the database.
+The environment name should be less than 18 characters and must be comprised of lower-case, numeric, and dash characters (for example, `dotnetwebapp`).  The environment name is used for resource group naming and specific resource naming.
 
-You can substitute the environment name with your own value.
-
-By default, Azure resources are sized for a "development" mode. If doing a Production deployment, see the [prod Deployment](./prod-deployment.md) instructions for more detail.
+By default, Azure resources are sized for a development deployment. If doing a production deployment, see the [production deployment](./prod-deployment.md) instructions for more detail.
 
 ```pwsh
 azd env new <pick_a_name>
@@ -138,37 +136,29 @@ Select the subscription that will be used for the deployment:
 azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
 ```
 
-To deploy the dev version:
-
-```pwsh
-azd env set ENVIRONMENT dev
-```
-
-Set the `AZURE_LOCATION` to the primary region (Run `(Get-AzLocation).Location` to see a list of locations):
+Set the `AZURE_LOCATION` (Run `(Get-AzLocation).Location` to see a list of locations):
 
 ```pwsh
 azd env set AZURE_LOCATION <pick_a_region>
 ```
 
-### 6. Provision the app and deploy the code
+### 5. Create the Azure resources and deploy the code
 
-Run the following command to create the infrastructure (about 15-minutes to provision):
+Run the following command to create the Azure resources and deploy the code (about 15-minutes to complete):
 
 ```pwsh
 azd up
 ```
 
-The provisioning and deployment process can take anywhere from 20 minutes to over an hour, depending on system load and your bandwidth.
+### 6. Open and use the application
 
-### 8. Open and use the application
+Use the URL displayed in the console output to launch the web application that you have deployed:
 
-Use the URL displayed in the consol output to launch the Relecloud application that you have deployed:
+![screenshot of web app home page](assets/images/WebAppHomePage.png)
 
-![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
+### 7. Teardown
 
-### 9. Teardown
-
-To tear down the deployment, run the following command:
+Run the following command to teardown the deployment:
 
 ```pwsh
 azd down --purge --force
@@ -178,8 +168,8 @@ azd down --purge --force
 
 - [Known issues](known-issues.md)
 - [Troubleshooting](troubleshooting.md)
-- [Developer patterns](simulate-patterns.md)
-- [Dev Experience](local-development.md)
+- [Pattern Simulations](demo.md)
+- [Developer Experience](developer-experience.md)
 - [Find additional resources](additional-resources.md)
 - [Report security concerns](SECURITY.md)
 - [Find Support](SUPPORT.md)
@@ -193,4 +183,4 @@ The software may collect information about you and your use of the software and 
 
 Telemetry collection is on by default.
 
-To opt out, run the following command `azd env set ENABLE_TELEMETRY` to `false` in your environment.
+To opt out, run the following command `azd env set ENABLE_TELEMETRY` to `false` in your AZD environment.
