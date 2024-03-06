@@ -1,17 +1,18 @@
-# Dev Experience
+# Developers Experience
 
-Relecloud developers use Visual Studio to develop and they integrate directly with Azure resources when building the code. The team chooses this workflow to so they can develop as their code would behave when deployed to Azure allowing them to catch issues like serialization exceptions.
+The dev team uses Visual Studio and they integrate directly with Azure resources when building the code. The team chooses this workflow to so they can integration test with Azure before it reaches the QA team.
 
 > **WARNING**
 >
-> This developer experience is only supported when the Azure resources are not network isolated.
-> If you are using network isolation you will only be able to access the Azure resources from the jump host.
+> This developer experience is only supported for dev deployments. Production deployments
+> use are network isolated and do not allow devs to connect from their workstation.
+> This content provides a jump host VM to help you access network isolated Azure resources.
 
-To connect to the Azure resources the dev team uses connection strings from Key Vault and App Configuration Service. Devs use the following script to retrieve data and store it as [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows) on their workstation.
+To connect to the Azure resources the dev team uses connection strings from Key Vault. Devs use the following script to retrieve data and store it as [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows) on their workstation.
 
 Using the `secrets.json` file helps the team keep their credentials secure. The file is stored outside of the source control directory so the data is never accidentally checked-in. And the devs don't share credentials over email or other ways that could compromise their security.
 
-Managing secrets from Key Vault and App Configuration ensures that only authorized team members can access the data and also centralizes the administration of these secrets so they can be easily changed.
+Managing secrets from Key Vault ensures that only authorized team members can access the data and also centralizes the administration of secrets.
 
 New team members should setup their environment by following these steps.
 
