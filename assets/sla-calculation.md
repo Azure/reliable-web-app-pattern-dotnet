@@ -13,9 +13,10 @@ With a development environment, network isolation is not used.  The following se
 | Azure App Service | 99.950%   |
 | Redis Cache       | 99.900%   |
 | Azure SQL         | 99.995%   |
+| Azure Storage     | 99.900%   |
 | Key Vault         | 99.990%   |
 | App Configuration | 99.900%   |
-| **Combined SLA**  | **99.715%** |
+| **Combined SLA**  | **99.616%** |
 
 ## Production - Single Region
 
@@ -33,11 +34,13 @@ When operating in production, network isolation is used.  We do not consider the
 | - Private Link    | 99.990%   |
 | Azure SQL         | 99.995%   |
 | - Private Link    | 99.990%   |
+| Azure Storage     | 99.900%   |
+| - Private Link    | 99.990%   |
 | Key Vault         | 99.990%   |
 | - Private Link    | 99.990%   |
 | App Configuration | 99.900%   |
 | - Private Link    | 99.990%   |
-| **Combined SLA**  | **99.655%** |
+| **Combined SLA**  | **99.546%** |
 
 ## Production - Two Regions
 
@@ -57,13 +60,15 @@ Since the single region SLA is less than the requested 99.9% availability, we ha
 | - Private Link    | 99.990%   |
 | Azure SQL         | 99.995%   |
 | - Private Link    | 99.990%   |
+| Azure Storage     | 99.900%   |
+| - Private Link    | 99.990%   |
 | Key Vault         | 99.990%   |
 | - Private Link    | 99.990%   |
 | App Configuration | 99.900%   |
 | - Private Link    | 99.990%   |
 | **Shared Services**   | **99.980%**   |
-| **Regional Services** | **99.655%**   |
-| **Combined SLA**      | **99.9788%**  |
+| **Regional Services** | **99.546%**   |
+| **Combined SLA**      | **99.9779%**  |
 
 Using dual regions will help us achieve the requested service level agreement.
 
