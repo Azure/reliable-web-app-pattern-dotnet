@@ -1,4 +1,4 @@
-# Developers Experience
+# Developer Experience
 
 The dev team uses Visual Studio and they integrate directly with Azure resources when building the code. The team chooses this workflow to so they can integration test with Azure before it reaches the QA team.
 
