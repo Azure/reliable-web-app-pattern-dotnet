@@ -1,4 +1,4 @@
-# Simulating the design patterns
+# Pattern Simulations
 
 You can test and configure the three code-level design patterns with this implementation: retry, circuit-breaker, and cache-aside. The following paragraphs detail steps to test the three code-level design patterns.
 
