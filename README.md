@@ -44,6 +44,8 @@ The following detailed deployment steps assume you are using a Dev Container ins
 
 ### 1. Clone the repo
 
+> For your convenience, we use Dev Containers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](./prerequisites.md) and skip to the deployment instructions starting in [Step 3](### 3. Log in to Azure).
+
 Start a WSL session to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
 
 
@@ -59,8 +61,6 @@ cd reliable-web-app-pattern-dotnet
 ```
 
 ### 2. Open Dev Container in Visual Studio Code (optional)
-
-> For your convenience, we use Dev Containers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](./prerequisites.md) and following the deployment instructions below.
 
 If required, ensure Docker Desktop is started and enabled for your WSL terminal [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt:
 
@@ -82,26 +82,15 @@ Once the command palette is open, search for `Dev Containers: Rebuild and Reopen
 
 ![WSL Ubuntu](assets/images/vscode-reopen-in-container-command.png)
 
-### 3. Create a new environment
+### 3. Log in to Azure
 
-Use the VS Code terminal to run the following commands to create a new environment.
-
-The environment name should be less than 18 characters and must be comprised of lower-case, numeric, and dash characters (for example, `dotnetwebapp`).  The environment name is used for resource group naming and specific resource naming. Also, select a password for the admin user of the database.
+Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
 
 If not using PowerShell 7+, run the following command:
 
 ```shell
 pwsh
 ```
-
-
-You can substitute the environment name with your own value.
-
-By default, Azure resources are sized for a "development" mode. If doing a Production deployment, see the [prod Deployment](./prod-deployment.md) instructions for more detail.
-
-### 4. Log in to Azure
-
-Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
 
 ```pwsh
 Import-Module Az.Resources
@@ -128,6 +117,16 @@ azd auth login
 ```
 
 Run the following commands to set these values and create a new environment:
+
+### 4. Create a new environment
+
+Use the VS Code terminal to run the following commands to create a new environment.
+
+The environment name should be less than 18 characters and must be comprised of lower-case, numeric, and dash characters (for example, `dotnetwebapp`).  The environment name is used for resource group naming and specific resource naming. Also, select a password for the admin user of the database.
+
+You can substitute the environment name with your own value.
+
+By default, Azure resources are sized for a "development" mode. If doing a Production deployment, see the [prod Deployment](./prod-deployment.md) instructions for more detail.
 
 ```pwsh
 azd env new <pick_a_name>
