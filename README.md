@@ -44,9 +44,9 @@ This description details the workflow for Relecloud's concert ticketing applicat
 
 The following detailed deployment steps assume you are using a Dev Container inside Visual Studio Code.
 
-### 1. Clone the repo
-
 > For your convenience, we use Dev Containers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](./prerequisites.md) and skip to the deployment instructions starting in [Step 3](#3-log-in-to-azure).
+
+### 1. Clone the repo
 
 Start a WSL session to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
 
@@ -61,7 +61,7 @@ git clone https://github.com/Azure/reliable-web-app-pattern-dotnet.git
 cd reliable-web-app-pattern-dotnet
 ```
 
-### 2. Open Dev Container in Visual Studio Code (optional)
+### 2. Open Dev Container in Visual Studio Code
 
 If required, ensure Docker Desktop is started and enabled for your WSL terminal [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt:
 
@@ -172,6 +172,7 @@ azd down --purge --force
 - [Troubleshooting](troubleshooting.md)
 - [Pattern Simulations](demo.md)
 - [Developer Experience](developer-experience.md)
+- [Calculating SLA](./assts/sla-calculation.md)
 - [Find additional resources](additional-resources.md)
 - [Report security concerns](SECURITY.md)
 - [Find Support](SUPPORT.md)
