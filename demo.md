@@ -99,7 +99,7 @@ Open the Redis Console by navigating to the Azure Cache for Redis resource in th
 ![image of Azure Cache for Redis Console](./assets/images/Guide/Simulating_RedisConsole.png)
 
 
-Run the command:
+Run the following command to see all cached keys:
 
 ```
 SCAN 0 COUNT 1000 MATCH *
@@ -107,7 +107,7 @@ SCAN 0 COUNT 1000 MATCH *
 
 ![image of Azure Cache for Redis Console lists all keys](./assets/images/Guide/Simulating_RedisConsoleListKeys.png)
 
-Run the command:
+Run the next command to see the concert data cached from the database:
 
 ```
 HGETALL UpcomingConcerts
