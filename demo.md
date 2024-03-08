@@ -40,7 +40,7 @@ For more information, see:
 
 > We recommend you cleanup by deleting the `Api:App:RetryDemo` setting. And restart both web apps to resume from a known state.
 
-### Circuit Breaker Pattern
+### Circuit Breaker pattern
 
 We built an app configuration setting that lets you simulate and test a failure from the Web API. The setting is called `Api:App:RetryDemo`. We've included this configuration in the deployable code. The `Api:App:RetryDemo` setting throws a 503 error when the end user sends an HTTP request to the web app API. `Api:App:RetryDemo` has an editable setting that determines the number of back-to-back errors between a successful request. A value of 5 generates five errors after returning one successful response. This is disabled by default.  Removing the setting, or changing the value to 0 will disable the feature.
 
@@ -76,11 +76,11 @@ For more information, see:
 
 > We recommend you cleanup by deleting the `Api:App:RetryDemo` setting. And restart both web apps to resume from a known state.
 
-### Cache-Aside Pattern
+### Cache-Aside pattern
 
-The cache-aside pattern enables us to reduce read queries to SQL server. It also provides a layer of redundancy that can keep parts of our application running in the event of issue with Azure SQL Database.
+The Cache-Aside pattern enables us to reduce read queries to SQL server. It also provides a layer of redundancy that can keep parts of our application running in the event of issue with Azure SQL Database.
 
-For more information, see [cache-aside pattern](https://learn.microsoft.com/azure/architecture/patterns/cache-aside).
+For more information, see [Cache-Aside pattern](https://learn.microsoft.com/azure/architecture/patterns/cache-aside).
 
 We can observe this behavior in App Insights by testing two different pages. First, visit the "Upcoming Concerts" page and refresh the page a couple of times. The first time the page is loaded the web API app will send a request to SQL server, but the following requests will go to Azure Cache for Redis.
 
