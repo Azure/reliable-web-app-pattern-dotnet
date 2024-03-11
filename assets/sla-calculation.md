@@ -1,6 +1,6 @@
 # Calculating Solution Service Level Agreement
 
-The requirement for the Contoso Fiber CAMS application is that the combined service level agreement for all components in the hot path is greater than 99.9%.  The components in the hot path comprise of any service that is used in fulfilling a web request from a user.  
+The requirement for the web application is that the combined service level agreement for all components in the hot path is greater than 99.9%.  The components in the hot path comprise of any service that is used in fulfilling a web request from a user.  
 
 ## Development
 
