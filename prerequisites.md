@@ -65,7 +65,6 @@ The following tools are pre-requisites to running the associated deployment step
 | Windows WSL |    ✅     |      ✅      |
 | macOS       |    ✅     |      ✅      |
 | macOS arm64 |    ✅     |      ✅      |
-| Linux       |    ✅     |      ✅      |
 
 ## VSCode Dev Container prerequisites
 
