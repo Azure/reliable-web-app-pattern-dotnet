@@ -87,11 +87,15 @@ The following detailed deployment steps assume you are using a Dev Container ins
     azd env set AZURE_LOCATION <pick_a_region>
     ```
 
+    *You want to make sure the region has availability zones. Azure App Service is configured with [Availability zone support](https://learn.microsoft.com/en-us/azure/reliability/reliability-app-service?tabs=graph%2Ccli#availability-zone-support).*
+
 1. Choose an Azure region for the secondary deployment:
 
     ```pwsh
     azd env set AZURE_SECONDARY_LOCATION <pick_a_region>
     ```
+
+    *We encourage readers to choose paired regions for multi-regional web apps. Paired regions typically offer low network latency, data residency in the same geography, and sequential updating. Read [Azure paired regions](https://learn.microsoft.com/en-us/azure/reliability/cross-region-replication-azure#azure-paired-regions) to learn more about these regions.*
 
 1. Run the following command to create the Azure resources (about 45-minutes to provision):
 
