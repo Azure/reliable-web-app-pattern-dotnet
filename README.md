@@ -48,7 +48,7 @@ The following detailed deployment steps assume you are using a Dev Container ins
 
 ### 1. Clone the repo
 
-Start a WSL session to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
+> For Windows users, we recommend using Windows Subsystem for Linux (WSL) to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
 
 ```pwsh
 wsl
