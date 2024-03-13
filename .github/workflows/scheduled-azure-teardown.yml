@@ -62,6 +62,11 @@ jobs:
       - name: Set the principal type
         run : azd env set AZURE_PRINCIPAL_TYPE ServicePrincipal
 
+      - name: Set AZURE_RESOURCE_GROUP
+        # Azure resource group is required by the AZD tool for teardown
+        # calculated AZURE_RESOURCE_GROUP from the templates
+        run : azd env set AZURE_RESOURCE_GROUP rg-${{ secrets.AZURE_ENV_NAME }}-dev-${{ secrets.AZURE_LOCATION }}-application
+
       - name: Teardown Azure resources
         continue-on-error: true
         run: azd down --force --purge --no-prompt
