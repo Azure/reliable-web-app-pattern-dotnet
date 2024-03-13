@@ -23,11 +23,7 @@ jobs:
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
-      IS_RUN_AS_SERVICEPRINCIPAL: true
-      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      AZURE_PRINCIPAL_TYPE: ServicePrincipal
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
     steps:
       - name: Install jq tool
         uses: dcarbone/install-jq-action@v2
@@ -63,11 +59,17 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           enable-AzPSSession: true
 
-      - name: Azure Dev Provision
-        run: azd provision --no-prompt
+      - name: Set the environment
+        run : azd env set ${{ secrets.AZURE_ENV_NAME }}
 
-      - name: Azure Dev Deploy
-        run: azd deploy --no-prompt
+      - name: Set the location
+        run: azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
+
+      - name: Set the principal type
+        run: azd env set --principal-type ${{ secrets.AZURE_PRINCIPAL_TYPE }}
+
+      - name: Azure Deploy
+        run: azd up
 
       - name: QA - Validate Deployment
         run: ./testscripts/call-validate-deployment.sh
@@ -80,11 +82,7 @@ jobs:
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
-      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      AZURE_PRINCIPAL_TYPE: ServicePrincipal
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -107,8 +105,14 @@ jobs:
       - name: Create AZD environment
         # Creating an azd environment so we can set the principal type
         # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/241
-        run: azd env new ${{ secrets.AZURE_ENV_NAME }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --location ${{ secrets.AZURE_LOCATION }}
-        
+        run: azd env new ${{ secrets.AZURE_ENV_NAME }}
+
+      - name: Set the subscription
+        run: azd env set AZURE_SUBSCRIPTION_ID  ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set the location
+        run: azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
+
       - name: Azure Dev Down
         run: azd down --force --purge --no-prompt
 
