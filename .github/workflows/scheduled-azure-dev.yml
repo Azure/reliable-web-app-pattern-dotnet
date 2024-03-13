@@ -63,16 +63,16 @@ jobs:
         run : azd env new ${{ secrets.AZURE_ENV_NAME }}
 
       - name: Set the location
-        run: azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
+        run : azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
 
       - name: Set the principal type
-        run: azd env set --principal-type ${{ secrets.AZURE_PRINCIPAL_TYPE }}
+        run : azd env set AZURE_PRINCIPAL_TYPE ${{ secrets.AZURE_PRINCIPAL_TYPE }}
 
       - name: Azure Deploy
-        run: azd up
+        run : azd up
 
       - name: QA - Validate Deployment
-        run: ./testscripts/call-validate-deployment.sh
+        run : ./testscripts/call-validate-deployment.sh
 
   teardown:
     needs: [build]
@@ -108,11 +108,11 @@ jobs:
         run: azd env new ${{ secrets.AZURE_ENV_NAME }}
 
       - name: Set the subscription
-        run: azd env set AZURE_SUBSCRIPTION_ID  ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run : azd env set AZURE_SUBSCRIPTION_ID  ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Set the location
-        run: azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
+        run : azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
 
       - name: Azure Dev Down
-        run: azd down --force --purge --no-prompt
+        run : azd down --force --purge --no-prompt
 
