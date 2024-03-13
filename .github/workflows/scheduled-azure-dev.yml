@@ -60,7 +60,7 @@ jobs:
           enable-AzPSSession: true
 
       - name: Set the environment
-        run : azd env set ${{ secrets.AZURE_ENV_NAME }}
+        run : azd env new ${{ secrets.AZURE_ENV_NAME }}
 
       - name: Set the location
         run: azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
