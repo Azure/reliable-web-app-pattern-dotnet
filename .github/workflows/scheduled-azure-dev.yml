@@ -75,7 +75,6 @@ jobs:
         run : azd up
 
       - name: QA - Validate Deployment
-        continu
         run : ./testscripts/call-validate-deployment.sh
 
       - name: Azure Dev Down
