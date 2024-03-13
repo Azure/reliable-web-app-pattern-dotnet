@@ -12,15 +12,24 @@ jobs:
     container:
       image: mcr.microsoft.com/azure-dev-cli-apps:1.5.1
     env:
-      AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
-      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
     steps:
+      - name: Install jq tool
+        uses: dcarbone/install-jq-action@v2
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install Az module
+        run: Install-Module -Name Az -Force -AllowClobber -Scope CurrentUser -Repository PSGallery
+        shell: pwsh
         
       # login to run ado commands such provision, deploy, and down
-      - name: Log in with Azure (Client Credentials)
+      - name: Log in with Azure (Client Credentials) for AZD
         if: ${{ env.AZURE_CREDENTIALS != '' }}
         run: |
           $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
@@ -41,11 +50,18 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           enable-AzPSSession: true
 
-      - name: Create AZD environment
-        # Creating an azd environment so we can set the principal type
-        # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/241
-        run: azd env new ${{ secrets.AZURE_ENV_NAME }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --location ${{ secrets.AZURE_LOCATION }}
-        
+      - name: Set the environment
+        run: azd env new ${{ secrets.AZURE_ENV_NAME }}
+
+      - name: Set the subscription
+        run : azd env set AZURE_SUBSCRIPTION_ID  ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set the location
+        run : azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
+
+      - name: Set the principal type
+        run : azd env set AZURE_PRINCIPAL_TYPE ServicePrincipal
+
       - name: Azure Dev Down
         continue-on-error: true
         run: azd down --force --purge --no-prompt
