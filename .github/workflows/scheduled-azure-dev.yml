@@ -66,7 +66,7 @@ jobs:
         run : azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
 
       - name: Set the principal type
-        run : azd env set AZURE_PRINCIPAL_TYPE ${{ secrets.AZURE_PRINCIPAL_TYPE }}
+        run : azd env set AZURE_PRINCIPAL_TYPE ServicePrincipal
 
       - name: Azure Deploy
         run : azd up
