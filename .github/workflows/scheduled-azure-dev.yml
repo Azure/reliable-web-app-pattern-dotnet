@@ -75,56 +75,10 @@ jobs:
         run : azd up
 
       - name: QA - Validate Deployment
+        continu
         run : ./testscripts/call-validate-deployment.sh
 
-  teardown:
-    needs: [build]
-    runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/azure-dev-cli-apps:1.5.1
-    env:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-    steps:
-      - name: Install jq tool
-        uses: dcarbone/install-jq-action@v2
-      - name: Checkout
-        uses: actions/checkout@v4
-        
-      # login to run ado commands such provision, deploy, and down
-      - name: Log in with Azure (Client Credentials) for AZD
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
-        run: |
-          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
-          Write-Host "::add-mask::$($info.clientSecret)"
-
-          azd login `
-            --client-id "$($info.clientId)" `
-            --client-secret "$($info.clientSecret)" `
-            --tenant-id "$($info.tenantId)"
-        shell: pwsh
-        env:
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # login to run azd hooks
-      - name: Log in with Azure CLI
-        uses: Azure/login@v1.6.1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          enable-AzPSSession: true
-
-      - name: Create AZD environment
-        # Creating an azd environment so we can set the principal type
-        # https://github.com/Azure/reliable-web-app-pattern-dotnet/issues/241
-        run: azd env new ${{ secrets.AZURE_ENV_NAME }}
-
-      - name: Set the subscription
-        run : azd env set AZURE_SUBSCRIPTION_ID  ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Set the location
-        run : azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
-
       - name: Azure Dev Down
+        if  : always()
         run : azd down --force --purge --no-prompt
 
