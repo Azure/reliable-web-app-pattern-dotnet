@@ -231,6 +231,38 @@ function Get-ResourceToken($resourceGroupName) {
     return ($redisInstances | Select-Object -First 1).Name.Substring($defaultRedisNamePrefix.Length)
 }
 
+<#
+.SYNOPSIS
+    Reads input from the user, but taking care of default value and request to
+    not prompt the user.
+.PARAMETER Prompt
+    The prompt to display to the user.
+.PARAMETER DefaultValue
+    The default value to use if the user just hits Enter.
+.PARAMETER NoPrompt
+    If specified, don't prompt - just use the default value.
+#>
+function Read-ApplicationPrompt {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Prompt,
+
+        [Parameter(Mandatory = $true)]
+        [string] $DefaultValue,
+
+        [Parameter(Mandatory = $false)]
+        [switch] $NoPrompt = $false
+    )
+
+    $returnValue = ""
+    if (-not $NoPrompt) {
+        $returnValue = Read-Host -Prompt "`n$($Prompt) [default: $(Get-HighlightedText($DefaultValue))] "
+    }
+    if ([string]::IsNullOrWhiteSpace($returnValue)) {
+        $returnValue = $DefaultValue
+    }
+    return $returnValue
+}
 "`nCleaning up environment for application '$rgApplication'" | Write-Output
 
 # Get the list of resource groups to deal with
