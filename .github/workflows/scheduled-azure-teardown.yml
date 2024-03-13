@@ -62,7 +62,7 @@ jobs:
       - name: Set the principal type
         run : azd env set AZURE_PRINCIPAL_TYPE ServicePrincipal
 
-      - name: Azure Dev Down
+      - name: Teardown Azure resources
         continue-on-error: true
         run: azd down --force --purge --no-prompt
 

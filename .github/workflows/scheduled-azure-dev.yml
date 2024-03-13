@@ -77,7 +77,7 @@ jobs:
       - name: QA - Validate Deployment
         run : ./testscripts/call-validate-deployment.sh
 
-      - name: Azure Dev Down
+      - name: Teardown Azure resources
         if  : always()
         run : azd down --force --purge --no-prompt
 
