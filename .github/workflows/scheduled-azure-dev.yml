@@ -87,6 +87,8 @@ jobs:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
     steps:
+      - name: Install jq tool
+        uses: dcarbone/install-jq-action@v2
       - name: Checkout
         uses: actions/checkout@v4
         
@@ -104,6 +106,13 @@ jobs:
         shell: pwsh
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # login to run azd hooks
+      - name: Log in with Azure CLI
+        uses: Azure/login@v1.6.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
 
       - name: Create AZD environment
         # Creating an azd environment so we can set the principal type
