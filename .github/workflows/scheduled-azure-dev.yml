@@ -62,6 +62,9 @@ jobs:
       - name: Set the environment
         run : azd env new ${{ secrets.AZURE_ENV_NAME }}
 
+      - name: Set the subscription
+        run : azd env set AZURE_SUBSCRIPTION_ID  ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Set the location
         run : azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
 
