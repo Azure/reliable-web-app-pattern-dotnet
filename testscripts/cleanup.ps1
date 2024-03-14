@@ -38,6 +38,7 @@ Param(
     [Parameter(Mandatory = $false)][string]$SecondarySpokeResourceGroup,
     [Parameter(Mandatory = $false)][string]$HubResourceGroup,
     [Parameter(Mandatory = $false)][switch]$SkipResourceGroupDeletion,
+    [Parameter(Mandatory = $false)][switch]$Purge,
     [Parameter(Mandatory = $false)][switch]$NoPrompt
 )
 
@@ -230,6 +231,38 @@ function Get-ResourceToken($resourceGroupName) {
     return ($redisInstances | Select-Object -First 1).Name.Substring($defaultRedisNamePrefix.Length)
 }
 
+<#
+.SYNOPSIS
+    Reads input from the user, but taking care of default value and request to
+    not prompt the user.
+.PARAMETER Prompt
+    The prompt to display to the user.
+.PARAMETER DefaultValue
+    The default value to use if the user just hits Enter.
+.PARAMETER NoPrompt
+    If specified, don't prompt - just use the default value.
+#>
+function Read-ApplicationPrompt {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Prompt,
+
+        [Parameter(Mandatory = $true)]
+        [string] $DefaultValue,
+
+        [Parameter(Mandatory = $false)]
+        [switch] $NoPrompt = $false
+    )
+
+    $returnValue = ""
+    if (-not $NoPrompt) {
+        $returnValue = Read-Host -Prompt "`n$($Prompt) [default: $(Get-HighlightedText($DefaultValue))] "
+    }
+    if ([string]::IsNullOrWhiteSpace($returnValue)) {
+        $returnValue = $DefaultValue
+    }
+    return $returnValue
+}
 "`nCleaning up environment for application '$rgApplication'" | Write-Output
 
 # Get the list of resource groups to deal with
@@ -275,6 +308,10 @@ if (Test-EntraAppRegistrationExists -Name $calculatedAppRegistrationNameForFront
     $appRegistrations.Add($calculatedAppRegistrationNameForFrontend) | Out-Null
 }
 
+# Determine if we need to purge the App Configuration and Key Vault.
+$defaultPurgeResources = if ($Purge) { "y" } else { "n" }
+$purgeResources = Read-ApplicationPrompt -Prompt "Do you wish to puge resources that cannot be reassigned immediately (such as Key Vault)? [y/n]" -DefaultValue $defaultPurgeResources -NoPrompt:$NoPrompt
+
 # press enter to proceed
 if (-not $NoPrompt) {
     "`nPress enter to proceed with cleanup or CTRL+C to cancel" | Write-Output
@@ -287,6 +324,25 @@ if ($azdConfig['AZURE_PRINCIPAL_TYPE'] -eq 'User') {
     "`nRemoving Entra ID App Registration..." | Write-Output
     foreach($appRegistration in $appRegistrations) {
         Remove-AzADApplicationByName -Name $appRegistration
+    }
+}
+
+if ($purgeResources -eq "y") {
+    "> Remove and purge purgeable resources:" | Write-Output
+    foreach ($resourceGroupName in $resourceGroups) {
+        Get-AzKeyVault -ResourceGroupName $resourceGroupName | Foreach-Object {
+            "`tRemoving $($_.VaultName)" | Write-Output
+            Remove-AzKeyVault -VaultName $_.VaultName -ResourceGroupName $resourceGroupName -Force
+            "`tPurging $($_.VaultName)" | Write-Output
+            Remove-AzKeyVault -VaultName $_.VaultName -Location $_.Location -InRemovedState -Force -ErrorAction SilentlyContinue
+        }
+
+        Get-AzAppConfigurationStore -ResourceGroupName $resourceGroupName | Foreach-Object {
+            "`tRemoving $($_.Name)" | Write-Output
+            Remove-AzAppConfigurationStore -Name $_.Name -ResourceGroupName $resourceGroupName
+            "`tPurging $($_.Name)" | Write-Output
+            Clear-AzAppConfigurationDeletedStore -Location $_.Location -Name $_.Name -ErrorAction SilentlyContinue
+        }
     }
 }
 
