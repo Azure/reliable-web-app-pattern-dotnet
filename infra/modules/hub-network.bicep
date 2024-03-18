@@ -81,9 +81,6 @@ param deploymentSettings DeploymentSettings
 @description('The diagnostic settings to use for this deployment.')
 param diagnosticSettings DiagnosticSettings
 
-@description('If enabled, a Windows 11 jump host will be deployed.  Ensure you enable the bastion host as well.')
-param enableJumpHost bool = false
-
 @description('The resource names for the resources to be created.')
 param resourceNames object
 
@@ -96,6 +93,17 @@ param logAnalyticsWorkspaceId string = ''
 /*
 ** Settings
 */
+@secure()
+@minLength(8)
+@description('The password for the administrator account on the jump host.')
+param administratorPassword string = newGuid()
+
+@minLength(8)
+@description('The username for the administrator account on the jump host.')
+param administratorUsername string = 'adminuser'
+
+@description('If enabled, an Ubuntu jump host will be deployed.  Ensure you enable the bastion host as well.')
+param enableJumpHost bool = false
 
 @description('The CIDR block to use for the address prefix of this virtual network.')
 param addressPrefix string = '10.0.0.0/20'
@@ -117,6 +125,9 @@ param spokeAddressPrefixPrimary string
 
 @description('The CIDR block to use for the address prefix of the secondary spoke virtual network.')
 param spokeAddressPrefixSecondary string
+
+@description('If true, create a subnet for Devops resources')
+param createDevopsSubnet bool = false
 
 // ========================================================================
 // VARIABLES
@@ -160,8 +171,17 @@ var privateEndpointSubnet = {
 var subnets = union(
   [privateEndpointSubnet],
   enableBastionHost ? [bastionHostSubnetDefinition] : [],
-  enableFirewall ? [firewallSubnetDefinition] : []
+  enableFirewall ? [firewallSubnetDefinition] : [],
+  createDevopsSubnet ? [devopsSubnet] : []
 )
+
+var devopsSubnet = createDevopsSubnet ? [{
+  name: resourceNames.spokeDevopsSubnet
+  properties: {
+    addressPrefix: subnetPrefixes[6]
+    privateEndpointNetworkPolicies: 'Disabled'
+  }
+}] : []
 
 // Some helpers for the firewall rules
 var allowTraffic = { type: 'allow' }
@@ -216,8 +236,6 @@ var applicationRuleCollections = [
 ]
 
 // The subnet prefixes for the individual subnets inside the virtual network
-var spokeSubnetPrefixesFromPrimary = [ for i in range(0, 16): cidrSubnet(spokeAddressPrefixPrimary, 26, i)]
-var spokeSubnetPrefixesFromSecondary = [ for i in range(0, 16): cidrSubnet(spokeAddressPrefixSecondary, 26, i)]
 
 var networkRuleCollections = [
   {
@@ -244,7 +262,7 @@ var networkRuleCollections = [
           protocols: [
             'Any'
           ]
-          sourceAddresses: deploymentSettings.isMultiLocationDeployment ? [ spokeSubnetPrefixesFromPrimary[6] ] : [ spokeSubnetPrefixesFromPrimary[6], spokeSubnetPrefixesFromSecondary[6] ]
+          sourceAddresses: [ subnetPrefixes[6] ]
         }
         {
           destinationAddresses: [
@@ -258,7 +276,7 @@ var networkRuleCollections = [
           protocols: [
             'Any'
           ]
-          sourceAddresses: deploymentSettings.isMultiLocationDeployment ? [ spokeSubnetPrefixesFromPrimary[6] ] : [ spokeSubnetPrefixesFromPrimary[6], spokeSubnetPrefixesFromSecondary[6] ]
+          sourceAddresses: [ subnetPrefixes[6] ]
         }
       ]
     }
@@ -298,7 +316,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing 
 }
 
 module ddosProtectionPlan '../core/network/ddos-protection-plan.bicep' = if (enableDDoSProtection) {
-  name: 'hub-ddos-protection-plan'
+  name: 'hub-ddos-protection-plan-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubDDoSProtectionPlan
@@ -308,7 +326,7 @@ module ddosProtectionPlan '../core/network/ddos-protection-plan.bicep' = if (ena
 }
 
 module virtualNetwork '../core/network/virtual-network.bicep' = {
-  name: 'hub-virtual-network'
+  name: 'hub-virtual-network-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubVirtualNetwork
@@ -327,7 +345,7 @@ module virtualNetwork '../core/network/virtual-network.bicep' = {
 }
 
 module firewall '../core/network/firewall.bicep' = if (enableFirewall) {
-  name: 'hub-firewall'
+  name: 'hub-firewall-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubFirewall
@@ -353,8 +371,28 @@ module firewall '../core/network/firewall.bicep' = if (enableFirewall) {
 }
 
 
+module jumphost '../core/compute/ubuntu-jumphost.bicep' = if (enableJumpHost) {
+  name: 'hub-jumphost-${deploymentSettings.resourceToken}'
+  scope: resourceGroup
+  params: {
+    name: resourceNames.hubJumphost
+    location: deploymentSettings.location
+    tags: moduleTags
+
+    // Dependencies
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    subnetId: virtualNetwork.outputs.subnets[resourceNames.spokeDevopsSubnet].id
+
+    // Settings
+    adminPasswordOrKey: administratorPassword
+    adminUsername: administratorUsername
+    diagnosticSettings: diagnosticSettings
+  }
+}
+
+
 module bastionHost '../core/network/bastion-host.bicep' = if (enableBastionHost) {
-  name: 'hub-bastion-host'
+  name: 'hub-bastion-host-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubBastionHost
@@ -379,7 +417,7 @@ module bastionHost '../core/network/bastion-host.bicep' = if (enableBastionHost)
   or if it is located in the Workload resource group (yes, when Network Isolation is not enabled).
  */
 module sharedKeyVault '../core/security/key-vault.bicep' = {
-  name: 'shared-key-vault'
+  name: 'shared-key-vault-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.keyVault
@@ -405,7 +443,7 @@ module sharedKeyVault '../core/security/key-vault.bicep' = {
 }
 
 module hubBudget '../core/cost-management/budget.bicep' = {
-  name: 'hub-budget'
+  name: 'hub-budget-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubBudget
@@ -447,3 +485,5 @@ output firewall_ip_address string = enableFirewall ? firewall.outputs.internal_i
 output virtual_network_id string = virtualNetwork.outputs.id
 output virtual_network_name string = virtualNetwork.outputs.name
 output key_vault_name string = enableJumpHost ? sharedKeyVault.outputs.name : ''
+output jumphost_computer_name string = enableJumpHost ? jumphost.outputs.computer_name : ''
+output jumphost_resource_id string = enableJumpHost ? jumphost.outputs.id : ''

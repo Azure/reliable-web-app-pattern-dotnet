@@ -314,13 +314,16 @@ module hubNetwork './modules/hub-network.bicep' = if (willDeployHubNetwork) {
     logAnalyticsWorkspaceId: azureMonitor.outputs.log_analytics_workspace_id
 
     // Settings
+    administratorPassword: jumphostAdministratorPassword
+    administratorUsername: administratorUsername
+    createDevopsSubnet: true
     enableBastionHost: true
     // DDoS protection is recommended for Production deployments
     // however, for this sample we disable this feature because DDoS should be configured to protect multiple subscriptions, deployments, and resources
     // learn more at https://learn.microsoft.com/azure/ddos-protection/ddos-protection-overview
     enableDDoSProtection: false // primaryDeploymentSettings.isProduction
     enableFirewall: true
-    enableJumpHost: willDeployHubNetwork
+    enableJumpHost: true
     spokeAddressPrefixPrimary: spokeAddressPrefixPrimary
     spokeAddressPrefixSecondary: spokeAddressPrefixSecondary
   }
@@ -351,10 +354,6 @@ module spokeNetwork './modules/spoke-network.bicep' = if (isNetworkIsolated) {
 
     // Settings
     addressPrefix: spokeAddressPrefixPrimary
-    administratorPassword: jumphostAdministratorPassword
-    administratorUsername: administratorUsername
-    createDevopsSubnet: isNetworkIsolated
-    enableJumpHost: true
   }
   dependsOn: [
     resourceGroups
@@ -374,10 +373,6 @@ module spokeNetwork2 './modules/spoke-network.bicep' = if (isNetworkIsolated && 
 
     // Settings
     addressPrefix: spokeAddressPrefixSecondary
-    administratorPassword: jumphostAdministratorPassword
-    administratorUsername: administratorUsername
-    createDevopsSubnet: true
-    enableJumpHost: true
   }
   dependsOn: [
     resourceGroups2
@@ -558,8 +553,7 @@ output firewall_hostname string = willDeployHubNetwork ? hubNetwork.outputs.fire
 
 // Spoke resources
 output build_agent string = installBuildAgent ? buildAgent.outputs.build_agent_hostname : ''
-output JUMPHOST_RESOURCE_ID string = isNetworkIsolated ? spokeNetwork.outputs.jumphost_resource_id : ''
-output SECONDARY_JUMPHOST_RESOURCE_ID string = isNetworkIsolated ? spokeNetwork2.outputs.jumphost_resource_id : ''
+output JUMPHOST_RESOURCE_ID string = isNetworkIsolated ? hubNetwork.outputs.jumphost_resource_id : ''
 
 // Application resources
 output AZURE_RESOURCE_GROUP string = resourceGroups.outputs.application_resource_group_name
