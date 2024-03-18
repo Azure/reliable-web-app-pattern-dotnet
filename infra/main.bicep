@@ -324,8 +324,6 @@ module hubNetwork './modules/hub-network.bicep' = if (willDeployHubNetwork) {
     enableDDoSProtection: false // primaryDeploymentSettings.isProduction
     enableFirewall: true
     enableJumpHost: true
-    spokeAddressPrefixPrimary: spokeAddressPrefixPrimary
-    spokeAddressPrefixSecondary: spokeAddressPrefixSecondary
   }
   dependsOn: [
     resourceGroups
