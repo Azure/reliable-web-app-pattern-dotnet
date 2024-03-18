@@ -561,7 +561,7 @@ output service_web_endpoints string[] = application.outputs.service_web_endpoint
 output AZURE_OPS_VAULT_NAME string = isNetworkIsolated ? hubNetwork.outputs.key_vault_name : application.outputs.key_vault_name
 
 // Local development values
-output AZURE_PRINCIPAL_TYPE = principalType
+output AZURE_PRINCIPAL_TYPE string = principalType
 output APP_CONFIG_SERVICE_URI string = application.outputs.app_config_uri
 output WEB_URI string = application.outputs.web_uri
 output SQL_DATABASE_NAME string = application.outputs.sql_database_name
