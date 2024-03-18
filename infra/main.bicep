@@ -45,17 +45,17 @@ param principalType string = 'ServicePrincipal'
 */
 @secure()
 @minLength(8)
-@description('The password for the SQL administrator account. This will be used for the jump host, SQL server, and anywhere else a password is needed for creating a resource.')
+@description('The password for the SQL administrator account. This will be used for the jump box, SQL server, and anywhere else a password is needed for creating a resource.')
 param databasePassword string
 
 @secure()
 @minLength(12)
-@description('The password for the jump host administrator account.')
-param jumphostAdministratorPassword string
+@description('The password for the jump box administrator account.')
+param jumpboxAdministratorPassword string
 
 
 @minLength(8)
-@description('The username for the administrator account.  This will be used for the jump host, SQL server, and anywhere else a password is needed for creating a resource.')
+@description('The username for the administrator account.  This will be used for the jump box, SQL server, and anywhere else a password is needed for creating a resource.')
 param administratorUsername string = 'azureadmin'
 
 /*
@@ -314,7 +314,7 @@ module hubNetwork './modules/hub-network.bicep' = if (willDeployHubNetwork) {
     logAnalyticsWorkspaceId: azureMonitor.outputs.log_analytics_workspace_id
 
     // Settings
-    administratorPassword: jumphostAdministratorPassword
+    administratorPassword: jumpboxAdministratorPassword
     administratorUsername: administratorUsername
     createDevopsSubnet: true
     enableBastionHost: true
@@ -323,7 +323,7 @@ module hubNetwork './modules/hub-network.bicep' = if (willDeployHubNetwork) {
     // learn more at https://learn.microsoft.com/azure/ddos-protection/ddos-protection-overview
     enableDDoSProtection: false // primaryDeploymentSettings.isProduction
     enableFirewall: true
-    enableJumpHost: true
+    enableJumpBox: true
   }
   dependsOn: [
     resourceGroups
@@ -486,7 +486,7 @@ module applicationPostConfiguration './modules/application-post-config.bicep' = 
   name: '${prefix}-application-postconfig'
   params: {
     deploymentSettings: primaryDeploymentSettings
-    administratorPassword: jumphostAdministratorPassword
+    administratorPassword: jumpboxAdministratorPassword
     administratorUsername: administratorUsername
     databasePassword: databasePassword
     keyVaultName: isNetworkIsolated? hubNetwork.outputs.key_vault_name : application.outputs.key_vault_name
@@ -516,7 +516,7 @@ module buildAgent './modules/build-agent.bicep' = if (installBuildAgent) {
     subnets: isNetworkIsolated ? spokeNetwork.outputs.subnets : {}
 
     // Settings
-    administratorPassword: jumphostAdministratorPassword
+    administratorPassword: jumpboxAdministratorPassword
     administratorUsername: administratorUsername
     adoOrganizationUrl: adoOrganizationUrl
     adoToken: adoToken
@@ -551,7 +551,7 @@ output firewall_hostname string = willDeployHubNetwork ? hubNetwork.outputs.fire
 
 // Spoke resources
 output build_agent string = installBuildAgent ? buildAgent.outputs.build_agent_hostname : ''
-output JUMPHOST_RESOURCE_ID string = isNetworkIsolated ? hubNetwork.outputs.jumphost_resource_id : ''
+output JUMPBOX_RESOURCE_ID string = isNetworkIsolated ? hubNetwork.outputs.jumpbox_resource_id : ''
 
 // Application resources
 output AZURE_RESOURCE_GROUP string = resourceGroups.outputs.application_resource_group_name

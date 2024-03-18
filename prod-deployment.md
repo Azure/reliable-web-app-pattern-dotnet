@@ -1,5 +1,5 @@
 # Steps to deploy the production deployment
-This section describes the deployment steps for the reference implementation of a reliable web application pattern with .NET on Microsoft Azure. These steps guide you through using the jump host that is deployed when performing a network isolated deployment because access to resources will be restricted from public network access and must be performed from a machine connected to the vnet.
+This section describes the deployment steps for the reference implementation of a reliable web application pattern with .NET on Microsoft Azure. These steps guide you through using the jump box that is deployed when performing a network isolated deployment because access to resources will be restricted from public network access and must be performed from a machine connected to the vnet.
 
 ![Diagram showing the network focused architecture of the reference implementation.](./assets/images/reliable-web-app-prod-network.svg)
 
@@ -17,7 +17,7 @@ If you do not wish to use a Dev Container, please refer to the [prerequisites](p
 
 > **Note**
 >
-> These steps are used to connect to a Linux jump host where you can deploy the code. The jump host is not designed to be a build server. You should use a devOps pipeline to manage build agents and deploy code into the environment. Also note that for this content the jump host is a Linux VM. This can be swapped with a Windows VM based on your organization's requirements.
+> These steps are used to connect to a Linux jump box where you can deploy the code. The jump box is not designed to be a build server. You should use a devOps pipeline to manage build agents and deploy code into the environment. Also note that for this content the jump box is a Linux VM. This can be swapped with a Windows VM based on your organization's requirements.
 
 ## Steps to deploy the reference implementation
 
@@ -103,31 +103,31 @@ The following detailed deployment steps assume you are using a Dev Container ins
     azd provision
     ```
 
-### 3. Upload the code to the jump host
+### 3. Upload the code to the jump box
 
 > **WARNING**
 >
-> When the prod deployment is performed the Key Vault resource will be deployed with public network access enabled. This allows the reader to access the Key Vault to retrieve the username and password for the jump host. This also allows you to save data created by the `create-app-registration` script directly to the Key Vault. We recommend reviewing this approach with your security team as you may want to change this approach. One option to consider is adding the jump host to the domain, disabling public network access for Key Vault, and running the `create-app-registration` script from the jump host.
+> When the prod deployment is performed the Key Vault resource will be deployed with public network access enabled. This allows the reader to access the Key Vault to retrieve the username and password for the jump box. This also allows you to save data created by the `create-app-registration` script directly to the Key Vault. We recommend reviewing this approach with your security team as you may want to change this approach. One option to consider is adding the jump box to the domain, disabling public network access for Key Vault, and running the `create-app-registration` script from the jump box.
 
 To retrieve the generated password:
 
-1. Retrieve the username and password for your jump host:
+1. Retrieve the username and password for your jump box:
 
     - Locate the Hub resource group in the Azure Portal.
     - Open the Azure Key Vault from the list of resources.
     - Select **Secrets** from the menu sidebar.
-    - Select **Jumphost--AdministratorPassword**.
+    - Select **Jumpbox--AdministratorPassword**.
     - Select the currently enabled version.
     - Press **Show Secret Value**.
     - Note the secret value for later use.
-    - Repeat the proecess for the **Jumphost--AdministratorUsername** secret.
+    - Repeat the proecess for the **Jumpbox--AdministratorUsername** secret.
 
 1. Start a new PowerShell session in the terminal (In VS Code use `Ctrl+Shift+~`). Run the following command from the dev container terminal to start a new PowerShell session:
     ```
     pwsh
     ```
 
-1. We use the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/) to create a bastion tunnel that allows us to connect to the jump host:
+1. We use the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/) to create a bastion tunnel that allows us to connect to the jump box:
 
     <!-- requires AZ cli login -->
 
@@ -149,10 +149,10 @@ To retrieve the generated password:
     ```pwsh
     $bastionName = ((azd env get-values --output json | ConvertFrom-Json).BASTION_NAME)
     $resourceGroupName = ((azd env get-values --output json | ConvertFrom-Json).BASTION_RESOURCE_GROUP)
-    $targetResourceId = ((azd env get-values --output json | ConvertFrom-Json).JUMPHOST_RESOURCE_ID)
+    $targetResourceId = ((azd env get-values --output json | ConvertFrom-Json).JUMPBOX_RESOURCE_ID)
     ```
 
-1. Run the following command to create a bastion tunnel to the jump host:
+1. Run the following command to create a bastion tunnel to the jump box:
     ```pwsh
     az network bastion tunnel --name $bastionName --resource-group $resourceGroupName --target-resource-id $targetResourceId --resource-port 22 --port 50022
     ```
@@ -162,25 +162,25 @@ To retrieve the generated password:
     > Now that the tunnel is open, change back to use the original PowerShell session to deploy the code.
 
 
-1. From PowerShell use the following SCP command to upload the code to the jump host (use the password you retrieved from Key Vault to authenticate the SCP command):
+1. From PowerShell use the following SCP command to upload the code to the jump box (use the password you retrieved from Key Vault to authenticate the SCP command):
     ```shell
     scp -r -P 50022 * azureadmin@127.0.0.1:/home/azureadmin/web-app-pattern
     ```
 
     > If you were unable to connect due to [Remote host identification has changed](troubleshooting.md#remote-host-identification-has-changed)
 
-1. From PowerShell use the SCP command to upload the AZD environment to the jump host:
+1. From PowerShell use the SCP command to upload the AZD environment to the jump box:
     ```shell
     scp -r -P 50022 ./.azure azureadmin@127.0.0.1:/home/azureadmin/web-app-pattern
     ```
 
-1. Run the following command to start a shell session on the jump host:
+1. Run the following command to start a shell session on the jump box:
 
     ```shell
     ssh azureadmin@127.0.0.1 -p 50022
     ```
 
-### 4. Deploy code from the jump host
+### 4. Deploy code from the jump box
 
 1. Change to the directory where you uploaded the code:
 
@@ -217,7 +217,7 @@ To retrieve the generated password:
     azd auth login --use-device-code
     ```
 
-1. Deploy the code from the jump host:
+1. Deploy the code from the jump box:
 
     <!--  from PowerShell use the following command to deploy the code to the secondary region:
     azd env set AZURE_RESOURCE_GROUP ((azd env get-values --output json | ConvertFrom-Json).SECONDARY_RESOURCE_GROUP) -->
@@ -228,7 +228,7 @@ To retrieve the generated password:
 
     It takes approximately 5 minutes to deploy the code.
 
-    For a multi-region deployment, you must also deploy the code to the secondary region following these same steps on the secondary jump host using secondary region settings.
+    For a multi-region deployment, you must also deploy the code to the secondary region following these same steps on the secondary jump box using secondary region settings.
 
     > **WARNING**
     >
@@ -240,7 +240,7 @@ To retrieve the generated password:
 
 ### 5. Teardown
 
-1. Close the PowerShell session on the jump host:
+1. Close the PowerShell session on the jump box:
 
     ```shell
     exit

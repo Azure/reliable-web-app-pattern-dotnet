@@ -10,11 +10,11 @@
   // "hubDDoSProtectionPlan": "",
   // "hubFirewall": "",
   // "hubFirewallPublicIpAddress": "",
-  // "hubJumphost": "",
+  // "hubJumpbox": "",
   // "hubResourceGroup": "",
   // "hubSubnetBastionHost": "",
   // "hubSubnetFirewall": "",
-  // "hubSubnetJumphost": "",
+  // "hubSubnetJumpbox": "",
   // "hubSubnetPrivateEndpoint": "",
   // "hubVirtualNetwork": "",
 

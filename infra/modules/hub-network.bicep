@@ -95,15 +95,15 @@ param logAnalyticsWorkspaceId string = ''
 */
 @secure()
 @minLength(8)
-@description('The password for the administrator account on the jump host.')
+@description('The password for the administrator account on the jump box.')
 param administratorPassword string = newGuid()
 
 @minLength(8)
-@description('The username for the administrator account on the jump host.')
+@description('The username for the administrator account on the jump box.')
 param administratorUsername string = 'adminuser'
 
-@description('If enabled, an Ubuntu jump host will be deployed.  Ensure you enable the bastion host as well.')
-param enableJumpHost bool = false
+@description('If enabled, an Ubuntu jump box will be deployed.  Ensure you enable the bastion host as well.')
+param enableJumpBox bool = false
 
 @description('The CIDR block to use for the address prefix of this virtual network.')
 param addressPrefix string = '10.0.0.0/20'
@@ -288,7 +288,7 @@ var budgetCategories = deploymentSettings.isProduction ? {
   virtualNetwork: 0             /* Virtual networks are free - peering included in spoke */
   firewall: 290                 /* Basic plan, 100GiB processed */
   bastionHost: 212              /* Standard plan */
-  jumphost: 85                  /* Standard_B2ms, S10 managed disk, minimal bandwidth usage */
+  jumpbox: 85                  /* Standard_B2ms, S10 managed disk, minimal bandwidth usage */
 } : {
   ddosProtectionPlan: 0         /* Includes protection for 100 public IP addresses */
   azureMonitor: 69              /* Estimate 1GiB/day Analytics + Basic Logs  */
@@ -297,7 +297,7 @@ var budgetCategories = deploymentSettings.isProduction ? {
   virtualNetwork: 0             /* Virtual networks are free - peering included in spoke */
   firewall: 290                 /* Standard plan, 100GiB processed */
   bastionHost: 139              /* Basic plan */
-  jumphost: 85                  /* Standard_B2ms, S10 managed disk, minimal bandwidth usage */
+  jumpbox: 85                  /* Standard_B2ms, S10 managed disk, minimal bandwidth usage */
 }
 var budgetAmount = reduce(map(items(budgetCategories), (obj) => obj.value), 0, (total, amount) => total + amount)
 
@@ -365,11 +365,11 @@ module firewall '../core/network/firewall.bicep' = if (enableFirewall) {
 }
 
 
-module jumphost '../core/compute/ubuntu-jumphost.bicep' = if (enableJumpHost) {
-  name: 'hub-jumphost-${deploymentSettings.resourceToken}'
+module jumpbox '../core/compute/ubuntu-jumpbox.bicep' = if (enableJumpBox) {
+  name: 'hub-jumpbox-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
-    name: resourceNames.hubJumphost
+    name: resourceNames.hubJumpbox
     location: deploymentSettings.location
     tags: moduleTags
 
@@ -478,6 +478,6 @@ output firewall_hostname string = enableFirewall ? firewall.outputs.hostname : '
 output firewall_ip_address string = enableFirewall ? firewall.outputs.internal_ip_address : ''
 output virtual_network_id string = virtualNetwork.outputs.id
 output virtual_network_name string = virtualNetwork.outputs.name
-output key_vault_name string = enableJumpHost ? sharedKeyVault.outputs.name : ''
-output jumphost_computer_name string = enableJumpHost ? jumphost.outputs.computer_name : ''
-output jumphost_resource_id string = enableJumpHost ? jumphost.outputs.id : ''
+output key_vault_name string = enableJumpBox ? sharedKeyVault.outputs.name : ''
+output jumpbox_computer_name string = enableJumpBox ? jumpbox.outputs.computer_name : ''
+output jumpbox_resource_id string = enableJumpBox ? jumpbox.outputs.id : ''
