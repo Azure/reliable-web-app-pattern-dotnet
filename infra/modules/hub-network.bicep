@@ -120,12 +120,6 @@ param enableFirewall bool = true
 @description('The address spaces allowed to connect through the firewall.  By default, we allow all RFC1918 address spaces')
 param internalAddressSpace string[] = [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ]
 
-@description('The CIDR block to use for the address prefix of the primary spoke virtual network.')
-param spokeAddressPrefixPrimary string
-
-@description('The CIDR block to use for the address prefix of the secondary spoke virtual network.')
-param spokeAddressPrefixSecondary string
-
 @description('If true, create a subnet for Devops resources')
 param createDevopsSubnet bool = false
 
