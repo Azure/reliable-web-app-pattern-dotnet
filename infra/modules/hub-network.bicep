@@ -162,20 +162,20 @@ var privateEndpointSubnet = {
   }
 }
 
+var devopsSubnet = {
+  name: resourceNames.spokeDevopsSubnet
+  properties: {
+    addressPrefix: subnetPrefixes[6]
+    privateEndpointNetworkPolicies: 'Disabled'
+  }
+}
+
 var subnets = union(
   [privateEndpointSubnet],
   enableBastionHost ? [bastionHostSubnetDefinition] : [],
   enableFirewall ? [firewallSubnetDefinition] : [],
   createDevopsSubnet ? [devopsSubnet] : []
 )
-
-var devopsSubnet = createDevopsSubnet ? [{
-  name: resourceNames.spokeDevopsSubnet
-  properties: {
-    addressPrefix: subnetPrefixes[6]
-    privateEndpointNetworkPolicies: 'Disabled'
-  }
-}] : []
 
 // Some helpers for the firewall rules
 var allowTraffic = { type: 'allow' }
