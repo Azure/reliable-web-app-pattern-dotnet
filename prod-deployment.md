@@ -213,26 +213,34 @@ To retrieve the generated password:
 
 1. [Sign in to azd](https://learn.microsoft.com/azure/developer/azure-developer-cli/reference#azd-auth-login):
 
-    ```shell
+    ```pwsh
     azd auth login --use-device-code
     ```
 
-1. Deploy the code from the jump box:
+1. Deploy the application to the primary region using:
 
     <!--  from PowerShell use the following command to deploy the code to the secondary region:
     azd env set AZURE_RESOURCE_GROUP ((azd env get-values --output json | ConvertFrom-Json).SECONDARY_RESOURCE_GROUP) -->
 
-    ```shell
+    ```pwsh
     azd deploy
     ```
 
     It takes approximately 5 minutes to deploy the code.
-
-    For a multi-region deployment, you must also deploy the code to the secondary region following these same steps on the secondary jump box using secondary region settings.
-
+    
     > **WARNING**
     >
     > In some scenarios, the DNS entries for resources secured with Private Endpoint may have been cached incorrectly. It can take up to 10-minutes for the DNS cache to expire.
+
+1. Deploy the application to the secondary region using:
+
+    ```pwsh
+    azd env set AZURE_RESOURCE_GROUP ((azd env get-values --output json | ConvertFrom-Json).SECONDARY_RESOURCE_GROUP)
+    ```
+
+    ```pwsh
+    azd deploy
+    ```
 
 1. Use the URL displayed in the console output to launch the Relecloud application that you have deployed:
 
