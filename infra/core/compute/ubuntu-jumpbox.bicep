@@ -1,14 +1,14 @@
 targetScope = 'resourceGroup'
 
 /*
-** Ubuntu VM Jumphost
+** Ubuntu VM Jumpbox
 ** Copyright (C) 2023 Microsoft, Inc.
 ** All Rights Reserved
 **
 ***************************************************************************
 **
 ** Creates an Ubuntu VM with appropriate capabilities to act as a
-** jumphost
+** jumpbox
 */
 
 // ========================================================================
