@@ -196,38 +196,41 @@ namespace Relecloud.Web
                 });
             }
 
-            // this sample uses AFD for the URL registered with Microsoft Entra ID to make it easier to get started
-            // but we recommend host name preservation for production scenarios
-            // https://learn.microsoft.com/en-us/azure/architecture/best-practices/host-name-preservation
-            services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                // not needed when using host name preservation
-                options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto;
-            });
-
             services.Configure<OpenIdConnectOptions>(Configuration.GetSection("MicrosoftEntraId"));
-            services.Configure((Action<MicrosoftIdentityOptions>)(options =>
+            if (!Debugger.IsAttached)
             {
-                var frontDoorHostname = Configuration["App:FrontDoorHostname"];
-                var callbackPath = Configuration["MicrosoftEntraId:CallbackPath"];
+                // this sample uses AFD for the URL registered with Microsoft Entra ID to make it easier to get started
+                // but we recommend host name preservation for production scenarios
+                // https://learn.microsoft.com/en-us/azure/architecture/best-practices/host-name-preservation
+                services.Configure<ForwardedHeadersOptions>(options =>
+                {
+                    // not needed when using host name preservation
+                    options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto;
+                });
 
-                options.Events.OnTokenValidated += async ctx =>
+                services.Configure((Action<MicrosoftIdentityOptions>)(options =>
                 {
-                    await CreateOrUpdateUserInformation(ctx);
-                };
-                options.Events.OnRedirectToIdentityProvider += ctx =>
-                {
-                    // not needed when using host name preservation
-                    ctx.ProtocolMessage.RedirectUri = $"https://{frontDoorHostname}{callbackPath}";
-                    return Task.CompletedTask;
-                };
-                options.Events.OnRedirectToIdentityProviderForSignOut += ctx =>
-                {
-                    // not needed when using host name preservation
-                    ctx.ProtocolMessage.PostLogoutRedirectUri = $"https://{frontDoorHostname}";
-                    return Task.CompletedTask;
-                };
-            }));
+                    var frontDoorHostname = Configuration["App:FrontDoorHostname"];
+                    var callbackPath = Configuration["MicrosoftEntraId:CallbackPath"];
+
+                    options.Events.OnTokenValidated += async ctx =>
+                    {
+                        await CreateOrUpdateUserInformation(ctx);
+                    };
+                    options.Events.OnRedirectToIdentityProvider += ctx =>
+                    {
+                        // not needed when using host name preservation
+                        ctx.ProtocolMessage.RedirectUri = $"https://{frontDoorHostname}{callbackPath}";
+                        return Task.CompletedTask;
+                    };
+                    options.Events.OnRedirectToIdentityProviderForSignOut += ctx =>
+                    {
+                        // not needed when using host name preservation
+                        ctx.ProtocolMessage.PostLogoutRedirectUri = $"https://{frontDoorHostname}";
+                        return Task.CompletedTask;
+                    };
+                }));
+            }
         }
 
         private static async Task CreateOrUpdateUserInformation(TokenValidatedContext ctx)
