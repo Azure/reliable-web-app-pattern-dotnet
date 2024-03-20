@@ -191,8 +191,8 @@ module writeSqlAdminInfoToKeyVault '../core/security/key-vault-secrets.bicep' = 
   params: {
     name: existingKeyVault.name
     secrets: [
-      { key: 'Relecloud--SqlAdministratorUsername', value: administratorUsername }
-      { key: 'Relecloud--SqlAdministratorPassword', value: databasePassword }
+      { key: 'Application--SqlAdministratorUsername', value: administratorUsername }
+      { key: 'Application--SqlAdministratorPassword', value: databasePassword }
     ]
   }
 }
