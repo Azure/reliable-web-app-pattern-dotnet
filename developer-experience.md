@@ -6,7 +6,7 @@ The dev team uses Visual Studio and they integrate directly with Azure resources
 >
 > This developer experience is only supported for dev deployments. Production deployments
 > use are network isolated and do not allow devs to connect from their workstation.
-> This content provides a jump host VM to help you access network isolated Azure resources.
+> This content provides a jump box VM to help you access network isolated Azure resources.
 
 To connect to the Azure resources the dev team uses connection strings from Key Vault. Devs use the following script to retrieve data and store it as [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows) on their workstation.
 

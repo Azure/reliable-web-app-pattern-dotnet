@@ -1,14 +1,14 @@
 targetScope = 'resourceGroup'
 
 /*
-** Windows 11 Jumphost
+** Windows 11 Jumpbox
 ** Copyright (C) 2023 Microsoft, Inc.
 ** All Rights Reserved
 **
 ***************************************************************************
 **
 ** Creates a Windows 11 VM with appropriate capabilities to act as a
-** jumphost.  This includes the Windows CLI, git, and SSMS.
+** jumpbox.  This includes the Windows CLI, git, and SSMS.
 */
 
 // ========================================================================
@@ -64,11 +64,11 @@ param subnetId string
 */
 @secure()
 @minLength(8)
-@description('The password for the administrator account on the jump host.')
+@description('The password for the administrator account on the jump box.')
 param administratorPassword string
 
 @minLength(8)
-@description('The username for the administrator account on the jump host.')
+@description('The username for the administrator account on the jump box.')
 param administratorUsername string
 
 @minLength(3)

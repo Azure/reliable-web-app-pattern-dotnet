@@ -81,9 +81,6 @@ param deploymentSettings DeploymentSettings
 @description('The diagnostic settings to use for this deployment.')
 param diagnosticSettings DiagnosticSettings
 
-@description('If enabled, a Windows 11 jump host will be deployed.  Ensure you enable the bastion host as well.')
-param enableJumpHost bool = false
-
 @description('The resource names for the resources to be created.')
 param resourceNames object
 
@@ -96,6 +93,17 @@ param logAnalyticsWorkspaceId string = ''
 /*
 ** Settings
 */
+@secure()
+@minLength(8)
+@description('The password for the administrator account on the jump box.')
+param administratorPassword string = newGuid()
+
+@minLength(8)
+@description('The username for the administrator account on the jump box.')
+param administratorUsername string = 'adminuser'
+
+@description('If enabled, an Ubuntu jump box will be deployed.  Ensure you enable the bastion host as well.')
+param enableJumpBox bool = false
 
 @description('The CIDR block to use for the address prefix of this virtual network.')
 param addressPrefix string = '10.0.0.0/20'
@@ -112,11 +120,8 @@ param enableFirewall bool = true
 @description('The address spaces allowed to connect through the firewall.  By default, we allow all RFC1918 address spaces')
 param internalAddressSpace string[] = [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ]
 
-@description('The CIDR block to use for the address prefix of the primary spoke virtual network.')
-param spokeAddressPrefixPrimary string
-
-@description('The CIDR block to use for the address prefix of the secondary spoke virtual network.')
-param spokeAddressPrefixSecondary string
+@description('If true, create a subnet for Devops resources')
+param createDevopsSubnet bool = false
 
 // ========================================================================
 // VARIABLES
@@ -157,10 +162,19 @@ var privateEndpointSubnet = {
   }
 }
 
+var devopsSubnet = {
+  name: resourceNames.spokeDevopsSubnet
+  properties: {
+    addressPrefix: subnetPrefixes[6]
+    privateEndpointNetworkPolicies: 'Disabled'
+  }
+}
+
 var subnets = union(
   [privateEndpointSubnet],
   enableBastionHost ? [bastionHostSubnetDefinition] : [],
-  enableFirewall ? [firewallSubnetDefinition] : []
+  enableFirewall ? [firewallSubnetDefinition] : [],
+  createDevopsSubnet ? [devopsSubnet] : []
 )
 
 // Some helpers for the firewall rules
@@ -216,8 +230,6 @@ var applicationRuleCollections = [
 ]
 
 // The subnet prefixes for the individual subnets inside the virtual network
-var spokeSubnetPrefixesFromPrimary = [ for i in range(0, 16): cidrSubnet(spokeAddressPrefixPrimary, 26, i)]
-var spokeSubnetPrefixesFromSecondary = [ for i in range(0, 16): cidrSubnet(spokeAddressPrefixSecondary, 26, i)]
 
 var networkRuleCollections = [
   {
@@ -244,7 +256,7 @@ var networkRuleCollections = [
           protocols: [
             'Any'
           ]
-          sourceAddresses: deploymentSettings.isMultiLocationDeployment ? [ spokeSubnetPrefixesFromPrimary[6] ] : [ spokeSubnetPrefixesFromPrimary[6], spokeSubnetPrefixesFromSecondary[6] ]
+          sourceAddresses: [ subnetPrefixes[6] ]
         }
         {
           destinationAddresses: [
@@ -258,7 +270,7 @@ var networkRuleCollections = [
           protocols: [
             'Any'
           ]
-          sourceAddresses: deploymentSettings.isMultiLocationDeployment ? [ spokeSubnetPrefixesFromPrimary[6] ] : [ spokeSubnetPrefixesFromPrimary[6], spokeSubnetPrefixesFromSecondary[6] ]
+          sourceAddresses: [ subnetPrefixes[6] ]
         }
       ]
     }
@@ -276,7 +288,7 @@ var budgetCategories = deploymentSettings.isProduction ? {
   virtualNetwork: 0             /* Virtual networks are free - peering included in spoke */
   firewall: 290                 /* Basic plan, 100GiB processed */
   bastionHost: 212              /* Standard plan */
-  jumphost: 85                  /* Standard_B2ms, S10 managed disk, minimal bandwidth usage */
+  jumpbox: 85                  /* Standard_B2ms, S10 managed disk, minimal bandwidth usage */
 } : {
   ddosProtectionPlan: 0         /* Includes protection for 100 public IP addresses */
   azureMonitor: 69              /* Estimate 1GiB/day Analytics + Basic Logs  */
@@ -285,7 +297,7 @@ var budgetCategories = deploymentSettings.isProduction ? {
   virtualNetwork: 0             /* Virtual networks are free - peering included in spoke */
   firewall: 290                 /* Standard plan, 100GiB processed */
   bastionHost: 139              /* Basic plan */
-  jumphost: 85                  /* Standard_B2ms, S10 managed disk, minimal bandwidth usage */
+  jumpbox: 85                  /* Standard_B2ms, S10 managed disk, minimal bandwidth usage */
 }
 var budgetAmount = reduce(map(items(budgetCategories), (obj) => obj.value), 0, (total, amount) => total + amount)
 
@@ -298,7 +310,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing 
 }
 
 module ddosProtectionPlan '../core/network/ddos-protection-plan.bicep' = if (enableDDoSProtection) {
-  name: 'hub-ddos-protection-plan'
+  name: 'hub-ddos-protection-plan-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubDDoSProtectionPlan
@@ -308,7 +320,7 @@ module ddosProtectionPlan '../core/network/ddos-protection-plan.bicep' = if (ena
 }
 
 module virtualNetwork '../core/network/virtual-network.bicep' = {
-  name: 'hub-virtual-network'
+  name: 'hub-virtual-network-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubVirtualNetwork
@@ -327,7 +339,7 @@ module virtualNetwork '../core/network/virtual-network.bicep' = {
 }
 
 module firewall '../core/network/firewall.bicep' = if (enableFirewall) {
-  name: 'hub-firewall'
+  name: 'hub-firewall-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubFirewall
@@ -353,8 +365,28 @@ module firewall '../core/network/firewall.bicep' = if (enableFirewall) {
 }
 
 
+module jumpbox '../core/compute/ubuntu-jumpbox.bicep' = if (enableJumpBox) {
+  name: 'hub-jumpbox-${deploymentSettings.resourceToken}'
+  scope: resourceGroup
+  params: {
+    name: resourceNames.hubJumpbox
+    location: deploymentSettings.location
+    tags: moduleTags
+
+    // Dependencies
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    subnetId: virtualNetwork.outputs.subnets[resourceNames.spokeDevopsSubnet].id
+
+    // Settings
+    adminPasswordOrKey: administratorPassword
+    adminUsername: administratorUsername
+    diagnosticSettings: diagnosticSettings
+  }
+}
+
+
 module bastionHost '../core/network/bastion-host.bicep' = if (enableBastionHost) {
-  name: 'hub-bastion-host'
+  name: 'hub-bastion-host-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubBastionHost
@@ -379,7 +411,7 @@ module bastionHost '../core/network/bastion-host.bicep' = if (enableBastionHost)
   or if it is located in the Workload resource group (yes, when Network Isolation is not enabled).
  */
 module sharedKeyVault '../core/security/key-vault.bicep' = {
-  name: 'shared-key-vault'
+  name: 'shared-key-vault-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.keyVault
@@ -405,7 +437,7 @@ module sharedKeyVault '../core/security/key-vault.bicep' = {
 }
 
 module hubBudget '../core/cost-management/budget.bicep' = {
-  name: 'hub-budget'
+  name: 'hub-budget-${deploymentSettings.resourceToken}'
   scope: resourceGroup
   params: {
     name: resourceNames.hubBudget
@@ -446,4 +478,6 @@ output firewall_hostname string = enableFirewall ? firewall.outputs.hostname : '
 output firewall_ip_address string = enableFirewall ? firewall.outputs.internal_ip_address : ''
 output virtual_network_id string = virtualNetwork.outputs.id
 output virtual_network_name string = virtualNetwork.outputs.name
-output key_vault_name string = enableJumpHost ? sharedKeyVault.outputs.name : ''
+output key_vault_name string = enableJumpBox ? sharedKeyVault.outputs.name : ''
+output jumpbox_computer_name string = enableJumpBox ? jumpbox.outputs.computer_name : ''
+output jumpbox_resource_id string = enableJumpBox ? jumpbox.outputs.id : ''

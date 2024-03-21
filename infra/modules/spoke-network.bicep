@@ -96,23 +96,10 @@ param firewallInternalIpAddress string = ''
 /*
 ** Settings
 */
-@secure()
-@minLength(8)
-@description('The password for the administrator account on the jump host.')
-param administratorPassword string = newGuid()
-
-@minLength(8)
-@description('The username for the administrator account on the jump host.')
-param administratorUsername string = 'adminuser'
 
 @description('The CIDR block to use for the address prefix of this virtual network.')
 param addressPrefix string = '10.0.16.0/20'
 
-@description('If true, create a subnet for Devops resources')
-param createDevopsSubnet bool = false
-
-@description('If enabled, a Windows 11 jump host will be deployed.  Ensure you enable the bastion host as well.')
-param enableJumpHost bool = false
 
 
 // ========================================================================
@@ -188,13 +175,6 @@ var routeTableSettings = enableFirewall ? {
   routeTable: { id: routeTable.outputs.id }
 } : {}
 
-var devopsSubnet = createDevopsSubnet ? [{
-  name: resourceNames.spokeDevopsSubnet
-  properties: {
-    addressPrefix: subnetPrefixes[6]
-    privateEndpointNetworkPolicies: 'Disabled'
-  }
-}] : []
 
 // ========================================================================
 // AZURE MODULES
@@ -317,7 +297,7 @@ module virtualNetwork '../core/network/virtual-network.bicep' = {
     // Settings
     addressPrefix: addressPrefix
     diagnosticSettings: diagnosticSettings
-    subnets: union([
+    subnets: [
       {
         name: resourceNames.spokePrivateEndpointSubnet
         properties: {
@@ -359,7 +339,7 @@ module virtualNetwork '../core/network/virtual-network.bicep' = {
           networkSecurityGroup: { id: webOutboundNSG.outputs.id }
           privateEndpointNetworkPolicies: 'Enabled'
         }, routeTableSettings)
-      }], devopsSubnet)
+      }]
   }
 }
 
@@ -385,24 +365,6 @@ module routeTable '../core/network/route-table.bicep' = if (enableFirewall) {
   }
 }
 
-module jumphost '../core/compute/ubuntu-jumphost.bicep' = if (enableJumpHost) {
-  name: deploymentSettings.isPrimaryLocation ? 'hub-jumphost-0' : 'hub-jumphost-1'
-  scope: resourceGroup
-  params: {
-    name: resourceNames.hubJumphost
-    location: deploymentSettings.location
-    tags: moduleTags
-
-    // Dependencies
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    subnetId: virtualNetwork.outputs.subnets[resourceNames.spokeDevopsSubnet].id
-
-    // Settings
-    adminPasswordOrKey: administratorPassword
-    adminUsername: administratorUsername
-    diagnosticSettings: diagnosticSettings
-  }
-}
 
 var virtualNetworkLinks = [
   {
@@ -429,5 +391,3 @@ module privateDnsZones './private-dns-zones.bicep' = {
 output virtual_network_id string = virtualNetwork.outputs.id
 output virtual_network_name string = virtualNetwork.outputs.name
 output subnets object = virtualNetwork.outputs.subnets
-output jumphost_computer_name string = enableJumpHost ? jumphost.outputs.computer_name : ''
-output jumphost_resource_id string = enableJumpHost ? jumphost.outputs.id : ''

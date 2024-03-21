@@ -92,11 +92,11 @@ var defaultResourceNames = {
   hubDDoSProtectionPlan: 'ddos-${resourceToken}'
   hubFirewall: 'afw-${resourceToken}'
   hubFirewallPublicIpAddress: 'pip-afw-${resourceToken}'
-  hubJumphost: 'vm-jump-${resourceToken}'
+  hubJumpbox: 'vm-jump-${resourceToken}'
   hubResourceGroup: '${hubResourceGroupPrefix}-hub'
   hubSubnetBastionHost: 'AzureBastionSubnet'
   hubSubnetFirewall: 'AzureFirewallSubnet'
-  hubSubnetJumphost: 'JumphostSubnet'
+  hubSubnetJumpbox: 'JumpboxSubnet'
   hubSubnetPrivateEndpoint: 'PrivateEndpointSubnet'
   hubVirtualNetwork: 'vnet-hub-${resourceToken}'
 
@@ -168,11 +168,11 @@ output resourceNames object = {
   hubDDoSProtectionPlan: contains(overrides, 'hubDDoSProtectionPlan') && !empty(overrides.hubDDoSProtectionPlan) ? overrides.hubDDoSProtectionPlan : defaultResourceNames.hubDDoSProtectionPlan
   hubFirewall: contains(overrides, 'hubFirewall') && !empty(overrides.hubFirewall) ? overrides.hubFirewall : defaultResourceNames.hubFirewall
   hubFirewallPublicIpAddress: contains(overrides, 'hubFirewallPublicIpAddress') && !empty(overrides.hubFirewallPublicIpAddress) ? overrides.hubFirewallPublicIpAddress : defaultResourceNames.hubFirewallPublicIpAddress
-  hubJumphost: contains(overrides, 'hubJumphost') && !empty(overrides.hubJumphost) ? overrides.hubJumphost : defaultResourceNames.hubJumphost
+  hubJumpbox: contains(overrides, 'hubJumpbox') && !empty(overrides.hubJumpbox) ? overrides.hubJumpbox : defaultResourceNames.hubJumpbox
   hubResourceGroup: contains(overrides, 'hubResourceGroup') && !empty(overrides.hubResourceGroup) ? overrides.hubResourceGroup : defaultResourceNames.hubResourceGroup
   hubSubnetBastionHost: contains(overrides, 'hubSubnetBastionHost') && !empty(overrides.hubSubnetBastionHost) ? overrides.hubSubnetBastionHost : defaultResourceNames.hubSubnetBastionHost
   hubSubnetFirewall: contains(overrides, 'hubSubnetFirewall') && !empty(overrides.hubSubnetFirewall) ? overrides.hubSubnetFirewall : defaultResourceNames.hubSubnetFirewall
-  hubSubnetJumphost: contains(overrides, 'hubSubnetJumphost') && !empty(overrides.hubSubnetJumphost) ? overrides.hubSubnetJumphost : defaultResourceNames.hubSubnetJumphost
+  hubSubnetJumpbox: contains(overrides, 'hubSubnetJumpbox') && !empty(overrides.hubSubnetJumpbox) ? overrides.hubSubnetJumpbox : defaultResourceNames.hubSubnetJumpbox
   hubSubnetPrivateEndpoint: contains(overrides, 'hubSubnetPrivateEndpoint') && !empty(overrides.hubSubnetPrivateEndpoint) ? overrides.hubSubnetPrivateEndpoint : defaultResourceNames.hubSubnetPrivateEndpoint
   hubVirtualNetwork: contains(overrides, 'hubVirtualNetwork') && !empty(overrides.hubVirtualNetwork) ? overrides.hubVirtualNetwork : defaultResourceNames.hubVirtualNetwork
 
