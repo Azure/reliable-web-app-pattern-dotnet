@@ -274,7 +274,7 @@ if ($networkIsolation) {
     } elseif ($NoHub) {
         $deployHubNetwork = $false
     } elseif (!$NoPrompt) {
-        Write-Host "`nDo you want to deploy a hub network with an Azure Firewall, Bastion, and Jump host?"
+        Write-Host "`nDo you want to deploy a hub network with an Azure Firewall, Bastion, and Jump box?"
         $items = @( "Yes - deploy a hub network", "No - do not deploy a hub network" )
         $useHub = ShowMenu -keys $truefalse -items $items -defaultValue $(if ($deployHubNetwork -eq $true) { "true" } else { "false" })
         $deployHubNetwork = $useHub -eq "true"

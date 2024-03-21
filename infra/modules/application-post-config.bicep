@@ -69,11 +69,11 @@ param deploymentSettings DeploymentSettings
 */
 @secure()
 @minLength(12)
-@description('The password for the administrator account.  This will be used for the jump host, SQL server, and anywhere else a password is needed for creating a resource.')
+@description('The password for the administrator account.  This will be used for the jump box, SQL server, and anywhere else a password is needed for creating a resource.')
 param administratorPassword string = newGuid()
 
 @minLength(8)
-@description('The username for the administrator account on the jump host.')
+@description('The username for the administrator account on the jump box.')
 param administratorUsername string = 'adminuser'
 
 @secure()
@@ -172,15 +172,15 @@ resource existingKeyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
 // AZURE MODULES
 // ========================================================================
 
-module writeJumpHostCredentialsToKeyVault '../core/security/key-vault-secrets.bicep' = if (deploymentSettings.isNetworkIsolated) {
-  name: 'hub-write-jumphost-credentials'
+module writeJumpBoxCredentialsToKeyVault '../core/security/key-vault-secrets.bicep' = if (deploymentSettings.isNetworkIsolated) {
+  name: 'hub-write-jumpbox-credentials-${deploymentSettings.resourceToken}'
   scope: existingKvResourceGroup
   params: {
     name: existingKeyVault.name
     secrets: [
-      { key: 'Jumphost--AdministratorPassword', value: administratorPassword          }
-      { key: 'Jumphost--AdministratorUsername', value: administratorUsername          }
-      { key: 'Jumphost--ComputerName',          value: resourceNames.hubJumphost }
+      { key: 'Jumpbox--AdministratorPassword', value: administratorPassword          }
+      { key: 'Jumpbox--AdministratorUsername', value: administratorUsername          }
+      { key: 'Jumpbox--ComputerName',          value: resourceNames.hubJumpbox }
     ]
   }
 }
