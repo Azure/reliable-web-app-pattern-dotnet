@@ -1,7 +1,7 @@
 # Steps to deploy the production deployment
 This section describes the deployment steps for the reference implementation of a reliable web application pattern with .NET on Microsoft Azure. These steps guide you through using the jump box that is deployed when performing a network isolated deployment because access to resources will be restricted from public network access and must be performed from a machine connected to the vnet.
 
-![Diagram showing the network focused architecture of the reference implementation.](./assets/images/reliable-web-app-prod-network.svg)
+![Diagram showing the network focused architecture of the reference implementation.](./assets/icons/reliable-web-app-vnet.svg)
 
 ## Prerequisites
 

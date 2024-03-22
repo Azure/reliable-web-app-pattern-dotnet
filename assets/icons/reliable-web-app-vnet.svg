@@ -35,7 +35,7 @@
 		.st20 {fill:#000000;font-family:Segoe UI;font-size:1.00001em;font-weight:bold}
 		.st21 {marker-end:url(#mrkr4-112);marker-start:url(#mrkr4-110);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5}
 		.st22 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.37313432835821}
-		.st23 {fill:#ffffff;stroke:none;stroke-linecap:butt}
+		.st23 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
 		.st24 {fill:#f2f2f2;stroke:none;stroke-linecap:butt;stroke-width:0.75}
 		.st25 {fill:#000000;font-family:Calibri;font-size:0.75em}
 		.st26 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:0.75}
@@ -2288,7 +2288,7 @@
 		</g>
 		<g id="group816-647" transform="translate(750.207,-285.807)" v:mID="816" v:groupContext="group">
 			<title>Azure DevOps</title>
-			<desc>Jump Host</desc>
+			<desc>Jump box</desc>
 			<g id="shape817-648" v:mID="817" v:groupContext="shape">
 				<title>Sheet.817</title>
 				<v:userDefs>
@@ -2301,7 +2301,7 @@
 			<g id="shape816-652" v:mID="816" v:groupContext="groupContent">
 				<v:textBlock v:margins="rect(0,0,0,0)"/>
 				<v:textRect cx="11.88" cy="941.402" width="72" height="10.8036"/>
-				<text x="-7.34" y="944.1" class="st25" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Jump Host</text>			</g>
+				<text x="-5.58" y="944.1" class="st25" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Jump box</text>			</g>
 		</g>
 		<g id="group829-654" transform="translate(168.871,-823.127)" v:mID="829" v:groupContext="group">
 			<title>Sheet.829</title>
