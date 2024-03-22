@@ -569,7 +569,7 @@
 			<title>Dynamic connector.1198</title>
 			<path d="M0 603 L65.83 603" class="st23"/>
 		</g>
-		<g id="group75-105" transform="translate(482.32,-101.487)" v:mID="75" v:groupContext="group">
+		<g id="group75-105" transform="translate(482.32,-116.55)" v:mID="75" v:groupContext="group">
 			<title>Cache Redis</title>
 			<desc>Azure Cache For Redis</desc>
 			<g id="shape76-106" v:mID="76" v:groupContext="shape" transform="translate(18.2965,-11.2956)">
@@ -1538,7 +1538,7 @@
 			<v:userDefs>
 				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
 			</v:userDefs>
-			<path d="M9 612 L9 723" class="st45"/>
+			<path d="M9 612 L9 707.94" class="st45"/>
 		</g>
 		<g id="group1004-473" transform="translate(359.047,-86.425)" v:mID="1004" v:groupContext="group">
 			<title>Sheet.1004</title>
