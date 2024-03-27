@@ -11,28 +11,16 @@
 
 # Example usage: ./validate-params.sh
 
-environmentType=$(azd env get-values -o json | jq -r '.AZURE_ENV_TYPE')
-networkIsolation=$(azd env get-values -o json | jq -r '.NETWORK_ISOLATION')
+environmentType=$(azd env get-values -o json | jq -r '.ENVIRONMENT')
 
 # default environmentType to dev if not set
 if [[ $environmentType == "null" ]]; then
     environmentType="dev"
 fi
 
-# default networkIsolation to false if not set
-if [[ $networkIsolation == "null" ]]; then
-    networkIsolation="false"
-fi
-
 # Block invalid deployment scenarios by helping the user understand the valid AZD options
 if [[ $environmentType != "dev" && $environmentType != "prod" ]]; then
     echo ""
     echo "   Invalid AZD environment type: '$environmentType'. Valid values are 'dev' or 'prod'."
-    exit 1
-fi
-
-if [[ $networkIsolation == "false" && $environmentType != "dev" ]]; then
-    echo ""
-    echo "   Invalid AZD network isolation value: '$networkIsolation' and AZD environment type: '$environmentType'. The 'prod' environment type can only be used when network isolation is enabled."
     exit 1
 fi

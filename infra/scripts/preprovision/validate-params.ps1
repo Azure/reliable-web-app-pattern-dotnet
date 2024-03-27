@@ -21,16 +21,10 @@
 $azdConfig = azd env get-values -o json | ConvertFrom-Json -Depth 9 -AsHashtable
 
 
-$environmentType = $azdConfig['AZURE_ENV_TYPE'] ?? 'dev'
-$networkIsolation = $azdConfig['NETWORK_ISOLATION'] ?? 'false'
+$environmentType = $azdConfig['ENVIRONMENT'] ?? 'dev'
 
 # Block invalid deployment scenarios by helping the user understand the valid AZD options
 if ($environmentType -ne 'dev' -and $environmentType -ne 'prod') {
     Write-Error "Invalid AZD environment type: '$environmentType'. Valid values are 'dev' or 'prod'."
-    exit 1
-}
-
-if ($networkIsolation -eq 'false' -and $environmentType -ne 'dev') {
-    Write-Error "Invalid AZD network isolation value: '$networkIsolation' and AZD environment type: '$environmentType'. The 'prod' environment type can only be used when network isolation is enabled."
     exit 1
 }
