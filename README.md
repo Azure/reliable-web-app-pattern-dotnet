@@ -2,471 +2,189 @@
 
 > :mega: **Got feedback?** Fill out [this survey](https://aka.ms/eap/rwa/dotnet/survey) to help us shape the future of Enterprise App Patterns and understand whether we're focusing on the business goals and features important to you. [Microsoft Privacy Statement](https://go.microsoft.com/fwlink/?LinkId=521839)
 
-The reference implementation provides a production-grade web application that uses best practices from our guidance and gives developers concrete examples to build their own Reliable Web Application in Azure. It simulates the journey from an on-premises ASP.NET application to a migration to Azure. It shows you what changes to make to maximize the benefits of the cloud in the initial cloud adoption phase. Here's an outline of the contents in this readme:
+The reference implementation provides a production-grade web application that uses best practices from our guidance and gives developers concrete examples to build their own Reliable Web Application in Azure. This repository specifically demonstrates a concert ticketing application for the fictional company Relecloud, embodying the reliable web app pattern with a focus on .NET technologies. It guides developers through a simulated migration from an on-premises ASP.NET application to Azure, detailing the architectural changes and enhancements that capitalize on the cloud's strengths during the initial adoption phase. 
 
-- [Azure Architecture Center guidance](#azure-architecture-center-guidance)
-- [6 videos on the reliable web app pattern for .NET](#videos)
+This project has [a companion article in the Azure Architecture Center](https://aka.ms/eap/rwa/dotnet/doc) that describes design patterns and best practices and [a six-part video series (YouTube)](https://aka.ms/eap/rwa/dotnet/videos) that details the reliable web app pattern for .NET web app. Here's an outline of the contents in this readme:
+
 - [Architecture](#architecture)
 - [Workflow](#workflow)
 - [Steps to deploy the reference implementation](#steps-to-deploy-the-reference-implementation)
 - [Additional links](#additional-links)
 - [Data Collection](#data-collection)
 
-## Azure Architecture Center guidance
-
-This project has a [companion article in the Azure Architecture Center](https://aka.ms/eap/rwa/dotnet/doc) that describes design patterns and best practices for migrating to the cloud. We suggest you read it as it will give important context to the considerations applied in this implementation.
-
-## Videos
-
-This project has a six-part video series that details the reliable web app pattern for .NET web app. For more information, see [Reliable web app pattern videos (YouTube)](https://aka.ms/eap/rwa/dotnet/videos).
-
 ## Architecture
 
-![architecture diagram](./assets/icons/reliable-web-app-dotnet.png)
+Relecloud aligned to a hub and spoke network topology in the production deployment architecture to centralize common resources. This network topology provided cost savings, enhanced security, and facilitated network integration (platform and hybrid):
+
+![architecture diagram](./assets/icons/reliable-web-app-dotnet.svg)
+
+This diagram describes the production deployment which is described in the [prod-deployment.md](./prod-deployment.md) file. The following steps below are for a [development deployment](./assets/icons/reliable-web-app-dotnet-dev.svg) which is a simplified version.
+
+-	Cost efficiency: The hub acts as a central point for shared resources, promoting cost-effective resource reuse. For instance, Azure Bastion is a shared service in the hub, providing secure and cost-effective remote access without the need for separate deployments for each application.
+-	Traffic control and security: Network traffic is managed and secured using Network Security Groups and Route tables in each subnet, creating secure boundaries for Azure resources. Private endpoints add an extra layer of security, and a jump box allows for deployment within these boundaries, maintaining local IP access to resources.
+-	Network integration: The topology supports network integrations for data transfer across applications and hybrid scenarios. While the reference architecture doesn't include ExpressRoute or Azure VPN Gateway, these should be considered for applications requiring hybrid network connections.
 
 ## Workflow
 
-- Azure Front Door routes traffic based on availability of the primary region. When the primary region is unavailable it will route traffic to the secondary region.
-- When Front Door passes the request to the Web App, it will pass-through the Azure Web Application Firewall. The Azure Web Application Firewall will evaluate the request and protect the web app against common security attacks.
-- Once the traffic reaches the web front-end users will be shown the home page. They can view these pages without authenticating.
-- Navigating to the Concerts on the web app will send a request to the web front-end that tells it to ask the web api app for details about upcoming concerts.
-- Details about the upcoming concerts will be retrieved from the Azure SQL Database by the web api app with a SQL query. The results will be formatted as a JSON response and returned to the web front-end.
-- When the web front-end receives results from the API it will use razor template engine to render the HTML page shown to the user that asked for a list of concerts.
-- Once a user adds a concert ticket to their shopping cart the front-end web app will start interacting with Azure Cache for Redis. Asking the web app to put a concert ticket into the cart tells the web app to save information about that pending purchase as JSON data in Redis as part of a session object for the current user. Saving the session to an external datastore enables the web app to load balance traffic more evenly and to handle horizontal scaling events without losing the customer's intent to buy a ticket. No inventory management is included in this sample so there are no quantities deducted, or placed on reserve, in the backend of the system.
-- As the user checks out the front-end web app will ask the user to authenticate with Azure AD. This scenario is for a call center that places orders on-behalf of customers so the accounts in-use are managed by Relecloud and are not self-managed.
-- After authenticating to Azure AD the front-end web app will receive a token from Azure AD that represents the current user. This token is saved as a cookie in the user's browser and is not persisted by the front-end web app.
-- As the user proceeds with checkout the web app will collect payment data. Payment data is not sent anywhere for this sample.
-- When the payment data is submitted for approval the ticket will be purchased. Logic to handle this is located in the web api project so the web app makes a call to the web api project.
-- Prior to calling the API, the front-end web app asks the MSAL library for a token it can use to call the web api app as an authenticated user.
-- When the MSAL library, in the front-end web app,  has a token it will cache it in Azure Cache for Redis. If it does not have a token it will request one from Azure AD and then save it in Azure Cache for Redis.
-- Once the ticket purchase request is sent to the web api app the API will render the ticket image and save it to Azure storage.
-- After the ticket purchase is completed successfully the user will be directed to their tickets page where they can see a list of the tickets they have purchased. These tickets will be immediately available because rendering the ticket was part of the purchase request.
-  - As information flows between services the Azure network handles traffic routing across private endpoints by using Azure Private DNS to lookup the correct IP addresses. This enables the system to block public network traffic and use a single v-net to manage traffic between these systems. This v-net can be connected to others as-needed to allow the app to call other systems in your digital estate or to allow other systems to call the web API so they can access details about ticket purchases.
-  - As the front-end, and web api, apps process requests they are sending data to Application Insights so that you can monitor information about processing web requests
-  - When the web app is started for the first time it will load configuration data from App Config Service and Azure Key Vault. This information is saved in the web apps memory and is not accessed afterwards.
+This description details the workflow for Relecloud's concert ticketing application. It highlights key components and functionality to help you emulate its design:
+ 
+- Global traffic routing: Azure Front Door acts as a global traffic manager, routing users to the primary region for optimal performance and failing over to a secondary region during outages for uninterrupted service.
+- Security inspection: Incoming traffic is inspected by Azure Web Application Firewall to protect against web vulnerabilities before reaching the web app.
+- Static and dynamic content delivery: Users receive static content, like the home page, immediately upon request. Dynamic content, such as 'Upcoming Concerts', is generated by making API calls to the backend, which fetches data from Azure SQL Database and returns it in a JSON format.
+- Session state management: User sessions, including shopping cart data, are managed by Azure Cache for Redis, ensuring persistence and consistency across scale-out events.
+- User authentication: Microsoft Entra ID handles user authentication, suitable for environments where accounts are centrally managed, enhancing security and control.
+- API interaction and token management: The front-end web app uses the MSAL library to obtain tokens for authenticated API calls, caching them in Azure Cache for Redis to optimize performance and manageability.
+- Payment and checkout flow: While this example doesn't process real payments, the web app captures payment information during checkout, demonstrating how a web app can handle sensitive data.
+- Purchase and ticket generation: The backend API processes purchase requests and generates tickets that are immediately accessible to users.
+- Networking and access control: Azure Private DNS, Network Security Groups, and Azure Firewall tightly control the flow of traffic within the app's network, maintaining security and isolation.
+- Monitoring and telemetry: Application Insights provides monitoring and telemetry capabilities, enabling performance tracking and proactive issue resolution.
+- Configuration and secrets management: Initial configuration and sensitive information are loaded from Azure App Configuration and Azure Key Vault into the app's memory upon startup, minimizing access to sensitive data thereafter.
 
 ## Steps to deploy the reference implementation
 
-This reference implementation provides you with the instructions and templates you need to deploy this solution. This solution uses the Azure Dev CLI to set up Azure services
-and deploy the code.
+The following detailed deployment steps assume you are using a Dev Container inside Visual Studio Code.
 
-### Pre-requisites
+> For your convenience, we use Dev Containers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](./prerequisites.md) and skip to the deployment instructions starting in [Step 3](#3-log-in-to-azure).
 
-1. To run the scripts, Windows users require Powershell 7.2 (LTS) or above. Alternatively, you can use a bash terminal using [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install). macOS users can use a bash terminal.
+### 1. Clone the repo
 
-   1. PowerShell users - [Install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows)
-       Run the following to verify that you're running the latest PowerShell
-   
-       ```ps1
-       $PsVersionTable
-       ```
+> For Windows users, we recommend using Windows Subsystem for Linux (WSL) to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
 
-1. [Install Git](https://github.com/git-guides/install-git)
-    Run the following to verify that git is available
-    ```ps1
-    git version
-    ```
-
-1. [Install the Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli).
-    Run the following command to verify that you're running version
-    2.38.0 or higher.
-
-    ```ps1
-    az version
-    ```
-    
-    After the installation, run the following command to [sign in to Azure interactively](https://learn.microsoft.com/cli/azure/authenticate-azure-cli#sign-in-interactively).
-
-    ```ps1
-    az login
-    ```
-1. [Upgrade the Azure CLI Bicep extension](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli).
-    Run the following command to verify that you're running version 0.12.40 or higher.
-
-    ```ps1
-    az bicep version
-    ```
-
-1. [Install the Azure Dev CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd).
-    Run the following command to verify that the Azure Dev CLI is installed.
-
-    ```ps1
-    azd auth login
-    ```
-
-1. [Install .NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
-    Run the following command to verify that the .NET SDK 6.0 is installed.
-    ```ps1
-    dotnet --version
-    ```
-
-### Get the code
-
-Please clone the repo to get started.
-
-```
-git clone https://github.com/Azure/reliable-web-app-pattern-dotnet
+```pwsh
+wsl
 ```
 
-And switch to the folder so that `azd` will recognize the solution.
+Clone the repository from GitHub into the WSL 2 filesystem using the following command:
 
-```
+```shell
+git clone https://github.com/Azure/reliable-web-app-pattern-dotnet.git
 cd reliable-web-app-pattern-dotnet
 ```
 
-### Deploying to Azure
+### 2. Open Dev Container in Visual Studio Code
 
-Relecloud's developers use the `azd` command line experience to deploy the code. This means their local workflow is the same
-experience that runs from the GitHub action. You can use these
-steps to follow their experience by running the commands from the folder where this guide is stored after cloning this repo.
+If required, ensure Docker Desktop is started and enabled for your WSL terminal [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt:
 
-Use this command to get started with deployment by creating an
-`azd` environment on your workstation.
-
-<table>
-<tr>
-<td>PowerShell</td>
-<td>
-
-```ps1
-$myEnvironmentName="relecloudresources"
+```shell
+code .
 ```
 
-```ps1
-azd init -e $myEnvironmentName
+Once Visual Studio Code is launched, you should see a popup allowing you to click on the button **Reopen in Container**.
+
+![Reopen in Container](assets/images/vscode-reopen-in-container.png)
+
+If you don't see the popup, open the Visual Studio Code Command Palette to execute the command. There are three ways to open the command palette:
+
+- For Mac users, use the keyboard shortcut ⇧⌘P
+- For Windows and Linux users, use Ctrl+Shift+P
+- From the Visual Studio Code top menu, navigate to View -> Command Palette.
+
+Once the command palette is open, search for `Dev Containers: Rebuild and Reopen in Container`.
+
+![WSL Ubuntu](assets/images/vscode-reopen-in-container-command.png)
+
+### 3. Log in to Azure
+
+Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
+
+If you are not using PowerShell 7+, run the following command (you can use [$PSVersionTable.PSVersion](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_powershell_editions) to check your version):
+
+```shell
+pwsh
 ```
 
-</td>
-</tr>
-<tr>
-<td>Bash</td>
-<td>
-
-```bash
-myEnvironmentName="relecloudresources"
+```pwsh
+Import-Module Az.Resources
 ```
 
-```bash
-azd init -e $myEnvironmentName
+```pwsh
+Connect-AzAccount
 ```
 
-</td>
-</tr>
-</table>
+Set the subscription to the one you want to use (you can use [Get-AzSubscription](https://learn.microsoft.com/powershell/module/az.accounts/get-azsubscription?view=azps-11.3.0) to list available subscriptions):
 
-
-#### (Optional Steps) Choose Prod or Non-prod environment
-
-The Relecloud team uses the same bicep templates to deploy
-their production, and non-prod, environments. To do this
-they set `azd` environment parameters that change the behavior
-of the next steps.
-
-> If you skip the next two optional steps, and change nothing,
-> then the bicep templates will default to non-prod settings.
-
-*Step: 1*
-
-Relecloud devs deploy the production environment by running the
-following command to choose the SKUs they want in production.
-
-```ps1
-azd env set IS_PROD true
+```pwsh
+$AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
 ```
 
-*Step: 2*
-
-Relecloud devs also use the following command to choose a second
-Azure location because the production environment is
-multiregional.
-
-```ps1
-azd env set SECONDARY_AZURE_LOCATION westus3
+```pwsh
+Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
 ```
 
-> You can find a list of available Azure regions by running
-> the following Azure CLI command.
-> 
-> ```ps1
-> az account list-locations --query "[].name" -o tsv
-> ```
+Use the next command to login with the Azure Dev CLI (AZD) tool:
 
-#### Provision the infrastructure
-
-Relecloud uses the following command to deploy the Azure
-services defined in the bicep files by running the provision
-command.
-
-> This step will take several minutes based on the region
-> and deployment options you selected.
-
-```ps1
-azd provision
-```
-When prompted, select the preferred Azure Subscription and the Location:
-
-![screenshot azd env new](./assets/Guide/Azd-Env-New.png)
-
-> When the command finishes you have deployed Azure App
-> Service, SQL Database, and supporting services to your
-> subscription. If you log into the the
-> [Azure Portal](http://portal.azure.com) you can find them
-> in the resource group named `$myEnvironmentName-rg`.
-
-#### Create App Registrations
-
-Relecloud devs have automated the process of creating Azure
-AD resources that support the authentication features of the
-web app. They use the following command to create two new
-App Registrations within Azure AD. The command is also
-responsible for saving configuration data to Key Vault and
-App Configuration so that the web app can read this data.
-
-<table>
-<tr>
-<td>PowerShell</td>
-<td>
-
-```ps1
-pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\createAppRegistrations.ps1 -g '$myEnvironmentName-rg'"
+```pwsh
+azd auth login
 ```
 
-</td>
-</tr>
-<tr>
-<td>Bash</td>
-<td>
 
-```bash
-chmod +x ./infra/createAppRegistrations.sh
-./infra/createAppRegistrations.sh -g "$myEnvironmentName-rg"
+### 4. Create a new environment
+
+Next we provide the AZD tool with variables that it uses to create the deployment. The first thing we initialize is the AZD environment with a name.
+
+The environment name should be less than 18 characters and must be comprised of lower-case, numeric, and dash characters (for example, `dotnetwebapp`).  The environment name is used for resource group naming and specific resource naming.
+
+By default, Azure resources are sized for a development deployment. If doing a production deployment, see the [production deployment](./prod-deployment.md) instructions for more detail.
+
+```pwsh
+azd env new <pick_a_name>
 ```
 
-</td>
-</tr>
-</table>
+Select the subscription that will be used for the deployment:
 
-> Known issue: [/bin/bash^M: bad interpreter](known-issues.md#troubleshooting)
-
-#### Deploy the code
-
-To finish the deployment process the Relecloud devs run the
-folowing `azd` commands to build, package, and deploy the dotnet
-code for the front-end and API web apps.
-
-```ps1
- azd env set AZURE_RESOURCE_GROUP "$myEnvironmentName-rg"
+```pwsh
+azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
 ```
 
-```ps1
- azd deploy
+Set the `AZURE_LOCATION` (Run `(Get-AzLocation).Location` to see a list of locations):
+
+```pwsh
+azd env set AZURE_LOCATION <pick_a_region>
 ```
 
-When finished the console will display the URI for the web app. You can use this URI to view the deployed solution in a browser.
+### 5. Create the Azure resources and deploy the code
 
-![screenshot of Relecloud app home page](./assets/Guide/WebAppHomePage.png)
+Run the following command to create the Azure resources and deploy the code (about 15-minutes to complete):
 
-> If you face any issues with the deployment, see the [Known issues document](known-issues.md) below for possible workarounds. There could be interim issues while deploying to Azure, and repeating the steps after a few minutes should fix most of them. Azure deployments are incremental by default, and only failed actions will be retired.
-
-#### Clean up Azure Resources
-
-1. Unprovision the Azure Resources
-2. Clean up App Registrations
-3. Delete the Deployment
-
-##### 1. Unprovision the Azure Resources
-To tear down an enviroment, and clean up the Azure resource group, use the folloing command:
-
-```ps1
-azd down --force --purge --no-prompt
+```pwsh
+azd up
 ```
 
-> You can also use the Azure Portal to delete the "relecloudresources" resource groups. This approach will not purge the Key Vault or App Configuration services and they will remain in your subscription for 7 days in a deleted state that does not charge your subscription. This feature enables you to recover the data if the configuration was accidentally deleted. You can purge these in the _Manage deleted stores_ section of each service in the portal. 
+### 6. Open and use the application
 
- ![screenshot of Purging App Configurations](./assets/Guide/AppConfig-Purge.png)
+Use the URL displayed in the console output to launch the web application that you have deployed:
 
-##### 2. Clean up App Registrations
-You will also need to delete the two Azure AD app registrations that were created. You can find them in Azure AD by searching for their environment name. 
- 
- **Delete App Registrations** 
+![screenshot of web app home page](assets/images/WebAppHomePage.png)
 
- ![screenshot of Azure AD App Registrations](./assets/Guide/AD-AppRegistrations.png)
- 
- You will also need to purge the App Configuration Service instance that was deployed.
+You can learn more about the web app by reading the [Pattern Simulations](demo.md) documentation.
 
+### 7. Tear down the deployment
 
-##### 3. Delete the Deployment
+Run the following command to tear down the deployment:
 
-Your Azure subscription will retain your deployment request as a stateful object.
-If you would like to change the Azure region for this deployment you will need to
-delete the deployment by running the following command.
-
+```pwsh
+azd down --purge --force
 ```
-az deployment delete --name $myEnvironmentName
-```
-
-> You can list all deployments with the following command
-> `az deployment sub list --query "[].name" -o tsv`
-
-### Local Development
-
-Relecloud developers use Visual Studio to develop locally and they co-share
-an Azure SQL database for local dev. The team chooses this workflow to
-help them practice early integration of changes as modifying the
-database and other shared resources can impact multiple workstreams.
-
-To connect to the shared database the dev team uses connection strings
-from Key Vault and App Configuration Service. Devs use the following
-script to retrieve data and store it as
-[User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows)
-on their workstation.
-
-Using the `secrets.json` file helps the team keep their credentials
-secure. The file is stored outside of the source control directory so
-the data is never accidentally checked-in. And the devs don't share
-credentials over email or other ways that could compromise their
-security.
-
-Managing secrets from Key Vault and App Configuration ensures that only
-authorized team members can access the data and also centralizes the
-administration of these secrets so they can be easily changed.
-
-New team members should setup their environment by following these steps.
-
-1. Open the Visual Studio solution `./src/Relecloud.sln`
-1. Setup the **Relecloud.Web** project User Secrets
-    1. Right-click on the **Relecloud.Web** project
-    1. From the context menu choose **Manage User Secrets**
-    1. From a command prompt run the bash command
-
-        <table>
-        <tr>
-        <td>PowerShell</td>
-        <td>
-
-        ```ps1
-        pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g '$myEnvironmentName-rg' -Web"
-        ```
-
-        </td>
-        </tr>
-        <tr>
-        <td>Bash</td>
-        <td>
-                
-        ```bash
-        chmod +x ./infra/localDevScripts/getSecretsForLocalDev.sh
-        ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --web
-        ```
-
-        </td>
-        </tr>
-        </table>
-
-    1. Copy the output into the `secrets.json` file for the **Relecloud.Web**
-    project.
-
-1. Setup the **Relecloud.Web.Api** project User Secrets
-    1. Right-click on the **Relecloud.Web.Api** project
-    1. From the context menu choose **Manage User Secrets**
-    1. From a command prompt run the bash command
-
-        <table>
-        <tr>
-        <td>PowerShell</td>
-        <td>
-
-        ```ps1
-        pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\localDevScripts\getSecretsForLocalDev.ps1 -g '$myEnvironmentName-rg' -Api"
-        ```
-
-        </td>
-        </tr>
-        <tr>
-        <td>Bash</td>
-        <td>
-                
-        ```bash
-        ./infra/localDevScripts/getSecretsForLocalDev.sh -g "$myEnvironmentName-rg" --api
-        ```
-
-        </td>
-        </tr>
-        </table>
-
-    1. Copy the output into the `secrets.json` file for the 
-    **Relecloud.Web.Api** project.
-
-1. Right-click the **Relecloud** solution and pick **Set Startup Projects...**
-1. Choose **Multiple startup projects**
-1. Change the dropdowns for *Relecloud.Web* and *Relecloud.Web.Api* to the action of **Start**.
-1. Click **Ok** to close the popup
-1. Add your IP address to the SQL Database firewall as an allowed connection by using the following script
-
-    <table>
-    <tr>
-    <td>PowerShell</td>
-    <td>
-
-    ```ps1
-    pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\localDevScripts\addLocalIPToSqlFirewall.ps1 -g '$myEnvironmentName-rg'"
-    ```
-
-    </td>
-    </tr>
-    <tr>
-    <td>Bash</td>
-    <td>
-            
-    ```bash
-    chmod +x ./infra/localDevScripts/addLocalIPToSqlFirewall.sh
-    ./infra/localDevScripts/addLocalIPToSqlFirewall.sh -g "$myEnvironmentName-rg"
-    ```
-
-    </td>
-    </tr>
-    </table>
-
-1. When connecting to Azure SQL database you'll connect with your Azure AD account.
-Run the following command to give your Azure AD account permission to access the database.
-
-    <table>
-    <tr>
-    <td>PowerShell</td>
-    <td>
-
-    ```ps1
-    pwsh -c "Set-ExecutionPolicy Bypass Process; .\infra\localDevScripts\makeSqlUserAccount.ps1 -g '$myEnvironmentName-rg'"
-    ```
-
-    </td>
-    </tr>
-    <tr>
-    <td>Bash</td>
-    <td>
-            
-    ```bash
-    chmod +x ./infra/localDevScripts/makeSqlUserAccount.sh
-    ./infra/localDevScripts/makeSqlUserAccount.sh -g "$myEnvironmentName-rg"
-    ```
-
-    </td>
-    </tr>
-    </table>
-
-1. Press F5 to start debugging the website
-
-> These steps grant access to SQL server in the primary resource group.
-> You can use the same commands if you want to test with the secondary resource
-> group by changing the ResourceGroup parameter "-g" to "$myEnvironmentName-secondary-rg"
 
 ## Additional links
 
 - [Known issues](known-issues.md)
-- [Developer patterns](simulate-patterns.md)
+- [Troubleshooting](troubleshooting.md)
+- [Pattern Simulations](demo.md)
+- [Developer Experience](developer-experience.md)
+- [Calculating SLA](./assets/sla-calculation.md)
+- [Find additional resources](additional-resources.md)
 - [Report security concerns](SECURITY.md)
 - [Find Support](SUPPORT.md)
 - [Contributing](CONTRIBUTING.md)
+
+## Trademarks
+
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
+trademarks or logos is subject to and must follow 
+[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
+Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
+Any use of third-party trademarks or logos are subject to those third-party's policies.
 
 ## Data Collection
 
@@ -476,4 +194,4 @@ The software may collect information about you and your use of the software and 
 
 Telemetry collection is on by default.
 
-To opt out, run the following command `azd env set ENABLE_TELEMETRY` to `false` in your environment.
+To opt out, run the following command `azd env set ENABLE_TELEMETRY` to `false` in your AZD environment.

@@ -2,44 +2,62 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "name": {
-      "value": "${AZURE_ENV_NAME}"
+    "adoOrganizationUrl": {
+        "value": "${AZURE_DEVOPS_ORG_URL}"
     },
-    "location": {
-      "value": "${AZURE_LOCATION}"
+    "adoToken": {
+        "value": "${AZURE_DEVOPS_TOKEN}"
     },
-    "principalId": {
-      "value": "${AZURE_PRINCIPAL_ID}"
+    "clientIpAddress": {
+        "value": "${AZD_IP_ADDRESS}"
     },
-    "secondaryAzureLocation": {
-      "value": "${SECONDARY_AZURE_LOCATION}"
+    "databasePassword": {
+        "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} Application--SqlAdministratorPassword)"
     },
-    "isProd": {
-      "value": "${IS_PROD}"
-    },
-    "azureSqlPassword": {
-      "value": "$(secretOrRandomPassword ${AZURE_KEYVAULT_NAME} sqlAdminPassword)"
-    },
-    "principalType": {
-      "value": "${PRINCIPAL_TYPE=user}"
-    },
-    "azureAdApiScopeFrontEnd": {
-      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdApiScopeFrontEnd)"
-    },
-    "azureAdClientIdForBackEnd": {
-      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdClientIdForBackEnd)"
-    },
-    "azureAdClientIdForFrontEnd": {
-      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdClientIdForFrontEnd)"
-    },
-    "azureAdClientSecretForFrontEnd": {
-      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdClientSecretForFrontEnd)"
-    },
-    "azureAdTenantId": {
-      "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} azureAdTenantId)"
+    "differentiator": {
+        "value": "${AZURE_CI_DIFFERENTIATOR=none}"
     },
     "enableTelemetry": {
       "value": "${ENABLE_TELEMETRY=true}"
+    },
+    "environmentName": {
+        "value": "${AZURE_ENV_NAME}"
+    },
+    "environmentType": {
+        "value": "${ENVIRONMENT=dev}"
+    },
+    "githubRepositoryUrl": {
+        "value": "${GITHUB_REPO}"
+    },
+    "githubToken": {
+        "value": "${GITHUB_TOKEN}"
+    },
+    "jumpboxAdministratorPassword": {
+        "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} Jumpbox--AdministratorPassword)"
+    },
+    "location": {
+        "value": "${AZURE_LOCATION}"
+    },
+    "principalId": {
+        "value": "${AZURE_PRINCIPAL_ID}"
+    },
+    "principalType": {
+        "value": "${AZURE_PRINCIPAL_TYPE=User}"
+    },
+    "deployHubNetwork": {
+        "value": "${DEPLOY_HUB_NETWORK=auto}"
+    },
+    "networkIsolation": {
+        "value": "${NETWORK_ISOLATION=auto}"
+    },
+    "ownerEmail": {
+        "value": "${OWNER_EMAIL=noreply@contoso.com}"
+    },
+    "ownerName": {
+        "value": "${OWNER_NAME=notset}"
+    },
+    "azureSecondaryLocation": {
+      "value": "${AZURE_SECONDARY_LOCATION}"
     }
   }
 }

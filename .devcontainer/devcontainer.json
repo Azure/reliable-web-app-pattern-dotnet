@@ -1,41 +1,39 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.236.0/containers/dotnet
 {
-	"name": "reliable-web-app-pattern-dotnet",
+	"name": "web-app-pattern-dotnet",
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": { 
-			"VARIANT": "6.0-bullseye"
-		}		
+			"VARIANT": "8.0-bookworm"
+		}
 	},
 	"runArgs": ["--init", "--privileged"],
 
 	"customizations": {
 		"vscode": {	
 			"extensions": [
-				"ms-dotnettools.csharp",
-				"ms-azuretools.vscode-bicep",
-				"ms-azuretools.vscode-azureappservice",
-				"ms-azuretools.vscode-docker",
 				"ms-azuretools.azure-dev",
+				"ms-azuretools.vscode-azureappservice",
+				"ms-azuretools.vscode-azureresourcegroups",
+				"ms-azuretools.vscode-azurestorage",
+				"ms-azuretools.vscode-bicep",
+				"ms-azuretools.vscode-docker",
+				"ms-dotnettools.csharp",
 				"ms-mssql.mssql",
-				"github.copilot"
+				"ms-vscode.azure-account",
+				"ms-vscode.PowerShell"
 			]
 		}
 	},
-
-	"remoteUser": "vscode",
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {},
-		"ghcr.io/devcontainers/features/powershell:1": {},
+		"ghcr.io/azure/azure-dev/azd:latest": {
+			"version": "1.5.1"
+		},
 		"ghcr.io/devcontainers/features/azure-cli:1": {},
-		"ghcr.io/devcontainers/features/common-utils:1": {},
-		"ghcr.io/devcontainers/features/sshd:1": {
-			"version": "latest"
-		}
+		"ghcr.io/devcontainers/features/common-utils:2": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/powershell:1": {},
+		"ghcr.io/devcontainers/features/sshd:1": {}
 	},
-
-	"waitFor": "postCreateCommand",
-	"postCreateCommand": "curl -fsSL https://aka.ms/install-azd.sh | bash",
-	"postStartCommand": "az bicep install; azd config set auth.useAzCliAuth true"
+	// resolves error: dubious ownership of the workspace folder
+	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}"
 }
