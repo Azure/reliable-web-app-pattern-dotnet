@@ -161,6 +161,10 @@ To retrieve the generated password:
     >
     > Now that the tunnel is open, change back to use the original PowerShell session to deploy the code.
 
+1. Run the following command to restore packages and compile code.
+    ```pwsh
+    azd package
+    ```
 
 1. From PowerShell use the following SCP command to upload the code to the jump box (use the password you retrieved from Key Vault to authenticate the SCP command):
     ```shell
