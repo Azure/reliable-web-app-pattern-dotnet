@@ -111,14 +111,17 @@ $AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
 Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
 ```
 
+### 4. Create a new environment
+
+> [!NOTE]
+> You may see warnings along the lines of *WARNING: your version of azd is out of date, you have 1.5.1 and the latest version is 1.8.0*. If using the dev container, the correct version is installed and you may ignore the warning.
+> The infrastructure code in the repository may not be supported by the latest version of azd or bicep, but the dev container is kept at a version that has been tested and is useable. 
+
 Use the next command to login with the Azure Dev CLI (AZD) tool:
 
 ```pwsh
 azd auth login
 ```
-
-
-### 4. Create a new environment
 
 Next we provide the AZD tool with variables that it uses to create the deployment. The first thing we initialize is the AZD environment with a name.
 
