@@ -133,9 +133,6 @@ param clientIpAddress string = ''
 @description('If true, use a common App Service Plan.  If false, use a separate App Service Plan per App Service.')
 param useCommonAppServicePlan bool
 
-@description('The principal id of the user running the deployment')
-param principalId string
-
 // ========================================================================
 // VARIABLES
 // ========================================================================
@@ -467,14 +464,19 @@ module redis './application-redis.bicep' = {
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     subnets: subnets
     tags: moduleTags
-    users: [
+    users: deploymentSettings.principalId == null ? [
+      {
+       alias: appManagedIdentity.name
+       objectId: appManagedIdentity.outputs.principal_id 
+      }
+    ] : [
       {
        alias: appManagedIdentity.name
        objectId: appManagedIdentity.outputs.principal_id 
       }
       {
-        alias: principalId
-        objectId: principalId
+        alias: deploymentSettings.principalId
+        objectId: deploymentSettings.principalId
       }
     ]
   }

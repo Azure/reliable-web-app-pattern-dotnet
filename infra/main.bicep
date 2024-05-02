@@ -442,7 +442,6 @@ module application './modules/application-resources.bicep' = {
     frontDoorSettings: frontdoor.outputs.settings
 
     // Settings
-    principalId: principalId
     administratorUsername: administratorUsername
     databasePassword: databasePassword
     clientIpAddress: clientIpAddress
@@ -473,7 +472,6 @@ module application2 './modules/application-resources.bicep' =  if (isMultiLocati
     databasePassword: databasePassword
     clientIpAddress: clientIpAddress
     useCommonAppServicePlan: willDeployCommonAppServicePlan
-    principalId: principalId
   }
   dependsOn: [
     resourceGroups2
