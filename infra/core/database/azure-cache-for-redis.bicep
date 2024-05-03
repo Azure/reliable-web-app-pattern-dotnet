@@ -54,6 +54,9 @@ type RedisUser = {
 
   @description('The alias of the user')
   alias: string
+
+  @description('Specify name of built-in access policy to use as assignment.')
+  accessPolicy: 'Data Owner' | 'Data Contributor' | 'Data Reader'
 }
 
 // ========================================================================
@@ -115,14 +118,6 @@ param redisCacheCapacity int = 1
 @description('If set, the private endpoint settings for this resource')
 param privateEndpointSettings PrivateEndpointSettings?
 
-@description('Specify name of Built-In access policy to use as assignment.')
-@allowed([
-  'Data Owner'
-  'Data Contributor'
-  'Data Reader'
-])
-param builtInAccessPolicyName string = 'Data Reader'
-
 param users RedisUser[] = []
 
 // ========================================================================
@@ -149,10 +144,10 @@ resource cache 'Microsoft.Cache/redis@2023-08-01' = {
 
 @batchSize(1)
 resource redisCacheBuiltInAccessPolicyAssignment 'Microsoft.Cache/redis/accessPolicyAssignments@2023-08-01' = [for user in users: {
-  name: guid(resourceGroup().id, name, builtInAccessPolicyName, user.objectId)
+  name: guid(resourceGroup().id, name, user.accessPolicy, user.objectId)
   parent: cache
   properties: {
-    accessPolicyName: builtInAccessPolicyName
+    accessPolicyName: user.accessPolicy
     objectId: user.objectId
     objectIdAlias: user.alias
   }

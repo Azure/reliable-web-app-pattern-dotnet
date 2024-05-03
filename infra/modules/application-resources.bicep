@@ -467,16 +467,19 @@ module redis './application-redis.bicep' = {
     users: deploymentSettings.principalId == null ? [
       {
        alias: appManagedIdentity.name
-       objectId: appManagedIdentity.outputs.principal_id 
+       objectId: appManagedIdentity.outputs.principal_id
+       accessPolicy: 'Data Owner'
       }
     ] : [
       {
        alias: appManagedIdentity.name
-       objectId: appManagedIdentity.outputs.principal_id 
+       objectId: appManagedIdentity.outputs.principal_id
+       accessPolicy: 'Data Owner'
       }
       {
         alias: deploymentSettings.principalId
         objectId: deploymentSettings.principalId
+        accessPolicy: 'Data Owner'
       }
     ]
   }

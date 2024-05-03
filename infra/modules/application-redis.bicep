@@ -76,6 +76,9 @@ type RedisUser = {
 
   @description('The alias of the user')
   alias: string
+
+  @description('Specify name of built-in access policy to use as assignment.')
+  accessPolicy: 'Data Owner' | 'Data Contributor' | 'Data Reader'
 }
 
 // ========================================================================
@@ -145,12 +148,11 @@ module redis '../core/database/azure-cache-for-redis.bicep' = {
         }
       : null
 
-    builtInAccessPolicyName: 'Data Owner'
     users: users
   }
 }
 
-resource redis_config 'Microsoft.AppConfiguration/configurationStores/keyValues@2021-10-01-preview' = {
+resource redis_config 'Microsoft.AppConfiguration/configurationStores/keyValues@2023-03-01' = {
   parent: configStore
   name: 'App:RedisCache:ConnectionString'
   properties: {

@@ -6,4 +6,7 @@ type RedisUser = {
 
   @description('The alias of the user')
   alias: string
+
+  @description('Specify name of built-in access policy to use as assignment.')
+  accessPolicy: 'Data Owner' | 'Data Contributor' | 'Data Reader'
 }
