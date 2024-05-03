@@ -466,15 +466,15 @@ module redis './application-redis.bicep' = {
     tags: moduleTags
     users: deploymentSettings.principalId == null ? [
       {
-       alias: ownerManagedIdentity.name
-       objectId: ownerManagedIdentity.outputs.principal_id
-       accessPolicy: 'Data Contributor'
+        alias: ownerManagedIdentity.name
+        objectId: ownerManagedIdentity.outputs.principal_id
+        accessPolicy: 'Data Contributor'
       }
     ] : [
       {
-       alias: ownerManagedIdentity.name
-       objectId: ownerManagedIdentity.outputs.principal_id
-       accessPolicy: 'Data Contributor'
+        alias: ownerManagedIdentity.name
+        objectId: ownerManagedIdentity.outputs.principal_id
+        accessPolicy: 'Data Contributor'
       }
       {
         alias: deploymentSettings.principalId
