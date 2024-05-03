@@ -468,18 +468,18 @@ module redis './application-redis.bicep' = {
       {
        alias: ownerManagedIdentity.name
        objectId: ownerManagedIdentity.outputs.principal_id
-       accessPolicy: 'Data Owner'
+       accessPolicy: 'Data Contributor'
       }
     ] : [
       {
        alias: ownerManagedIdentity.name
        objectId: ownerManagedIdentity.outputs.principal_id
-       accessPolicy: 'Data Owner'
+       accessPolicy: 'Data Contributor'
       }
       {
         alias: deploymentSettings.principalId
         objectId: deploymentSettings.principalId
-        accessPolicy: 'Data Owner'
+        accessPolicy: 'Data Contributor'
       }
     ]
   }
