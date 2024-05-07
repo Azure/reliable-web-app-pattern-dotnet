@@ -492,11 +492,7 @@ module applicationPostConfiguration './modules/application-post-config.bicep' = 
     keyVaultName: isNetworkIsolated? hubNetwork.outputs.key_vault_name : application.outputs.key_vault_name
     kvResourceGroupName: isNetworkIsolated? resourceGroups.outputs.hub_resource_group_name : resourceGroups.outputs.application_resource_group_name
     readerIdentities: union(application.outputs.service_managed_identities, defaultDeploymentSettings.isMultiLocationDeployment ? application2.outputs.service_managed_identities : [])
-    redisCacheNamePrimary: application.outputs.redis_cache_name
-    redisCacheNameSecondary: isMultiLocationDeployment ? application2.outputs.redis_cache_name : application.outputs.redis_cache_name
     resourceNames: naming.outputs.resourceNames
-    applicationResourceGroupNamePrimary: resourceGroups.outputs.application_resource_group_name
-    applicationResourceGroupNameSecondary: isMultiLocationDeployment ? resourceGroups2.outputs.application_resource_group_name : ''
   }
 }
 

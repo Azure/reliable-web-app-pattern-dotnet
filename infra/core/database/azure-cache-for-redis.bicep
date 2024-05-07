@@ -46,6 +46,19 @@ type PrivateEndpointSettings = {
   subnetId: string
 }
 
+// From: infra/types/RedisUser.bicep
+@description('Type describing the user for redis.')
+type RedisUser = {
+  @description('The object id of the user.')
+  objectId: string
+
+  @description('The alias of the user')
+  alias: string
+
+  @description('Specify name of built-in access policy to use as assignment.')
+  accessPolicy: 'Data Owner' | 'Data Contributor' | 'Data Reader'
+}
+
 // ========================================================================
 // PARAMETERS
 // ========================================================================
@@ -105,11 +118,13 @@ param redisCacheCapacity int = 1
 @description('If set, the private endpoint settings for this resource')
 param privateEndpointSettings PrivateEndpointSettings?
 
+param users RedisUser[] = []
+
 // ========================================================================
 // AZURE RESOURCES
 // ========================================================================
 
-resource cache 'Microsoft.Cache/redis@2023-04-01' = {
+resource cache 'Microsoft.Cache/redis@2023-08-01' = {
   name: name
   location: location
   tags: tags
@@ -121,8 +136,22 @@ resource cache 'Microsoft.Cache/redis@2023-04-01' = {
       family: redisCacheFamily
       name: redisCacheSku
     }
+    redisConfiguration: {
+      'aad-enabled': 'true'
+    }
   }
 }
+
+@batchSize(1)
+resource redisCacheBuiltInAccessPolicyAssignment 'Microsoft.Cache/redis/accessPolicyAssignments@2023-08-01' = [for user in users: {
+  name: guid(resourceGroup().id, name, user.accessPolicy, user.objectId)
+  parent: cache
+  properties: {
+    accessPolicyName: user.accessPolicy
+    objectId: user.objectId
+    objectIdAlias: user.alias
+  }
+}]
 
 module privateEndpoint '../network/private-endpoint.bicep' = if (privateEndpointSettings != null) {
   name: '${name}-private-endpoint'
@@ -163,3 +192,4 @@ resource diagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' 
 }
 
 output name string = cache.name
+output connection_string string = '${cache.name}.redis.cache.windows.net:6380,ssl=True,abortConnect=False'

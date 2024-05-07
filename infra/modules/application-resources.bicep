@@ -452,25 +452,36 @@ module webFrontendFrontDoorRoute '../core/security/front-door-route.bicep' = if 
 ** Azure Cache for Redis
 */
 
-module redis '../core/database/azure-cache-for-redis.bicep' = {
+module redis './application-redis.bicep' = {
   name: 'application-redis-${deploymentSettings.resourceToken}'
   scope: resourceGroup
-  params: {
-    name: resourceNames.redis
-    location: deploymentSettings.location
+  params:{
+    appConfigurationName: appConfiguration.outputs.name
+    deploymentSettings: deploymentSettings
     diagnosticSettings: diagnosticSettings
+    dnsResourceGroupName: dnsResourceGroupName
+    resourceNames: resourceNames
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    // vault provided by Hub resource group when network isolated
-    redisCacheSku : deploymentSettings.isProduction ? 'Standard' : 'Basic'
-    redisCacheFamily : 'C'
-    redisCacheCapacity: deploymentSettings.isProduction ? 1 : 0
-    
-    privateEndpointSettings: deploymentSettings.isNetworkIsolated ? {
-      dnsResourceGroupName: dnsResourceGroupName
-      name: resourceNames.redisPrivateEndpoint
-      resourceGroupName: resourceNames.spokeResourceGroup
-      subnetId: subnets[resourceNames.spokePrivateEndpointSubnet].id
-    } : null
+    subnets: subnets
+    tags: moduleTags
+    users: deploymentSettings.principalId == null ? [
+      {
+        alias: ownerManagedIdentity.name
+        objectId: ownerManagedIdentity.outputs.principal_id
+        accessPolicy: 'Data Contributor'
+      }
+    ] : [
+      {
+        alias: ownerManagedIdentity.name
+        objectId: ownerManagedIdentity.outputs.principal_id
+        accessPolicy: 'Data Contributor'
+      }
+      {
+        alias: deploymentSettings.principalId
+        objectId: deploymentSettings.principalId
+        accessPolicy: 'Data Contributor'
+      }
+    ]
   }
 }
 
@@ -548,7 +559,6 @@ module applicationBudget '../core/cost-management/budget.bicep' = {
 
 output app_config_uri string = appConfiguration.outputs.app_config_uri
 output key_vault_name string = deploymentSettings.isNetworkIsolated ? resourceNames.keyVault : keyVault.outputs.name
-output redis_cache_name string = redis.outputs.name
 
 output owner_managed_identity_id string = ownerManagedIdentity.outputs.id
 output app_managed_identity_id string = appManagedIdentity.outputs.id

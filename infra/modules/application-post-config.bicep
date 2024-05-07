@@ -93,18 +93,6 @@ param keyVaultName string
 @description('Name of the hub resource group containing the key vault.')
 param kvResourceGroupName string
 
-@description('Name of the primary Azure Cache for Redis.')
-param redisCacheNamePrimary string
-
-@description('Name of the second Azure Cache for Redis.')
-param redisCacheNameSecondary string
-
-@description('Name of the resource group containing Azure Cache for Redis.')
-param applicationResourceGroupNamePrimary string
-
-@description('Name of the resource group containing Azure Cache for Redis.')
-param applicationResourceGroupNameSecondary string
-
 @description('List of user assigned managed identities that will receive Secrets User role to the shared key vault')
 param readerIdentities object[]
 
@@ -122,10 +110,6 @@ var microsoftEntraIdClientSecret = 'MicrosoftEntraId--ClientSecret'
 var microsoftEntraIdInstance = 'MicrosoftEntraId--Instance'
 var microsoftEntraIdSignedOutCallbackPath = 'MicrosoftEntraId--SignedOutCallbackPath'
 var microsoftEntraIdTenantId = 'MicrosoftEntraId--TenantId'
-var redisCacheSecretNamePrimary = 'App--RedisCache--ConnectionString-Primary'
-var redisCacheSecretNameSecondary = 'App--RedisCache--ConnectionString-Secondary'
-
-var multiRegionalSecrets = deploymentSettings.isMultiLocationDeployment ? [redisCacheSecretNameSecondary] : []
 
 var listOfAppConfigSecrets = [
   microsoftEntraIdApiClientId
@@ -140,27 +124,12 @@ var listOfAppConfigSecrets = [
   microsoftEntraIdTenantId
 ]
 
-var listOfSecretNames = union(listOfAppConfigSecrets,
-  [
-    redisCacheSecretNamePrimary
-  ], multiRegionalSecrets)
-
 // ========================================================================
 // EXISTING RESOURCES
 // ========================================================================
 
 resource existingKvResourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: kvResourceGroupName
-}
-
-resource existingPrimaryRedisCache 'Microsoft.Cache/redis@2023-04-01' existing = {
-  name: redisCacheNamePrimary
-  scope: resourceGroup(applicationResourceGroupNamePrimary)
-}
-
-resource existingSecondaryRediscache 'Microsoft.Cache/redis@2023-04-01' existing = if (deploymentSettings.isMultiLocationDeployment) {
-  name: redisCacheNameSecondary
-  scope: resourceGroup(deploymentSettings.isMultiLocationDeployment ? applicationResourceGroupNameSecondary : applicationResourceGroupNamePrimary)
 }
 
 resource existingKeyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
@@ -197,28 +166,6 @@ module writeSqlAdminInfoToKeyVault '../core/security/key-vault-secrets.bicep' = 
   }
 }
 
-module writePrimaryRedisSecret '../core/security/key-vault-secrets.bicep' = {
-  name: 'write-primary-redis-secret-to-keyvault'
-  scope: existingKvResourceGroup
-  params: {
-    name: existingKeyVault.name
-    secrets: [
-      { key: redisCacheSecretNamePrimary, value: '${existingPrimaryRedisCache.name}.redis.cache.windows.net:6380,password=${existingPrimaryRedisCache.listKeys().primaryKey},ssl=True,abortConnect=False' }
-    ]
-  }
-}
-
-module writeSecondaryRedisSecret '../core/security/key-vault-secrets.bicep' = if (deploymentSettings.isMultiLocationDeployment) {
-  name: 'write-secondary-redis-secret-to-keyvault'
-  scope: existingKvResourceGroup
-  params: {
-    name: existingKeyVault.name
-    secrets: [
-      { key: redisCacheSecretNameSecondary, value: '${existingSecondaryRediscache.name}.redis.cache.windows.net:6380,password=${existingSecondaryRediscache.listKeys().primaryKey},ssl=True,abortConnect=False' }
-    ]
-  }
-}
-
 // ======================================================================== //
 // Microsoft Entra Application Registration placeholders
 // ======================================================================== //
@@ -237,7 +184,7 @@ module writeAppRegistrationSecrets '../core/security/key-vault-secrets.bicep' = 
 // Grant reader permissions for the web apps to access the key vault
 // ======================================================================== //
 
-module grantSecretsUserAccessBySecretName './grant-secret-user.bicep' = [ for secretName in listOfSecretNames: {
+module grantSecretsUserAccessBySecretName './grant-secret-user.bicep' = [ for secretName in listOfAppConfigSecrets: {
   scope: existingKvResourceGroup
   name: 'grant-kv-access-for-${secretName}'
   params: {

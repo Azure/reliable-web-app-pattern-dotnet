@@ -124,26 +124,6 @@ function Get-WorkloadKeyVault {
     return Get-AzKeyVault -VaultName $keyVaultName -ResourceGroupName $hubGroup.ResourceGroupName
 }
 
-function Get-RedisCacheKeyName {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$ResourceGroupName
-    )
-    Write-Host "`tGetting redis cache key name for $highlightColor'$ResourceGroupName'$defaultColor"
-
-    $group = Get-AzResourceGroup -Name $ResourceGroupName
-
-    # if the group contains a tag 'IsPrimary' then use the primary redis cache
-    if ($group.Tags["IsPrimaryLocation"] -eq "true") {
-        # matches hard coded value in application-post-config.bicep module
-        return "App--RedisCache--ConnectionString-Primary"
-    }
-
-    # matches hard coded value in application-post-config.bicep module
-    return "App--RedisCache--ConnectionString-Secondary"
-
-}
-
 Write-Host "Configuring app settings for $highlightColor'$ResourceGroupName'$defaultColor"
 
 # default settings
@@ -153,7 +133,6 @@ $defaultAzureStorageTicketUri = (Get-WorkloadStorageAccount -ResourceGroupName $
 $defaultAzureFrontDoorHostName = $WebUri.Substring("https://".Length) # the hostname of the front door
 $defaultRelecloudBaseUri = "$WebUri/api" # used by the frontend to call the backend through the front door
 $defaultKeyVaultUri = (Get-WorkloadKeyVault -ResourceGroupName $ResourceGroupName).VaultUri # the URI of the key vault where secrets are stored
-$defaultRedisCacheKeyName = (Get-RedisCacheKeyName -ResourceGroupName $ResourceGroupName) # workloads use independent redis caches and a shared vault to store the connection string
 
 # prompt to confirm settings
 $azureStorageTicketContainerName = ""
@@ -210,15 +189,6 @@ if ($keyVaultUri -eq "") {
     $keyVaultUri = $defaultKeyVaultUri
 }
 
-$redisCacheKeyName = ""
-if (-not $NoPrompt) {
-    $redisCacheKeyName = Read-Host -Prompt "`nWhat value should be used for the RedisCacheKeyName? [default: $highlightColor$defaultRedisCacheKeyName$defaultColor]"
-}
-
-if ($redisCacheKeyName -eq "") {
-    $redisCacheKeyName = $defaultRedisCacheKeyName
-}
-
 # display the settings so that the user can verify them in the output log
 Write-Host "`nWorking settings:"
 Write-Host "`tazureStorageTicketContainerName: $highlightColor'$azureStorageTicketContainerName'$defaultColor"
@@ -227,7 +197,6 @@ Write-Host "`tSqlConnectionString: $highlightColor'$sqlConnectionString'$default
 Write-Host "`tAzureStorageTicketUri: $highlightColor'$azureStorageTicketUri'$defaultColor"
 Write-Host "`tAzureFrontDoorHostName: $highlightColor'$azureFrontDoorHostName'$defaultColor"
 Write-Host "`tRelecloudBaseUri: $highlightColor'$relecloudBaseUri'$defaultColor"
-Write-Host "`tRedisCacheKeyName: $highlightColor'$redisCacheKeyName'$defaultColor"
 
 # handles multi-regional app configuration because the app config must be in the same region as the code deployment
 $configStore = Get-AzAppConfigurationStore -ResourceGroupName $resourceGroupName
@@ -248,7 +217,6 @@ try {
     Set-AzAppConfigurationKeyValue -Endpoint $configStore.Endpoint -Key Api:MicrosoftEntraId:ClientId -Value "{ `"uri`":`"$($keyVaultUri)secrets/Api--MicrosoftEntraId--ClientId`"}" -ContentType 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8' > $null
     Set-AzAppConfigurationKeyValue -Endpoint $configStore.Endpoint -Key Api:MicrosoftEntraId:Instance -Value "{ `"uri`":`"$($keyVaultUri)secrets/Api--MicrosoftEntraId--Instance`"}" -ContentType 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8' > $null
     Set-AzAppConfigurationKeyValue -Endpoint $configStore.Endpoint -Key Api:MicrosoftEntraId:TenantId -Value "{ `"uri`":`"$($keyVaultUri)secrets/Api--MicrosoftEntraId--TenantId`"}" -ContentType 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8' > $null
-    Set-AzAppConfigurationKeyValue -Endpoint $configStore.Endpoint -Key App:RedisCache:ConnectionString -Value "{ `"uri`":`"$($keyVaultUri)secrets/$($redisCacheKeyName)`"}" -ContentType 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8' > $null
     Set-AzAppConfigurationKeyValue -Endpoint $configStore.Endpoint -Key App:RelecloudApi:AttendeeScope -Value "{ `"uri`":`"$($keyVaultUri)secrets/App--RelecloudApi--AttendeeScope`"}" -ContentType 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8' > $null
     Set-AzAppConfigurationKeyValue -Endpoint $configStore.Endpoint -Key MicrosoftEntraId:Instance -Value "{ `"uri`":`"$($keyVaultUri)secrets/MicrosoftEntraId--Instance`"}" -ContentType 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8' > $null
     Set-AzAppConfigurationKeyValue -Endpoint $configStore.Endpoint -Key MicrosoftEntraId:CallbackPath -Value "{ `"uri`":`"$($keyVaultUri)secrets/MicrosoftEntraId--CallbackPath`"}" -ContentType 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8' > $null
