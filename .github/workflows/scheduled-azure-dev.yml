@@ -23,7 +23,6 @@ jobs:
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
     steps:
       - name: Install jq tool
         uses: dcarbone/install-jq-action@v2
@@ -38,8 +37,8 @@ jobs:
         shell: pwsh
 
       - name: Check configuration
-        if: ${{ env.AZURE_CREDENTIALS == '' }}
-        run: echo "AZURE_CREDENTIALS are not available."
+        if: ${{ env.AZURE_CLIENT_ID == '' }}
+        run: echo "AZURE_CLIENT_ID are not available."
         
       # login to run ado commands such provision, deploy, and down
       - name: Log in with Azure (Federated Credentials)
@@ -62,30 +61,30 @@ jobs:
             enable-AzPSSession: true
 
       - name: Set the environment
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
         run : azd env new ${{ secrets.AZURE_ENV_NAME }}
 
       - name: Set the subscription
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
         run : azd env set AZURE_SUBSCRIPTION_ID  ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Set the location
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
         run : azd env set AZURE_LOCATION  ${{ secrets.AZURE_LOCATION }}
 
       - name: Set the principal type
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
         run : azd env set AZURE_PRINCIPAL_TYPE ServicePrincipal
 
       - name: Azure Deploy
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
         run : azd up
 
       - name: QA - Validate Deployment
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
         run : ./testscripts/call-validate-deployment.sh
 
       - name: Teardown Azure resources
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
         run : azd down --force --purge --no-prompt
 
