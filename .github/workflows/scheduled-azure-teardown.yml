@@ -36,26 +36,24 @@ jobs:
         shell: pwsh
         
       # login to run ado commands such provision, deploy, and down
-      - name: Log in with Azure (Client Credentials) for AZD
-        if: ${{ env.AZURE_CREDENTIALS != '' }}
+      - name: Log in with Azure (Federated Credentials)
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
         run: |
-          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
-          Write-Host "::add-mask::$($info.clientSecret)"
-
-          azd login `
-            --client-id "$($info.clientId)" `
-            --client-secret "$($info.clientSecret)" `
-            --tenant-id "$($info.tenantId)"
+          azd auth login `
+            --client-id "$Env:AZURE_CLIENT_ID" `
+            --federated-credential-provider "github" `
+            --tenant-id "$Env:AZURE_TENANT_ID" `
         shell: pwsh
-        env:
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # login to run azd hooks
+      # login to run azd hooks and the QA validation script
       - name: Log in with Azure CLI
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
         uses: Azure/login@v1.6.1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          enable-AzPSSession: true
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            enable-AzPSSession: true
 
       - name: Set the environment
         run: azd env new ${{ secrets.AZURE_ENV_NAME }}
