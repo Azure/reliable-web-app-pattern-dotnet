@@ -36,17 +36,12 @@ param ownerName string
 @description('The ID of the running user or service principal.  This will be set as the owner when needed.')
 param principalId string = ''
 
+@description('The name of the running user or service principal.  This will be set as the owner when needed.')
+param principalName string = ''
+
 @allowed([ 'ServicePrincipal', 'User' ])
 @description('The type of the principal specified in \'principalId\'')
 param principalType string = 'ServicePrincipal'
-
-/*
-** Passwords - specify these!
-*/
-@secure()
-@minLength(8)
-@description('The password for the SQL administrator account. This will be used for the jump box, SQL server, and anywhere else a password is needed for creating a resource.')
-param databasePassword string
 
 @secure()
 @minLength(12)
@@ -141,6 +136,7 @@ var defaultDeploymentSettings = {
   isPrimaryLocation: true
   location: location
   name: environmentName
+  principalName: principalName
   principalId: principalId
   principalType: principalType
   resourceToken: primaryResourceToken
@@ -442,8 +438,6 @@ module application './modules/application-resources.bicep' = {
     frontDoorSettings: frontdoor.outputs.settings
 
     // Settings
-    administratorUsername: administratorUsername
-    databasePassword: databasePassword
     clientIpAddress: clientIpAddress
     useCommonAppServicePlan: willDeployCommonAppServicePlan
   }
@@ -468,8 +462,6 @@ module application2 './modules/application-resources.bicep' =  if (isMultiLocati
     frontDoorSettings: frontdoor.outputs.settings
 
     // Settings
-    administratorUsername: administratorUsername
-    databasePassword: databasePassword
     clientIpAddress: clientIpAddress
     useCommonAppServicePlan: willDeployCommonAppServicePlan
   }
@@ -488,7 +480,6 @@ module applicationPostConfiguration './modules/application-post-config.bicep' = 
     deploymentSettings: primaryDeploymentSettings
     administratorPassword: jumpboxAdministratorPassword
     administratorUsername: administratorUsername
-    databasePassword: databasePassword
     keyVaultName: isNetworkIsolated? hubNetwork.outputs.key_vault_name : application.outputs.key_vault_name
     kvResourceGroupName: isNetworkIsolated? resourceGroups.outputs.hub_resource_group_name : resourceGroups.outputs.application_resource_group_name
     readerIdentities: union(application.outputs.service_managed_identities, defaultDeploymentSettings.isMultiLocationDeployment ? application2.outputs.service_managed_identities : [])

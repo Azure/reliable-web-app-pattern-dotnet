@@ -11,9 +11,6 @@
     "clientIpAddress": {
         "value": "${AZD_IP_ADDRESS}"
     },
-    "databasePassword": {
-        "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} Application--SqlAdministratorPassword)"
-    },
     "differentiator": {
         "value": "${AZURE_CI_DIFFERENTIATOR=none}"
     },
@@ -40,6 +37,9 @@
     },
     "principalId": {
         "value": "${AZURE_PRINCIPAL_ID}"
+    },
+    "principalName": {
+        "value": "${AZURE_PRINCIPAL_NAME}"
     },
     "principalType": {
         "value": "${AZURE_PRINCIPAL_TYPE=User}"
