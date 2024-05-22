@@ -192,4 +192,3 @@ resource diagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' 
 }
 
 output name string = cache.name
-output connection_string string = '${cache.name}.redis.cache.windows.net:6380,ssl=True,abortConnect=False'

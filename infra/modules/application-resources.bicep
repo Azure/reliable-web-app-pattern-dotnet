@@ -452,18 +452,28 @@ module webFrontendFrontDoorRoute '../core/security/front-door-route.bicep' = if 
 ** Azure Cache for Redis
 */
 
-module redis './application-redis.bicep' = {
-  name: 'application-redis-${deploymentSettings.resourceToken}'
+module redis '../core/database/azure-cache-for-redis.bicep' = {
+  name: 'application-redis-db-${deploymentSettings.resourceToken}'
   scope: resourceGroup
-  params:{
-    appConfigurationName: appConfiguration.outputs.name
-    deploymentSettings: deploymentSettings
+  params: {
+    name: resourceNames.redis
+    location: deploymentSettings.location
     diagnosticSettings: diagnosticSettings
-    dnsResourceGroupName: dnsResourceGroupName
-    resourceNames: resourceNames
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    subnets: subnets
-    tags: moduleTags
+    // vault provided by Hub resource group when network isolated
+    redisCacheSku: deploymentSettings.isProduction ? 'Standard' : 'Basic'
+    redisCacheFamily: 'C'
+    redisCacheCapacity: deploymentSettings.isProduction ? 1 : 0
+
+    privateEndpointSettings: deploymentSettings.isNetworkIsolated
+      ? {
+          dnsResourceGroupName: dnsResourceGroupName
+          name: resourceNames.redisPrivateEndpoint
+          resourceGroupName: resourceNames.spokeResourceGroup
+          subnetId: subnets[resourceNames.spokePrivateEndpointSubnet].id
+        }
+      : null
+
     users: deploymentSettings.principalId == null ? [
       {
         alias: ownerManagedIdentity.name
