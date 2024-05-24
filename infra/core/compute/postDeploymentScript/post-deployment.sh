@@ -28,11 +28,6 @@ sudo apt-get install -y dotnet-sdk-8.0
 # install Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-# make directory for SCP
-mkdir /home/azureadmin/web-app-pattern
-
-sudo chown -R azureadmin:azureadmin /home/azureadmin/web-app-pattern
-
 # install pwsh core
 
 # Download the PowerShell package file

@@ -46,19 +46,13 @@ param name string
 @description('The name of the linux PC.  By default, this will be automatically constructed by the resource name.')
 param computerLinuxName string?
 
-@description('Username for the Virtual Machine.')
-param adminUsername string
+@description('Username for the Virtual Machine. NOTE: this is not saved anywhere as Entra is used to manage SSH logins once created.')
+param adminUsername string = 'azureadmin'
 
-@description('Type of authentication to use on the Virtual Machine. SSH key is recommended.')
-@allowed([
-  'sshPublicKey'
-  'password'
-])
-param authenticationType string = 'password'
-
-@description('SSH Key or password for the Virtual Machine. SSH key is recommended.')
+@description('Password for admin. NOTE: this is not saved anywhere as Entra is used to manage SSH logins once created.')
 @secure()
-param adminPasswordOrKey string
+@minLength(8)
+param adminPassword string = newGuid()
 
 @description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.')
 @allowed([
@@ -76,6 +70,9 @@ param vmSize string = 'Standard_B2ms'
 
 @description('The tags to associate with this resource.')
 param tags object = {}
+
+@description('Users to add to VM management role for jumpbox')
+param users string[]
 
 /*
 ** Dependencies
@@ -129,18 +126,7 @@ var imageReference = {
     version: 'latest'
   }
 }
-var osDiskType = 'Standard_LRS'
-var linuxConfiguration = (authenticationType == 'password') ? {} : {
-  disablePasswordAuthentication: true
-  ssh: {
-    publicKeys: [
-      {
-        path: '/home/${adminUsername}/.ssh/authorized_keys'
-        keyData: adminPasswordOrKey
-      }
-    ]
-  }
-}
+
 var securityProfileJson = {
   uefiSettings: {
     secureBootEnabled: true
@@ -148,12 +134,6 @@ var securityProfileJson = {
   }
   securityType: securityType
 }
-var extensionName = 'GuestAttestation'
-var extensionPublisher = 'Microsoft.Azure.Security.LinuxAttestation'
-var extensionVersion = '1.0'
-var maaTenantName = 'GuestAttestation'
-var maaEndpoint = substring('emptystring', 0, 0)
-
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = {
   name: 'nic-${name}'
@@ -177,10 +157,12 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = {
   }
 }
 
-
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
   name: name
   location: location
+  identity: {
+    type: 'SystemAssigned' // Needed by the Entra extension
+  }
   properties: {
     hardwareProfile: {
       vmSize: vmSize
@@ -189,7 +171,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
       osDisk: {
         createOption: 'FromImage'
         managedDisk: {
-          storageAccountType: osDiskType
+          storageAccountType: 'Standard_LRS'
         }
       }
       imageReference: imageReference[ubuntuOSVersion]
@@ -204,29 +186,28 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
     osProfile: {
       computerName: computerName
       adminUsername: adminUsername
-      adminPassword: adminPasswordOrKey
-      linuxConfiguration: ((authenticationType == 'password') ? null : linuxConfiguration)
+      adminPassword: adminPassword
     }
     securityProfile: ((securityType == 'TrustedLaunch') ? securityProfileJson : null)
   }
   tags: tags
 }
 
-resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = if ((securityType == 'TrustedLaunch') && ((securityProfileJson.uefiSettings.secureBootEnabled == true) && (securityProfileJson.uefiSettings.vTpmEnabled == true))) {
+resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = if ((securityType == 'TrustedLaunch') && ((securityProfileJson.uefiSettings.secureBootEnabled == true) && (securityProfileJson.uefiSettings.vTpmEnabled == true))) {
   parent: virtualMachine
-  name: extensionName
+  name: 'GuestAttestation'
   location: location
   properties: {
-    publisher: extensionPublisher
-    type: extensionName
-    typeHandlerVersion: extensionVersion
+    publisher: 'Microsoft.Azure.Security.LinuxAttestation'
+    type: 'GuestAttestation'
+    typeHandlerVersion: '1.0'
     autoUpgradeMinorVersion: true
     enableAutomaticUpgrade: true
     settings: {
       AttestationConfig: {
         MaaSettings: {
-          maaEndpoint: maaEndpoint
-          maaTenantName: maaTenantName
+          maaEndpoint: substring('emptystring', 0, 0)
+          maaTenantName: 'GuestAttestation'
         }
       }
     }
@@ -243,7 +224,7 @@ resource postDeploymentScript 'Microsoft.Compute/virtualMachines/extensions@2023
     typeHandlerVersion: '2.1'
     autoUpgradeMinorVersion: true
     settings: {
-      skipDos2Unix:false
+      skipDos2Unix: false
     }
     protectedSettings: {
       commandToExecute: 'chmod +x post-deployment.sh && bash post-deployment.sh'
@@ -253,6 +234,31 @@ resource postDeploymentScript 'Microsoft.Compute/virtualMachines/extensions@2023
     }
   }
 }
+
+resource aadsshlogin 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
+  name: 'aadsshlogin'
+  location: location
+  parent: virtualMachine
+  properties: {
+    publisher: 'Microsoft.Azure.ActiveDirectory'
+    type: 'AADSSHLoginForLinux'
+    typeHandlerVersion: '1.0'
+    autoUpgradeMinorVersion: true
+  }
+}
+
+// Role id for Virtual Machine Administrator Login
+var vmAdminLoginId = '1c0163c0-47e6-4577-8991-ea5c82e286e4'
+
+resource vmAdminRoles 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for user in users: {
+  name: guid(virtualMachine.name, resourceGroup().name, user)
+  scope: virtualMachine
+  properties: {
+    principalType: 'User'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', vmAdminLoginId)
+    principalId: user
+  }
+}]
 
 resource diagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (diagnosticSettings != null && !empty(logAnalyticsWorkspaceId)) {
   name: '${name}-diagnostics'

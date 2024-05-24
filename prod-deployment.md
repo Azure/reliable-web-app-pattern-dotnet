@@ -105,23 +105,6 @@ The following detailed deployment steps assume you are using a Dev Container ins
 
 ### 3. Upload the code to the jump box
 
-> **WARNING**
->
-> When the prod deployment is performed the Key Vault resource will be deployed with public network access enabled. This allows the reader to access the Key Vault to retrieve the username and password for the jump box. This also allows you to save data created by the `create-app-registration` script directly to the Key Vault. We recommend reviewing this approach with your security team as you may want to change this approach. One option to consider is adding the jump box to the domain, disabling public network access for Key Vault, and running the `create-app-registration` script from the jump box.
-
-To retrieve the generated password:
-
-1. Retrieve the username and password for your jump box:
-
-    - Locate the Hub resource group in the Azure Portal.
-    - Open the Azure Key Vault from the list of resources.
-    - Select **Secrets** from the menu sidebar.
-    - Select **Jumpbox--AdministratorPassword**.
-    - Select the currently enabled version.
-    - Press **Show Secret Value**.
-    - Note the secret value for later use.
-    - Repeat the proecess for the **Jumpbox--AdministratorUsername** secret.
-
 1. Start a new PowerShell session in the terminal (In VS Code use `Ctrl+Shift+~`). Run the following command from the dev container terminal to start a new PowerShell session:
     ```
     pwsh
@@ -166,22 +149,29 @@ To retrieve the generated password:
     azd package
     ```
 
-1. From PowerShell use the following SCP command to upload the code to the jump box (use the password you retrieved from Key Vault to authenticate the SCP command):
+1. Install the SSH extension for Azure CLI
+
+    ```pwsh
+    az extension add --name ssh
+    ```
+
+1. Obtain an SSH key from entra:
+
+    ```pwsh
+    az ssh config --ip 127.0.0.1 -f ./ssh-config
+    ```
+
+1. From PowerShell use the following `rsync` command to upload the code to the jump box using the ssh config exported above:
     ```shell
-    scp -r -P 50022 * azureadmin@127.0.0.1:/home/azureadmin/web-app-pattern
+    rsync -av -e "ssh -F ./ssh-config -p 50022" . 127.0.0.1:~/web-app-pattern
     ```
 
     > If you were unable to connect due to [Remote host identification has changed](troubleshooting.md#remote-host-identification-has-changed)
 
-1. From PowerShell use the SCP command to upload the AZD environment to the jump box:
-    ```shell
-    scp -r -P 50022 ./.azure azureadmin@127.0.0.1:/home/azureadmin/web-app-pattern
-    ```
-
-1. Run the following command to start a shell session on the jump box:
+1. Run the following command to start a shell session on the jump box using the ssh config exported above:
 
     ```shell
-    ssh azureadmin@127.0.0.1 -p 50022
+    ssh -F ./ssh-config 127.0.0.1 -p 50022
     ```
 
 ### 4. Deploy code from the jump box
@@ -249,7 +239,7 @@ To retrieve the generated password:
 1. Use the URL displayed in the console output to launch the Relecloud application that you have deployed:
 
     ![screenshot of Relecloud app home page](assets/images/WebAppHomePage.png)
-
+ 
 ### 5. Teardown
 
 1. Close the PowerShell session on the jump box:

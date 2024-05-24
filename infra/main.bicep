@@ -43,16 +43,6 @@ param principalName string = ''
 @description('The type of the principal specified in \'principalId\'')
 param principalType string = 'ServicePrincipal'
 
-@secure()
-@minLength(12)
-@description('The password for the jump box administrator account.')
-param jumpboxAdministratorPassword string
-
-
-@minLength(8)
-@description('The username for the administrator account.  This will be used for the jump box, SQL server, and anywhere else a password is needed for creating a resource.')
-param administratorUsername string = 'azureadmin'
-
 /*
 ** Parameters that make changes to the deployment based on requirements.  They mostly have
 ** "reasonable" defaults such that a developer can just run "azd up" and get a working dev
@@ -60,18 +50,6 @@ param administratorUsername string = 'azureadmin'
 */
 
 // Settings for setting up a build agent for Azure DevOps
-@description('The URL of the Azure DevOps organization.  If this and the adoToken is provided, then an Azure DevOps build agent will be deployed.')
-param adoOrganizationUrl string = ''
-
-@description('The access token for the Azure DevOps organization.  If this and the adoOrganizationUrl is provided, then an Azure DevOps build agent will be deployed.')
-param adoToken string = ''
-
-// Settings for setting up a build agent for GitHub Actions
-@description('The URL of the GitHub repository.  If this and the githubToken is provided, then a GitHub Actions build agent will be deployed.')
-param githubRepositoryUrl string = ''
-
-@description('The personal access token for the GitHub repository.  If this and the githubRepositoryUrl is provided, then a GitHub Actions build agent will be deployed.')
-param githubToken string = ''
 
 // The IP address for the current system.  This is used to set up the firewall
 // for Key Vault and SQL Server if in development mode.
@@ -204,8 +182,6 @@ var diagnosticSettings = {
   enableMetrics: true
 }
 
-var installBuildAgent = isNetworkIsolated && ((!empty(adoOrganizationUrl) && !empty(adoToken)) || (!empty(githubRepositoryUrl) && !empty(githubToken)))
-
 var spokeAddressPrefixPrimary = '10.0.16.0/20'
 var spokeAddressPrefixSecondary = '10.0.32.0/20'
 
@@ -310,8 +286,6 @@ module hubNetwork './modules/hub-network.bicep' = if (willDeployHubNetwork) {
     logAnalyticsWorkspaceId: azureMonitor.outputs.log_analytics_workspace_id
 
     // Settings
-    administratorPassword: jumpboxAdministratorPassword
-    administratorUsername: administratorUsername
     createDevopsSubnet: true
     enableBastionHost: true
     // DDoS protection is recommended for Production deployments
@@ -477,38 +451,9 @@ module application2 './modules/application-resources.bicep' =  if (isMultiLocati
 module applicationPostConfiguration './modules/application-post-config.bicep' = {
   name: '${prefix}-application-postconfig'
   params: {
-    deploymentSettings: primaryDeploymentSettings
-    administratorPassword: jumpboxAdministratorPassword
-    administratorUsername: administratorUsername
     keyVaultName: isNetworkIsolated? hubNetwork.outputs.key_vault_name : application.outputs.key_vault_name
     kvResourceGroupName: isNetworkIsolated? resourceGroups.outputs.hub_resource_group_name : resourceGroups.outputs.application_resource_group_name
     readerIdentities: union(application.outputs.service_managed_identities, defaultDeploymentSettings.isMultiLocationDeployment ? application2.outputs.service_managed_identities : [])
-    resourceNames: naming.outputs.resourceNames
-  }
-}
-
-/*
-** Create a build agent (only if network isolated and the relevant information has been provided)
-*/
-module buildAgent './modules/build-agent.bicep' = if (installBuildAgent) {
-  name: '${prefix}-build-agent'
-  params: {
-    deploymentSettings: primaryDeploymentSettings
-    diagnosticSettings: diagnosticSettings
-    resourceNames: naming.outputs.resourceNames
-
-    // Dependencies
-    logAnalyticsWorkspaceId: azureMonitor.outputs.log_analytics_workspace_id
-    managedIdentityId: application.outputs.owner_managed_identity_id
-    subnets: isNetworkIsolated ? spokeNetwork.outputs.subnets : {}
-
-    // Settings
-    administratorPassword: jumpboxAdministratorPassword
-    administratorUsername: administratorUsername
-    adoOrganizationUrl: adoOrganizationUrl
-    adoToken: adoToken
-    githubRepositoryUrl: githubRepositoryUrl
-    githubToken: githubToken
   }
 }
 
@@ -537,7 +482,6 @@ output bastion_hostname string = willDeployHubNetwork ? hubNetwork.outputs.basti
 output firewall_hostname string = willDeployHubNetwork ? hubNetwork.outputs.firewall_hostname : ''
 
 // Spoke resources
-output build_agent string = installBuildAgent ? buildAgent.outputs.build_agent_hostname : ''
 output JUMPBOX_RESOURCE_ID string = isNetworkIsolated ? hubNetwork.outputs.jumpbox_resource_id : ''
 
 // Application resources
