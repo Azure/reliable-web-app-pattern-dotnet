@@ -136,7 +136,7 @@ Select the subscription that will be used for the deployment:
 azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
 ```
 
-Set your principal name:
+(Optionally) Set your principal name:
 
 ```pwsh
 azd env set AZURE_PRINCIPAL_NAME (Get-AzContext).Account.Id

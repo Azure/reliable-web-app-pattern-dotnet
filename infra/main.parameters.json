@@ -39,7 +39,7 @@
         "value": "${AZURE_PRINCIPAL_ID}"
     },
     "principalName": {
-        "value": "${AZURE_PRINCIPAL_NAME}"
+        "value": "${AZURE_PRINCIPAL_NAME=Developer}"
     },
     "principalType": {
         "value": "${AZURE_PRINCIPAL_TYPE=User}"
