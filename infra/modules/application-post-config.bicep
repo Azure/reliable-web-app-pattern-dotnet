@@ -41,6 +41,9 @@ type DeploymentSettings = {
   @description('The ID of the principal that is being used to deploy resources.')
   principalId: string
 
+  @description('The name of the principal that is being used to deploy resources.')
+  principalName: string
+
   @description('The type of the \'principalId\' property.')
   principalType: 'ServicePrincipal' | 'User'
 
@@ -69,17 +72,12 @@ param deploymentSettings DeploymentSettings
 */
 @secure()
 @minLength(12)
-@description('The password for the administrator account.  This will be used for the jump box, SQL server, and anywhere else a password is needed for creating a resource.')
+@description('The password for the administrator account.  This will be used for the jump box and anywhere else a password is needed for creating a resource.')
 param administratorPassword string = newGuid()
 
 @minLength(8)
 @description('The username for the administrator account on the jump box.')
 param administratorUsername string = 'adminuser'
-
-@secure()
-@minLength(8)
-@description('The password for the administrator account on the SQL Server.')
-param databasePassword string
 
 @description('The resource names for the resources to be created.')
 param resourceNames object
@@ -150,18 +148,6 @@ module writeJumpBoxCredentialsToKeyVault '../core/security/key-vault-secrets.bic
       { key: 'Jumpbox--AdministratorPassword', value: administratorPassword          }
       { key: 'Jumpbox--AdministratorUsername', value: administratorUsername          }
       { key: 'Jumpbox--ComputerName',          value: resourceNames.hubJumpbox }
-    ]
-  }
-}
-
-module writeSqlAdminInfoToKeyVault '../core/security/key-vault-secrets.bicep' = {
-  name: 'write-sql-admin-info-to-keyvault'
-  scope: existingKvResourceGroup
-  params: {
-    name: existingKeyVault.name
-    secrets: [
-      { key: 'Application--SqlAdministratorUsername', value: administratorUsername }
-      { key: 'Application--SqlAdministratorPassword', value: databasePassword }
     ]
   }
 }

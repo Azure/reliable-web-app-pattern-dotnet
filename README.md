@@ -136,6 +136,12 @@ Select the subscription that will be used for the deployment:
 azd env set AZURE_SUBSCRIPTION_ID $AZURE_SUBSCRIPTION_ID
 ```
 
+(Optionally) Set your principal name:
+
+```pwsh
+azd env set AZURE_PRINCIPAL_NAME (Get-AzContext).Account.Id
+```
+
 Set the `AZURE_LOCATION` (Run `(Get-AzLocation).Location` to see a list of locations):
 
 ```pwsh

@@ -18,8 +18,8 @@ param location string
 @description('The tags to associate with this resource.')
 param tags object = {}
 
-@description('The comma-separated list of database roles to assign to the user.')
-param databaseRoles string = 'db_datareader'
+@description('The database roles to assign to the user.')
+param databaseRoles string[] = ['db_datareader']
 
 @description('The ID of the managed identity to be used to run the script.')
 param managedIdentityId string
@@ -28,11 +28,7 @@ param managedIdentityId string
 param principalId string
 
 @description('The name of the user to create.')
-param principalName string = ''
-
-@allowed([ 'ServicePrincipal', 'User' ])
-@description('The type of identity referenced by \'principalId\'.')
-param principalType string = 'ServicePrincipal'
+param principalName string
 
 @description('The name of the SQL Database resource.')
 param sqlDatabaseName string
@@ -47,30 +43,34 @@ param uniqueScriptId string = newGuid()
 // AZURE RESOURCES
 // ========================================================================
 
-resource createSqlUserAndRole 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: 'createSqlUserAndRole-${principalId}'
-  location: location
-  tags: tags
-  kind: 'AzurePowerShell'
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${managedIdentityId}': {}
+resource createSqlUserAndRole 'Microsoft.Resources/deploymentScripts@2020-10-01' = [
+  for databaseRole in databaseRoles: {
+    name: 'sqlUserRole-${guid(principalId, databaseRole, sqlServerName, sqlDatabaseName)}'
+    location: location
+    tags: tags
+    kind: 'AzurePowerShell'
+    identity: {
+      type: 'UserAssigned'
+      userAssignedIdentities: {
+        '${managedIdentityId}': {}
+      }
+    }
+    properties: {
+      forceUpdateTag: uniqueScriptId
+      azPowerShellVersion: '7.4'
+      retentionInterval: 'PT1H'
+      cleanupPreference: 'OnExpiration'
+      arguments: join(
+        [
+          '-SqlServerName \'${sqlServerName}\''
+          '-SqlDatabaseName \'${sqlDatabaseName}\''
+          '-ObjectId \'${principalId}\''
+          '-DisplayName \'${principalName}\''
+          '-DatabaseRole \'${databaseRole}\''
+        ],
+        ' '
+      )
+      scriptContent: loadTextContent('./scripts/create-sql-user-and-role.ps1')
     }
   }
-  properties: {
-    forceUpdateTag: uniqueScriptId
-    azPowerShellVersion: '7.4'
-    retentionInterval: 'PT1H'
-    cleanupPreference: 'OnExpiration'
-    arguments: join([
-      '-SqlServerName \'${sqlServerName}\''
-      '-SqlDatabaseName \'${sqlDatabaseName}\''
-      '-ObjectId \'${principalId}\''
-      !empty(principalName) ? '-DisplayName \'${principalName}\'' : ''
-      principalType == 'ServicePrincipal' ? '-IsServicePrincipal' : ''
-      '-DatabaseRoles ${databaseRoles}'
-    ], ' ')
-    scriptContent: loadTextContent('./scripts/create-sql-user-and-role.ps1')
-  }
-}
+]

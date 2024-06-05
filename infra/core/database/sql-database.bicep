@@ -28,12 +28,22 @@ type DiagnosticSettings = {
   enableMetrics: bool
 }
 
+// From: infra/types/UserIdentity.bicep
+@description('Type describing a user identity.')
+type UserIdentity = {
+  @description('The ID of the user')
+  principalId: string
+
+  @description('The name of the user')
+  principalName: string
+}
+
 // From: infra/types/PrivateEndpointSettings.bicep
 @description('Type describing the private endpoint settings.')
 type PrivateEndpointSettings = {
   @description('The name of the resource group to hold the Private DNS Zone. By default, this uses the same resource group as the resource.')
   dnsResourceGroupName: string
-  
+
   @description('The name of the private endpoint resource.  By default, this uses a prefix of \'pe-\' followed by the name of the resource.')
   name: string
 
@@ -82,6 +92,9 @@ param privateEndpointSettings PrivateEndpointSettings?
 @description('The service tier to use for the database.')
 param sku string = 'Basic'
 
+param users UserIdentity[] = []
+param managedIdentityName string
+
 @description('If true, enable availability zone redundancy.')
 param zoneRedundant bool = false
 
@@ -106,6 +119,10 @@ var logCategories = [
 // ========================================================================
 // AZURE RESOURCES
 // ========================================================================
+
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+  name: managedIdentityName
+}
 
 resource sqlServer 'Microsoft.Sql/servers@2021-11-01' existing = {
   name: sqlServerName
@@ -167,6 +184,20 @@ resource diagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' 
     ]
   }
 }
+
+module sqluser 'create-sql-user-and-role.bicep' = [for user in users: {
+  name: 'sqluser-${guid(location, user.principalId, user.principalName, name, sqlServer.name)}'
+  params: {
+    managedIdentityId: managedIdentity.id
+    principalId: user.principalId
+    principalName: user.principalName
+    sqlDatabaseName: name
+    location: location
+    sqlServerName: sqlServer.name
+    databaseRoles: ['db_owner']
+  }
+  dependsOn: [ sqlDatabase ]
+}]
 
 // ========================================================================
 // OUTPUTS

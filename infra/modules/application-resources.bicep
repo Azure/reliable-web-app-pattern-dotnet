@@ -36,6 +36,9 @@ type DeploymentSettings = {
   @description('The ID of the principal that is being used to deploy resources.')
   principalId: string
 
+  @description('The name of the principal that is being used to deploy resources.')
+  principalName: string
+
   @description('The type of the \'principalId\' property.')
   principalType: 'ServicePrincipal' | 'User'
 
@@ -118,14 +121,6 @@ param frontDoorSettings FrontDoorSettings
 /*
 ** Settings
 */
-@secure()
-@minLength(8)
-@description('The password for the administrator account on the SQL Server.')
-param databasePassword string
-
-@minLength(8)
-@description('The username for the administrator account on the SQL Server.')
-param administratorUsername string
 
 @description('The IP address of the current system.  This is used to set up the firewall for Key Vault and SQL Server if in development mode.')
 param clientIpAddress string = ''
@@ -293,8 +288,6 @@ module sqlServer '../core/database/sql-server.bicep' = if (createSqlServer) {
     } : null
     diagnosticSettings: diagnosticSettings
     enablePublicNetworkAccess: !deploymentSettings.isNetworkIsolated
-    sqlAdministratorPassword: databasePassword
-    sqlAdministratorUsername: administratorUsername
   }
 }
 
@@ -321,6 +314,12 @@ module sqlDatabase '../core/database/sql-database.bicep' = {
     } : null
     sku: deploymentSettings.isProduction ? 'Premium' : 'Standard'
     zoneRedundant: deploymentSettings.isProduction
+    users: deploymentSettings.isProduction ? [] : [ 
+      {
+        principalId: deploymentSettings.principalId
+        principalName: deploymentSettings.principalName
+      } ]
+    managedIdentityName: ownerManagedIdentity.outputs.name
   }
 }
 

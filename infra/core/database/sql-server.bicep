@@ -68,15 +68,6 @@ param enablePublicNetworkAccess bool = true
 @description('The firewall rules to install on the Key Vault.')
 param firewallRules FirewallRules?
 
-@secure()
-@minLength(8)
-@description('The password for the administrator account on the SQL Server.')
-param sqlAdministratorPassword string = newGuid()
-
-@minLength(8)
-@description('The username for the administrator account on the SQL Server.')
-param sqlAdministratorUsername string = 'adminuser'
-
 // ========================================================================
 // VARIABLES
 // ========================================================================
@@ -100,10 +91,8 @@ resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
   location: location
   tags: tags
   properties: {
-    administratorLogin: sqlAdministratorUsername
-    administratorLoginPassword: sqlAdministratorPassword
     administrators: {
-      azureADOnlyAuthentication: false
+      azureADOnlyAuthentication: true
       login: managedIdentity.name
       principalType: 'User'
       sid: managedIdentity.properties.principalId
