@@ -29,7 +29,7 @@ code .
 
 Once Visual Studio Code is launched, you should see a popup allowing you to click on the button **Reopen in Container**.
 
-![Reopen in Container](./images/vscode-reopen-in-container.png)
+![Reopen in Container](../images/1-Tooling%20and%20Deployment/vscode-reopen-in-container.png)
 
 If you don't see the popup, open the Visual Studio Code Command Palette to execute the command. There are three ways to open the command palette:
 
@@ -39,7 +39,7 @@ If you don't see the popup, open the Visual Studio Code Command Palette to execu
 
 Once the command palette is open, search for `Dev Containers: Rebuild and Reopen in Container`.
 
-![WSL Ubuntu](./images/vscode-reopen-in-container-command.png)
+![WSL Ubuntu](../images/1-Tooling%20and%20Deployment//vscode-reopen-in-container-command.png)
 
 ### 3. Log in to Azure
 
@@ -74,7 +74,7 @@ Next we provide the AZD tool with variables that it uses to create the deploymen
 
 The environment name should be less than 18 characters and must be comprised of lower-case, numeric, and dash characters (for example, `dotnetwebapp`).  The environment name is used for resource group naming and specific resource naming.
 
-By default, Azure resources are sized for a development deployment. If doing a production deployment, see the [production deployment](./prod-deployment.md) instructions for more detail.
+By default, Azure resources are sized for a development deployment. If doing a production deployment, see the [production deployment](../../prod-deployment.md) instructions for more detail.
 
 ```pwsh
 azd env new <pick_a_name>
@@ -104,7 +104,7 @@ azd up
 
 Use the URL displayed in the console output to launch the web application that you have deployed:
 
-![screenshot of web app home page](./images/WebAppHomePage.png)
+![screenshot of web app home page](../images/1-Tooling%20and%20Deployment//WebAppHomePage.png)
 
 You can learn more about the web app by reading the [Pattern Simulations](../../demo.md) documentation.
 
