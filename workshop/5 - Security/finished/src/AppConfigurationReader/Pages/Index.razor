@@ -1,0 +1,12 @@
+﻿@page "/"
+@inject IConfiguration Configuration
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<h3>The secret message is @Configuration["greeting"]</h3>
+
+<h4>The keyvault super duper secret is @Configuration["AppConfigSuperSecret"]</h4>

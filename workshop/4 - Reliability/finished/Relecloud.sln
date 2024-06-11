@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32104.313
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Relecloud.Web.Api", "Relecloud.Web.Api\Relecloud.Web.Api.csproj", "{13320B78-0B26-4026-ADCE-FE84E1735097}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Relecloud.Web.Models", "Relecloud.Models\Relecloud.Web.Models.csproj", "{CFDE9EEE-4994-43DF-8F99-123E88BEDDE8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Relecloud.Web", "Relecloud.Web\Relecloud.Web.csproj", "{58966CC0-F7FC-467F-8DEF-6D8EC4B2DC3D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13320B78-0B26-4026-ADCE-FE84E1735097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13320B78-0B26-4026-ADCE-FE84E1735097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13320B78-0B26-4026-ADCE-FE84E1735097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13320B78-0B26-4026-ADCE-FE84E1735097}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFDE9EEE-4994-43DF-8F99-123E88BEDDE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFDE9EEE-4994-43DF-8F99-123E88BEDDE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFDE9EEE-4994-43DF-8F99-123E88BEDDE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFDE9EEE-4994-43DF-8F99-123E88BEDDE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58966CC0-F7FC-467F-8DEF-6D8EC4B2DC3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58966CC0-F7FC-467F-8DEF-6D8EC4B2DC3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58966CC0-F7FC-467F-8DEF-6D8EC4B2DC3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58966CC0-F7FC-467F-8DEF-6D8EC4B2DC3D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A0C384B5-59E7-474A-A07D-F48D883CA4F8}
+	EndGlobalSection
+EndGlobal

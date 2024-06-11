@@ -1,0 +1,113 @@
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.min-h-150 {
+    min-height: 150px !important;
+}
+
+/* Layout */
+
+fieldset {
+    margin-top: 50px;
+}
+
+textarea {
+    min-height: 100px;
+}
+
+label small {
+    color: gray;
+}
+
+.offset-top-md {
+    margin-top: 10px;
+}
+
+.search-result {
+    font-weight: bold;
+    border-bottom: 1px dotted gray;
+}
+
+.highlight {
+    margin-bottom: 10px;
+}
+
+.highlight em {
+    background-color: yellow;
+    font-weight: bold;
+}
+
+/* Validation */
+
+.body-content input[type="text"]:not([disabled]).form-control,
+.body-content input[type="password"]:not([disabled]).form-control,
+.body-content input[type="datetime"]:not([disabled]).form-control,
+.body-content input[type="datetime-local"]:not([disabled]).form-control,
+.body-content input[type="date"]:not([disabled]).form-control,
+.body-content input[type="month"]:not([disabled]).form-control,
+.body-content input[type="time"]:not([disabled]).form-control,
+.body-content input[type="week"]:not([disabled]).form-control,
+.body-content input[type="number"]:not([disabled]).form-control,
+.body-content input[type="email"]:not([disabled]).form-control,
+.body-content input[type="url"]:not([disabled]).form-control,
+.body-content input[type="search"]:not([disabled]).form-control,
+.body-content input[type="tel"]:not([disabled]).form-control,
+.body-content input[type="color"]:not([disabled]).form-control,
+.body-content input[type="range"]:not([disabled]).form-control,
+.body-content textarea:not([disabled]).form-control,
+select.form-control {
+    border-left: solid 5px #cccccc;
+}
+
+.body-content input[data-val-required]:not([disabled]).form-control,
+.body-content textarea[data-val-required]:not([disabled]).form-control,
+.body-content select[data-val-required]:not([disabled]).form-control {
+    border-left: solid 5px #f0ad4e;
+}
+
+input.input-validation-error,
+textarea.input-validation-error {
+    border: 1px solid #b94a48;
+}
+
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
+}
+
+.validation-summary-errors {
+    color: #b94a48;
+}
+
+/* Jumbotron */
+
+.jumbotron {
+    margin-top: 30px;
+    padding: 0 !important;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.jumbotron-content {
+    min-height: 500px;
+    padding: 60px;
+    background-color: #fff;
+    opacity: 0.60;
+    filter: alpha(opacity=60); /* For IE8 and earlier */
+}
+
+footer {
+    border-top: 1px solid #e5e5e5;
+    padding-top: 10px;
+    margin-top: 10px;
+    background: inherit;
+}

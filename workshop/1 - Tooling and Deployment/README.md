@@ -1,12 +1,16 @@
 ## 1 - Tooling and Deployment
 
-The following detailed deployment steps assume you are using a Dev Container inside Visual Studio Code.
+Welcome to the RWA .NET Workshop, we are going to learn how build reliable web applications using .NET and enterprise Cloud Apps. We are going to deploy a Ticket Store Application, Relecloud Concerts!
+
+For this guide, we assume you are using a Dev Container inside Visual Studio Code using Dev Containers.
 
 > For your convenience, we use Dev Containers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](../../prerequisites.md) and skip to the deployment instructions starting in [Step 3](#3-log-in-to-azure).
 
 ### 1. Clone the repo
 
 > For Windows users, we recommend using Windows Subsystem for Linux (WSL) to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
+
+Run in a PowerShell Shell window, the following command.
 
 ```pwsh
 wsl
@@ -19,13 +23,17 @@ git clone https://github.com/Azure/reliable-web-app-pattern-dotnet.git
 cd reliable-web-app-pattern-dotnet
 ```
 
+You still can run this guide outside of WSL, but performance may be affected.
+
 ### 2. Open Dev Container in Visual Studio Code
 
-If required, ensure Docker Desktop is started and enabled for your WSL terminal [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt:
+If required, ensure Docker Desktop is started and enabled for your WSL terminal [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt in WSL:
 
 ```shell
 code .
 ```
+
+> If you are not running WSL, open VS Code and Docker, as usual, to open in Container the preconfigured environment.
 
 Once Visual Studio Code is launched, you should see a popup allowing you to click on the button **Reopen in Container**.
 
@@ -43,17 +51,27 @@ Once the command palette is open, search for `Dev Containers: Rebuild and Reopen
 
 ### 3. Log in to Azure
 
-Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. Run the following command to authenticate:
+Before deploying, you must be authenticated to Azure and have the appropriate subscription selected. 
 
-If you are not using PowerShell 7+, run the following command (you can use [$PSVersionTable.PSVersion](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_powershell_editions) to check your version):
+Run the following commands to authenticate:
+
+
+
+> If you are not using PowerShell 7+, run the following command (you can use [$PSVersionTable.PSVersion](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_powershell_editions) to check your version).
+
+Open PowerShell on VSCode, or use:
 
 ```shell
 pwsh
 ```
 
+Import Az.Resources use Azure command in our Shell.
+
 ```pwsh
 Import-Module Az.Resources
 ```
+
+Login into Azure:
 
 ```pwsh
 Connect-AzAccount -UseDeviceAuthentication 
@@ -107,6 +125,10 @@ Use the URL displayed in the console output to launch the web application that y
 ![screenshot of web app home page](../images/1-Tooling%20and%20Deployment//WebAppHomePage.png)
 
 You can learn more about the web app by reading the [Pattern Simulations](../../demo.md) documentation.
+
+### 7. Follow-up
+
+Great, now we have a functioning Application for our Relecloud Concerts company. Learn more how the Reliable Web Apps pattern makes everything work, [going next](../2%20-%20RWA%20Overview/README.MD). 
 
 ### Appendix A (To be run only after completing the workshop)
 
