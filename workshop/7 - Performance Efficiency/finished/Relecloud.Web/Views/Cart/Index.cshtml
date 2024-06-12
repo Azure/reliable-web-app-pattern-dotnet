@@ -1,0 +1,54 @@
+﻿@model Relecloud.Web.ViewModels.CartViewModel
+@{
+    ViewData["Title"] = "Your Cart";
+}
+<h1>@ViewData["Title"]</h1>
+@if (Model == null || !Model.Concerts.Any())
+{
+    <div class="alert alert-info">You haven't added any concerts to your cart yet, why don't you browse around the <a asp-controller="Concert" asp-action="Index">upcoming concerts</a>?</div>
+}
+else
+{
+    <table class="table table-responsive table-bordered">
+        <thead>
+            <tr class="info">
+                <th class="col-md-9">Concert</th>
+                <th class="col-md-1">Price</th>
+                <th class="col-md-1">Tickets</th>
+                <th class="col-md-1">Total</th>
+            </tr>
+        </thead>
+        @foreach (var concert in Model.Concerts.Keys)
+        {
+            <tr>
+                <td>
+                    <form asp-controller="Cart" asp-action="Remove" asp-route-concertid="@concert.Id" method="post" class="form-inline">
+                        <button type="submit" class="btn btn-danger btn-xs" aria-label="Remove" title="Remove">
+                            <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        </button>
+                        <a asp-controller="Concert" asp-action="Details" asp-route-id="@concert.Id">@concert.Artist on @concert.StartTime.UtcDateTime.ToString()</a>
+                    </form>
+                </td>
+                <td>
+                    @concert.Price.ToString("c")
+                </td>
+                <td>
+                    @Model.Concerts[concert]
+                </td>
+                <td>
+                    @((concert.Price * Model.Concerts[concert]).ToString("c"))
+                </td>
+            </tr>
+        }
+        <tfoot>
+            <tr class="info">
+                <th></th>
+                <th></th>
+                <th>@Model.TotalTickets</th>
+                <th>@Model.TotalPrice.ToString("c")</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <a asp-controller="Cart" asp-action="Checkout" class="btn btn-success">Checkout &raquo;</a>
+}

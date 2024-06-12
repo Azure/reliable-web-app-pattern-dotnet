@@ -1,0 +1,30 @@
+﻿@model IList<Concert>
+
+@{
+    ViewData["Title"] = "Upcoming Concerts";
+}
+
+@if (User.IsInRole(Roles.Administrator))
+{
+    <a class="float-end" asp-controller="Concert" asp-action="Create">Create</a>
+}
+<h1>@ViewData["Title"]</h1>
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">There are no upcoming concerts.</div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var concert in Model)
+        {
+            <div class="list-group-item">
+                <h3 class="list-group-item-heading">
+                    <a asp-controller="Concert" asp-action="Details" asp-route-id="@concert.Id">@concert.Artist &mdash; @concert.Title</a>
+                    <span class="label label-info">@concert.Price.ToString("c")</span>
+                </h3>
+                <div class="text-muted"><span class="badge bg-secondary">@concert.Genre</span> @concert.StartTime.UtcDateTime.ToString() &raquo; @concert.Location</div>
+            </div>
+        }
+    </div>
+}

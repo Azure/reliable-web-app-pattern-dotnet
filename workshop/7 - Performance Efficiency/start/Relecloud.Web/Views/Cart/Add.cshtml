@@ -1,0 +1,34 @@
+﻿@model Relecloud.Web.Models.ConcertContext.Concert
+@{
+    ViewData["Title"] = "Add To Cart";
+}
+<h1>@ViewData["Title"]</h1>
+
+@if(Model is null)
+{
+    <div>Oops! Something went wrong. Please try again.</div>
+    return;
+}
+
+<form asp-controller="Cart" asp-action="Add" method="post" class="form-inline">
+    <div>
+        <select name="count" class="form-select w-auto d-inline-block">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>20</option>
+        </select>
+        ticket(s) for <a asp-controller="Concert" asp-action="Details" asp-route-id="@Model.Id">@Model.Artist on @Model.StartTime.UtcDateTime.ToString()</a>
+    </div>
+    <div class="offset-top-md">
+        <input type="hidden" name="concertId" value="@Model.Id" />
+        <input type="submit" class="btn btn-success btn-lg" value="Confirm" />
+    </div>
+</form>

@@ -1,0 +1,78 @@
+﻿@using Relecloud.Web.ViewModels
+
+@model ConcertViewModel
+
+@{
+    ViewData["Title"] = "Create Concert";
+}
+
+@if (Model is null || Model.Concert is null)
+{
+    <div class="row">
+        <div class="col-md-8">
+            We're sorry, but an error is blocking the concert edit feature. Please try again later.
+        </div>
+    </div>
+    return;
+}
+
+<h4 class="mb-3">@ViewData["Title"]</h4>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Concert!.Artist" class="form-label"></label>
+                <input asp-for="Concert!.Artist" class="form-control" />
+                <span asp-validation-for="Concert!.Artist" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Concert!.Genre" class="form-label"></label>
+                <input asp-for="Concert!.Genre" class="form-control" />
+                <span asp-validation-for="Concert!.Genre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Concert!.Location" class="form-label"></label>
+                <input asp-for="Concert!.Location" class="form-control" />
+                <span asp-validation-for="Concert!.Location" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Concert!.Title" class="form-label"></label>
+                <input asp-for="Concert!.Title" class="form-control" />
+                <span asp-validation-for="Concert!.Title" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Concert!.Description" class="form-label"></label>
+                <textarea asp-for="Concert!.Description" class="form-control min-h-150" ></textarea>
+                <span asp-validation-for="Concert!.Description" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Concert!.Price" class="form-label"></label>
+                <input asp-for="Concert!.Price" class="form-control" />
+                <span asp-validation-for="Concert!.Price" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Concert!.StartTime" class="form-label"></label>
+                <input asp-for="Concert!.StartTime" class="form-control" type="date" />
+                <span asp-validation-for="Concert!.StartTime" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <input asp-for="Concert!.IsVisible" class="form-check-input" />
+                <label asp-for="Concert!.IsVisible" class="form-check-label"></label>
+                <span asp-validation-for="Concert!.IsVisible" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,120 @@
+﻿@model Relecloud.Web.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model == null || Model.Cart == null || Model.PaymentDetails == null)
+{
+    <div class="row">
+        <div class="col-md-8">
+            We're sorry, but an error is blocking your checkout. Please try again later.
+        </div>
+    </div>
+
+    return;
+}
+
+<form asp-action="Checkout">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row">
+        <div class="col-md-8">
+            <fieldset>
+                <legend>Customer Payment Details</legend>
+                <div class="mb-3">
+                    <label asp-for="PaymentDetails!.Name" class="form-label"></label>
+                    <input asp-for="PaymentDetails!.Name" class="form-control" />
+                    <span asp-validation-for="PaymentDetails!.Name" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PaymentDetails!.Email" class="form-label"></label>
+                    <input asp-for="PaymentDetails!.Email" class="form-control" />
+                    <span asp-validation-for="PaymentDetails!.Email" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PaymentDetails!.Phone" class="form-label"></label>
+                    <input asp-for="PaymentDetails!.Phone" class="form-control" />
+                    <span asp-validation-for="PaymentDetails!.Phone" class="text-danger"></span>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Customer Payment Details</legend>
+                <div class="mb-3">
+                    <label asp-for="PaymentDetails!.NameOnCard" class="form-label"></label>
+                    <input asp-for="PaymentDetails!.NameOnCard" class="form-control" />
+                    <span asp-validation-for="PaymentDetails!.NameOnCard" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PaymentDetails!.CardType" class="form-label"></label>
+                    <select asp-for="PaymentDetails!.CardType" asp-items="Model.GetCardTypeList()" class="form-select"></select>
+                    <span asp-validation-for="PaymentDetails!.CardType" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PaymentDetails!.CardNumber" class="form-label"></label>
+                    <select asp-for="PaymentDetails!.CardNumber" asp-items="Model.GetSampleCardNumbers()" class="form-select"></select>
+                    <span asp-validation-for="PaymentDetails!.CardNumber" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PaymentDetails!.ExpirationMonthYear" class="form-label"></label>
+                    <input asp-for="PaymentDetails!.ExpirationMonthYear" class="form-control" />
+                    <span asp-validation-for="PaymentDetails!.ExpirationMonthYear" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PaymentDetails!.SecurityCode" class="form-label"></label>
+                    <select asp-for="PaymentDetails!.SecurityCode" asp-items="Model.GetSampleSecurityCodes()" class="form-select"></select>
+                    <span asp-validation-for="PaymentDetails!.SecurityCode" class="text-danger"></span>
+                </div>
+            </fieldset>
+
+            <div class="mb-3">
+                <input type="submit" value="Purchase" class="btn btn-primary" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <fieldset>
+                <legend>Your Order</legend>
+                <div class="alert alert-info">
+                    <table>
+                        <thead>
+                            <tr class="info">
+                                <th class="col-md-9">Concert</th>
+                                <th class="col-md-1">Price</th>
+                            </tr>
+                        </thead>
+                        @foreach (var concert in Model.Cart.Concerts.Keys)
+                        {
+                            <tr>
+                                <td>
+                                    @concert.Artist on @concert.StartTime.UtcDateTime.ToString()
+                                </td>
+                                <td>
+                                    @((concert.Price * Model.Cart.Concerts[concert]).ToString("c"))
+                                </td>
+                            </tr>
+                        }
+                        <tfoot>
+                            <tr>
+                                <td class="pt-3">Total purchases</td>
+                                <td class="pt-3">@Model.Cart.TotalPrice.ToString("c")</td>
+                            </tr>
+                            <tr>
+                                <td>Sales tax</td>
+                                <td>@Model.Cart.TotalPrice.ToString("c")</td>
+                            </tr>
+                            <tr>
+                                <th class="pt-3">Total</th>
+                                <th class="pt-3">@Model.Cart.TotalPrice.ToString("c")</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
