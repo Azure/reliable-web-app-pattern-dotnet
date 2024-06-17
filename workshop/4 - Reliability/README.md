@@ -28,9 +28,7 @@ To experiment with the Retry pattern, we'll need to change the application and m
 
 1. Verify that both the **Relecloud.Web.CallCenter.Api** and **Relecloud.Web.CallCenter** projects are set as startup projects.
     1. Verify that the **C# Dev Kit** is installed in your VS Code, if not install [here](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit).
-    1. From the **Solution Explorer**, right-click on the **Relecloud** solution and select **Configure Startup Projects**.
-    1. Verify **Multiple startup projects** is selected.
-    1. Verify both **Relecloud.Web.Api** and **Relecloud.Web** are set to **Start**.
+    1. From the **Run & Debug**, check that the correct option to deploy is selected **Web + Api** 
 
     ![Screenshot of the multiple startup dialog](../images/4-Reliability/multiple-startups.png)
 
@@ -50,8 +48,8 @@ Let's make our application more resilient!
 
 Most Azure services and client SDKs have a built-in retry mechanism. You should use the built-in retry mechanism for Azure services to expedite the implementation. Let's see how to implement the retry pattern using Entity Framework Core's built-in retry mechanism.
 
-1. Open the **Part 4\Reliability\src\Relecloud.sln** solution in Visual Studio.
-1. Open the **Relecloud.Web.Api** project's **Startup.cs** file.
+1. Select the main **Relecloud** solution.
+1. Open the **Relecloud.CallCenter.Api** project's **Startup.cs** file.
 1. Browse to the `AddConcertContextServices` method. This method configures the Entity Framework Core context for the application.
 1. Change the `services.AddDbContextPool<ConcertDataContext>` call to the following code:
 
@@ -69,6 +67,7 @@ Most Azure services and client SDKs have a built-in retry mechanism. You should 
     The `EnableRetryOnFailure` method enables the built-in retry mechanism for Entity Framework Core. The default retry policy is to retry up to 6 times with a 2-second delay between retries. You can change the default retry policy by passing a `MaxRetryCount` and `MaxRetryDelay` to the `EnableRetryOnFailure` method.
 
 Now we'll use the Azure App Configuration's SDK to add a retry policy to communication with the Azure App Configuration service.
+
 
 1. Open the **Program.cs** file from the same project.
 1. Browse to the `builder.Configuration.AddAzureAppConfiguration` call. It should be on line 11.
@@ -111,11 +110,13 @@ Now we'll use the Azure App Configuration's SDK to add a retry policy to communi
 
 You might need to make calls to a dependency that isn't an Azure service or doesn't support the Retry pattern natively. In that case, you should use the [Polly library](https://github.com/App-vNext/Polly) to implement the Retry pattern. Polly is a .NET resilience and transient-fault-handling library.
 
-Let's implement custom retry policies to the Relecloud.Web project to handle any transient communication faults with the Relecloud.Web.Api service.
+Let's implement custom retry policies to the Relecloud.Web project to handle any transient communication faults with the Relecloud.Web.CallCenter.Api service.
 
-1. Add the Polly NuGet package to **Relecloud.Web**. From **Solution Explorer**, right-click the **Relecloud.Web** project and select **Manage NuGet Packages**.
+
+1. Open in solution explorer in VS Code the main **Relecloud solution**.
+1. Add the Polly NuGet package to **Relecloud.Web.CallCenter**. From **Solution Explorer**, right-click the **Relecloud.Web.CallCenter** project and select **Manage NuGet Packages**.
     1. From the **Browse** tab, search for **Polly.Contrib.WaitAndRetry** and then click **Install**.
-1. Open the **Startup.cs** file from the **Relecloud.Web** project.
+1. Open the **Startup.cs** file from the **Relecloud.Web.CallCenter** project.
 1. Add the following using statements to the top of the file:
 
     ```csharp
@@ -177,7 +178,7 @@ You should pair the Retry pattern with the Circuit Breaker pattern. The Circuit 
 
 You can implement the circuit breaker pattern with Polly as follows:
 
-1. Open the **Startup.cs** file from the **Relecloud.Web** project.
+1. Open the **Startup.cs** file from the **Relecloud.Web.CallCenter** project.
 1. Add the following method
 
     ```csharp
