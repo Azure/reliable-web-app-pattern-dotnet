@@ -8,11 +8,36 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "buildweb",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/Relecloud.Web/bin/Debug/net6.0/Relecloud.Web.dll",
+            "program": "${workspaceFolder}/src/Relecloud.Web.CallCenter/bin/Debug/net6.0/Relecloud.Web.CallCenter.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/Relecloud.Web",
+            "cwd": "${workspaceFolder}/src/Relecloud.Web.CallCenter",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+            "name": ".NET Core Launch (Api)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildweb",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/src/Relecloud.Web.CallCenter.Api/bin/Debug/net6.0/Relecloud.Web.CallCenter.Api.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Relecloud.Web.CallCenter.Api",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {
@@ -31,5 +56,15 @@
             "type": "coreclr",
             "request": "attach"
         }
-    ]
+    ],
+    "compounds": [
+    {
+      "name": "Web + Api",
+      "configurations": [
+        ".NET Core Launch (web)",
+        ".NET Core Launch (Api)"
+      ],
+      "stopAll": true
+    }
+  ]
 }

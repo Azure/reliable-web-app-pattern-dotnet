@@ -8,12 +8,12 @@ These design patterns introduce self-healing qualities and help your application
 
 The Retry pattern is a technique for handling temporary service interruptions. These temporary service interruptions are known as transient faults. They're transient because they typically resolve themselves in a few seconds.
 
-### Run the application locally
+### Changing our application
 
-To experiment with the Retry pattern, we'll need to run the application locally and manually simulate a transient fault.
+To experiment with the Retry pattern, we'll need to change the application and manually simulate a transient fault.
 
-1. Open the **4 - Reliability\src\Relecloud.sln** solution.
-1. Open the **Relecloud.Web.Api** project's **appsettings.json** file.
+1. Open the main solution in **src\Relecloud.sln**.
+1. Open the **Relecloud.Web.CallCenter.Api** project's **appsettings.json** file.
 1. Add the following key immediately after the **AllowedHosts** key:
 
     ```json
@@ -24,9 +24,10 @@ To experiment with the Retry pattern, we'll need to run the application locally 
     }
     ```
 
-    This sets the **Relecloud.Web.Api** service to throw an exception every other time it's called. This will simulate a transient fault.
+    This sets the **Relecloud.Web.CallCenter.Api** service to throw an exception every other time it's called. This will simulate a transient fault.
 
-1. Verify that both the **Relecloud.Web.Api** and **Relecloud.Web** projects are set as startup projects.
+1. Verify that both the **Relecloud.Web.CallCenter.Api** and **Relecloud.Web.CallCenter** projects are set as startup projects.
+    1. Verify that the **C# Dev Kit** is installed in your VS Code, if not install [here](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit).
     1. From the **Solution Explorer**, right-click on the **Relecloud** solution and select **Configure Startup Projects**.
     1. Verify **Multiple startup projects** is selected.
     1. Verify both **Relecloud.Web.Api** and **Relecloud.Web** are set to **Start**.

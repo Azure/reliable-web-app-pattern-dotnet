@@ -2,12 +2,24 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "buildweb",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/Relecloud.Web/Relecloud.Web.csproj",
+                "${workspaceFolder}/src/Relecloud.Web.CallCenter/Relecloud.Web.CallCenter.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "buildapi",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/Relecloud.Web.CallCenter.Api/Relecloud.Web.CallCenter.Api.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +31,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/Relecloud.Web/Relecloud.Web.csproj",
+                "${workspaceFolder}/src/Relecloud.Web.CallCenter/Relecloud.Web.CallCenter.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +45,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/src/Relecloud.Web/Relecloud.Web.csproj"
+                "${workspaceFolder}/src/Relecloud.Web.CallCenter/Relecloud.Web.CallCenter.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
