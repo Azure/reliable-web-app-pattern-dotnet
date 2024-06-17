@@ -18,9 +18,9 @@ This workshop is designed to help you learn how to take your application's first
 ## Table of Contents
 
 - [1️⃣ Part 1 - Tooling and Deployment](./1%20-%20Tooling%20and%20Deployment/README.md)
-- 2️⃣ Part 2 - RWA Overview
-- 3️⃣ Part 3 - Cost Optimization
-- 4️⃣ Part 4 - Reliability
-- 5️⃣ Part 5 - Security
-- 6️⃣ Part 6 - Operational Excellence
-- 7️⃣ Part 7 - Performance Efficiency
+- [2️⃣ Part 2 - RWA Overview](./2%20-%RWA%Overview/README.md)
+- [3️⃣ Part 3 - Cost Optimization](./3%20-%20Cost%20Optimization/README.md)
+- [4️⃣ Part 4 - Reliability](./4%20-%20Reliability/README.md)
+- [5️⃣ Part 5 - Security](./5%20-%20Security/README.md)
+- [6️⃣ Part 6 - Operational Excellence](./6%20-%20Operational%20Excellence/README.md)
+- [7️⃣ Part 7 - Performance Efficiency](./7%20-%20Performance%20Efficiency/README.md)
