@@ -1,8 +1,8 @@
 # 2 - Reliable Web App Pattern - .NET Overview
 
-The reliable web app pattern is a set of principles that helps developers successfully migrate web applications to the cloud. It provides implementation guidance built on the Azure Well-Architected Framework. The pattern focuses on the minimal changes you need to make to ensure the success of your web app in the cloud.
+The reliable web app pattern (or RWA) is a set of principles that helps developers successfully migrate web applications to the cloud. It provides implementation guidance built on the Azure Well-Architected Framework. The pattern focuses on the minimal changes you need to make to ensure the success of your web app in the cloud.
 
-In this workshop we're going to run through the principles and show how to apply them to your web applications.
+In this workshop series, we're going to run through the principles and show how to apply them to your web applications.
 
 ## Enterprise web app cloud journey
 
@@ -16,7 +16,9 @@ But first, let's explore what it means to converge in the cloud and create an ap
 
 ## Pattern of patterns
 
-That's not to say that the reliable web app pattern is simpilistic. It's not. It's a pattern of patterns. Each pattern provides prescriptive guidance on how to build a specific aspect of a reliable web application. You can use them together or separately.
+That's not to say that the reliable web app pattern is simpilistic. _It is not_. 
+
+It's a pattern of patterns. Each pattern provides prescriptive guidance on how to build a specific aspect of a reliable web application. You can use them together or separately.
 
 The image below shows just some of the considerations that you'll need to take into account when converging to the cloud and the reliable web app pattern provides guidance on those. In fact, the reliable web app pattern builds on real-world tested technologies and techniques, like the Azure Well-Architected Framework to produce the set of patterns that you'll learn about in the image below.
 
@@ -24,7 +26,7 @@ The image below shows just some of the considerations that you'll need to take i
 
 ## Objectives
 
-The objectives of the reliable web app pattern are straightforward. It's designed to help you:
+The objectives of the reliable web app pattern are straightforward. It's designed to help you migrate to the cloud with good cloud practices:
 
 ![Objectives](../images/2-RWA%20Overview/objectives.png)
 

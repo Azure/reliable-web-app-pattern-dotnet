@@ -1,8 +1,12 @@
 # 3 - Cost Optimization
 
-Cost optimization principles balance business goals with budget justification to create a cost-effective web application. Cost optimization is about reducing unnecessary expenses and improving operational efficiencies.
+Cost optimization principles balance business goals with budget justification to create a cost-effective web application. This pillar is about reducing unnecessary expenses and improving operational efficiencies.
 
-We'll explore 4 techniques for cost optimization. Correctly sizing the resources for your business needs. Computing service-level agreements. Aiming for scalable costs. And finally, making sure to delete and cleanup what you no longer need.
+We'll explore 4 techniques for cost optimization. 
+- Correctly sizing the resources for your business needs. 
+- Computing service-level agreements. 
+- Aiming for scalable costs. 
+- To delete and cleanup what you no longer need.
 
 In this portion of the workshop, we'll be working with a simple Blazor Server application deployed to Azure App Service that reads a value from Azure App Configuration.
 
@@ -10,13 +14,14 @@ In this portion of the workshop, we'll be working with a simple Blazor Server ap
 
 ## Right size resources
 
-You can use bicep parameters to specify Azure resource deployment configurations. We'll use a small sample contained in this [folder directory](../3%20-%20Cost%20Optimization/azd-sample/) to illustrate this technique.
+You can use bicep parameters to specify Azure resource deployment configurations. We'll use a small sample contained in this [folder directory](../3%20-%20Cost%20Optimization/azd-sample/) and PowerShell to illustrate this technique. If you are not logged in Azure, before following the guide, [click for instructions to login](../1%20-%20Tooling%20and%20Deployment/README.md#3-log-in-to-azure).
 
-1. Open a PowerShell terminal and navigate to the **3 - Cost Optimization\azd-sample** directory or [click here](../3%20-%20Cost%20Optimization/azd-sample/) to open.
-1. Run the following command to initialize an Azure Developer CLI (azd) environment. _(Replace `<USERNAME>` below with the username you were given at the start of this workshop. Only use the portion before the `@` symbol.)_
+
+1. Open the *PowerShell terminal* and navigate to the **3 - Cost Optimization\azd-sample** directory or [click here](../3%20-%20Cost%20Optimization/azd-sample/) to open.
+1. Run the following command to initialize an Azure Developer CLI (azd) environment. _(Replace `<env-name>` below the desired environment name, remember use valid chars, this will reflect in the website URL.)_
 
     ```powershell
-    $costEnvironmentName = '<USERNAME>'
+    $costEnvironmentName = '<env-name>'
     azd init -e $costEnvironmentName
     ```
 1. Run the following command to set an azd environment variable. This variable will be passed into the bicep file as a parameter.
@@ -56,7 +61,7 @@ You can use bicep parameters to specify Azure resource deployment configurations
     azd up
     ```
 
-    You will be prompted to pick a subscription and Azure region. You should only have one subscription option, and pick **EastUS** for the region.
+    You will be prompted to pick a subscription and Azure region. Select your subscription option, and pick **EastUS** for the region.
 
 2. When the provisioning and deployment is finished, the URL for the sample application will be displayed in the terminal. Open that URL in a browser. You should see the sample application running.
 
@@ -102,7 +107,7 @@ You want to have your resources scale up and down as needed. Azure App Service h
 
     ![Screenshot of the App Service Plan](../images/3-Cost%20Optimization/app-service-plan-p1v2.png)
 
-1. Click on **Scale out (App Service Plan)** in the left navigation. You should see that autoscaling is enabled with a "Rules Based" scale out method.  Click on **Manage rules based scaling** to see the scaling rules.
+1. Click on **Scale out (App Service Plan)** in the left navigation menu, under Settings. You should see that autoscaling is enabled with a "Rules Based" scale out method.  Click on **Manage rules based scaling** to see the scaling rules.
 
     ![Screenshot of the scale out settings](../images/3-Cost%20Optimization/scale-out.png)
 

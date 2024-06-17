@@ -10,7 +10,7 @@ For this guide, we assume you are using a Dev Container inside Visual Studio Cod
 
 > For Windows users, we recommend using Windows Subsystem for Linux (WSL) to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
 
-Run in a PowerShell Shell window, the following command.
+Open and run in a PowerShell Shell window, the following command.
 
 ```pwsh
 wsl
@@ -23,7 +23,7 @@ git clone https://github.com/Azure/reliable-web-app-pattern-dotnet.git
 cd reliable-web-app-pattern-dotnet
 ```
 
-You still can run this guide outside of WSL, but performance may be affected.
+> You still can run this guide outside of WSL in Windows, but performance may be affected. Clone the repo with the instructions above.
 
 ### 2. Open Dev Container in Visual Studio Code
 
