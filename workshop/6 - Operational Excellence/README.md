@@ -1,10 +1,16 @@
 # 6 - Operational excellence
 
-Operational excellence encompasses the procedures that ensure smooth functioning of an application in a production environment. Deployments should be both dependable and consistent. By automating these deployments, the likelihood of human error is significantly reduced. Efficient and routine deployment processes facilitate the swift release of new features and bug fixes without causing delays. Additionally, it is crucial to have the ability to rapidly roll back in case of any issues arising from a release.
+Operational excellence encompasses the procedures that ensure smooth functioning of an application in a production environment. **Deployments should be both dependable and consistent**. 
+
+By automating deployments, the likelihood of human error is significantly reduced. As efficient and routine deployment processes facilitate the swift release of new features and bug fixes without causing delays. 
+
+Additionally, it is crucial to have the ability to rapidly roll back in case of any issues arising from a release.
 
 ## Repeatable infrastructure
 
-Cloud computing changes the way we procure infrastructure. No longer are we unboxing, racking, and cabling physical infrastructure. We have internet accessible management portals and REST interfaces to help us. We can now provision virtual machines, databases, and other cloud services on demand and globally. When we no longer need cloud services, they can be easily deleted. As businesses move to the cloud, they need to repeatedly deploy their solutions and know that their infrastructure is in a reliable state. To meet these challenges, you can automate deployments using a practice referred to as infrastructure as code. In code, you define the infrastructure that needs to be deployed. A DevOps methodology provides a greater return on investment for application teams in the cloud. Infrastructure as Code (IaC) is a key tenet of DevOps. The reliable web app pattern requires the use of IaC to deploy application infrastructure, configure services, and set up application telemetry. 
+Cloud computing changes how we procure infrastructure. No longer are we unboxing, racking, and cabling physical infrastructure. We have internet accessible management portals and REST interfaces to help us. We can now provision virtual machines, databases, and other cloud services on demand and globally. When we no longer need cloud services, they can be easily deleted. As businesses move to the cloud, they need to repeatedly deploy their solutions and know that their infrastructure is in a reliable state. 
+
+To meet these challenges, you can automate deployments using a practice referred to as *infrastructure as code*. In code, you define the infrastructure that needs to be deployed. A DevOps methodology provides a greater return on investment for application teams in the cloud. Infrastructure as Code (IaC) is a key tenet of DevOps. The reliable web app pattern requires the use of IaC to deploy application infrastructure, configure services, and set up application telemetry. 
 
 The reference implementation uses Azure Dev CLI and IaC (Bicep templates) to create Azure resources, setup configuration, and deploy the required resources from a GitHub Action.
 
@@ -41,7 +47,9 @@ The following example shows a simple Bicep file that defines a Azure Redis Cache
 
 ## Automate operational tasks
 
-Operational tasks encompass various actions and activities performed while managing systems, system access, and processes. Examples include rebooting servers, creating accounts, and transferring logs to a data store. Automating these tasks using scripting technologies can save time and reduce errors. In this module, we will examine the script to rotate client secrets in the Relecloud application.
+Operational tasks encompass various actions and activities performed while managing systems, system access, and processes. Examples include rebooting servers, creating accounts, and transferring logs to a data store. 
+
+Automating these tasks using scripting technologies can save time and reduce errors. In this module, we will examine the script to rotate client secrets in the Relecloud application.
 
 ## Rotating Secrets
 

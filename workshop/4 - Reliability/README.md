@@ -199,7 +199,7 @@ You can implement the circuit breaker pattern with Polly as follows:
     .AddPolicyHandler(GetCircuitBreakerPolicy());
     ```
 
-1. To simulate **Relecloud.Web.Api** being down, update the `Api:App:RetryDemo` key in the project's **appsettings.json** file to have a value of **1**.
+1. To simulate **Relecloud.Web.CallCenter.Api** being down, update the `Api:App:RetryDemo` key in the project's **appsettings.json** file to have a value of **1**.
 
     ```json
     "Api": {
@@ -211,7 +211,7 @@ You can implement the circuit breaker pattern with Polly as follows:
 
     This sets the **Relecloud.Web.Api** service to throw an exception every time an HTTP request is received.
 
-1. Run the application locally again, this time if 5 exceptions occur within 30 seconds, the circuit will break and the application will stop trying to communicate with the **Relecloud.Web.Api** service.
+1. Run the application locally again, this time if 5 exceptions occur within 30 seconds, the circuit will break and the application will stop trying to communicate with the **Relecloud.Web.CallCenter.Api** service.
 1. When you call it more than 5 times you will start to see a `Polly.CircuitBreaker.BrokenCircuitException` exception in the output window.
 
     ![Screenshot of circuit breaker exception](../images/4-Reliability/circuit-breaker.png)

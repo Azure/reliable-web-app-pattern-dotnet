@@ -8,10 +8,10 @@ The Cache-Aside pattern is a technique that's used to manage in-memory data cach
 
 Let's implement the Cache-Aside pattern in our application.
 
-1. Open the **7 - Performance Efficiency\start\Relecloud.sln** solution.
-1. From the **Solution Explorer**, right-click on the **Relecloud.Web.Api** project and select **Manage NuGet Packages**.
+1. Open the **Relecloud.sln** solution.
+1. From the **Solution Explorer**, right-click on the **Relecloud.Web.CallCenter.Api** project and select **Manage NuGet Packages**.
 1. Search for **Microsoft.Extensions.Caching.StackExchangeRedis** and install the package.
-1. Open the **Startup.cs** of the **Relecloud.Web.Api** project and browse to the `AddDistributedSession` method.
+1. Open the **Startup.cs** of the **Relecloud.Web.CallCenter.Api** project and browse to the `AddDistributedSession` method.
 1. Delete the code inside that method.
 1. Add code to read the Azure Redis Cache connection string from the configuration settings.
 
@@ -211,14 +211,13 @@ Thank you for attending this workshop.  We hope you learned something and feel m
 ### Cleaning up the cost optimization web application
 
 1. Open a PowerShell terminal.
-2. Change directory to the `3 - Cost Optimization\azd-sample` directory.
 3. Run the command `azd down --force --purge --no-prompt`.
 
 You may also log on to the Azure portal, select the resource group and press **Delete Resource group**.  The resource group is named similar to **<USERNAME>-cost-rg**.
 
 ### Cleaning up the reliable web app sample
 
-1. Change directory to the `Reference App` directory.
+1. Change directory to the `src` directory.
 2. Run the command `azd down --force --purge --no-prompt`.
 
 You may also log on to the Azure portal, select each resource group and press **Delete Resource group**.  There are two resource groups: **<USERNAME>-rg** and **<USERNAME>-secondary-rg**.
