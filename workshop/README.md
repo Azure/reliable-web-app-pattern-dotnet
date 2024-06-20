@@ -24,3 +24,4 @@ This workshop is designed to help you learn how to take your application's first
 - [5️⃣ Part 5 - Security](./5%20-%20Security/README.md)
 - [6️⃣ Part 6 - Operational Excellence](./6%20-%20Operational%20Excellence/README.md)
 - [7️⃣ Part 7 - Performance Efficiency](./7%20-%20Performance%20Efficiency/README.md)
+- [8️⃣ Part 8 - Clean Up](./8%20-%20Clean%20Up/README.md)

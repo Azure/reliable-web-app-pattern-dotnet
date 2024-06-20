@@ -124,7 +124,17 @@ Use the URL displayed in the console output to launch the web application that y
 
 ![screenshot of web app home page](../images/1-Tooling%20and%20Deployment//WebAppHomePage.png)
 
-You can learn more about the web app by reading the [Pattern Simulations](../../demo.md) documentation.
+The application is for the fictional company Relecloud, embodying the reliable web app pattern with a focus on .NET technologies. Relecloud Tickets is a production-grade web application that uses best practices from our guidance and gives developers concrete examples to build their own Reliable Web Application in Azure. Guiding developers through a simulated migration from an on-premises ASP.NET application to Azure, detailing the architectural changes and enhancements that capitalize on the cloud's strengths during the initial adoption phase. 
+
+![architecture diagram](../../assets/icons/reliable-web-app-dotnet.svg)
+
+This diagram illustrates the production deployment, while also detailing a development deployment which is a more streamlined version. Key aspects include:
+
+- Cost Efficiency: Utilizes a hub for shared resources, such as Azure Bastion, to enable secure, cost-effective remote access without individual deployments.
+- Traffic Control & Security: Employs Network Security Groups and Route tables for secure traffic management within subnets, complemented by Private endpoints and a jump box for secure local IP access.
+- Network Integration: Facilitates data transfer and hybrid scenarios, with recommendations to consider ExpressRoute or Azure VPN Gateway for hybrid network connections.
+
+For more details, learn more reading about the Archtecture and Workflow, look at the main [Readme](../../README.md) to learn more about the application in detail.
 
 ### 7. Follow-up
 
