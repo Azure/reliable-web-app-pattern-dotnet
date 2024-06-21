@@ -113,6 +113,111 @@ You want to have your resources scale up and down as needed. Azure App Service h
 
 > Note: Due to limits of the free subsription, the autoscaling may not work. However, it will work if you have a paid subscription.
 
+## Cost Optimization in the Relecloud Tickets Application
+
+Analyzing the Relecloud Ticket application, it is possible to understand how production applications do apply Cost Optimizations in Azure in the Code. Helping Relecloud to operate the platform with cost efficiency and smooth with Azure and Bicep configurations.
+
+First, open the bicep file for App Service plan for the main application, the file can be found at ```infra\core\hosting\app-service-plan.bicep```.
+
+In the file, we do have the maps to the Service Plans for each plan, for each step while scaling or descaling. This goes from the most basic plan in B1 until a Premium plan in P3v3.
+
+```bicep
+// https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/patterns-configuration-set#example
+var environmentConfigurationMap = {
+  B1:   { name: 'B1',   tier: 'Basic',          size: 'B1',   family: 'B'   }
+  B2:   { name: 'B2',   tier: 'Basic',          size: 'B2',   family: 'B'   }
+  B3:   { name: 'B3',   tier: 'Basic',          size: 'B3',   family: 'B'   }
+  P0v3: { name: 'P0v3', tier: 'PremiumV3',      size: 'P0v3', family: 'Pv3' }
+  P1v3: { name: 'P1v3', tier: 'PremiumV3',      size: 'P1v3', family: 'Pv3' }
+  P2v3: { name: 'P2v3', tier: 'PremiumV3',      size: 'P2v3', family: 'Pv3' }
+  P3v3: { name: 'P3v3', tier: 'PremiumV3',      size: 'P3v3', family: 'Pv3' }
+  S1:   { name: 'S1',   tier: 'Standard',       size: 'S1',   family: 'S'   }
+  S2:   { name: 'S2',   tier: 'Standard',       size: 'S2',   family: 'S'   }
+  S3:   { name: 'S3',   tier: 'Standard',       size: 'S3',   family: 'S'   }
+}
+```
+
+In the next section of the Bicep script, we delineate the auto-scaling rules for the application. 
+
+The script is structured to first retrieve the properties defined within the Bicep configuration. Following this, it adjusts the scaling parameters based on predefined trigger points to ensure optimal performance. 
+
+```bicep
+resource autoScaleRule 'Microsoft.Insights/autoscalesettings@2022-10-01' = if (autoScaleSettings != null) {
+  name: '${name}-autoscale'
+  location: location
+  tags: tags
+  properties: {
+    targetResourceUri: appServicePlan.id
+    enabled: true
+```
+
+This condition specifies the capacity boundaries for scaling operations. The minimum and default capacity values are determined by a conditional check on zoneRedundant. Being the minCapacity and maxCapacity setted in the autoScaleSettings.
+
+```bicep
+    profiles: [
+      {
+        name: 'Auto created scale condition'
+        capacity: {
+          minimum: string(zoneRedundant ? 3 : autoScaleSettings!.minCapacity)
+          maximum: string(autoScaleSettings!.maxCapacity)
+          default: string(zoneRedundant ? 3 : autoScaleSettings!.minCapacity)
+        }
+```
+Let's look how the rule defines a metric-based trigger for auto-scaling for a better service.
+
+Starting with, specifing that the CPU usage percentage of the app service plan is monitored. The metric is evaluated over a period of 5 minutes (PT5M). 
+
+If the average CPU percentage over a 10-minute window (PT10M) exceeds the defined threshold, the scale action is triggered. 
+
+The action specified is to increase the instance count, with a cooldown period of 10 minutes before another scale action can be initiated.
+
+ This rule ensures that the application scales up responsively when the CPU load increases, maintaining performance while avoiding unnecessary scaling.
+
+```bicep
+        rules: [
+          {
+            metricTrigger: {
+              metricResourceUri: appServicePlan.id
+              metricName: 'CpuPercentage'
+              timeGrain: 'PT5M'
+              statistic: 'Average'
+              timeWindow: 'PT10M'
+              timeAggregation: 'Average'
+              operator: 'GreaterThan'
+              threshold: autoScaleSettings.?scaleOutThreshold ?? defaultScaleOutThreshold
+            }
+            scaleAction: {
+              direction: 'Increase'
+              type: 'ChangeCount'
+              value: string(1)
+              cooldown: 'PT10M'
+            }
+          }
+
+```
+
+The same happens with the down-scale. Which if the CPU is under a certain porcentage, it will descale the the count by one, and cooldowns the selection for ten minutes before acting the rule again.
+
+```bicep
+          {
+            metricTrigger: {
+              metricResourceUri: appServicePlan.id
+              metricName: 'CpuPercentage'
+              timeGrain: 'PT5M'
+              statistic: 'Average'
+              timeWindow: 'PT10M'
+              timeAggregation: 'Average'
+              operator: 'LessThan'
+              threshold: autoScaleSettings.?scaleInThreshold ?? defaultScaleInThreshold
+            }
+            scaleAction: {
+              direction: 'Decrease'
+              type: 'ChangeCount'
+              value: string(1)
+              cooldown: 'PT10M'
+            }
+```
+
 ## Compute service level agreements
 
 Picking the right SKU for your Azure resources based on the service level agreements (SLA) you need is another way to optimize costs. Let's look at how to compute SLAs.

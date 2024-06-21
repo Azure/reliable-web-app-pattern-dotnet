@@ -142,8 +142,4 @@ Great, now we have a functioning Application for our Relecloud Concerts company.
 
 ### Appendix A (To be run only after completing the workshop)
 
-Run the following command to tear down the deployment:
-
-```pwsh
-azd down --purge --force
-```
+See how to clean up the app in [Chapter 8](../8%20-%20Clean%20Up/README.md).

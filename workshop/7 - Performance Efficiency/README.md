@@ -206,20 +206,6 @@ The reference implementation uses a single Azure Cache for Redis instance to sto
 
 ## Cleaning up
 
-Thank you for attending this workshop.  We hope you learned something and feel more comfortable tackling the patterns that are used in enterprise web applications.  You can now clean up the resources that you used:
+Thank you for attending this workshop.  We hope you learned something and feel more comfortable tackling the patterns that are used in enterprise web applications. 
 
-### Cleaning up the cost optimization web application
-
-1. Open a PowerShell terminal.
-3. Run the command `azd down --force --purge --no-prompt`.
-
-You may also log on to the Azure portal, select the resource group and press **Delete Resource group**.  The resource group is named similar to **<USERNAME>-cost-rg**.
-
-### Cleaning up the reliable web app sample
-
-1. Change directory to the `src` directory.
-2. Run the command `azd down --force --purge --no-prompt`.
-
-You may also log on to the Azure portal, select each resource group and press **Delete Resource group**.  There are two resource groups: **<USERNAME>-rg** and **<USERNAME>-secondary-rg**.
-
-This process leaves the app registrations used in place. You can clean these up in the Azure Portal.  Go to the Azure Active Directory blade, then **App Registrations** > **Owned applications**.  Remove each app registration associated with your username individually.
+[Check how to clean up this workshop in following lesson](../8%20-%20Clean%20Up/README.md). 
