@@ -36,7 +36,7 @@ The reliable web app pattern is built off of 5 pillars. Each pillar is a set of 
 
 ![The Five Pillars](../images/2-RWA%20Overview/the-five-pillars.png)
 
-## Going next
+## Follow-up
 
 With the Application running, let's focus optimizing our application cost for our Azure deployment.
 

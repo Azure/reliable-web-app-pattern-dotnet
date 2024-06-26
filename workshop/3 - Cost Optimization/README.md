@@ -52,7 +52,7 @@ You can use bicep parameters to specify Azure resource deployment configurations
 1. Open the **resources.bicep** file. `isProd` again is defined as a parameter at the top of the file. On line 62, it is used to make a determination of what SKU level the Azure App Service should be provisioned at.
 
     ```bicep
-    var appServicePlanSku = (isProd) ? 'P1v2' : 'B1'
+    var appServicePlanSku = (isProd) ? 'P1v3' : 'B1'
     ```
 
 1. Now let's provision the Azure resources and deploy the sample application. In the PowerShell terminal, make sure you're still in the **azd-sample** directory and run the following command:

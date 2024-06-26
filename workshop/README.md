@@ -6,7 +6,7 @@
 
 In this workshop, we'll introduce a simple starter app, and then deploy a single region of the Reliable Web Application Reference Architecture on Azure. 
 
-This workshop should take approximately 1.5 hours to complete:
+This workshop should take approximately five hours to complete:
 
 - The provisioning of the Azure resources for the reference architecure will take 20 minutes and the deployment 20 minutes.
 - Between the provision and deployment, we will explain the other Parts so you can continue with the workshop while the installation is running.

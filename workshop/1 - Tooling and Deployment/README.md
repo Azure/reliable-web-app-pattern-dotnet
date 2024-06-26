@@ -82,7 +82,7 @@ Set the subscription to the one you want to use selecting from the list availabl
 Use the next command to login with the Azure Dev CLI (AZD) tool:
 
 ```pwsh
-azd auth login
+azd auth login --use-device-code
 ```
 
 
@@ -96,6 +96,12 @@ By default, Azure resources are sized for a development deployment. If doing a p
 
 ```pwsh
 azd env new <pick_a_name>
+```
+
+Use the Azure Subscription ID from the current Subscription, add this as variable.
+
+```pwsh
+$AZURE_SUBSCRIPTION_ID=(Get-AzContext).Subscription.Id
 ```
 
 Select the subscription that will be used for the deployment:
@@ -128,17 +134,17 @@ The application is for the fictional company Relecloud, embodying the reliable w
 
 ![architecture diagram](../../assets/icons/reliable-web-app-dotnet.svg)
 
-This diagram illustrates the production deployment, while also detailing a development deployment which is a more streamlined version. Key aspects include:
+The infrastructure-as-code implementation implements the production deployment (shown above) and a development deployment, which is geared towards developer productivity and is more cost effective to run. Key aspects include:
 
 - Cost Efficiency: Utilizes a hub for shared resources, such as Azure Bastion, to enable secure, cost-effective remote access without individual deployments.
 - Traffic Control & Security: Employs Network Security Groups and Route tables for secure traffic management within subnets, complemented by Private endpoints and a jump box for secure local IP access.
 - Network Integration: Facilitates data transfer and hybrid scenarios, with recommendations to consider ExpressRoute or Azure VPN Gateway for hybrid network connections.
 
-For more details, learn more reading about the Archtecture and Workflow, look at the main [Readme](../../README.md) to learn more about the application in detail.
+For more details on the architecture and workflow for the Relecloud application, read the [main instructions](../../README.md) to learn more about the application in detail.
 
 ### 7. Follow-up
 
-Great, now we have a functioning Application for our Relecloud Concerts company. Learn more how the Reliable Web Apps pattern makes everything work, [going next](../2%20-%20RWA%20Overview/README.MD). 
+Great, now we have a functioning Application for our Relecloud Concerts company. Learn more how the Reliable Web Apps pattern makes everything work [next](../2%20-%20RWA%20Overview/README.MD). 
 
 ### Appendix A (To be run only after completing the workshop)
 
