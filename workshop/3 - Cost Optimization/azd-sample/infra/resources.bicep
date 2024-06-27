@@ -59,7 +59,7 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
-var appServicePlanSku = (isProd) ? 'P1v2' : 'B1'
+var appServicePlanSku = (isProd) ? 'P1v3' : 'B1'
 
 resource webAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${environmentName}-web-plan-${resourceToken}'
