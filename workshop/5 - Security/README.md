@@ -43,7 +43,7 @@ The web application (and  you!) now has read access to Azure App Configuration. 
 1. Copy the **Endpoint** value to the clipboard.
 1. Open the **5 - Security\azd-sample\src\AppConfigurationReader.sln** solution in Visual Studio.
 1. Open the **appsettings.json** file and replace the value for `AzureUrls:AppConfiguration` with the value you copied to the clipboard.
-1. Replace the `options.Connect(appConfigUrl);` with the following:
+1. Open the `Program.cs` file and replace `options.Connect(appConfigUrl);` with the following:
 
     ```csharp
     options.Connect(new Uri(appConfigUrl), new DefaultAzureCredential());
