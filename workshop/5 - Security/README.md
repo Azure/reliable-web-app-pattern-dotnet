@@ -51,6 +51,8 @@ The web application (and  you!) now has read access to Azure App Configuration. 
 
     This will use the managed identity to authenticate to Azure App Configuration. In fact, it will use whoever is logged in to authenticate, including the Azure account you associated with Visual Studio.
 
+1. Before running the application locally for testing, you will need to Authorize the endpoint identity for Powershell. Run the following at your terminal `Connect-AzAccount -UseDeviceAuthentication -AuthScope 'endpoint'`
+
 1. Run the application locally. You should see the message from Azure App Configuration displayed in the browser.
 
     ![Screenshot of the sample application](../images/5-Security/sample-application.png)
@@ -64,11 +66,11 @@ The web application (and  you!) now has read access to Azure App Configuration. 
     ```
 
 1. When the deployment is finished, go back to the portal and open up the App Service.
-1. Click on the **Configuration** menu item in the left navigation.
+1. Click on the **Environment Variables** menu item in the left navigation.
 1. Change the `AzureUrls:AppConfiguration` value to the Azure App Configuration's URL value you copied to the clipboard earlier. Instead of the full connection string, it should just be a URL now.
 1. Click **Ok**.
-1. Click **Save** at the top of the page and confirm you want to restart the application.
-1. Go to the **Overview** menu item in the left navigation and click on the **Browse** button from the top row of buttons.
+1. Click **Apply** at the bottom of the page and confirm you want to restart the application.
+1. Go to the **Overview** menu item in the left navigation and click on restart. Then, click on Browse.
 1. The application will launch and will read the value from Azure App Configuration without using a connection string.
 
     ![Screenshot of the sample application](../images/5-Security/sample-application.png)
