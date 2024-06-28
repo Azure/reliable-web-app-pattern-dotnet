@@ -105,7 +105,7 @@ You want to have your resources scale up and down as needed. Azure App Service h
 
 1. Now open up the same App Service Plan as before in the Azure portal (or just refresh your browser if you already have it open). You should see that it is provisioned with a **P1v2** SKU.
 
-    ![Screenshot of the App Service Plan](../images/3-Cost%20Optimization/app-service-plan-p1v2.png)
+    ![Screenshot of the App Service Plan](../images/3-Cost%20Optimization/app-service-plan-p1v3.png)
 
 1. Click on **Scale out (App Service Plan)** in the left navigation menu, under Settings. You should see that autoscaling is enabled with a "Rules Based" scale out method.  Click on **Manage rules based scaling** to see the scaling rules.
 

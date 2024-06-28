@@ -26,6 +26,15 @@ To experiment with the Retry pattern, we'll need to change the application and m
 
     This sets the **Relecloud.Web.CallCenter.Api** service to throw an exception every other time it's called. This will simulate a transient fault.
 
+1. Add a valid certificate for our .NET application, use the following command ``dotnet dev-certs https --trust`` in a terminal to generate a valid certificate.
+
+1. Before we run the application, we need to generate our app registrations.
+    1. Open PowerShell terminal.
+    1. Use `cd ./infra/scripts/postprovision/` to change to the Scripts directory
+    1. Run the `create-app-registrations.ps1` script.
+    1. Paste the name in the Resource Group from the Azure Portal.
+    1. Go with the default values in the following ones.
+
 1. Verify that both the **Relecloud.Web.CallCenter.Api** and **Relecloud.Web.CallCenter** projects are set as startup projects.
     1. Verify that the **C# Dev Kit** is installed in your VS Code, if not install [here](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit).
     1. From the **Run & Debug**, check that the correct option to deploy is selected **Web + Api** 
