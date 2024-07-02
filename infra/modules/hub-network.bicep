@@ -96,14 +96,6 @@ param logAnalyticsWorkspaceId string = ''
 /*
 ** Settings
 */
-@secure()
-@minLength(8)
-@description('The password for the administrator account on the jump box.')
-param administratorPassword string = newGuid()
-
-@minLength(8)
-@description('The username for the administrator account on the jump box.')
-param administratorUsername string = 'adminuser'
 
 @description('If enabled, an Ubuntu jump box will be deployed.  Ensure you enable the bastion host as well.')
 param enableJumpBox bool = false
@@ -380,9 +372,10 @@ module jumpbox '../core/compute/ubuntu-jumpbox.bicep' = if (enableJumpBox) {
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     subnetId: virtualNetwork.outputs.subnets[resourceNames.spokeDevopsSubnet].id
 
+    // users
+    users: [ deploymentSettings.principalId ]
+
     // Settings
-    adminPasswordOrKey: administratorPassword
-    adminUsername: administratorUsername
     diagnosticSettings: diagnosticSettings
   }
 }

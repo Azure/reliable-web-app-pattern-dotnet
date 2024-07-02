@@ -29,9 +29,6 @@
     "githubToken": {
         "value": "${GITHUB_TOKEN}"
     },
-    "jumpboxAdministratorPassword": {
-        "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} Jumpbox--AdministratorPassword)"
-    },
     "location": {
         "value": "${AZURE_LOCATION}"
     },
