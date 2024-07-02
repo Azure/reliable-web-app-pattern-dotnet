@@ -1,4 +1,4 @@
-// From: infra/types/UserIdentity.bicep
+@export()
 @description('Type describing a user identity.')
 type UserIdentity = {
   @description('The ID of the user')

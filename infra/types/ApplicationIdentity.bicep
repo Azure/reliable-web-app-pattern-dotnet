@@ -1,4 +1,4 @@
-// From: infra/types/ApplicationIdentity.bicep
+@export()
 @description('Type describing an application identity.')
 type ApplicationIdentity = {
   @description('The ID of the identity')

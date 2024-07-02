@@ -12,25 +12,7 @@ targetScope = 'resourceGroup'
 ** databases to be created on the same server.
 */
 
-// ========================================================================
-// USER-DEFINED TYPES
-// ========================================================================
-
-// From: infra/types/DiagnosticSettings.bicep
-@description('The diagnostic settings for a resource')
-type DiagnosticSettings = {
-  @description('The number of days to retain log data.')
-  logRetentionInDays: int
-
-  @description('The number of days to retain metric data.')
-  metricRetentionInDays: int
-
-  @description('If true, enable diagnostic logging.')
-  enableLogs: bool
-
-  @description('If true, enable metrics logging.')
-  enableMetrics: bool
-}
+import { DiagnosticSettings } from '../../types/DiagnosticSettings.bicep'
 
 type FirewallRules = {
   @description('The list of IP address CIDR blocks to allow access from.')

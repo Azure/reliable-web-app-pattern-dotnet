@@ -1,4 +1,4 @@
-// From: infra/types/DeploymentSettings.bicep
+@export()
 @description('Type that describes the global deployment settings')
 type DeploymentSettings = {
   @description('If \'true\', then two regional deployments will be performed.')

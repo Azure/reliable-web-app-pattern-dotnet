@@ -1,4 +1,4 @@
-// From: infra/types/DiagnosticSettings.bicep
+@export()
 @description('The diagnostic settings for a resource')
 type DiagnosticSettings = {
   @description('The number of days to retain log data.')

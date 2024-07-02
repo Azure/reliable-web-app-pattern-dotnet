@@ -8,51 +8,9 @@ targetScope = 'resourceGroup'
 ***************************************************************************
 */
 
-// ========================================================================
-// USER-DEFINED TYPES
-// ========================================================================
-
-// From: infra/types/ApplicationIdentity.bicep
-@description('Type describing an application identity.')
-type ApplicationIdentity = {
-  @description('The ID of the identity')
-  principalId: string
-
-  @description('The type of identity - either ServicePrincipal or User')
-  principalType: 'ServicePrincipal' | 'User'
-}
-
-// From: infra/types/DiagnosticSettings.bicep
-@description('The diagnostic settings for a resource')
-type DiagnosticSettings = {
-  @description('The number of days to retain log data.')
-  logRetentionInDays: int
-
-  @description('The number of days to retain metric data.')
-  metricRetentionInDays: int
-
-  @description('If true, enable diagnostic logging.')
-  enableLogs: bool
-
-  @description('If true, enable metrics logging.')
-  enableMetrics: bool
-}
-
-// From: infra/types/PrivateEndpointSettings.bicep
-@description('Type describing the private endpoint settings.')
-type PrivateEndpointSettings = {
-  @description('The name of the resource group to hold the Private DNS Zone. By default, this uses the same resource group as the resource.')
-  dnsResourceGroupName: string
-  
-  @description('The name of the private endpoint resource.')
-  name: string
-
-  @description('The name of the resource group to hold the private endpoint.')
-  resourceGroupName: string
-
-  @description('The ID of the subnet to link the private endpoint to.')
-  subnetId: string
-}
+import { PrivateEndpointSettings } from '../../types/PrivateEndpointSettings.bicep'
+import { DiagnosticSettings } from '../../types/DiagnosticSettings.bicep'
+import { ApplicationIdentity } from '../../types/ApplicationIdentity.bicep'
 
 // ========================================================================
 // PARAMETERS

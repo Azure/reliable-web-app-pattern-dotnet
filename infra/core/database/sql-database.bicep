@@ -8,51 +8,9 @@ targetScope = 'resourceGroup'
 ***************************************************************************
 */
 
-// ========================================================================
-// USER-DEFINED TYPES
-// ========================================================================
-
-// From: infra/types/DiagnosticSettings.bicep
-@description('The diagnostic settings for a resource')
-type DiagnosticSettings = {
-  @description('The number of days to retain log data.')
-  logRetentionInDays: int
-
-  @description('The number of days to retain metric data.')
-  metricRetentionInDays: int
-
-  @description('If true, enable diagnostic logging.')
-  enableLogs: bool
-
-  @description('If true, enable metrics logging.')
-  enableMetrics: bool
-}
-
-// From: infra/types/UserIdentity.bicep
-@description('Type describing a user identity.')
-type UserIdentity = {
-  @description('The ID of the user')
-  principalId: string
-
-  @description('The name of the user')
-  principalName: string
-}
-
-// From: infra/types/PrivateEndpointSettings.bicep
-@description('Type describing the private endpoint settings.')
-type PrivateEndpointSettings = {
-  @description('The name of the resource group to hold the Private DNS Zone. By default, this uses the same resource group as the resource.')
-  dnsResourceGroupName: string
-
-  @description('The name of the private endpoint resource.  By default, this uses a prefix of \'pe-\' followed by the name of the resource.')
-  name: string
-
-  @description('The name of the resource group to hold the private endpoint.  By default, this uses the same resource group as the resource.')
-  resourceGroupName: string
-
-  @description('The ID of the subnet to link the private endpoint to.')
-  subnetId: string
-}
+import { DiagnosticSettings } from '../../types/DiagnosticSettings.bicep'
+import { PrivateEndpointSettings } from '../../types/PrivateEndpointSettings.bicep'
+import { UserIdentity } from '../../types/UserIdentity.bicep'
 
 // ========================================================================
 // PARAMETERS

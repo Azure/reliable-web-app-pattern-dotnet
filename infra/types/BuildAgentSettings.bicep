@@ -1,4 +1,4 @@
-// From: infra/types/BuildAgentSettings.bicep
+@export()
 @description('Describes the required settings for a Azure DevOps Pipeline runner')
 type AzureDevopsSettings = {
   @description('The URL of the Azure DevOps organization to use for this agent')
@@ -8,6 +8,7 @@ type AzureDevopsSettings = {
   token: string
 }
 
+@export()
 @description('Describes the required settings for a GitHub Actions runner')
 type GithubActionsSettings = {
   @description('The URL of the GitHub repository to use for this agent')
