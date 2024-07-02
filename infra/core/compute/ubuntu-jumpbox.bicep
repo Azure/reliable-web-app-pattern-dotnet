@@ -47,7 +47,7 @@ param name string
 param computerLinuxName string?
 
 @description('Username for the Virtual Machine. NOTE: this is not saved anywhere as Entra is used to manage SSH logins once created.')
-param adminUsername string = 'azureadmin'
+param adminUsername string = newGuid()
 
 @description('Password for admin. NOTE: this is not saved anywhere as Entra is used to manage SSH logins once created.')
 @secure()
