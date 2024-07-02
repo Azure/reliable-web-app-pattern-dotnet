@@ -33,7 +33,7 @@
             "name": ".NET Core Launch (Api)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "buildweb",
+            "preLaunchTask": "buildapi",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/src/Relecloud.Web.CallCenter.Api/bin/Debug/net6.0/Relecloud.Web.CallCenter.Api.dll",
             "args": [],
