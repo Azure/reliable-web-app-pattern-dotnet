@@ -6,7 +6,7 @@ In this workshop series, we're going to run through the principles and show how 
 
 ## Enterprise web app cloud journey
 
-Imagine a web application's evolution in the cloud as a journey. Each step in the journey has different goals. The reliable web app pattern is designed to help you take the first step in the journey. You may only need to "lift and shift" or converge your application to the cloud, and do so with a minimal amount of changes. The reliable web app pattern helps you do that.
+Imagine a web application's evolution in the cloud as a journey. Each step in the journey has different goals. The reliable web app pattern is designed to help you take the first step in the journey. You may only need to "lift and shift" or replatform your application to the cloud, and do so with a minimal amount of changes. The reliable web app pattern helps you do that.
 
 ![Enterprise web app cloud journey](../images/2-RWA%20Overview/enterprise-web-app-cloud-journey.png)
 
@@ -36,13 +36,13 @@ The reliable web app pattern is built off of 5 pillars. Each pillar is a set of 
 
 ![The Five Pillars](../images/2-RWA%20Overview/the-five-pillars.png)
 
-## Follow-up
+## Next Steps
 
-With the Application running, let's focus optimizing our application cost for our Azure deployment.
+Now that your application is up and running, it’s time to shift our attention towards optimizing the cost of our Azure deployment.
 
 [Part 3 - Cost Optimization](../3%20-%20Cost%20Optimization/README.md)
 
-If the application is not deployed, go back into the development and Azure tooling you'll need for the rest of this workshop and make sure everything is running.
+In case your application is not yet deployed, please revisit the development and Azure tooling sections of this workshop. Ensure all the necessary tools are properly set up and your application is running smoothly before proceeding.
 
 [Part 1 - Tooling Setup](../Part%201%20-%20Tooling/README.md)
 

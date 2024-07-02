@@ -250,6 +250,6 @@ You should use private endpoints to provide more secure communication between yo
 
 This improved network security is transparent from the code perspective. It doesn't involve any app configuration, connection string, or code changes.
 
-## Going Next
+## Next Steps
 
 Next up learn about how to keep our application running smoothly in the [Part 6 - Operational Excellence](../6%20-%20Operational%20Excellence/README.md) module.

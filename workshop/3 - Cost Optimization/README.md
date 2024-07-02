@@ -253,6 +253,8 @@ But in order for 2 regions to operate as one, you need a traffic manager or load
 
 And that's exactly the 99.98% uptime our management wanted.
 
-## Going Next
+For our Relecloud Concerts application, we have devised a specific strategy on how to utilize various regions to meet the Service Level Agreement (SLA). If you’re interested in understanding more about these calculations and our regional usage strategy, follow this [link](/assets/sla-calculation.md) to learn more.
 
-Now let's see how we can make our web application more resilient to failures in [Part 4 - Reliability](../4%20-%20Reliability/README.md) module.
+## Next Steps
+
+Next, we will explore how to enhance the resilience of our web application. This involves implementing strategies to ensure our application remains functional and accessible, even in the event of failures. Dive into the [Part 4 - Reliability](../4%20-%20Reliability/README.md) module.

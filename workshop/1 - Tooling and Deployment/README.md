@@ -142,9 +142,9 @@ The infrastructure-as-code implementation implements the production deployment (
 
 For more details on the architecture and workflow for the Relecloud application, read the [main instructions](../../README.md) to learn more about the application in detail.
 
-### 7. Follow-up
+### 7. Next Steps
 
-Great, now we have a functioning Application for our Relecloud Concerts company. Learn more how the Reliable Web Apps pattern makes everything work [next](../2%20-%20RWA%20Overview/README.MD). 
+Fantastic! We've successfully deployed a production-like Relecloud concerts monolithic web application to Azure. Relecloud Concerts leverages the Reliable Web App Pattern with minimal code changes, seamlessly deployed to Azure using simple steps via azd. Now, let's dive deeper and explore the patterns and best-practices used in this application. As we advance, we'll simplify things by deploying a more basic application to help illustrate these concepts clearly before reviewing them in our main app. Ready to start? Click [next](../2%20-%20RWA%20Overview/README.MD). 
 
 ### Appendix A (To be run only after completing the workshop)
 

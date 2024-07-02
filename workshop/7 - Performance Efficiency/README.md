@@ -204,7 +204,7 @@ The reference implementation uses a single Azure Cache for Redis instance to sto
 1. Open the **CartController.cs** file found in the **Controllers** folder of the **Relecloud.Web** project.
 1. Browse to the `SetCardData` method. Here you can see the session data get set. It seamlessly uses Azure Cache for Redis when available.
 
-## Cleaning up
+## Next Steps
 
 Thank you for attending this workshop.  We hope you learned something and feel more comfortable tackling the patterns that are used in enterprise web applications. 
 

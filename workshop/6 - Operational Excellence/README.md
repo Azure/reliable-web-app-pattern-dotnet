@@ -187,6 +187,6 @@ this.telemetryClient.TrackEvent("AddToCart", new Dictionary<string, string> {
 
 You can find the telemetry from TelemetryClient in the **Azure portal**. Go to **Application Insights**. Under **Usage**, select **Events**. Click on **View More Insights** and filter by the **Event** to see the count.
 
-## Going Next
+## Next Steps
 
 Next up find out how to keep your application running fast with the [Part 7 - Performance Efficiency](../7%20-%20Performance%20Efficiency/README.md) module.

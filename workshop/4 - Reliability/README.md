@@ -225,6 +225,6 @@ You can implement the circuit breaker pattern with Polly as follows:
 
     ![Screenshot of circuit breaker exception](../images/4-Reliability/circuit-breaker.png)
 
-## Going Next
+## Next Steps
 
 Next up let's look at how to make sure our application stays secure in the [Part 5 - Security](../5%20-%20Security/README.md) module.
