@@ -1,4 +1,4 @@
-// From: infra/types/RedisUser.bicep
+@export()
 @description('Type describing the user for redis.')
 type RedisUser = {
   @description('The object id of the user.')
