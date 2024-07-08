@@ -6,19 +6,18 @@ Performance efficiency is the ability of a workload to scale and meet the demand
 
 The Cache-Aside pattern is a technique that's used to manage in-memory data caching. It reduces the request response time and can lead to increased response throughput. This efficiency reduces the number of horizontal scaling events, making the app more capable of handling traffic bursts. It also improves service availability by reducing the load on the primary data store and decreasing the likelihood of service outages.
 
-Let's implement the Cache-Aside pattern in our application.
+Take a look for the Cache-Aside pattern implementation in our application.
 
 1. Open the **Relecloud.sln** solution.
 1. From the **Solution Explorer**, right-click on the **Relecloud.Web.CallCenter.Api** project and select **Manage NuGet Packages**.
 1. Search for **Microsoft.Extensions.Caching.StackExchangeRedis** and install the package.
 1. Open the **Startup.cs** of the **Relecloud.Web.CallCenter.Api** project and browse to the `AddDistributedSession` method.
-1. Delete the code inside that method.
-1. Add code to read the Azure Redis Cache connection string from the configuration settings.
+1. Look at the Azure Redis Cache connection string from the configuration settings.
 
     ```csharp
     var redisCacheConnectionString = Configuration["App:RedisCache:ConnectionString"];
     ```
-1. Add code to use Azure Redis if the connection string contains a value
+1. This code uses Azure Redis if the connection string contains a value
 
     ```csharp
     if (!string.IsNullOrWhiteSpace(redisCacheConnectionString))
@@ -32,7 +31,7 @@ Let's implement the Cache-Aside pattern in our application.
     }
     ```
 
-1. Add the following code to handle if a connection string is not present, use the built-in distributed cache.
+1. The following code handles if a connection string is not present, use the built-in distributed cache.
 
     ```csharp
     else
@@ -41,14 +40,14 @@ Let's implement the Cache-Aside pattern in our application.
     }
     ```
 
-1. Now we want to cache some of the most used data in our application, and that is getting concerts from the database. Open the **SqlDatabaseConcertRepository.cs** file found in the **Services/SqlDatabaseConcertRepository** folder of the **Relecloud.Web.Api** project.
-1. Create a private class-level variable to hold the distributed cache.
+1. Now, we want to cache some of the most used data in our application, and that is getting concerts from the database. Open the **SqlDatabaseConcertRepository.cs** file found in the **Services/SqlDatabaseConcertRepository** folder of the **Relecloud.Web.Api** project.
+1. A Private class-level variable holds the distributed cache.
 
     ```csharp
     private readonly IDistributedCache cache;
     ```
 
-1. Update the constructor so it accepts an `IDistributedCache` parameter. The finished version shoud look like this:
+1. The constructor accepts an `IDistributedCache` parameter.
 
     ```csharp
     public SqlDatabaseConcertRepository(ConcertDataContext database, IDistributedCache cache)
@@ -58,7 +57,7 @@ Let's implement the Cache-Aside pattern in our application.
     }
     ```
 
-1. Any time data is modified in the database, the cache needs to be cleared. Update the `CreateConcertAsync` method to include the cache removal. The final method should look like this:
+1. Any time data is modified in the database, the cache needs to be cleared. The `CreateConcertAsync` method includes the cache removal. The method should look like this:
 
     ```csharp
     public async Task<CreateResult> CreateConcertAsync(Concert concert)
@@ -73,7 +72,7 @@ Let's implement the Cache-Aside pattern in our application.
     }
     ```
 
-1. Add the same cache clearing to `UpdateConcertAsync`. The final method should look like this:
+1. The same cache clearing to `UpdateConcertAsync`. The method should look like this:
 
     ```csharp
     public async Task<UpdateResult> UpdateConcertAsync(Concert existingConcert)
@@ -87,20 +86,20 @@ Let's implement the Cache-Aside pattern in our application.
     }
     ```
 
-1. The same thing needs to happen when a concert is deleted. Add the following code to the `DeleteConcertAsync` method immediately after the `SaveChangesAsync` call:
+1. The same thing needs to happen when a concert is deleted. The following code to the `DeleteConcertAsync` method immediately after the `SaveChangesAsync` call:
 
     ```csharp
     this.cache.Remove(CacheKeys.UpcomingConcerts);
     ```
 
-1. Now that the cache is cleared when any data modification occurs, we want to put data into the cache when data is read from the database and the cache is empty. Browse to the `GetUpcomingConcertsAsync` method.
+1. Now, that the cache is cleared when any data modification occurs, we want to put data into the cache when data is read from the database and the cache is empty. Browse to the `GetUpcomingConcertsAsync` method.
 1. We'll read from the cache by using `GetStringAsync`. Add the following code immediately under the `IList<Concert>? concerts;` definition.
 
     ```csharp
     var concertsJson = await this.cache.GetStringAsync(CacheKeys.UpcomingConcerts);
     ```
 
-1. If the returned `concertsJson` has a value, we can deserialize that into the `concerts` variable. Add the following code to do so:
+1. If the returned `concertsJson` has a value, we can deserialize that into the `concerts` variable.
 
     ```csharp
     if (concertsJson != null)
@@ -109,7 +108,7 @@ Let's implement the Cache-Aside pattern in our application.
     }
     ```
 
-1. If there is nothing in the `concertsJson` variable, and thus nothingn in the cache read the data from the database as normal. Put the existing data retrieval code inside an else statement:
+1. If there is nothing in the `concertsJson` variable, and thus nothing in the cache read the data from the database as normal. Look at the existing data retrieval code inside an else statement:
 
     ```csharp
     else 
@@ -122,7 +121,7 @@ Let's implement the Cache-Aside pattern in our application.
     }
     ```
 
-1. Now that we have the data, we want to put it into the cache. Add the following code immediately after the `concerts = await this.database.Concerts.AsNoTracking()` line:
+1. Now that we have the data, we want to put it into the cache. Look at the line after the `concerts = await this.database.Concerts.AsNoTracking()` line:
 
     ```csharp
     concertsJson = JsonSerializer.Serialize(concerts);

@@ -16,6 +16,8 @@ Before we begin, copy the `.azure` from our previous deployment from chapter thr
 
 In the sample, open the `src` and the `AppConfigurationFolder` to change both `appsettings.json` and  `program.cs`
 
+*Verifying this with stakeholders for the next steps*
+
 Go to the `appsettings.json`, add the following key immediately after the **AllowedHosts** key:
 
 ```json
@@ -26,7 +28,8 @@ Go to the `appsettings.json`, add the following key immediately after the **Allo
 }
 ```
 
-Now, run locally. 
+
+To test the application locally. Run the application using `dotnet run`
 
 You might need to make calls to a dependency that isn't an Azure service or doesn't support the Retry pattern natively. In that case, you should use the [Polly library](https://github.com/App-vNext/Polly) to implement the Retry pattern. Polly is a .NET resilience and transient-fault-handling library.
 
@@ -63,7 +66,7 @@ Let's implement custom retry policies to the project to handle any transient com
 
     The `GetRetryPolicy` method returns a `IAsyncPolicy<HttpResponseMessage>` that can be used to retry HTTP requests. The `HandleTransientHttpError` method tells Polly to retry the HTTP request if the response is a transient HTTP error. The `WaitAndRetryAsync` method tells Polly to retry the HTTP request using a specified delay between retries.
 
-*Verifying this for the next steps*
+*Verifying this with stakeholders for the next steps*
 
 1. Now, we have to tell application for a `HttpClient` that is used to communicate to the **Weather Forecast** service to use the retry policy.
 
@@ -102,7 +105,7 @@ You can implement the circuit breaker pattern with Polly as follows:
 
     The `GetCircuitBreakerPolicy` method returns a `IAsyncPolicy<HttpResponseMessage>` that can be used to implement the Circuit Breaker pattern. The `HandleTransientHttpError` method tells Polly to retry the HTTP request if the response is a transient HTTP error. The `OrResult` method tells Polly to retry the HTTP request if the response is a 404 Not Found. The `CircuitBreakerAsync` method tells Polly to break circuit if the HTTP request fails 5 times in 30 seconds.
 
-*Verifying this for the next steps*
+*Verifying this with stakeholders for the next steps*
 
 1. Now, we have to tell application for a `HttpClient` that is used to communicate to the **Weather Forecast** service to use the retry policy.
 
@@ -124,9 +127,9 @@ You can implement the circuit breaker pattern with Polly as follows:
     ![Screenshot of circuit breaker exception](../images/4-Reliability/circuit-breaker.png)
 
 
-### Use Azure service SDKs and client libraries first
+### Checking the Main Relecloud Application to check Azure service SDKs and client libraries
 
-Most Azure services and client SDKs have a built-in retry mechanism. You should use the built-in retry mechanism for Azure services to expedite the implementation. Let's see how to implement the retry pattern using Entity Framework Core's built-in retry mechanism.
+Most Azure services and client SDKs have a built-in retry mechanism. You should use the built-in retry mechanism for Azure services to expedite the implementation. Let's see how the retry pattern is implemented in the main sample using Entity Framework Core's built-in retry mechanism.
 
 1. Select the main **Relecloud** solution.
 1. Open the **Relecloud.CallCenter.Api** project's **Startup.cs** file.
@@ -183,7 +186,7 @@ Now we'll use the Azure App Configuration's SDK to add a retry policy to communi
             });
     });
     ```    
-    
+
 ## Next Steps
 
-Next up let's look at how to make sure our application stays secure in the [Part 5 - Security](../5%20-%20Security/README.md) module.
+Next up, let's look at how to make sure our application stays secure in the [Part 5 - Security](../5%20-%20Security/README.md) module.
