@@ -488,21 +488,25 @@ module applicationBudget '../core/cost-management/budget.bicep' = {
   }
 }
 
-// module aiResources 'ai-resources.bicep' = if (deploymentSettings.isPrimaryLocation) {
-//   name: 'ai-resources-${deploymentSettings.resourceToken}'
-//   params: {
-//     usePrivateEndpoint: deploymentSettings.isNetworkIsolated
-//     environmentName: deploymentSettings.name
-//     location: deploymentSettings.location
-//     bypass: 'AzureServices'
-//     clientIpAddress: clientIpAddress
-//     openAiResourceGroupName:'rg-ai-${deploymentSettings.name}'
-//     principalId: deploymentSettings.principalId
-//     publicNetworkAccess: deploymentSettings.isNetworkIsolated ? 'Disabled' : 'Enabled'
-//     resourceGroupName: resourceGroup.name
-//     principalType: deploymentSettings.principalType
-//   }
-// }
+module aiResources 'ai-resources.bicep' = if (deploymentSettings.isPrimaryLocation) {
+  name: 'ai-resources-${deploymentSettings.resourceToken}'
+  params: {
+    bypass: 'AzureServices'
+    clientIpAddress: clientIpAddress
+    resourceNames: resourceNames
+    deploymentSettings: deploymentSettings
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    diagnosticSettings: diagnosticSettings
+    dnsResourceGroupName: dnsResourceGroupName
+    servicePrefix: 'pyweb'
+    useCommonAppServicePlan: useCommonAppServicePlan
+    managedIdentityName: ownerManagedIdentity.outputs.name // principal_id
+    subnets: subnets
+  }
+  dependsOn:[
+    webService
+  ]
+}
 
 // ========================================================================
 // OUTPUTS

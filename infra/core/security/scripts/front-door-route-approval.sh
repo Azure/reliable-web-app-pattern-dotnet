@@ -21,7 +21,8 @@ if [[ -z "$rg_name" ]]; then
     exit 1
 fi
 
-webapp_ids=$(az webapp list -g $rg_name --query "[].id" | jq -r '.[]')
+# find all of the web apps (except the python one)
+webapp_ids=$(az webapp list -g $rg_name --query '[? !contains(name, `py`)].id' | jq -r '.[]')
 
 # Validate that we found a front-end and back-end web app.
 # When deploying multi-region, we expect to find 2 web apps as two resource groups are deployed.

@@ -83,6 +83,14 @@ var defaultResourceNames = {
   keyVaultPrivateEndpoint: 'pep-kv-${resourceToken}'
 
   // Application resources
+  appCognitiveServices: 'cog-${resourceToken}'
+  pyAppService: 'app-py-plan-${resourceToken}'
+  pyAppServicePlan: 'asp-py-plan-${resourceToken}'
+  searchService: 'gptkb-${resourceToken}'
+  webAppPyPrivateEndpoint: 'pep-pyapp-${resourceToken}'
+  cogServicesPrivateEndpoint: 'pep-cog-${resourceToken}'
+  searchPrivateEndpoint:  'pep-search-${resourceToken}'
+
   apiAppService: 'app-api-${resourceToken}'
   apiAppServicePlan: 'asp-api-${resourceToken}'
   apiPrivateEndpoint: 'pep-api-${resourceToken}'
@@ -157,6 +165,14 @@ output resourceNames object = {
   logAnalyticsWorkspace: contains(overrides, 'logAnalyticsWorkspace') && !empty(overrides.logAnalyticsWorkspace) ? overrides.logAnalyticsWorkspace : defaultResourceNames.logAnalyticsWorkspace
 
   // Application resources
+  pyAppService: contains(overrides, 'pyAppService') && !empty(overrides.pyAppService) ? overrides.pyAppService : defaultResourceNames.pyAppService
+  pyAppServicePlan: contains(overrides, 'pyAppServicePlan') && !empty(overrides.pyAppServicePlan) ? overrides.pyAppServicePlan : defaultResourceNames.pyAppServicePlan
+  appCognitiveServices: contains(overrides, 'appCognitiveServices') && !empty(overrides.appCognitiveServices) ? overrides.appCognitiveServices : defaultResourceNames.appCognitiveServices
+  searchService: contains(overrides, 'searchService') && !empty(overrides.searchService) ? overrides.searchService : defaultResourceNames.searchService
+  webAppPyPrivateEndpoint: contains(overrides, 'webAppPyPrivateEndpoint') && !empty(overrides.webAppPyPrivateEndpoint) ? overrides.webAppPyPrivateEndpoint : defaultResourceNames.webAppPyPrivateEndpoint
+  cogServicesPrivateEndpoint: contains(overrides, 'cogServicesPrivateEndpoint') && !empty(overrides.cogServicesPrivateEndpoint) ? overrides.cogServicesPrivateEndpoint : defaultResourceNames.cogServicesPrivateEndpoint
+  searchPrivateEndpoint: contains(overrides, 'searchPrivateEndpoint') && !empty(overrides.searchPrivateEndpoint) ? overrides.searchPrivateEndpoint : defaultResourceNames.searchPrivateEndpoint
+
   apiAppService: contains(overrides, 'apiAppService') && !empty(overrides.apiAppService) ? overrides.apiAppService : defaultResourceNames.apiAppService
   apiAppServicePlan: contains(overrides, 'apiAppServicePlan') && !empty(overrides.apiAppServicePlan) ? overrides.apiAppServicePlan : defaultResourceNames.apiAppServicePlan
   apiPrivateEndpoint: contains(overrides, 'apiPrivateEndpoint') && !empty(overrides.apiPrivateEndpoint) ? overrides.apiPrivateEndpoint : defaultResourceNames.apiPrivateEndpoint

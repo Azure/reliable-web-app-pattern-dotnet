@@ -36,6 +36,14 @@
   // "spokeWebOutboundNSG": "",
 
   // Common services - may be in hub or application resource group
+
+  // "appCognitiveServices": "",
+  // "pyAppService": "",
+  // "pyAppServicePlan": "",
+  // "webAppPyPrivateEndpoint": "",
+  // "cogServicesPrivateEndpoint": "",
+  // "searchPrivateEndpoint": "",
+
   // "applicationInsights": "",
   // "buildAgent": "",
   // "keyVault": "",
