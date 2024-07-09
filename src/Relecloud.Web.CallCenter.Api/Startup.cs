@@ -33,7 +33,7 @@ namespace Relecloud.Web.Api
         public void ConfigureServices(IServiceCollection services)
         {
             // Add services to the container.
-            AddMicrosoftEntraIdServices(services);
+            //AddMicrosoftEntraIdServices(services);
 
             services.AddControllers();
 
@@ -188,8 +188,8 @@ namespace Relecloud.Web.Api
 
             app.UseHttpsRedirection();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+            // app.UseAuthentication();
+            // app.UseAuthorization();
 
             app.MapHealthChecks("/healthz");
 

@@ -47,7 +47,7 @@ if (hasRequiredConfigSettings)
     startup.ConfigureServices(builder.Services);
 }
 
-var hasMicrosoftEntraIdSettings = !string.IsNullOrEmpty(builder.Configuration["Api:MicrosoftEntraId:ClientId"]);
+var hasMicrosoftEntraIdSettings = true;// !string.IsNullOrEmpty(builder.Configuration["Api:MicrosoftEntraId:ClientId"]);
 
 var app = builder.Build();
 

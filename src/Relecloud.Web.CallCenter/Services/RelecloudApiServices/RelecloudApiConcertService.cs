@@ -14,14 +14,18 @@ namespace Relecloud.Web.CallCenter.Services.ApiConcertService
     {
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly HttpClient httpClient;
-        private readonly ITokenAcquisition tokenAcquisition;
+        //private readonly ITokenAcquisition tokenAcquisition;
         private readonly IOptions<RelecloudApiOptions> options;
 
-        public RelecloudApiConcertService(IHttpContextAccessor httpContextAccessor, HttpClient httpClient, ITokenAcquisition tokenAcquisition, IOptions<RelecloudApiOptions> options)
+        public RelecloudApiConcertService(
+            IHttpContextAccessor httpContextAccessor,
+            HttpClient httpClient,
+            //ITokenAcquisition tokenAcquisition,
+            IOptions<RelecloudApiOptions> options)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.httpClient = httpClient;
-            this.tokenAcquisition = tokenAcquisition;
+            //this.tokenAcquisition = tokenAcquisition;
             this.options = options;
         }
 
@@ -224,13 +228,13 @@ namespace Relecloud.Web.CallCenter.Services.ApiConcertService
         private async Task PrepareAuthenticatedClient()
         {
             var identity = this.httpContextAccessor.HttpContext?.User?.Identity;
-            if (identity != null && identity.IsAuthenticated)
-            {
-                var scopes = new[] { this.options.Value.AttendeeScope ?? throw new ArgumentNullException(nameof(this.options.Value.AttendeeScope)) };
-                var accessToken = await this.tokenAcquisition.GetAccessTokenForUserAsync(scopes);
-                this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            }
+            // if (identity != null && identity.IsAuthenticated)
+            // {
+            //     var scopes = new[] { this.options.Value.AttendeeScope ?? throw new ArgumentNullException(nameof(this.options.Value.AttendeeScope)) };
+            //     var accessToken = await this.tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+            //     this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            //     this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            // }
         }
     }
 }
