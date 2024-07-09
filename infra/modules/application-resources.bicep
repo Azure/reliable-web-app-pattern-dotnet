@@ -432,6 +432,7 @@ module storageAccount '../core/storage/storage-account.bicep' = {
 
     // Settings
     allowSharedKeyAccess: false
+    enablePublicNetworkAccess: false
     ownerIdentities: [
       { principalId: deploymentSettings.principalId, principalType: deploymentSettings.principalType }
       { principalId: ownerManagedIdentity.outputs.principal_id, principalType: 'ServicePrincipal' }
@@ -486,6 +487,22 @@ module applicationBudget '../core/cost-management/budget.bicep' = {
     resourceGroups: union([ resourceGroup.name ], deploymentSettings.isNetworkIsolated ? [ resourceNames.spokeResourceGroup ] : [])
   }
 }
+
+// module aiResources 'ai-resources.bicep' = if (deploymentSettings.isPrimaryLocation) {
+//   name: 'ai-resources-${deploymentSettings.resourceToken}'
+//   params: {
+//     usePrivateEndpoint: deploymentSettings.isNetworkIsolated
+//     environmentName: deploymentSettings.name
+//     location: deploymentSettings.location
+//     bypass: 'AzureServices'
+//     clientIpAddress: clientIpAddress
+//     openAiResourceGroupName:'rg-ai-${deploymentSettings.name}'
+//     principalId: deploymentSettings.principalId
+//     publicNetworkAccess: deploymentSettings.isNetworkIsolated ? 'Disabled' : 'Enabled'
+//     resourceGroupName: resourceGroup.name
+//     principalType: deploymentSettings.principalType
+//   }
+// }
 
 // ========================================================================
 // OUTPUTS
