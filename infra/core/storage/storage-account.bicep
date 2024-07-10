@@ -65,6 +65,9 @@ param privateEndpointSettings PrivateEndpointSettings?
 @description('Required. Gets or sets the SKU name.')
 param sku object = { name: 'Standard_LRS' }
 
+@description('Determines whether or not trusted azure services are allowed to connect to this account')
+param bypass string = 'AzureServices'
+
 // ========================================================================
 // VARIABLES
 // ========================================================================
@@ -99,6 +102,10 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     dnsEndpointType: dnsEndpointType
     minimumTlsVersion: minimumTlsVersion
     publicNetworkAccess: enablePublicNetworkAccess ? 'Enabled' : 'Disabled'
+    networkAcls: {
+      defaultAction:'Deny'
+      bypass: bypass
+    }
   }
 }
 
