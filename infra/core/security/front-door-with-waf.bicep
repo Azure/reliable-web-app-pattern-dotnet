@@ -22,6 +22,49 @@ type WAFRuleSet = {
   version: string
 }
 
+type CustomRule = {
+  @description('The name of the custom rule')
+  name: string
+
+  @description('The priority of the custom rule')
+  priority: int
+
+  @description('The state of the custom rule')
+  enabledState: string
+
+  @description('The rule type "MatchRule" or "RateLimitRule".')
+  ruleType: string
+
+  @description('The action to take when the rule is triggered')
+  action: string
+
+  @description('Number of allowed requests per client within the time window.')
+  rateLimitThreshold: int
+
+  @description('Time window for resetting the rate limit count. Default is 1 minute.')
+  rateLimitDurationInMinutes: int
+
+  @description('The match conditions for the rule')
+  matchConditions: {
+    @description('The match variable')
+    matchVariable: string
+
+    @description('The operator to use for the match')
+    operator: string
+
+    @description('Describes if the result of this condition should be negated.')
+    negateCondition: bool
+
+    @description('The values to match against')
+    matchValue: string[]
+  }[]
+}
+
+type CustomRuleList = {
+  @description('A list of custom rules to apply')
+  rules: CustomRule[]
+}
+
 // =====================================================================================================================
 //     PARAMETERS
 // =====================================================================================================================
@@ -55,6 +98,9 @@ param logAnalyticsWorkspaceId string
 */
 @description('A list of managed rule sets to enable')
 param managedRules WAFRuleSet[]
+
+@description('A list of custom rules to apply')
+param customRules CustomRuleList?
 
 @allowed([ 'Premium', 'Standard' ])
 @description('The pricing plan to use for the Azure Front Door and Web Application Firewall')
@@ -102,7 +148,7 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-05-01' = {
   }
 }
 
-resource wafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@2022-05-01' = {
+resource wafPolicy 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@2024-02-01' = {
   name: webApplicationFirewallName
   location: 'global'
   tags: tags
@@ -115,9 +161,7 @@ resource wafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@20
       mode: 'Prevention'
       requestBodyCheck: 'Enabled'
     }
-    customRules: {
-      rules: []
-    }
+    customRules: customRules
     managedRules: {
       managedRuleSets: sku == 'Premium' ? managedRuleSets : []
     }
