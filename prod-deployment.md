@@ -115,7 +115,7 @@ The following detailed deployment steps assume you are using a Dev Container ins
     <!-- requires AZ cli login -->
 
     ```pwsh
-    az login
+    az login --use-device-code
     ```
     
     ```pwsh
