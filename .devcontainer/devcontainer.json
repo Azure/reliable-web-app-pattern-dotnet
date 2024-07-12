@@ -25,8 +25,13 @@
 		}
 	},
 	"features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            // This should match the version of Node.js in Github Actions workflows
+            "version": "18",
+            "nodeGypDependencies": false
+        },
 		"ghcr.io/azure/azure-dev/azd:latest": {
-			"version": "1.5.1"
+			"version": "1.9.3"
 		},
 		"ghcr.io/devcontainers/features/azure-cli:1": {},
 		"ghcr.io/devcontainers/features/common-utils:2": {},
