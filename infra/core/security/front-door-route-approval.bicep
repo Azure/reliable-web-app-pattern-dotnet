@@ -48,7 +48,7 @@ resource approval 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
       }
     ]
     scriptContent: loadTextContent('./scripts/front-door-route-approval.sh')
-    cleanupPreference: 'OnExpiration'
+    cleanupPreference: 'OnSuccess'
     retentionInterval: 'PT1H'
   }
 }
