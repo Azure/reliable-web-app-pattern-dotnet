@@ -432,6 +432,7 @@ module storageAccount '../core/storage/storage-account.bicep' = {
 
     // Settings
     allowSharedKeyAccess: false
+    enablePublicNetworkAccess: deploymentSettings.isNetworkIsolated
     ownerIdentities: [
       { principalId: deploymentSettings.principalId, principalType: deploymentSettings.principalType }
       { principalId: ownerManagedIdentity.outputs.principal_id, principalType: 'ServicePrincipal' }
@@ -442,6 +443,8 @@ module storageAccount '../core/storage/storage-account.bicep' = {
       resourceGroupName: resourceNames.spokeResourceGroup
       subnetId: subnets[resourceNames.spokePrivateEndpointSubnet].id
     } : null
+
+    firewallRules: clientIpAddress != '' ? { allowedIpAddresses: [clientIpAddress]} : null
   }
 }
 
