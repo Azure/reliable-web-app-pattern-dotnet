@@ -47,7 +47,7 @@ param managedIdentityName string = ''
 @description('Whether or not public endpoint access is allowed for this server')
 param enablePublicNetworkAccess bool = true
 
-@description('The firewall rules to install on the Key Vault.')
+@description('The firewall rules to install on the sql-server.')
 param firewallRules FirewallRules?
 
 // ========================================================================
