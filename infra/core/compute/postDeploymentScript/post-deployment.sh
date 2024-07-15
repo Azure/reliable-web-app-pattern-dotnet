@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # install AZD
-curl -fsSL https://aka.ms/install-azd.sh | sudo bash
+curl -fsSL https://aka.ms/install-azd.sh | bash -s -- -- version 1.9.5
 
 # add Microsoft package feed for the dotnet install
 # Get Ubuntu version
