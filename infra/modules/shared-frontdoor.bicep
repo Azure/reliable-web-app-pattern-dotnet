@@ -77,7 +77,7 @@ module frontDoor '../core/security/front-door-with-waf.bicep' = {
       { name: 'Microsoft_BotManagerRuleSet', version: '1.0' }
     ] : []
 
-    customRules: deploymentSettings.isProduction ? {
+    customRules: {
       rules: [{
         name: 'RateLimitRule2'
         enabledState: 'Enabled'
@@ -108,7 +108,7 @@ module frontDoor '../core/security/front-door-with-waf.bicep' = {
         ]
       }
     ]
-    } : null
+    }
     sku: deploymentSettings.isProduction || deploymentSettings.isNetworkIsolated ? 'Premium' : 'Standard'
   }
 }
