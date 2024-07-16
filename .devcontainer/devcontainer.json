@@ -25,6 +25,10 @@
 		}
 	},
 	"features": {
+		"ghcr.io/devcontainers/features/dotnet:2": {
+			"version": "8.0",
+			"additionalVersions": "6.0"
+		},
 		"ghcr.io/azure/azure-dev/azd:latest": {
 			"version": "1.9.5"
 		},
@@ -34,7 +38,10 @@
 		"ghcr.io/devcontainers/features/azure-cli:1": {},
 		"ghcr.io/devcontainers/features/common-utils:2": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers/features/powershell:1": {},
+		"ghcr.io/devcontainers/features/powershell:1": {
+			"version": "7.4.2",
+			"modules": "Az,SqlServer"
+		},
 		"ghcr.io/devcontainers/features/sshd:1": {}
 	},
 	// resolves error: dubious ownership of the workspace folder
