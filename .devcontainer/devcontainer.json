@@ -30,6 +30,7 @@
 			"additionalVersions": "6.0"
 		},
 		"ghcr.io/azure/azure-dev/azd:latest": {
+			// keep this version in sync with the version defined in the file /infra/core/compute/postDeploymentScript/post-deployment.sh
 			"version": "1.9.5"
 		},
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {
