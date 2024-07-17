@@ -77,7 +77,7 @@ module frontDoor '../core/security/front-door-with-waf.bicep' = {
 
     customRules: {
       rules: [{
-        name: 'RateLimitRule2'
+        name: 'RateLimitRule'
         enabledState: 'Enabled'
         priority: 100
         ruleType: 'RateLimitRule'
