@@ -53,8 +53,6 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing 
 // NEW RESOURCES
 // ========================================================================
 
-
-
 /*
 ** Azure Front Door with Web Application Firewall
 */
