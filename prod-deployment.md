@@ -40,7 +40,7 @@ The following detailed deployment steps assume you are using a Dev Container ins
 1. Log in to Azure:
     
     ```pwsh
-    Connect-AzAccount
+    Connect-AzAccount -UseDeviceAuthentication
     ```
 
 1. Set the subscription to the one you want to use (you can use [Get-AzSubscription](https://learn.microsoft.com/powershell/module/az.accounts/get-azsubscription?view=azps-11.3.0) to list available subscriptions):
@@ -57,7 +57,7 @@ The following detailed deployment steps assume you are using a Dev Container ins
 1. Azure Developer CLI (azd) has its own authentication context. Run the following command to authenticate to Azure:
 
     ```pwsh
-    azd auth login
+    azd auth login --use-device-code
     ```
 
 
@@ -115,7 +115,7 @@ The following detailed deployment steps assume you are using a Dev Container ins
     <!-- requires AZ cli login -->
 
     ```pwsh
-    az login
+    az login --use-device-code
     ```
     
     ```pwsh

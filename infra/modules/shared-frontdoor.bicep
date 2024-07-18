@@ -39,6 +39,8 @@ param logAnalyticsWorkspaceId string = ''
 // The tags to apply to all resources in this workload
 var moduleTags = union(deploymentSettings.tags, deploymentSettings.workloadTags)
 
+var documentationIPAddressRange = '192.0.2.0/24' // This is the TEST-NET-1 documentation IP address range.
+
 // ========================================================================
 // EXISTING RESOURCES
 // ========================================================================
@@ -72,6 +74,39 @@ module frontDoor '../core/security/front-door-with-waf.bicep' = {
       { name: 'Microsoft_DefaultRuleSet', version: '2.1' }
       { name: 'Microsoft_BotManagerRuleSet', version: '1.0' }
     ] : []
+
+    customRules: {
+      rules: [{
+        name: 'RateLimitRule'
+        enabledState: 'Enabled'
+        priority: 100
+        ruleType: 'RateLimitRule'
+        rateLimitDurationInMinutes: 1
+        rateLimitThreshold: 200
+        matchConditions: [
+        // Currently Front Door requires that a rate limit rule has a match condition. This specifies the subset
+        // of requests it should apply to. For this sample, we are using an IP address-based match condition
+        // and setting the value to "not 192.0.2.0/24". This is an IANA documentation range and no real clients
+        // will use that range, so this match condition effectively matches all requests.
+        // Note that the rate limit is applied per IP address.
+          {
+            matchVariable: 'RemoteAddr'
+            operator: 'IPMatch'
+            negateCondition: true
+            matchValue: [
+              documentationIPAddressRange
+            ]
+          }
+        ]
+        action: 'Block'
+        groupBy: [
+          {
+            variableName: 'SocketAddr'
+          }
+        ]
+      }
+    ]
+    }
     sku: deploymentSettings.isProduction || deploymentSettings.isNetworkIsolated ? 'Premium' : 'Standard'
   }
 }

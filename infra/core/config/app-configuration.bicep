@@ -101,6 +101,8 @@ resource appConfigStore 'Microsoft.AppConfiguration/configurationStores@2023-03-
   properties: {
     // when publicNetworkAccess is Disabled - must pair with build agent to set config values
     publicNetworkAccess: enablePublicNetworkAccess ? 'Enabled' : 'Disabled'
+    // disable local auth since access is performed with Entra ID
+    disableLocalAuth: true
   }
   sku: {
     name: skuName

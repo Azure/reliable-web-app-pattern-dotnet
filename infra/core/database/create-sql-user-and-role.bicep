@@ -59,7 +59,7 @@ resource createSqlUserAndRole 'Microsoft.Resources/deploymentScripts@2020-10-01'
       forceUpdateTag: uniqueScriptId
       azPowerShellVersion: '7.4'
       retentionInterval: 'PT1H'
-      cleanupPreference: 'OnExpiration'
+      cleanupPreference: 'OnSuccess' // No need to keep around any background resources if succeeded
       arguments: join(
         [
           '-SqlServerName \'${sqlServerName}\''
