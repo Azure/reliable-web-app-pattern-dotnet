@@ -1,4 +1,4 @@
-namespace AppConfigurationReader.Data
+namespace ReleCloudLite.Web.Data
 {
     public class WeatherForecast
     {
