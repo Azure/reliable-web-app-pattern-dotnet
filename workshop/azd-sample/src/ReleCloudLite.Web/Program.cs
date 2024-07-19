@@ -21,7 +21,7 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 
 builder.Services.AddHttpClient<TicketService>(client =>
 {
-    var baseAddress = builder.Configuration["AzureUrls:apiLink"]";
+    var baseAddress = builder.Configuration["AzureUrls:apiLink"];
     client.BaseAddress = new Uri("https://" + baseAddress);
 });
 
