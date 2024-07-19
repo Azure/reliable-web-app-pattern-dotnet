@@ -17,6 +17,9 @@ param webServiceName string
 @description('The name of the overall environment')
 param environmentName string
 
+@description('The link to the API')
+param apiLink string
+
 resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-05-01' = {
   name: 'appconfig-${resourceToken}'
   location: location
@@ -36,8 +39,8 @@ resource appConfigService 'Microsoft.AppConfiguration/configurationStores@2022-0
   }
 }
 
-resource web 'Microsoft.Web/sites@2021-03-01' = {
-  name: '${environmentName}-web-${resourceToken}'
+resource web 'Microsoft.Web/sites@2021-03-01' =  {
+  name: '${environmentName}-${resourceToken}'
   location: location
   tags: union(tags, {
       'azd-service-name': webServiceName
@@ -55,10 +58,10 @@ resource web 'Microsoft.Web/sites@2021-03-01' = {
     properties: {
       // get the app config connection string from appConfigService
       'AzureUrls:AppConfiguration': appConfigService.listKeys().value[0].connectionString
+      'AzureUrls:apiLink': apiLink
     }
   }
 }
-
 var appServicePlanSku = (isProd) ? 'P1v3' : 'B1'
 
 resource webAppServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {

@@ -14,14 +14,15 @@ builder.Services.AddSingleton<TicketService>();
 string appConfigUrl = builder.Configuration["AzureUrls:AppConfiguration"]!;
 
 // add app configuration
-//builder.Configuration.AddAzureAppConfiguration(options =>
-//{
-//    options.Connect(appConfigUrl);
-//});
+builder.Configuration.AddAzureAppConfiguration(options =>
+{
+   options.Connect(appConfigUrl);
+});
 
 builder.Services.AddHttpClient<TicketService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7171/");
+    var baseAddress = builder.Configuration["AzureUrls:apiLink"]";
+    client.BaseAddress = new Uri("https://" + baseAddress);
 });
 
 var app = builder.Build();

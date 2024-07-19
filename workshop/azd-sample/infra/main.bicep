@@ -13,6 +13,7 @@ param environmentName string
 param location string
 
 param webServiceName string = 'cost-optimization-web'
+param apiServiceName string = 'cost-optimization-api'	
 
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
@@ -28,16 +29,33 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   tags: tags
 }
 
+
+
 module resources 'resources.bicep' = {
-  name: 'primary-${resourceToken}'
+  name: 'primary-api-${resourceToken}'
   scope: rg
   params: {
     isProd: isProd
     location: location
-    resourceToken: resourceToken
+    resourceToken: 'api-${resourceToken}'
+    environmentName: environmentName
+    tags: tags
+    webServiceName: apiServiceName
+    apiLink: ''
+  }
+}
+
+module resources2 'resources.bicep' = {
+  name: 'primary-web-${resourceToken}'
+  scope: rg
+  params: {
+    isProd: isProd
+    location: location
+    resourceToken: 'web-${resourceToken}'
     environmentName: environmentName
     tags: tags
     webServiceName: webServiceName
+    apiLink: resources.outputs.WEB_APP_URL
   }
 }
 

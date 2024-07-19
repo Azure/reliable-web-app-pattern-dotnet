@@ -3,6 +3,11 @@
 name: azd-sample
 services:
   cost-optimization-web:
-    project: src/AppConfigurationReader
+    project: src/ReleCloudLite.Web/ReleCloudLite.Web.csproj
     language: csharp
     host: appservice
+  cost-optimization-api:
+    project: src/ReleCloudLite.API/ReleCloudLite.API.csproj
+    language: csharp
+    host: appservice
+  
