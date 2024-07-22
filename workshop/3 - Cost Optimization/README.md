@@ -17,7 +17,7 @@ In this portion of the workshop, we'll be working with a simple Blazor Server ap
 You can use bicep parameters to specify Azure resource deployment configurations. We'll use a small sample contained in this [folder directory](../3%20-%20Cost%20Optimization/azd-sample/) and PowerShell to illustrate this technique. If you are not logged in Azure, before following the guide, [click for instructions to login](../1%20-%20Tooling%20and%20Deployment/README.md#3-log-in-to-azure).
 
 
-1. Open the *PowerShell terminal* and navigate to the **3 - Cost Optimization\azd-sample** directory or [click here](../3%20-%20Cost%20Optimization/azd-sample/) to open.
+1. Open the *PowerShell terminal* and navigate to the **azd-sample** directory.
 1. Run the following command to initialize an Azure Developer CLI (azd) environment. _(Replace `<env-name>` below the desired environment name, remember use valid chars, this will reflect in the website URL.)_
 
     ```powershell
@@ -34,14 +34,14 @@ You can use bicep parameters to specify Azure resource deployment configurations
 1. A new directory named **.azure** has now been created under the **azd-sample** directory. It will have a subdirectory with the same name as the azd environment you created above. (For example **.azure\matt**). Within that directory will be a filed named **.env**. This file contains the environment variables you set above and needed by the Azure Developer CLI to provision the Azure resources. It should look something like the following:
 
     ```text
-    AZURE_ENV_NAME="matt"
-    AZURE_RESOURCE_GROUP="matt-cost-rg"
+    AZURE_ENV_NAME="workshop-rwa"
+    AZURE_RESOURCE_GROUP="workshop-rwa-cost-rg"
     IS_PROD="false"
     ```
 
     It also contains other environment variables needed by the Azure Developer CLI to successfully deploy the application, such as the Azure subscription ID and the Azure region to deploy to.
 
-1. In Visual Studio or VS Code, open up the **3 - Cost Optimization\azd-sample\infra** folder. This folder contains the bicep files that provision the Azure resources for this sample application.
+1. In Visual Studio or VS Code, open up the **azd-sample\infra** folder. This folder contains the bicep files that provision the Azure resources for this sample application.
 
     Variables can be used in bicep files to help provision the resources needed for particular needs. In this case we'll look at provisioning resources for production versus development.
 
@@ -75,7 +75,7 @@ You can use bicep parameters to specify Azure resource deployment configurations
 
 You want to have your resources scale up and down as needed. Azure App Service has built-in autoscaling capabilities. Let's add that to our sample application.
 
-1. In Visual Studio or VS Code, open the **autoscale.bicep** file from the **3 - Cost Optimization\azd-sample\infra** folder.
+1. In Visual Studio or VS Code, open the **autoscale.bicep** file from the **azd-sample\infra** folder.
 1. Note how it defines scaling rules both with a trigger and an action to take when the trigger is met. For example, if the CPU percentage is greater than a threshold, increase the number of instances by 1.
 1. Let's implement the autoscaling as part of our azd provisioning. Add the following to the **resources.bicep** file.
 
@@ -91,19 +91,19 @@ You want to have your resources scale up and down as needed. Azure App Service h
     }
     ```
 
-1. In a PowerShell terminal, still opened to the **3- Cost Optimization\azd-sample** directory, run the following to update the azd environment.
+1. In a PowerShell terminal, in the **\azd-sample** directory, run the following to update the azd environment.
 
     ```powershell
     azd env set IS_PROD true
     ```
 
-1. Now run the following to provision the autoscaling.
+1. Now, run the following to provision the autoscaling.
 
     ```powershell
     azd provision
     ```
 
-1. Now open up the same App Service Plan as before in the Azure portal (or just refresh your browser if you already have it open). You should see that it is provisioned with a **P1v2** SKU.
+1. Open up the same App Service Plan as before in the Azure portal (or just refresh your browser if you already have it open). You should see that it is provisioned with a **P1v3** SKU.
 
     ![Screenshot of the App Service Plan](../images/3-Cost%20Optimization/app-service-plan-p1v3.png)
 

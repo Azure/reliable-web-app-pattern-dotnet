@@ -10,9 +10,8 @@ When you grant managed identities access to a resource, you should always grant 
 
 Let's see how managed identities can help us remove connection strings from our code.
 
-1. We'll use the same sample application as we did during the [Cost Optimization](../3%20-%20Cost%20Optimization/README.md) module. A copy of the code is already in this module under the [azd-sample](./azd-sample) directory.
-1. Copy the **.azure** directory from the **3 - Cost Optimization\azd-sample** directory to the **5 - Security\azd-sample** directory.
-1. Open the [Azure portal](https://portal.azure.com) and browse for resource groups. The name of the resource group will start with  **<USERNAME>-cost-rg**. (Or what you named it in the previous module.)
+1. Use the main sample at the ``azd-sample`` directory. If you modified the sample in the last lesson, undo the modifications.
+1. Open the [Azure portal](https://portal.azure.com) and browse for resource groups. Search the Resource Group for the RWA Sample.
 1. Open the App Service within the resource group.
 1. Click on the **Identity** menu item in the left navigation.
 1. From the **System assigned** tab, click **On** to enable the system assigned identity. Then click **Save**.

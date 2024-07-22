@@ -12,11 +12,15 @@ The Retry pattern is a technique for handling temporary service interruptions. T
 
 ### Adding the Retry Pattern to our sample
 
-Before we begin, copy the `.azure` from our previous deployment from chapter three, to our `azd-sample` in the current chapter. 
+```
+NOTE: Run the samples though Visual Studio, as the certificates on running locally on Linux with .NET is currently not supported. Run the following command: 
 
-In the sample, open the `src` and the `AppConfigurationFolder` to change both `appsettings.json` and  `program.cs`
+dotnet dev-certs https --trust
 
-*Verifying this with stakeholders for the next steps*
+Talk with Nish -> https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust
+```
+
+In the sample, open the `src` and the `ReleCloudLite.Web` to change both `appsettings.json` and  `program.cs`. 
 
 Go to the `appsettings.json`, add the following key immediately after the **AllowedHosts** key:
 
@@ -29,20 +33,36 @@ Go to the `appsettings.json`, add the following key immediately after the **Allo
 ```
 
 
-To test the application locally. Run the application using `dotnet run`
+To test the application locally. Do the following changes in `Program.cs`:
+
+1. Change the service to look locally
+    ```
+    builder.Services.AddHttpClient<TicketService>(client =>
+    {
+        client.BaseAddress = new Uri("https://localhost:7171");
+    });
+    ```
+1. Comment the following block
+    ````
+    //builder.Configuration.AddAzureAppConfiguration(options =>
+    //{
+    //    options.Connect(appConfigUrl);
+    //});
+    ```
+Run the application.
 
 You might need to make calls to a dependency that isn't an Azure service or doesn't support the Retry pattern natively. In that case, you should use the [Polly library](https://github.com/App-vNext/Polly) to implement the Retry pattern. Polly is a .NET resilience and transient-fault-handling library.
 
 Let's implement custom retry policies to the project to handle any transient communication faults.
 
 
- Add the Polly NuGet package to **AppConfigurationReader**. From **Solution Explorer**. 
+ Add the Polly NuGet package to **ReleCloudLite.Web**. From **Solution Explorer**. 
 
-1. From the **Console**, add the following command.
+1. From the NuGet Packet Manager, add the following Packages.
+    - Microsoft.Extensions.Http.Polly
+    - Polly.Contrib.WaitAndRetry
 
-    ``dotnet add package Polly.Contrib.WaitAndRetry --version 1.1.1``
-
-1. Open the **Program.cs** file from the **AppConfigurationReader** project.
+1. Create a new class file the **Resilience.cs** file in the **ReleCloudLite.Web** project.
 1. Add the following using statements to the top of the file:
 
     ```csharp
@@ -51,10 +71,10 @@ Let's implement custom retry policies to the project to handle any transient com
     using Polly.Extensions.Http;
     ```
 
-1. Add the following method to the **Startup** class:
+1. Add the following method:
 
     ```csharp
-    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+    public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
     {
         var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(500), retryCount: 3);
 
@@ -66,15 +86,13 @@ Let's implement custom retry policies to the project to handle any transient com
 
     The `GetRetryPolicy` method returns a `IAsyncPolicy<HttpResponseMessage>` that can be used to retry HTTP requests. The `HandleTransientHttpError` method tells Polly to retry the HTTP request if the response is a transient HTTP error. The `WaitAndRetryAsync` method tells Polly to retry the HTTP request using a specified delay between retries.
 
-*Verifying this with stakeholders for the next steps*
-
-1. Now, we have to tell application for a `HttpClient` that is used to communicate to the **Weather Forecast** service to use the retry policy.
+1. Now, we have to tell application for a `HttpClient` that is used to communicate to the **Tickets** service to use the retry policy.
 
 
-1. Add the following code to the end of the `builder.Services.AddSingleton<WeatherForecastService>();` method:
+1. Add the following code to the end of the `AddHttpClient<TicketService>;` method:
 
     ```csharp
-    .AddPolicyHandler(GetRetryPolicy());
+    .AddPolicyHandler(Resilience.GetRetryPolicy());
     ```
 
     The `AddPolicyHandler` method adds the retry policy to the `HttpClient` that is injected into the `WeatherForecastService` class. That `HttpClient` is subsequently used to communicate with the **Weather Forecast** service.
@@ -90,11 +108,11 @@ To ensure reliability, it is recommended to combine the Retry pattern with the C
 
 You can implement the circuit breaker pattern with Polly as follows:
 
-1. Open the **Program.cs** file from the **AppConfigurationReader** project.
+1. Edit the **Resilience.cs** file from the **ReleCloudLite.Web** project.
 1. Add the following method
 
     ```csharp
-    private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
+    public static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
@@ -105,18 +123,16 @@ You can implement the circuit breaker pattern with Polly as follows:
 
     The `GetCircuitBreakerPolicy` method returns a `IAsyncPolicy<HttpResponseMessage>` that can be used to implement the Circuit Breaker pattern. The `HandleTransientHttpError` method tells Polly to retry the HTTP request if the response is a transient HTTP error. The `OrResult` method tells Polly to retry the HTTP request if the response is a 404 Not Found. The `CircuitBreakerAsync` method tells Polly to break circuit if the HTTP request fails 5 times in 30 seconds.
 
-*Verifying this with stakeholders for the next steps*
-
 1. Now, we have to tell application for a `HttpClient` that is used to communicate to the **Weather Forecast** service to use the retry policy.
 
 
-1. Add the following code to the end of the `builder.Services.AddSingleton<WeatherForecastService>();` method:
+1. Add the following code to the end of the `builder.Services.AddHttpClient<TicketService>` method:
 
     ```csharp
-    .AddPolicyHandler(GetCircuitBreakerPolicy());
+    .AddPolicyHandler(Resilience.GetCircuitBreakerPolicy());
     ```
 
-    The `AddPolicyHandler` method adds the retry policy to the `HttpClient` that is injected into the `WeatherForecastService` class. That `HttpClient` is subsequently used to communicate with the **Weather Forecast** service.
+    The `AddPolicyHandler` method adds the retry policy to the `HttpClient` that is injected into the `TicketService` class. That `HttpClient` is subsequently used to communicate with the **Ticket** service.
 
 1. Run the application locally again, and it will handle the transient errors successfully.
 
