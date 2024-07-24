@@ -156,6 +156,8 @@ Run the following command to create the Azure resources and deploy the code (abo
 azd up
 ```
 
+> **Errors during provisioning?**  See our [known issues list](./known-issues.md) or file an issue on our [GitHub repo](https://github.com/azure/reliable-web-app-pattern-dotnet/issues).
+
 ### 6. Open and use the application
 
 Use the URL displayed in the console output to launch the web application that you have deployed:
