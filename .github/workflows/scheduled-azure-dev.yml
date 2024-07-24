@@ -19,7 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/azure-dev-cli-apps:1.5.1
+      image: mcr.microsoft.com/azure-dev-cli-apps:1.9.5
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
