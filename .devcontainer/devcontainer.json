@@ -1,13 +1,6 @@
 {
 	"name": "web-app-pattern-dotnet",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": { 
-			"VARIANT": "8.0-bookworm"
-		}
-	},
-	"runArgs": ["--init", "--privileged"],
-
+	"image": "mcr.microsoft.com/devcontainers/dotnet:8.0-bookworm",
 	"customizations": {
 		"vscode": {	
 			"extensions": [
