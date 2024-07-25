@@ -12,9 +12,9 @@ The Retry pattern is a technique for handling temporary service interruptions. T
 
 ### Adding the Retry Pattern to our sample
 
-```
-NOTE: Run the samples though Visual Studio, as the certificates on running locally on Linux with .NET is currently not supported. Run the following command: 
+> NOTE: Run the samples though Visual Studio, as the certificates on running locally on Linux with .NET is currently not supported. Run the following command: 
 
+```
 dotnet dev-certs https --trust
 
 Talk with Nish -> https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust

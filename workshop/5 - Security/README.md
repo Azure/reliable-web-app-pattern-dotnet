@@ -12,7 +12,7 @@ Let's see how managed identities can help us remove connection strings from our 
 
 1. Use the main sample at the ``azd-sample`` directory. If you modified the sample in the last lesson, undo the modifications.
 1. Open the [Azure portal](https://portal.azure.com) and browse for resource groups. Search the Resource Group for the RWA Sample.
-1. Open the App Service within the resource group.
+1. Open the App Service from the Web Service within the resource group.
 1. Click on the **Identity** menu item in the left navigation.
 1. From the **System assigned** tab, click **On** to enable the system assigned identity. Then click **Save**.
 
@@ -20,8 +20,8 @@ Let's see how managed identities can help us remove connection strings from our 
 
 1. Click yes at the prompt to enable the identity.
 1. Make note of what the web application's name is. It will probably be easiest to copy it to a text file for reference later.
-    _It will be named similar to: **matt-web-y6kur4iwg4nxw**_
-1. Go back to the resource group and open the Azure App Configuration resource.
+    _It will be named similar to: **groupname-web-mhl5v7j5rkxya**_
+1. Go back to the resource group and open the Web App - App Configuration resource.
 1. Click on the **Access control (IAM)** menu item in the left navigation.
 1. Click the **+ Add** button. Then click **Add role assignment**.
 1. Select **App Configuration Data Reader** and click **Next**.
@@ -40,9 +40,12 @@ The web application (and  you!) now has read access to Azure App Configuration. 
 
 1. Click the **Overview** menu item in the left navigation of the Azure App Configuration service in the portal.
 1. Copy the **Endpoint** value to the clipboard.
-1. Open the **5 - Security\azd-sample\src\AppConfigurationReader.sln** solution in Visual Studio.
 1. Open the **appsettings.json** file and replace the value for `AzureUrls:AppConfiguration` with the value you copied to the clipboard.
-1. Open the `Program.cs` file and replace `options.Connect(appConfigUrl);` with the following:
+1. Open the `Program.cs` file and import the `Azure.Identity` library:
+    ```csharp
+    import Azure.Identity;
+    ```
+1. Replace `options.Connect(appConfigUrl);` with the following:
 
     ```csharp
     options.Connect(new Uri(appConfigUrl), new DefaultAzureCredential());
@@ -52,7 +55,7 @@ The web application (and  you!) now has read access to Azure App Configuration. 
 
 1. Before running the application locally for testing, you will need to Authorize the endpoint identity for Powershell. Run the following at your terminal `Connect-AzAccount -UseDeviceAuthentication -AuthScope 'endpoint'`
 
-1. Run the application locally. You should see the message from Azure App Configuration displayed in the browser.
+1. If you are running the application locally. You should see the message from Azure App Configuration displayed in the browser.
 
     ![Screenshot of the sample application](../images/5-Security/sample-application.png)
 
@@ -74,7 +77,7 @@ The web application (and  you!) now has read access to Azure App Configuration. 
 
     ![Screenshot of the sample application](../images/5-Security/sample-application.png)
 
-## Centralized secrets management
+## Centralized secrets management 
 
 Sometimes you cannot help but to need a secret key or connection string. In those cases, you should use a centralized secrets management service. Azure Key Vault is a great option for this.
 
@@ -88,7 +91,7 @@ Let's provision an Azure Key Vault through the Azure CLI.
     $resourceGroupName = "<RESOURCE_GROUP_NAME>"
     ```
 
-    Replace `<RESOURCE_GROUP_NAME>` with the name of your resource group. It will probably be something like **<USERNAME>-cost-rg**.
+    Replace `<RESOURCE_GROUP_NAME>` with the name of your resource group. It will probably be something like **test-workshop-cost-rg**.
 
 1. Provision a new KeyVault with the following command:
 

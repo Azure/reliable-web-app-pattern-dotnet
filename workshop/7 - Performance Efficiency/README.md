@@ -6,11 +6,13 @@ Performance efficiency is the ability of a workload to scale and meet the demand
 
 The Cache-Aside pattern is a technique that's used to manage in-memory data caching. It reduces the request response time and can lead to increased response throughput. This efficiency reduces the number of horizontal scaling events, making the app more capable of handling traffic bursts. It also improves service availability by reducing the load on the primary data store and decreasing the likelihood of service outages.
 
-Take a look for the Cache-Aside pattern implementation in our application.
+### Implementing Cache-Aside in Relecloud Lite
+
+### Cache-Aside in Relecloud Concerts
+Take a look for the Cache-Aside pattern implementation in our main application.
 
 1. Open the **Relecloud.sln** solution.
-1. From the **Solution Explorer**, right-click on the **Relecloud.Web.CallCenter.Api** project and select **Manage NuGet Packages**.
-1. Search for **Microsoft.Extensions.Caching.StackExchangeRedis** and install the package.
+1. Note that we use **Microsoft.Extensions.Caching.StackExchangeRedis** for Cacheing.
 1. Open the **Startup.cs** of the **Relecloud.Web.CallCenter.Api** project and browse to the `AddDistributedSession` method.
 1. Look at the Azure Redis Cache connection string from the configuration settings.
 
@@ -170,14 +172,18 @@ Take a look for the Cache-Aside pattern implementation in our application.
 1. Run the applications and browse to **Upcoming Concerts**.
 1. The first time you browse to it, the concerts may take a bit of time to load. Subsequent loads should be much faster.
 
-## Caching in the Reliable Web App reference application
+## Caching in the Reliable Web App
 
 You should use a single cache instance to support multiple data types rather than using a single instance for each data type.
 
 The reference implementation uses a single Azure Cache for Redis instance to store session state for the front-end web app and the back-end web app. The front-end web app stores two pieces of data in session state. It stores the cart and the Microsoft Authentication Library (MSAL) token.
 
+### Implement Caching in Relecloud Lite
+
+### Caching in Relecloud
+
 1. You can see all of this by using the **Relecloud** solution you already have open.
-1. Open the **Relecloud.Web** project.
+1. Open the **Relecloud.Web.CallCenter** project.
 1. Open the **Startup.cs** file and browse to the `AddAzureCacheForRedis` method.
 
     ```csharp
