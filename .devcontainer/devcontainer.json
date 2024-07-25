@@ -1,13 +1,6 @@
 {
 	"name": "web-app-pattern-dotnet",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": { 
-			"VARIANT": "8.0-bookworm"
-		}
-	},
-	"runArgs": ["--init", "--privileged"],
-
+	"image": "mcr.microsoft.com/devcontainers/dotnet:8.0-bookworm",
 	"customizations": {
 		"vscode": {	
 			"extensions": [
@@ -30,7 +23,7 @@
 			"additionalVersions": "6.0"
 		},
 		"ghcr.io/azure/azure-dev/azd:latest": {
-			"version": "1.9.3"
+			"version": "1.9.5"
 		},
 		"ghcr.io/devcontainers/features/powershell:1": {
 			"version": "7.4.2",
