@@ -9,7 +9,6 @@ The dev team uses Visual Studio and they integrate directly with Azure resources
 
 Most configurations in the project are stored in Azure App Configuration with secrets saved into Azure Key Vault. To connect to these resources from a developer workstation you need to complete the following steps.
 
-1. Add your identity to the Azure SQL resource
 1. Set up front-end web app configuration
 1. Set up back-end web app configuration
 
@@ -45,15 +44,7 @@ To support this workflow the following steps will store data in [User Secrets](h
     Set-AzContext -SubscriptionId $AZURE_SUBSCRIPTION_ID
     ```
 
-## 1. Add your identity to the Azure SQL resource
-
-1. Run the following script to automate the process in docs [Configure and manage Microsoft Entra authentication with Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure?view=azuresql&tabs=azure-powershell)
-
-    ```pwsh
-    ./infra/scripts/devexperience/call-make-sql-account.ps1
-    ```
-
-## 2. Set up front-end web app configuration
+## 1. Set up front-end web app configuration
 
 1. Get the Azure App Configuration URI
     ```pwsh
@@ -83,7 +74,7 @@ To support this workflow the following steps will store data in [User Secrets](h
     cd ../..
     ```
 
-## 3. Set up back-end web app configuration
+## 2. Set up back-end web app configuration
 
     ```pwsh
     cd src/Relecloud.Web.CallCenter.Api
@@ -97,7 +88,7 @@ To support this workflow the following steps will store data in [User Secrets](h
     dotnet user-secrets set "App:AppConfig:Uri" $appConfigurationUri
     ```
 
-## 4. Launch the project with Visual Studio
+## 3. Launch the project with Visual Studio
 
 1. Open the project in Visual Studio
 1. Configure the solution to start both the front-end and back-end web apps

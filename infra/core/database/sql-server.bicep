@@ -12,25 +12,7 @@ targetScope = 'resourceGroup'
 ** databases to be created on the same server.
 */
 
-// ========================================================================
-// USER-DEFINED TYPES
-// ========================================================================
-
-// From: infra/types/DiagnosticSettings.bicep
-@description('The diagnostic settings for a resource')
-type DiagnosticSettings = {
-  @description('The number of days to retain log data.')
-  logRetentionInDays: int
-
-  @description('The number of days to retain metric data.')
-  metricRetentionInDays: int
-
-  @description('If true, enable diagnostic logging.')
-  enableLogs: bool
-
-  @description('If true, enable metrics logging.')
-  enableMetrics: bool
-}
+import { DiagnosticSettings } from '../../types/DiagnosticSettings.bicep'
 
 type FirewallRules = {
   @description('The list of IP address CIDR blocks to allow access from.')
@@ -65,17 +47,8 @@ param managedIdentityName string = ''
 @description('Whether or not public endpoint access is allowed for this server')
 param enablePublicNetworkAccess bool = true
 
-@description('The firewall rules to install on the Key Vault.')
+@description('The firewall rules to install on the sql-server.')
 param firewallRules FirewallRules?
-
-@secure()
-@minLength(8)
-@description('The password for the administrator account on the SQL Server.')
-param sqlAdministratorPassword string = newGuid()
-
-@minLength(8)
-@description('The username for the administrator account on the SQL Server.')
-param sqlAdministratorUsername string = 'adminuser'
 
 // ========================================================================
 // VARIABLES
@@ -100,10 +73,8 @@ resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
   location: location
   tags: tags
   properties: {
-    administratorLogin: sqlAdministratorUsername
-    administratorLoginPassword: sqlAdministratorPassword
     administrators: {
-      azureADOnlyAuthentication: false
+      azureADOnlyAuthentication: true
       login: managedIdentity.name
       principalType: 'User'
       sid: managedIdentity.properties.principalId

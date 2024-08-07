@@ -1,4 +1,4 @@
-// From: infra/types/DeploymentSettings.bicep
+@export()
 @description('Type that describes the global deployment settings')
 type DeploymentSettings = {
   @description('If \'true\', then two regional deployments will be performed.')
@@ -21,6 +21,9 @@ type DeploymentSettings = {
 
   @description('The ID of the principal that is being used to deploy resources.')
   principalId: string
+
+  @description('The name of the principal that is being used to deploy resources.')
+  principalName: string
 
   @description('The type of the \'principalId\' property.')
   principalType: 'ServicePrincipal' | 'User'

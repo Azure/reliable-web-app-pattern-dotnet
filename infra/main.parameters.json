@@ -11,9 +11,6 @@
     "clientIpAddress": {
         "value": "${AZD_IP_ADDRESS}"
     },
-    "databasePassword": {
-        "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} Application--SqlAdministratorPassword)"
-    },
     "differentiator": {
         "value": "${AZURE_CI_DIFFERENTIATOR=none}"
     },
@@ -32,14 +29,14 @@
     "githubToken": {
         "value": "${GITHUB_TOKEN}"
     },
-    "jumpboxAdministratorPassword": {
-        "value": "$(secretOrRandomPassword ${AZURE_OPS_VAULT_NAME} Jumpbox--AdministratorPassword)"
-    },
     "location": {
         "value": "${AZURE_LOCATION}"
     },
     "principalId": {
         "value": "${AZURE_PRINCIPAL_ID}"
+    },
+    "principalName": {
+        "value": "${AZURE_PRINCIPAL_NAME=Developer}"
     },
     "principalType": {
         "value": "${AZURE_PRINCIPAL_TYPE=User}"

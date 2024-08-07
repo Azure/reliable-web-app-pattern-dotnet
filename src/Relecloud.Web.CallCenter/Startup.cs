@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All Rights Reserved.
 // Licensed under the MIT License.
 
+using Azure.Core;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
@@ -11,22 +12,25 @@ using Microsoft.Net.Http.Headers;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
-using Relecloud.Web.Models.ConcertContext;
-using Relecloud.Web.Models.Services;
 using Relecloud.Web.CallCenter.Infrastructure;
 using Relecloud.Web.CallCenter.Services;
 using Relecloud.Web.CallCenter.Services.ApiConcertService;
 using Relecloud.Web.CallCenter.Services.MockServices;
 using Relecloud.Web.CallCenter.Services.RelecloudApiServices;
+using Relecloud.Web.Models.ConcertContext;
+using Relecloud.Web.Models.Services;
 using System.Diagnostics;
 
 namespace Relecloud.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly TokenCredential _credential;
+
+        public Startup(IConfiguration configuration, TokenCredential credential)
         {
             Configuration = configuration;
+            _credential = credential;
         }
 
         public IConfiguration Configuration { get; }
@@ -54,12 +58,11 @@ namespace Relecloud.Web
 
         private void AddAzureCacheForRedis(IServiceCollection services)
         {
-            if (!string.IsNullOrWhiteSpace(Configuration["App:RedisCache:ConnectionString"]))
+            var connectionString = Configuration["App:RedisCache:ConnectionString"];
+
+            if (!string.IsNullOrWhiteSpace(connectionString))
             {
-                services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = Configuration["App:RedisCache:ConnectionString"];
-                });
+                services.AddAzureStackExchangeRedisCache(connectionString, _credential);
             }
             else
             {
@@ -106,7 +109,7 @@ namespace Relecloud.Web
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
             }
         }
-        
+
         private void AddTicketImageService(IServiceCollection services)
         {
             var baseUri = Configuration["App:RelecloudApi:BaseUri"];

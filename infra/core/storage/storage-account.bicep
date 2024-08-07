@@ -8,50 +8,13 @@ targetScope = 'resourceGroup'
 ***************************************************************************
 */
 
-// ========================================================================
-// USER-DEFINED TYPES
-// ========================================================================
+import { PrivateEndpointSettings } from '../../types/PrivateEndpointSettings.bicep'
+import { DiagnosticSettings } from '../../types/DiagnosticSettings.bicep'
+import { ApplicationIdentity } from '../../types/ApplicationIdentity.bicep'
 
-// From: infra/types/ApplicationIdentity.bicep
-@description('Type describing an application identity.')
-type ApplicationIdentity = {
-  @description('The ID of the identity')
-  principalId: string
-
-  @description('The type of identity - either ServicePrincipal or User')
-  principalType: 'ServicePrincipal' | 'User'
-}
-
-// From: infra/types/DiagnosticSettings.bicep
-@description('The diagnostic settings for a resource')
-type DiagnosticSettings = {
-  @description('The number of days to retain log data.')
-  logRetentionInDays: int
-
-  @description('The number of days to retain metric data.')
-  metricRetentionInDays: int
-
-  @description('If true, enable diagnostic logging.')
-  enableLogs: bool
-
-  @description('If true, enable metrics logging.')
-  enableMetrics: bool
-}
-
-// From: infra/types/PrivateEndpointSettings.bicep
-@description('Type describing the private endpoint settings.')
-type PrivateEndpointSettings = {
-  @description('The name of the resource group to hold the Private DNS Zone. By default, this uses the same resource group as the resource.')
-  dnsResourceGroupName: string
-  
-  @description('The name of the private endpoint resource.')
-  name: string
-
-  @description('The name of the resource group to hold the private endpoint.')
-  resourceGroupName: string
-
-  @description('The ID of the subnet to link the private endpoint to.')
-  subnetId: string
+type FirewallRules = {
+  @description('The list of IP address CIDR blocks to allow access from.')
+  allowedIpAddresses: string[]
 }
 
 // ========================================================================
@@ -107,6 +70,12 @@ param privateEndpointSettings PrivateEndpointSettings?
 @description('Required. Gets or sets the SKU name.')
 param sku object = { name: 'Standard_LRS' }
 
+@description('Determines whether or not trusted azure services are allowed to connect to this account')
+param bypass string = 'AzureServices'
+
+@description('The firewall rules to install on the sql-server.')
+param firewallRules FirewallRules?
+
 // ========================================================================
 // VARIABLES
 // ========================================================================
@@ -121,6 +90,11 @@ var storageBlobDataContributorRoleId = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 
 var defaultToOAuthAuthentication = false
 var dnsEndpointType = 'Standard'
+
+
+var allowedCidrBlocks = firewallRules != null ? map(firewallRules!.allowedIpAddresses, ipaddr => {
+  value: ipaddr
+}) : []
 
 // ========================================================================
 // AZURE RESOURCES
@@ -141,6 +115,14 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     dnsEndpointType: dnsEndpointType
     minimumTlsVersion: minimumTlsVersion
     publicNetworkAccess: enablePublicNetworkAccess ? 'Enabled' : 'Disabled'
+    networkAcls: enablePublicNetworkAccess ? {
+      bypass: bypass
+      defaultAction: 'Deny'
+      ipRules: allowedCidrBlocks
+    } : {
+      defaultAction:'Deny'
+      bypass: bypass
+    }
   }
 }
 

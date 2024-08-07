@@ -8,33 +8,8 @@
 ** Creates an Azure Front Door resource with a Web application Firewall
 */
 
-// =====================================================================================================================
-//     USER-DEFINED TYPES
-// =====================================================================================================================
-
-// From: infra/types/DiagnosticSettings.bicep
-@description('The diagnostic settings for a resource')
-type DiagnosticSettings = {
-  @description('The number of days to retain log data.')
-  logRetentionInDays: int
-
-  @description('The number of days to retain metric data.')
-  metricRetentionInDays: int
-
-  @description('If true, enable diagnostic logging.')
-  enableLogs: bool
-
-  @description('If true, enable metrics logging.')
-  enableMetrics: bool
-}
-
-type WAFRuleSet = {
-  @description('The name of the rule set')
-  name: string
-
-  @description('The version of the rule set')
-  version: string
-}
+import { DiagnosticSettings } from '../../types/DiagnosticSettings.bicep'
+import { WAFRuleSet, CustomRule, CustomRuleList } from '../../types/WafRules.bicep'
 
 // =====================================================================================================================
 //     PARAMETERS
@@ -69,6 +44,9 @@ param logAnalyticsWorkspaceId string
 */
 @description('A list of managed rule sets to enable')
 param managedRules WAFRuleSet[]
+
+@description('A list of custom rules to apply')
+param customRules CustomRuleList?
 
 @allowed([ 'Premium', 'Standard' ])
 @description('The pricing plan to use for the Azure Front Door and Web Application Firewall')
@@ -116,7 +94,7 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-05-01' = {
   }
 }
 
-resource wafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@2022-05-01' = {
+resource wafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@2024-02-01' = {
   name: webApplicationFirewallName
   location: 'global'
   tags: tags
@@ -129,9 +107,7 @@ resource wafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@20
       mode: 'Prevention'
       requestBodyCheck: 'Enabled'
     }
-    customRules: {
-      rules: []
-    }
+    customRules: customRules
     managedRules: {
       managedRuleSets: sku == 'Premium' ? managedRuleSets : []
     }

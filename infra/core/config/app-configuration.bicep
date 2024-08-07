@@ -10,51 +10,9 @@ targetScope = 'resourceGroup'
 ** Creates an Azure App Configuration Store resource, including permission grants and diagnostics.
 */
 
-// ========================================================================
-// USER-DEFINED TYPES
-// ========================================================================
-
-// From: infra/types/ApplicationIdentity.bicep
-@description('Type describing an application identity.')
-type ApplicationIdentity = {
-  @description('The ID of the identity')
-  principalId: string
-
-  @description('The type of identity - either ServicePrincipal or User')
-  principalType: 'ServicePrincipal' | 'User'
-}
-
-// From: infra/types/DiagnosticSettings.bicep
-@description('The diagnostic settings for a resource')
-type DiagnosticSettings = {
-  @description('The number of days to retain log data.')
-  logRetentionInDays: int
-
-  @description('The number of days to retain metric data.')
-  metricRetentionInDays: int
-
-  @description('If true, enable diagnostic logging.')
-  enableLogs: bool
-
-  @description('If true, enable metrics logging.')
-  enableMetrics: bool
-}
-
-// From: infra/types/PrivateEndpointSettings.bicep
-@description('Type describing the private endpoint settings.')
-type PrivateEndpointSettings = {
-  @description('The name of the resource group to hold the Private DNS Zone. By default, this uses the same resource group as the resource.')
-  dnsResourceGroupName: string
-
-  @description('The name of the private endpoint resource. By default, this uses a prefix of \'pe-\' followed by the name of the resource.')
-  name: string
-
-  @description('The name of the resource group to hold the private endpoint. By default, this uses the same resource group as the resource.')
-  resourceGroupName: string
-
-  @description('The ID of the subnet to link the private endpoint to.')
-  subnetId: string
-}
+import { DiagnosticSettings } from '../../types/DiagnosticSettings.bicep'
+import { ApplicationIdentity } from '../../types/ApplicationIdentity.bicep'
+import { PrivateEndpointSettings } from '../../types/PrivateEndpointSettings.bicep'
 
 // ========================================================================
 // PARAMETERS
@@ -143,6 +101,8 @@ resource appConfigStore 'Microsoft.AppConfiguration/configurationStores@2023-03-
   properties: {
     // when publicNetworkAccess is Disabled - must pair with build agent to set config values
     publicNetworkAccess: enablePublicNetworkAccess ? 'Enabled' : 'Disabled'
+    // disable local auth since access is performed with Entra ID
+    disableLocalAuth: true
   }
   sku: {
     name: skuName
