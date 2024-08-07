@@ -188,7 +188,7 @@ resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' =
     settings: {
       AttestationConfig: {
         MaaSettings: {
-          maaEndpoint: substring('emptystring', 0, 0)
+          maaEndpoint: ''
           maaTenantName: 'GuestAttestation'
         }
       }
