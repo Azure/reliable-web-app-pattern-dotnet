@@ -25,10 +25,10 @@ param name string
 
 @minLength(3)
 @maxLength(15)
-@description('The name of the linux PC.  By default, this will be automatically constructed by the resource name.')
+@description('The name of the linux virtual machine.  By default, this will be automatically constructed by the resource name.')
 param computerLinuxName string?
 
-@description('Username for the Virtual Machine. NOTE: this is not saved anywhere as Entra is used to manage SSH logins once created.')
+@description('Username for the virtual machine. NOTE: this is not saved anywhere as Entra is used to manage SSH logins once created.')
 param adminUsername string = 'azureadmin'
 
 @description('Password for admin. NOTE: this is not saved anywhere as Entra is used to manage SSH logins once created.')
