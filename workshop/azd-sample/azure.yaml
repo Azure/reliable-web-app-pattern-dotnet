@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: azd-sample
+services:
+  cost-optimization-web:
+    project: src/ReleCloudLite.Web/ReleCloudLite.Web.csproj
+    language: csharp
+    host: appservice
+  cost-optimization-api:
+    project: src/ReleCloudLite.API/ReleCloudLite.API.csproj
+    language: csharp
+    host: appservice
+  

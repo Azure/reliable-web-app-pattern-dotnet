@@ -11,6 +11,7 @@
 				"ms-azuretools.vscode-bicep",
 				"ms-azuretools.vscode-docker",
 				"ms-dotnettools.csharp",
+				"ms-dotnettools.csdevkit",
 				"ms-mssql.mssql",
 				"ms-vscode.azure-account",
 				"ms-vscode.PowerShell"
