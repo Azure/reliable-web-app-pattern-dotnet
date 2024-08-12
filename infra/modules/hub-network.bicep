@@ -11,65 +11,8 @@ targetScope = 'subscription'
 ** are generally associated with a hub.
 */
 
-// ========================================================================
-// USER-DEFINED TYPES
-// ========================================================================
-
-// From: infra/types/DeploymentSettings.bicep
-@description('Type that describes the global deployment settings')
-type DeploymentSettings = {
-  @description('If \'true\', then two regional deployments will be performed.')
-  isMultiLocationDeployment: bool
-  
-  @description('If \'true\', use production SKUs and settings.')
-  isProduction: bool
-
-  @description('If \'true\', isolate the workload in a virtual network.')
-  isNetworkIsolated: bool
-
-  @description('If \'false\', then this is a multi-location deployment for the second location.')
-  isPrimaryLocation: bool
-
-  @description('The Azure region to host resources')
-  location: string
-
-  @description('The name of the workload.')
-  name: string
-
-  @description('The ID of the principal that is being used to deploy resources.')
-  principalId: string
-
-  @description('The type of the \'principalId\' property.')
-  principalType: 'ServicePrincipal' | 'User'
-
-  @description('The token to use for naming resources.  This should be unique to the deployment.')
-  resourceToken: string
-
-  @description('The development stage for this application')
-  stage: 'dev' | 'prod'
-
-  @description('The common tags that should be used for all created resources')
-  tags: object
-
-  @description('The common tags that should be used for all workload resources')
-  workloadTags: object
-}
-
-// From: infra/types/DiagnosticSettings.bicep
-@description('The diagnostic settings for a resource')
-type DiagnosticSettings = {
-  @description('The number of days to retain log data.')
-  logRetentionInDays: int
-
-  @description('The number of days to retain metric data.')
-  metricRetentionInDays: int
-
-  @description('If true, enable diagnostic logging.')
-  enableLogs: bool
-
-  @description('If true, enable metrics logging.')
-  enableMetrics: bool
-}
+import { DiagnosticSettings } from '../types/DiagnosticSettings.bicep'
+import { DeploymentSettings } from '../types/DeploymentSettings.bicep'
 
 // ========================================================================
 // PARAMETERS
@@ -93,14 +36,6 @@ param logAnalyticsWorkspaceId string = ''
 /*
 ** Settings
 */
-@secure()
-@minLength(8)
-@description('The password for the administrator account on the jump box.')
-param administratorPassword string = newGuid()
-
-@minLength(8)
-@description('The username for the administrator account on the jump box.')
-param administratorUsername string = 'adminuser'
 
 @description('If enabled, an Ubuntu jump box will be deployed.  Ensure you enable the bastion host as well.')
 param enableJumpBox bool = false
@@ -377,9 +312,10 @@ module jumpbox '../core/compute/ubuntu-jumpbox.bicep' = if (enableJumpBox) {
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     subnetId: virtualNetwork.outputs.subnets[resourceNames.spokeDevopsSubnet].id
 
+    // users
+    users: [ deploymentSettings.principalId ]
+
     // Settings
-    adminPasswordOrKey: administratorPassword
-    adminUsername: administratorUsername
     diagnosticSettings: diagnosticSettings
   }
 }

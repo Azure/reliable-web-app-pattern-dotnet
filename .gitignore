@@ -354,3 +354,10 @@ MigrationBackup/
 
 **/Azure.LoadTest.Tool/publish/
 **/log*.txt
+
+# Shows up in the dev container
+.mono
+
+# Connection files
+az_ssh_config/
+ssh-config

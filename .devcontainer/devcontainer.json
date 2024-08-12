@@ -1,13 +1,6 @@
 {
 	"name": "web-app-pattern-dotnet",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": { 
-			"VARIANT": "8.0-bookworm"
-		}
-	},
-	"runArgs": ["--init", "--privileged"],
-
+	"image": "mcr.microsoft.com/devcontainers/dotnet:8.0-bookworm",
 	"customizations": {
 		"vscode": {	
 			"extensions": [
@@ -31,15 +24,23 @@
 			"additionalVersions": "6.0"
 		},
 		"ghcr.io/azure/azure-dev/azd:latest": {
-			"version": "1.9.3"
+			// keep this version in sync with the version defined in the following files:
+			//  - /infra/core/compute/postDeploymentScript/post-deployment.sh
+			//  - /.github/workflows/azure-dev.yml
+			//  - /.github/workflows/scheduled-azure-dev.yml
+			//  - /.github/workflows/scheduled-azure-teardown.yml
+			"version": "1.9.5"
 		},
-		"ghcr.io/devcontainers/features/powershell:1": {
-			"version": "7.4.2",
-			"modules": "Az,SqlServer"
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest"
 		},
 		"ghcr.io/devcontainers/features/azure-cli:1": {},
 		"ghcr.io/devcontainers/features/common-utils:2": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/powershell:1": {
+			"version": "7.4.2",
+			"modules": "Az,SqlServer"
+		},
 		"ghcr.io/devcontainers/features/sshd:1": {}
 	},
 	// resolves error: dubious ownership of the workspace folder

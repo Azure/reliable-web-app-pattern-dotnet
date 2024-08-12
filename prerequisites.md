@@ -35,7 +35,7 @@ The following tools are pre-requisites to running the associated deployment step
     After the installation, run the following command to [sign in to Azure PowerShell interactively](https://learn.microsoft.com/powershell/azure/authenticate-interactive).
 
     ```ps1
-    Connect-AzAccount
+    Connect-AzAccount -UseDeviceAuthentication
     ```
 1. [Upgrade the Azure CLI Bicep extension](https://learn.microsoft.com/azure/azure-resource-manager/bicep/install#azure-cli).
     Run the following command to verify that you're running version 0.12.40 or higher.
@@ -48,7 +48,7 @@ The following tools are pre-requisites to running the associated deployment step
     Run the following command to verify that the Azure Dev CLI is installed.
 
     ```ps1
-    azd auth login
+    azd auth login --use-device-code
     ```
 
 1. [Install .NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0)

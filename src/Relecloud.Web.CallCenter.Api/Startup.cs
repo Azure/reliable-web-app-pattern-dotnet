@@ -2,18 +2,17 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
-using Azure.Identity;
 using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
-using Relecloud.Web.Models.Services;
 using Relecloud.Web.Api.Infrastructure;
 using Relecloud.Web.Api.Services;
 using Relecloud.Web.Api.Services.MockServices;
 using Relecloud.Web.Api.Services.Search;
 using Relecloud.Web.Api.Services.SqlDatabaseConcertRepository;
 using Relecloud.Web.Api.Services.TicketManagementService;
+using Relecloud.Web.Models.Services;
 using Relecloud.Web.Services.Search;
 using System.Diagnostics;
 
@@ -21,16 +20,18 @@ namespace Relecloud.Web.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly TokenCredential _credential;
+
+        public Startup(IConfiguration configuration, TokenCredential credential)
         {
             Configuration = configuration;
+            _credential = credential;
         }
 
         public IConfiguration Configuration { get; }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            var azureCredential = GetAzureCredential();
-
             // Add services to the container.
             AddMicrosoftEntraIdServices(services);
 
@@ -46,7 +47,7 @@ namespace Relecloud.Web.Api
 
             AddAzureSearchService(services);
             AddConcertContextServices(services);
-            AddDistributedSession(services);
+            AddDistributedSession(services, _credential);
             AddPaymentGatewayService(services);
             AddTicketManagementService(services);
             AddTicketImageService(services);
@@ -54,7 +55,7 @@ namespace Relecloud.Web.Api
             // The ApplicationInitializer is injected in the Configure method with all its dependencies and will ensure
             // they are all properly initialized upon construction.
             services.AddScoped<ApplicationInitializer, ApplicationInitializer>();
-            
+
             services.AddHealthChecks();
         }
 
@@ -122,23 +123,22 @@ namespace Relecloud.Web.Api
             }
         }
 
-        private void AddDistributedSession(IServiceCollection services)
+        private void AddDistributedSession(IServiceCollection services, TokenCredential credential)
         {
-            var redisCacheConnectionString = Configuration["App:RedisCache:ConnectionString"];
-            if (!string.IsNullOrWhiteSpace(redisCacheConnectionString))
+            var connectionString = Configuration["App:RedisCache:ConnectionString"];
+
+            if (!string.IsNullOrWhiteSpace(connectionString))
             {
                 // If we have a connection string to Redis, use that as the distributed cache.
                 // If not, ASP.NET Core automatically injects an in-memory cache.
-                services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = redisCacheConnectionString;
-                });
+                services.AddAzureStackExchangeRedisCache(connectionString, credential);
             }
             else
             {
                 services.AddDistributedMemoryCache();
             }
         }
+
 
         private void AddPaymentGatewayService(IServiceCollection services)
         {
@@ -153,19 +153,8 @@ namespace Relecloud.Web.Api
             services.AddSingleton<ITicketImageService, TicketImageService>();
             var storageAccountUri = Configuration["App:StorageAccount:Uri"]
                 ?? throw new InvalidOperationException("Required configuration missing. Could not find App:StorageAccount:Uri setting.");
-            services.AddSingleton(sp => new BlobServiceClient(new Uri(storageAccountUri), GetAzureCredential()));
+            services.AddSingleton(sp => new BlobServiceClient(new Uri(storageAccountUri), _credential));
         }
-
-        private TokenCredential GetAzureCredential() =>
-            Configuration["App:AzureCredentialType"] switch
-            {
-                "AzureCLI" => new AzureCliCredential(),
-                "Environment" => new EnvironmentCredential(),
-                "ManagedIdentity" => new ManagedIdentityCredential(Configuration["AZURE_CLIENT_ID"]),
-                "VisualStudio" => new VisualStudioCredential(),
-                "VisualStudioCode" => new VisualStudioCodeCredential(),
-                _ => new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = Configuration["AZURE_CLIENT_ID"] }),
-            };
 
         public void Configure(WebApplication app, IWebHostEnvironment env)
         {
@@ -201,7 +190,7 @@ namespace Relecloud.Web.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
             app.MapHealthChecks("/healthz");
 
             app.MapGet("/", () => "Default Web API endpoint");

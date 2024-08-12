@@ -32,11 +32,11 @@ These scripts are used by the engineering team to accelerate the testing process
     * If you are not authenticated then run the following to set your account context.
 
         ```pwsh
-        Connect-AzAccount
+        Connect-AzAccount -UseDeviceAuthentication
         ```
         
         ```pwsh
-        azd auth login
+        azd auth login --use-device-code
         ```
 
     * If you need to change your default subscription.

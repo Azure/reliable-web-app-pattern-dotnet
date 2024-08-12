@@ -14,37 +14,9 @@ targetScope = 'resourceGroup'
 // USER-DEFINED TYPES
 // ========================================================================
 
-// From: infra/types/DiagnosticSettings.bicep
-@description('The diagnostic settings for a resource')
-type DiagnosticSettings = {
-  @description('The number of days to retain log data.')
-  logRetentionInDays: int
-
-  @description('The number of days to retain metric data.')
-  metricRetentionInDays: int
-
-  @description('If true, enable diagnostic logging.')
-  enableLogs: bool
-
-  @description('If true, enable metrics logging.')
-  enableMetrics: bool
-}
-
-// From: infra/types/PrivateEndpointSettings.bicep
-@description('Type describing the private endpoint settings.')
-type PrivateEndpointSettings = {
-  @description('The name of the resource group to hold the Private DNS Zone. By default, this uses the same resource group as the resource.')
-  dnsResourceGroupName: string
-
-  @description('The name of the private endpoint resource.')
-  name: string
-
-  @description('The name of the resource group to hold the private endpoint.')
-  resourceGroupName: string
-
-  @description('The ID of the subnet to link the private endpoint to.')
-  subnetId: string
-}
+import { DiagnosticSettings } from '../../types/DiagnosticSettings.bicep'
+import { PrivateEndpointSettings } from '../../types/PrivateEndpointSettings.bicep'
+import { RedisUser } from '../../types/RedisUser.bicep'
 
 // ========================================================================
 // PARAMETERS
@@ -105,11 +77,13 @@ param redisCacheCapacity int = 1
 @description('If set, the private endpoint settings for this resource')
 param privateEndpointSettings PrivateEndpointSettings?
 
+param users RedisUser[] = []
+
 // ========================================================================
 // AZURE RESOURCES
 // ========================================================================
 
-resource cache 'Microsoft.Cache/redis@2023-04-01' = {
+resource cache 'Microsoft.Cache/redis@2023-08-01' = {
   name: name
   location: location
   tags: tags
@@ -121,8 +95,22 @@ resource cache 'Microsoft.Cache/redis@2023-04-01' = {
       family: redisCacheFamily
       name: redisCacheSku
     }
+    redisConfiguration: {
+      'aad-enabled': 'true'
+    }
   }
 }
+
+@batchSize(1)
+resource redisCacheBuiltInAccessPolicyAssignment 'Microsoft.Cache/redis/accessPolicyAssignments@2023-08-01' = [for user in users: {
+  name: guid(resourceGroup().id, name, user.accessPolicy, user.objectId)
+  parent: cache
+  properties: {
+    accessPolicyName: user.accessPolicy
+    objectId: user.objectId
+    objectIdAlias: user.alias
+  }
+}]
 
 module privateEndpoint '../network/private-endpoint.bicep' = if (privateEndpointSettings != null) {
   name: '${name}-private-endpoint'

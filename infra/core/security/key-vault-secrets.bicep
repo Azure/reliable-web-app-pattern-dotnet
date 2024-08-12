@@ -15,6 +15,7 @@ targetScope = 'resourceGroup'
 // ========================================================================
 
 @description('The form of each Key Vault Secret to store.')
+@secure()
 type KeyVaultSecret = {
   @description('The key for the secret')
   key: string

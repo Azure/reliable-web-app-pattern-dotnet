@@ -1,4 +1,4 @@
-// From: infra/types/FrontDoorSettings.bicep
+@export()
 @description('Type describing the settings for Azure Front Door.')
 type FrontDoorSettings = {
   @description('The name of the Azure Front Door endpoint')
