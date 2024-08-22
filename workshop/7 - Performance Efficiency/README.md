@@ -11,7 +11,7 @@ The Cache-Aside pattern is a technique that's used to manage in-memory data cach
 ### Cache-Aside in Relecloud Concerts
 Take a look for the Cache-Aside pattern implementation in our main application.
 
-1. Open the **Relecloud.sln** solution.
+1. Open the main **Relecloud** solution.
 1. Note that we use **Microsoft.Extensions.Caching.StackExchangeRedis** for Cacheing.
 1. Open the **Startup.cs** of the **Relecloud.Web.CallCenter.Api** project and browse to the `AddDistributedSession` method.
 1. Look at the Azure Redis Cache connection string from the configuration settings.
@@ -22,14 +22,11 @@ Take a look for the Cache-Aside pattern implementation in our main application.
 1. This code uses Azure Redis if the connection string contains a value
 
     ```csharp
-    if (!string.IsNullOrWhiteSpace(redisCacheConnectionString))
+    if (!string.IsNullOrWhiteSpace(connectionString))
     {
         // If we have a connection string to Redis, use that as the distributed cache.
         // If not, ASP.NET Core automatically injects an in-memory cache.
-        services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = redisCacheConnectionString;
-        });
+        services.AddAzureStackExchangeRedisCache(connectionString, credential);
     }
     ```
 
@@ -189,12 +186,10 @@ The reference implementation uses a single Azure Cache for Redis instance to sto
     ```csharp
     private void AddAzureCacheForRedis(IServiceCollection services)
     {
-        if (!string.IsNullOrWhiteSpace(Configuration["App:RedisCache:ConnectionString"]))
+        var connectionString = Configuration["App:RedisCache:ConnectionString"];
+        if (!string.IsNullOrWhiteSpace(connectionString))
         {
-            services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = Configuration["App:RedisCache:ConnectionString"];
-            });
+            services.AddAzureStackExchangeRedisCache(connectionString, _credential);
         }
         else
         {

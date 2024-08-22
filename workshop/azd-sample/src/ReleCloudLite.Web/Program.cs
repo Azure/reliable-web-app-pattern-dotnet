@@ -2,6 +2,7 @@ using ReleCloudLite.Web.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Configuration;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSingleton<TicketService>();
+var azureCredential = builder.GetAzureTokenCredential();
 
 string appConfigUrl = builder.Configuration["AzureUrls:AppConfiguration"]!;
 

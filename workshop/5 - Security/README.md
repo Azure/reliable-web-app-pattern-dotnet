@@ -48,7 +48,7 @@ The web application (and  you!) now has read access to Azure App Configuration. 
 1. Replace `options.Connect(appConfigUrl);` with the following:
 
     ```csharp
-    options.Connect(new Uri(appConfigUrl), new DefaultAzureCredential());
+    options.Connect(new Uri(appConfigUrl), azureCredential);
     ```
 
     This will use the managed identity to authenticate to Azure App Configuration. In fact, it will use whoever is logged in to authenticate, including the Azure account you associated with Visual Studio.
@@ -102,6 +102,7 @@ Let's provision an Azure Key Vault through the Azure CLI.
     Replace `<USERNAME>` with your username.
 
 1. Refresh the resource group view in the Azure portal. The new Key Vault should appear. Open it up.
+1. If needed, change the **Access configuration** under **Settings**, in the left menu, from Azure RBAC to Vault access policy. Click in Apply.
 1. Click on the **Access policies** menu item in the left navigation.
 1. Click the **+ Create** button.
 1. From **Secret permissions**, select **Get** and **List**. Click **Next**.
@@ -135,10 +136,10 @@ Let's provision an Azure Key Vault through the Azure CLI.
     ```csharp
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
-        options.Connect(new Uri(appConfigUrl), new DefaultAzureCredential())
+        options.Connect(new Uri(appConfigUrl), azureCredential)
         .ConfigureKeyVault(kv =>
         {
-            kv.SetCredential(new DefaultAzureCredential());
+            kv.SetCredential(azureCredential);
         });
     });
     ```
