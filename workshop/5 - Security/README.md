@@ -112,6 +112,7 @@ Let's provision an Azure Key Vault through the Azure CLI.
 
 1. Click **Next** until you get to the **Review and create** tab and then click **Create**.
 1. You should now see your application listed.
+1. Do the same thing, adding your user to be able to see and set 
 1. To add a secret, click on the **Secrets** menu item in the left navigation.
 1. Click the **+ Generate/Import** button.
 1. Enter `SuperSecretSecret` for the **Name** field.
@@ -146,7 +147,7 @@ Let's provision an Azure Key Vault through the Azure CLI.
 
     This will configure our code to use Azure App Configuration to use the managed identity to authenticate to Key Vault.
 
-1. Open up the **Index.razor** file under the **Pages** directory.
+1. Open up the **Index.razor** file under the **Pages** directory on the **Relecloud Lite Web** project.
 1. Add in the following to the end of the file:
 
     ```html

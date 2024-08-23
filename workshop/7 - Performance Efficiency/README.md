@@ -8,6 +8,18 @@ The Cache-Aside pattern is a technique that's used to manage in-memory data cach
 
 ### Implementing Cache-Aside in Relecloud Lite
 
+To implement the Cache-Aside, we need somewhere to help us handle the throughput and responses required by application on that scale. That's where **Redis** comes along, in Azure the **Azure Cache for Redis**, helps us bringing a critical low-latency and high-throughput data storage solution to modern applications. It can be used as a distributed data or content cache, a session store, a message broker, and more. Know more about the **Azure Cache for Redis**, [here](https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/cache-overview)!
+
+1. To use the pattern, we need to deploy Azure for Redis. Use the following command to deploy Redis.
+
+    ```pwsh
+    az redis create --location eastus2 --name rwa-cache --resource-group $resourceGroupName --sku Basic --vm-size c0
+    ```
+1. Wait for the deployment, it can take some time.
+1. Verify in your Resource Group the Azure Cache for Redis resource. 
+1. Now, that it is available, we need to create our Cache-Aside pattern to our ReleCloudLite 
+
+
 ### Cache-Aside in Relecloud Concerts
 Take a look for the Cache-Aside pattern implementation in our main application.
 
@@ -174,8 +186,6 @@ Take a look for the Cache-Aside pattern implementation in our main application.
 You should use a single cache instance to support multiple data types rather than using a single instance for each data type.
 
 The reference implementation uses a single Azure Cache for Redis instance to store session state for the front-end web app and the back-end web app. The front-end web app stores two pieces of data in session state. It stores the cart and the Microsoft Authentication Library (MSAL) token.
-
-### Implement Caching in Relecloud Lite
 
 ### Caching in Relecloud
 
