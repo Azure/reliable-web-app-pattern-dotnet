@@ -15,7 +15,7 @@ if (hasRequiredConfigSettings)
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
         options
-            .Connect(new Uri(builder.Configuration["App:AppConfig:Uri"]), azureCredential)
+            .Connect(new Uri(builder.Configuration["App:AppConfig:Uri"]!), azureCredential)
             .ConfigureKeyVault(kv =>
             {
                 // Some of the values coming from Azure App Configuration are stored Key Vault, use

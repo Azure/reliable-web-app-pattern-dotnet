@@ -42,7 +42,10 @@ namespace Relecloud.Web
             services.AddOptions();
             AddMicrosoftEntraIdServices(services);
             services.AddControllersWithViews();
-            services.AddApplicationInsightsTelemetry(Configuration["App:Api:ApplicationInsights:ConnectionString"]);
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = Configuration["App:Api:ApplicationInsights:ConnectionString"];
+            });
 
             AddConcertContextService(services);
             AddConcertSearchService(services);
@@ -180,8 +183,8 @@ namespace Relecloud.Web
             });
 
             var builder = services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "MicrosoftEntraId")
-            .EnableTokenAcquisitionToCallDownstreamApi(new string[] { })
-               .AddDownstreamWebApi("relecloud-api", Configuration.GetSection("GraphBeta"));
+                .EnableTokenAcquisitionToCallDownstreamApi(new string[] { })
+                .AddDownstreamApi("relecloud-api", Configuration.GetSection("GraphBeta"));
 
             // when using Microsoft.Identity.Web to retrieve an access token on behalf of the authenticated user
             // you should use a shared session state provider.
@@ -262,7 +265,6 @@ namespace Relecloud.Web
 
         public void Configure(WebApplication app, IWebHostEnvironment env)
         {
-
             // Configure the HTTP request pipeline.
             if (!env.IsDevelopment())
             {
@@ -294,13 +296,10 @@ namespace Relecloud.Web
 
             app.MapHealthChecks("/healthz");
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapRazorPages();
-            });
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.MapRazorPages();
         }
     }
 }

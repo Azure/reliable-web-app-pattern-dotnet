@@ -11,12 +11,12 @@ var azureCredential = builder.GetAzureTokenCredential();
 
 var hasRequiredConfigSettings = !string.IsNullOrEmpty(builder.Configuration["App:AppConfig:Uri"]);
 
-if (hasRequiredConfigSettings)
+if (hasRequiredConfigSettings) 
 {
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
         options
-            .Connect(new Uri(builder.Configuration["App:AppConfig:Uri"]), azureCredential)
+            .Connect(new Uri(builder.Configuration["App:AppConfig:Uri"]!), azureCredential)
             .UseFeatureFlags() // Feature flags will be loaded and, by default, refreshed every 30 seconds
             .ConfigureKeyVault(kv =>
             {
