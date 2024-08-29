@@ -12,11 +12,6 @@ import { PrivateEndpointSettings } from '../../types/PrivateEndpointSettings.bic
 import { DiagnosticSettings } from '../../types/DiagnosticSettings.bicep'
 import { ApplicationIdentity } from '../../types/ApplicationIdentity.bicep'
 
-type FirewallRules = {
-  @description('The list of IP address CIDR blocks to allow access from.')
-  allowedIpAddresses: string[]
-}
-
 // ========================================================================
 // PARAMETERS
 // ========================================================================
