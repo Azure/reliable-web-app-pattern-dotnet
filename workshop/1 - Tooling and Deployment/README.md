@@ -2,7 +2,7 @@
 
 Welcome to the RWA .NET Workshop, we are going to learn how build reliable web applications using .NET and enterprise Cloud Apps. We are going to deploy a Ticket Store Application, Relecloud Concerts!
 
-For this guide, we assume you are using a Dev Container inside Visual Studio Code using Dev Containers.
+For this guide, we use Dev Containers to provide a complete development environment for the project.
 
 > For your convenience, we use Dev Containers with a fully-featured development environment. If you prefer to use Visual Studio, we recommend installing the necessary [dependencies](../../prerequisites.md) and skip to the deployment instructions starting in [Step 3](#3-log-in-to-azure).
 
@@ -10,7 +10,7 @@ For this guide, we assume you are using a Dev Container inside Visual Studio Cod
 
 > For Windows users, we recommend using Windows Subsystem for Linux (WSL) to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
 
-Open and run in a PowerShell Shell window, the following command.
+Open a PowerShell Shell window, then run the following command.
 
 ```pwsh
 wsl
@@ -27,13 +27,13 @@ cd reliable-web-app-pattern-dotnet
 
 ### 2. Open Dev Container in Visual Studio Code
 
-If required, ensure Docker Desktop is started and enabled for your WSL terminal [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt in WSL:
+If required, ensure Docker Desktop is installed, configured to use WSL, and started [more details](https://learn.microsoft.com/windows/wsl/tutorials/wsl-containers#install-docker-desktop). Open the repository folder in Visual Studio Code. You can do this from the command prompt in WSL:
 
 ```shell
 code .
 ```
 
-> If you are not running WSL, open VS Code and Docker, as usual, to open in Container the preconfigured environment.
+> If you are not running WSL, ensure Docker Desktop is started, then open Visual Studio Code and start the Dev Container.
 
 Once Visual Studio Code is launched, you should see a popup allowing you to click on the button **Reopen in Container**.
 

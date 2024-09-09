@@ -6,8 +6,6 @@ Performance efficiency is the ability of a workload to scale and meet the demand
 
 The Cache-Aside pattern is a technique that's used to manage in-memory data caching. It reduces the request response time and can lead to increased response throughput. This efficiency reduces the number of horizontal scaling events, making the app more capable of handling traffic bursts. It also improves service availability by reducing the load on the primary data store and decreasing the likelihood of service outages.
 
-### Implementing Cache-Aside in Relecloud Lite
-
 ### Cache-Aside in Relecloud Concerts
 Take a look for the Cache-Aside pattern implementation in our main application.
 
@@ -177,8 +175,6 @@ Take a look for the Cache-Aside pattern implementation in our main application.
 You should use a single cache instance to support multiple data types rather than using a single instance for each data type.
 
 The reference implementation uses a single Azure Cache for Redis instance to store session state for the front-end web app and the back-end web app. The front-end web app stores two pieces of data in session state. It stores the cart and the Microsoft Authentication Library (MSAL) token.
-
-### Implement Caching in Relecloud Lite
 
 ### Caching in Relecloud
 

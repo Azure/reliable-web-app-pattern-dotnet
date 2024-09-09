@@ -32,7 +32,7 @@ Let's see how managed identities can help us remove connection strings from our 
     ![Screenshot of picking the managed identity](../images/5-Security/selecting-managed-identity.png)
 
 1. Enter your web application's name in the **Select** field and then choose it. It should not appear under the **Selected members** section. Then click **Select**.
-1. The blade will disappear and you should see your web application's name under the **Members** section. Click **Review and assign**.
+1. The blade will disappear and you should see your web application's name under the **Members** section. Click **Review and assign**. _Note: you must wait until the user is fully added to an access policy before moving on to the next step, otherwise it will fail._
 1. Go through the same steps as above, but this time add your user account as a **App Configuration Data Reader**. _Note: you will use **User, group, or service principal** instead of **Managed identity** to search for your username to add._
 1. Click **Review and assign** to move through the rest of the tabs and apply the changes.
 
@@ -169,7 +169,7 @@ Let's review where how Managed Identity, Azure App Configuration, and Azure Key 
 
 The Reliable Web App reference application uses User-Assigned Managed Identities rather than System-Assigned. The major difference is that User-Assigned Managed Identities are not tied to a specific Azure resource. This allows you to use the same identity across multiple resources. This is useful when you have multiple resources that need to access the same Azure resources.
 
-Of course, you also need to create the User-Assigned Managed Identity, then assign it to the various resources, then assign the appropriate permissions to the identity. This is all done through the Azure CLI, Azure portal, or even ARM or bicep templates when provisioning the Azure resources.
+Of course, you also need to create the User-Assigned Managed Identity, then assign it to the various resources, then assign the appropriate permissions to the identity. You can assign permissions to a user-assigned managed identity through the Azure portal, CLI tools, ARM, Bicep, or other IaC tools such as Terraform when provisioning the Azure resources. Use Azure Verified Modules to make this process easier
 
 #### Creating bicep files
 

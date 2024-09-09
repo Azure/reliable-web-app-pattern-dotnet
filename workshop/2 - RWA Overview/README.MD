@@ -12,7 +12,7 @@ Imagine a web application's evolution in the cloud as a journey. Each step in th
 
 Further along in the journey, you may want to refactor your application to take advantage of cloud-native features and then optimize it for scale and performance.
 
-But first, let's explore what it means to converge in the cloud and create an application that's reliable with minimal changes in your existing investment.
+But first, let's explore what it means to converge in the cloud and and replatform an application to the Azure cloud with minimal changes but also enhances reliability and security.
 
 ## Pattern of patterns
 
