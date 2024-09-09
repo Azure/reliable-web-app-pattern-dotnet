@@ -27,7 +27,7 @@ namespace Relecloud.Web.Controllers
         {
             try
             {
-                if (imageName.IsNullOrEmpty())
+                if (string.IsNullOrEmpty(imageName))
                 {
                     return BadRequest();
                 }

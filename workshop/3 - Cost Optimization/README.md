@@ -14,7 +14,7 @@ In this portion of the workshop, we'll be working with a simple Blazor Server ap
 
 ## Right size resources
 
-You can use bicep parameters to specify Azure resource deployment configurations. We'll use a small sample contained in this [folder directory](../3%20-%20Cost%20Optimization/azd-sample/) and PowerShell to illustrate this technique. If you are not logged in Azure, before following the guide, [click for instructions to login](../1%20-%20Tooling%20and%20Deployment/README.md#3-log-in-to-azure).
+You can use bicep parameters to specify Azure resource deployment configurations. We'll use a small sample contained in the **azd-sample** folder and PowerShell to illustrate this technique. If you are not logged in Azure, before following the guide, [click for instructions to login](../1%20-%20Tooling%20and%20Deployment/README.md#3-log-in-to-azure).
 
 
 1. Open the *PowerShell terminal* and navigate to the **azd-sample** directory.

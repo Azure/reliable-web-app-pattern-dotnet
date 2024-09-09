@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Relecloud.Web.CallCenter.Infrastructure;
 using Relecloud.Web.CallCenter.Services.RelecloudApiServices;
@@ -223,13 +224,19 @@ namespace Relecloud.Web.CallCenter.Services.ApiConcertService
 
         private async Task PrepareAuthenticatedClient()
         {
-            var identity = this.httpContextAccessor.HttpContext?.User?.Identity;
-            if (identity != null && identity.IsAuthenticated)
+            if (this.httpContextAccessor.HttpContext is { User.Identity.IsAuthenticated: true } context)
             {
-                var scopes = new[] { this.options.Value.AttendeeScope ?? throw new ArgumentNullException(nameof(this.options.Value.AttendeeScope)) };
-                var accessToken = await this.tokenAcquisition.GetAccessTokenForUserAsync(scopes);
-                this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                try
+                {
+                    var scopes = new[] { this.options.Value.AttendeeScope ?? throw new ArgumentNullException(nameof(this.options.Value.AttendeeScope)) };
+                    var accessToken = await this.tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+                    this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                    this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+                catch (MicrosoftIdentityWebChallengeUserException)
+                {
+                    await context.ChallengeAsync();
+                }
             }
         }
     }

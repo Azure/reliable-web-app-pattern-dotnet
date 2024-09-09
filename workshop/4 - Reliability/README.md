@@ -16,8 +16,6 @@ The Retry pattern is a technique for handling temporary service interruptions. T
 
 ```
 dotnet dev-certs https --trust
-
-Talk with Nish -> https://stackoverflow.com/questions/55485511/how-to-run-dotnet-dev-certs-https-trust
 ```
 
 In the sample, open the `src` and the `ReleCloudLite.Web` to change both `appsettings.json` and  `program.cs`. 
@@ -148,7 +146,7 @@ You can implement the circuit breaker pattern with Polly as follows:
 Most Azure services and client SDKs have a built-in retry mechanism. You should use the built-in retry mechanism for Azure services to expedite the implementation. Let's see how the retry pattern is implemented in the main sample using Entity Framework Core's built-in retry mechanism.
 
 1. Select the main **Relecloud** solution.
-1. Open the **Relecloud.CallCenter.Api** project's **Startup.cs** file.
+1. Open the **Relecloud.Web.CallCenter.Api** project's **Startup.cs** file.
 1. Browse to the `AddConcertContextServices` method. This method configures the Entity Framework Core context for the application.
 1. Look at the `services.AddDbContextPool<ConcertDataContext>` call on the following code:
 
@@ -185,22 +183,20 @@ Now we'll use the Azure App Configuration's SDK to add a retry policy to communi
     The entire Azure App Configuration configuration should look like this:
 
     ```csharp
-    builder.Configuration.AddAzureAppConfiguration(options =>
+    if (hasRequiredConfigSettings)
     {
-        options
-            .Connect(new Uri(builder.Configuration["Api:AppConfig:Uri"]), new DefaultAzureCredential())
-            .ConfigureKeyVault(kv =>
-            {
-                // Some of the values coming from Azure App Configuration are stored Key Vault, use
-                // the managed identity of this host for the authentication.
-                kv.SetCredential(new DefaultAzureCredential());
-            })
-            .ConfigureClientOptions(options =>
-            {
-                options.Retry.MaxRetries = 5;
-                options.Retry.Delay = TimeSpan.FromSeconds(3);
-            });
-    });
+        builder.Configuration.AddAzureAppConfiguration(options =>
+        {
+            options
+                .Connect(new Uri(builder.Configuration["App:AppConfig:Uri"]), azureCredential)
+                .ConfigureKeyVault(kv =>
+                {
+                    // Some of the values coming from Azure App Configuration are stored Key Vault, use
+                    // the managed identity of this host for the authentication.
+                    kv.SetCredential(azureCredential);
+                });
+        });
+    }
     ```    
 
 ## Next Steps

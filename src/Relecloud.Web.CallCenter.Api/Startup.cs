@@ -43,7 +43,10 @@ namespace Relecloud.Web.Api
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            services.AddApplicationInsightsTelemetry(Configuration["App:Api:ApplicationInsights:ConnectionString"]);
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = Configuration["App:Api:ApplicationInsights:ConnectionString"];
+            });
 
             AddAzureSearchService(services);
             AddConcertContextServices(services);
@@ -96,7 +99,7 @@ namespace Relecloud.Web.Api
             else
             {
                 // Add a concert search service based on Azure Search.
-                services.AddScoped<IConcertSearchService>(x => new AzureSearchConcertSearchService(azureSearchServiceName, sqlDatabaseConnectionString));
+                services.AddScoped<IConcertSearchService>(x => new AzureSearchConcertSearchService(azureSearchServiceName, sqlDatabaseConnectionString!));
             }
         }
 
