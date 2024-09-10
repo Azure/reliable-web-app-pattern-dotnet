@@ -10,7 +10,7 @@ For this guide, we use Dev Containers to provide a complete development environm
 
 > For Windows users, we recommend using Windows Subsystem for Linux (WSL) to [improve Dev Container performance](https://code.visualstudio.com/remote/advancedcontainers/improve-performance).
 
-Open a PowerShell Shell window, then run the following command.
+Open a PowerShell terminal window, then run the following command.
 
 ```pwsh
 wsl
