@@ -461,12 +461,19 @@ if ($clientSecrets) {
 }
 
 # Create a new client secret with a 1 year expiration
-$clientSecrets = New-AzADAppCredential -ObjectId $frontendAppRegistration.Id -EndDate (Get-Date).AddYears(1) -ErrorAction Stop
+try {
 
-# Write to Key Vault
-$secretValue = ConvertTo-SecureString -String $clientSecrets.SecretText -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'MicrosoftEntraId--ClientSecret' -SecretValue $secretValue -ErrorAction Stop > $null
-Write-Host "`tSaved the $highlightColor'MicrosoftEntraId--ClientSecret'$defaultColor to Key Vault"
+    $clientSecrets = New-AzADAppCredential -ObjectId $frontendAppRegistration.Id -EndDate (Get-Date).AddYears(1) -ErrorAction Stop
+
+    # Write to Key Vault
+    $secretValue = ConvertTo-SecureString -String $clientSecrets.SecretText -AsPlainText -Force
+    Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name 'MicrosoftEntraId--ClientSecret' -SecretValue $secretValue -ErrorAction Stop > $null
+    Write-Host "`tSaved the $highlightColor'MicrosoftEntraId--ClientSecret'$defaultColor to Key Vault"
+} catch {
+    $errorMessage = $_.Exception.Message
+    Write-Warning "An error occurred saving $highlightColor'MicrosoftEntraId--ClientSecret'$defaultColor to Key Vault: $errorMessage"
+    Write-WWarning "Please save the client secret manually or users will not be able to make authenticated requests to the web API during checkout."
+}
 
 # Get or Create the api app registration
 $apiAppRegistration = Get-ApiAppRegistration `
