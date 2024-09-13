@@ -472,7 +472,7 @@ try {
 } catch {
     $errorMessage = $_.Exception.Message
     Write-Warning "An error occurred saving $highlightColor'MicrosoftEntraId--ClientSecret'$defaultColor to Key Vault: $errorMessage"
-    Write-WWarning "Please save the client secret manually or users will not be able to make authenticated requests to the web API during checkout."
+    Write-Warning "Please save the client secret manually or users will not be able to make authenticated requests to the web API during checkout."
 }
 
 # Get or Create the api app registration
