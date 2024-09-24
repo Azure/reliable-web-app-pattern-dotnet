@@ -443,8 +443,6 @@ module storageAccount '../core/storage/storage-account.bicep' = {
       resourceGroupName: resourceNames.spokeResourceGroup
       subnetId: subnets[resourceNames.spokePrivateEndpointSubnet].id
     } : null
-
-    firewallRules: clientIpAddress != '' ? { allowedIpAddresses: [clientIpAddress]} : null
   }
 }
 
