@@ -115,7 +115,7 @@ You want to have your resources scale up and down as needed. Azure App Service h
 
 ## Cost Optimization in the Relecloud Tickets Application
 
-Analyzing the Relecloud Ticket application, it is possible to understand how production applications do apply Cost Optimizations in Azure in the Code. Helping Relecloud to operate the platform with cost efficiency and smooth with Azure and Bicep configurations.
+Analyzing the Relecloud Ticket application, it is possible to understand how production applications do apply Cost Optimizations in Azure in the Code.
 
 First, open the bicep file for App Service plan for the main application, the file can be found at ```infra\core\hosting\app-service-plan.bicep```.
 
