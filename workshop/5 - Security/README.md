@@ -59,7 +59,7 @@ The web application (and  you!) now has read access to Azure App Configuration. 
 
     ![Screenshot of the sample application](../images/5-Security/sample-application.png)
 
-   > **Note** Azure Active Directory lazily updates permissions. If you receive a `403 Forbidden` error (surfaced as an exception in Visual Studio), wait for five minutes and try again.
+   > **Note** Azure Active Directory has eventual consistency in permissions. If you receive a `403 Forbidden` error (surfaced as an exception in Visual Studio), wait for five minutes and try again.
 
 1. Back to the PowerShell terminal and run the following command to deploy the application to Azure:
 
