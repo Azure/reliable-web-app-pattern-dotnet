@@ -196,7 +196,7 @@ The action specified is to increase the instance count, with a cooldown period o
 
 ```
 
-The same happens with the down-scale. Which if the CPU is under a certain porcentage, it will descale the the count by one, and cooldowns the selection for ten minutes before acting the rule again.
+The same happens with the down-scale. Which if the CPU is under a certain porcentage, it will descale the the count by one, and cooldowns the selection for ten minutes before applying the rule again.
 
 ```bicep
           {
