@@ -111,7 +111,7 @@ You want to have your resources scale up and down as needed. Azure App Service h
 
     ![Screenshot of the scale out settings](../images/3-Cost%20Optimization/scale-out.png)
 
-> Note: Due to limits of the free subsription, the autoscaling may not work. However, it will work if you have a paid subscription.
+> Note: Due to limits of the free subscription, the autoscaling may not work. However, it will work if you have a paid subscription.
 
 ## Cost Optimization in the Relecloud Tickets Application
 
