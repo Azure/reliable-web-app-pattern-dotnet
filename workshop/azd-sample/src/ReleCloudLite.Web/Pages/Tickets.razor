@@ -1,0 +1,52 @@
+﻿@page "/tickets"
+@using ReleCloudLite.Web.Data
+@using ReleCloudLite.Models
+@inject TicketService TicketService
+
+<PageTitle>Ticket Sales</PageTitle>
+
+<h1>Tickets available</h1>
+
+<p>Top artists and bands, anywhere in the world, only with ReleCloud Concerts.</p>
+
+@if (tickets == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Show Name</th>
+                <th>Band or Artist</th>
+                <th>Location</th>
+                <th>Tickets Remaining</th>
+                <th>Date</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in tickets)
+            {
+                <tr>
+                    <td>@ticket.ShowName</td>
+                    <td>@ticket.Band</td>
+                    <td>@ticket.Location</td>
+                    <td>@ticket.TicketsRemaining</td>
+                    <td>@ticket.Date.Value.DateTime</td>
+                    <td>@ticket.Price</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Ticket>? tickets;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tickets = await TicketService.GetTicketsAsync();
+    }
+}
