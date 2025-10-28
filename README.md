@@ -16,6 +16,9 @@ This project has [a companion article in the Azure Architecture Center](https://
 
 Relecloud aligned to a hub and spoke network topology in the production deployment architecture to centralize common resources. This network topology provided cost savings, enhanced security, and facilitated network integration (platform and hybrid):
 
+>[!WARNING]
+> **DEPRECATED:** [Azure Cache for Redis is retired](https://learn.microsoft.com/azure/azure-cache-for-redis/cache-retired-features). We will be updating this implementation to use [Azure Managed Redis](https://learn.microsoft.com/azure/redis/migrate/migrate-overview).
+
 ![architecture diagram](./assets/icons/reliable-web-app-dotnet.svg)
 
 This diagram describes the production deployment which is described in the [prod-deployment.md](./prod-deployment.md) file. The following steps below are for a [development deployment](./assets/icons/reliable-web-app-dotnet-dev.svg) which is a simplified version.
