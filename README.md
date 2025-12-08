@@ -153,7 +153,12 @@ azd env set AZURE_LOCATION <pick_a_region>
 
 ### 5. Create the Azure resources and deploy the code
 
-Run the following command to create the Azure resources and deploy the code (about 15-minutes to complete):
+(Optional) If your account has access to using multiple tenants, then you should reauthenticate before proceeding:
+```pwsh
+azd auth login --scope https://management.azure.com//.default
+```
+
+Run the following command to create the Azure resources and deploy the code (about 25-minutes to complete):
 
 ```pwsh
 azd up
