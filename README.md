@@ -1,6 +1,8 @@
-# Reliable web app pattern for .NET
+> **This repository is archived and no longer actively maintained.** It remains available in read-only mode for reference.
+>
+> For recommendations and best practices for modernizing your applications, we recommend [GitHub Copilot app modernization](https://learn.microsoft.com/azure/developer/github-copilot-app-modernization/).
 
-> :mega: **Got feedback?** Fill out [this survey](https://aka.ms/eap/rwa/dotnet/survey) to help us shape the future of Enterprise App Patterns and understand whether we're focusing on the business goals and features important to you. [Microsoft Privacy Statement](https://go.microsoft.com/fwlink/?LinkId=521839)
+# Reliable web app pattern for .NET
 
 The reference implementation provides a production-grade web application that uses best practices from our guidance and gives developers concrete examples to build their own Reliable Web Application in Azure. This repository specifically demonstrates a concert ticketing application for the fictional company Relecloud, embodying the reliable web app pattern with a focus on .NET technologies. It guides developers through a simulated migration from an on-premises ASP.NET application to Azure, detailing the architectural changes and enhancements that capitalize on the cloud's strengths during the initial adoption phase. 
 
