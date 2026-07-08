@@ -1,6 +1,6 @@
 > **This repository is archived and no longer actively maintained.** It remains available in read-only mode for reference.
 >
-> For recommendations and best practices for modernizing your applications, we recommend [GitHub Copilot app modernization](https://learn.microsoft.com/azure/developer/github-copilot-app-modernization/).
+> For recommendations and best practices for modernizing your applications, we recommend [GitHub Copilot modernization](https://aka.ms/ghcp-modernization).
 
 # Reliable web app pattern for .NET
 
